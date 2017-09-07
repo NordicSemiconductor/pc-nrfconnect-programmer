@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Hello should render component with custom title 1`] = `
+<h3>
+  Test title
+</h3>
+`;
+
+exports[`Hello should render component with default title 1`] = `
+<h3>
+  default title
+</h3>
+`;

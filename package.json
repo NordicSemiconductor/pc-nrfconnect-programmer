@@ -1,0 +1,44 @@
+{
+  "name": "pc-nrfconnect-programmer",
+  "version": "1.0.0",
+  "description": "Program a Nordic SoC with a .hex file from nRF Connect",
+  "displayName": "nRF Programmer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer.git"
+  },
+  "author": "Nordic Semiconductor ASA",
+  "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "nrfconnect": "2.x"
+  },
+  "main": "dist/bundle.js",
+  "files": [
+    "dist/",
+    "icon.png",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "webpack --watch",
+    "webpack": "webpack",
+    "build": "cross-env NODE_ENV=production webpack",
+    "lint": "eslint components reducers index.jsx",
+    "lintfix": "eslint --fix components reducers index.jsx",
+    "test": "jest --testResultsProcessor jest-bamboo-formatter",
+    "test-watch": "jest --watch",
+    "clean": "npm install rimraf && npm run clean-dist && npm run clean-modules",
+    "clean-dist": "rimraf dist",
+    "clean-modules": "rimraf \"node_modules/!(rimraf|.bin)\""
+  },
+  "devDependencies": {
+    "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.0.0"
+  },
+  "dependencies": {
+    "nrf-intel-hex": "^0.1.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "nrfconnect/core": "<rootDir>/mocks/coreMock.js"
+    }
+  }
+}
