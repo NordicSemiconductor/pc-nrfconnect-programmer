@@ -22,8 +22,8 @@
     "dev": "webpack --watch",
     "webpack": "webpack",
     "build": "cross-env NODE_ENV=production webpack",
-    "lint": "eslint components reducers index.jsx",
-    "lintfix": "eslint --fix components reducers index.jsx",
+    "lint": "eslint components/*.js reducers index.jsx actions hexpad.js",
+    "lintfix": "eslint --fix components/*.js reducers index.jsx actions hexpad.js",
     "test": "jest --testResultsProcessor jest-bamboo-formatter",
     "test-watch": "jest --watch",
     "clean": "npm install rimraf && npm run clean-dist && npm run clean-modules",
@@ -31,10 +31,11 @@
     "clean-modules": "rimraf \"node_modules/!(rimraf|.bin)\""
   },
   "devDependencies": {
+    "babel-loader": "^7.1.2",
     "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.0.0"
   },
   "dependencies": {
-    "nrf-intel-hex": "^0.1.0"
+    "nrf-intel-hex": "^0.2.0"
   },
   "jest": {
     "moduleNameMapper": {

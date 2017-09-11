@@ -1,8 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { overlapBlockSets } from 'nrf-intel-hex';
+
+// Colours from:
+// https://github.com/d3/d3-scale-chromatic
+// https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Dark2.js
+
+// const colours = [
+//     "#1b9e77",
+//     "#d95f02",
+//     "#7570b3",
+//     "#e7298a",
+//     "#66a61e",
+//     "#e6ab02",
+//     "#a6761d",
+//     "#666666"
+// ];
+
 /* eslint no-param-reassign: "off" */
-function drawMemoryLayoutDiagram(container, blocks, writtenAddress, max) {
+function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddress, max) {
     const min = 0x0;
     const labelStep = 0x10000;
 
@@ -53,12 +70,12 @@ function drawMemoryLayoutDiagram(container, blocks, writtenAddress, max) {
 
     const blocksWrapper = document.createElement('div');
     blocksWrapper.style.position = 'absolute';
-    blocksWrapper.style.height = `100%`;
-    blocksWrapper.style.width = `100%`;
+    blocksWrapper.style.height = '100%';
+    blocksWrapper.style.width = '100%';
     blocksWrapper.style.overflow = 'hidden';
     container.append(blocksWrapper);
 
-    function drawBlock(address, blockSize, colour) {
+    function drawBlock(address, blockSize, colours) {
         if ((address + blockSize) > min && address < max) {
             const block = document.createElement('div');
             block.style.position = 'absolute';
@@ -66,8 +83,23 @@ function drawMemoryLayoutDiagram(container, blocks, writtenAddress, max) {
             block.style.bottom = `${(100 * address) / max}%`;
             block.style.left = '25%';
             block.style.right = '25%';
-            block.style.background = colour;
             block.style.minHeight = '2px';
+
+            if (colours.length === 1) {
+                block.style.background = colours;
+            } else {
+                const gradientStops = [];
+                let gradientPx = 0;
+                for (const colour of colours) {
+                    gradientStops.push(`${colour} ${gradientPx}px`);
+                    gradientPx += 20;
+                    gradientStops.push(`${colour} ${gradientPx}px`);
+                }
+
+                block.style.background = `repeating-linear-gradient(45deg, ${
+                    gradientStops.join(',')})`;
+            }
+
 
     //         border.setAttribute('width', 50);
     //         border.setAttribute('height', 100 * blockSize / max);
@@ -130,25 +162,45 @@ function drawMemoryLayoutDiagram(container, blocks, writtenAddress, max) {
         container.append(label);
     }
 
-    const addresses = Array.from(blocks.keys());
-    for (let i = 0, l = addresses.length; i < l; i += 1) {
-        const address = addresses[i];
-        const blockSize = blocks.get(address).length;
+    const overlaps = overlapBlockSets(blockSets);
+
+    console.log(overlaps);
+
+    for (const [address, overlap] of overlaps) {
+        let blockSize = 0;
+        const blockColours = [];
+
+        for (const [filename, bytes] of overlap) {
+            blockSize = bytes.length;
+//             if (colour) {
+//                 console.log('FIXME: Should display several overlapping colours');
+//             }
+            blockColours.push(fileColours.get(filename));
+        }
+        // / TODO: fetch colours for this block or overlap
+
+
+//         const blockSize = blocks.get(address).length;
         if (writtenAddress > address) {
             const size = Math.min(writtenAddress - address, blockSize);
-            drawBlock(address, size, '#cc4040');
+            drawBlock(address, size, ['#cc4040']);
         }
         if (writtenAddress < (address + blockSize)) {
             const start = Math.max(writtenAddress, address);
             const size = (address + blockSize) - start;
-            drawBlock(start, size, '#473d73');
+            drawBlock(start, size, blockColours);
         }
     }
+
+//     const addresses = Array.from(blocks.keys());
+//     for (let i = 0, l = addresses.length; i < l; i += 1) {
+//         const address = addresses[i];
+//     }
 }
 
 
 const MemoryLayout = props => {
-    const { targetSize, blocks, fileError, writtenAddress } = props;
+    const { targetSize, blocks, fileError, fileColours, writtenAddress } = props;
 
     if (fileError) {
         return (
@@ -156,13 +208,25 @@ const MemoryLayout = props => {
         );
     }
     return (
-        <div ref={el => { drawMemoryLayoutDiagram(el, blocks, writtenAddress, targetSize); }} />
+        <div ref={
+            el => {
+                drawMemoryLayoutDiagram(
+                el,
+                blocks,
+                fileColours,
+                writtenAddress,
+                targetSize,
+            );
+            }
+        }
+        />
     );
 };
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
     blocks: PropTypes.instanceOf(Map),
+    fileColours: PropTypes.instanceOf(Map),
     writtenAddress: PropTypes.number,
     fileError: PropTypes.string,
 };
@@ -171,6 +235,7 @@ MemoryLayout.defaultProps = {
 //     targetSize: 0x100000,  // 1MiB
     targetSize: 0x080000,  // 0.5MiB
     blocks: new Map(),
+    fileColours: new Map(),
     writtenAddress: 0,  // From 0 to here will be assumed written, from here to the top pending
     fileError: null,
 };
