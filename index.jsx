@@ -41,6 +41,7 @@ import MemoryLayout from './components/MemoryLayout';
 import FileLegend from './components/FileLegend';
 import * as fileActions from './actions/files';
 import * as jprogActions from './actions/jprog';
+import appReducer from './reducers/appReducer';
 
 import './resources/css/index.less';
 
@@ -97,98 +98,7 @@ export default {
             dispatch({ type: 'empty-files' });
         },
     }),
-    reduceApp: (state = {
-        blocks: new Map(),
-        fileError: null,
-        targetSize: 0x00100000,  // 1MiB. TODO: Set a saner default?
-        targetPort: null,
-        writtenAddress: 0,
-        filenames: [],
-        fileColours: new Map(),
-    }, action) => {
-        const colours = [
-            '#b3e2cd',
-            '#fdcdac',
-            '#cbd5e8',
-            '#f4cae4',
-            '#e6f5c9',
-            '#fff2ae',
-            '#f1e2cc',
-            '#cccccc',
-        ];
-
-        switch (action.type) {
-            case 'SERIAL_PORT_SELECTED':
-                return {
-                    ...state,
-                    targetPort: action.port.comName,
-                    targetSerialNumber: action.port.serialNumber,
-                    writtenAddress: 0,
-                };
-            case 'target-size-known':
-                // Fetching target's flash size is async, armor against race conditions
-                if (action.targetPort !== state.targetPort) {
-                    return state;
-                }
-                return {
-                    ...state,
-                    targetSize: action.targetSize,
-                    targetPageSize: action.targetPageSize,
-                };
-            case 'empty-files':
-                return {
-                    ...state,
-//                     fileError: action.fileError,
-//                     blocks: new Map(),
-                    filenames: [],
-                    fileColours: new Map(),
-                    blocks: new Map(),
-                };
-            case 'file-error':
-                return {
-                    ...state,
-                    fileError: action.fileError,
-//                     blocks: new Map(),
-//                     filenames: [],
-                };
-            case 'file-parse':
-
-                // Colours from:
-                // https://github.com/d3/d3-scale-chromatic
-                // https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Dark2.js
-//                 const colours = [
-//                     "#1b9e77",
-//                     "#d95f02",
-//                     "#7570b3",
-//                     "#e7298a",
-//                     "#66a61e",
-//                     "#e6ab02",
-//                     "#a6761d",
-//                     "#666666"
-//                 ];
-
-//                 https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Pastel2.js
-
-                return {
-                    ...state,
-                    fileError: null,
-                    blocks: state.blocks.set(action.filename, action.blocks),
-                    filenames: [...state.filenames, action.filename],
-                    fileColours: state.fileColours.set(
-                        action.filename,
-                        colours[(state.blocks.size - 1) % 8],
-                    ),
-                    writtenAddress: 0,
-                };
-            case 'write-progress':
-                return {
-                    ...state,
-                    writtenAddress: action.address,
-                };
-            default:
-                return state;
-        }
-    },
+    reduceApp: appReducer,
     middleware: store => next => action => { // eslint-disable-line
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
