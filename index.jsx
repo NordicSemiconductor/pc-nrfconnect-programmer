@@ -38,7 +38,7 @@ import React from 'react';
 import { logger } from 'nrfconnect/core';
 
 import MemoryLayout from './components/MemoryLayout';
-import FileLegend from './components/FileLegend';
+import ControlPanel from './components/ControlPanel';
 import * as fileActions from './actions/files';
 import * as jprogActions from './actions/jprog';
 import appReducer from './reducers/appReducer';
@@ -50,7 +50,7 @@ import './resources/css/index.less';
 export default {
     decorateMainView: MainView => (
         props => (
-            <MainView {...props}>
+            <MainView>
                 <MemoryLayout {...props} />
             </MainView>
         )
@@ -65,22 +65,11 @@ export default {
         fileColours: state.app.fileColours,
     }),
     decorateSidePanel: SidePanel => (
-        props => {
-            console.log('decorateSidePanel', props);
-            return (
-                <SidePanel {...props}>
-                    <button onClick={props.closeFiles}>Clear loaded files</button>
-                    <button onClick={props.openFileDialog}>Add a .hex file...</button>
-                    <button disabled="disabled" style={{ color: 'graytext' }}>Add a recent .hex file...</button>
-                    <button disabled="disabled" style={{ color: 'graytext' }}>Add last files written to this device</button>
-                    <button disabled="disabled" style={{ color: 'graytext' }}>Reload .hex files</button>
-
-                    <FileLegend fileColours={props.fileColours} />
-
-                    <button onClick={props.performWrite}>Write all to devkit</button>
-                </SidePanel>
-            );
-        }
+        props => (
+            <SidePanel>
+                <ControlPanel {...props} />
+            </SidePanel>
+        )
     ),
     mapSidePanelState: (state, props) => ({
         ...props,
