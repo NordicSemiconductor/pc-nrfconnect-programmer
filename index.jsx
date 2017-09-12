@@ -88,11 +88,9 @@ export default {
     }),
     mapSidePanelDispatch: (dispatch, props) => ({
         ...props,
-        openFileDialog: fileActions.openFileDialog(dispatch),
+        openFileDialog: () => dispatch(fileActions.openFileDialog()),
         performWrite: () => {
-            dispatch({
-                type: 'start-write',
-            });
+            dispatch({ type: 'start-write' });
         },
         closeFiles: () => {
             dispatch({ type: 'empty-files' });
@@ -102,11 +100,10 @@ export default {
     middleware: store => next => action => { // eslint-disable-line
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                jprogActions.logDeviceInfo(
+                store.dispatch(jprogActions.logDeviceInfo(
                     action.port.serialNumber,
                     action.port.comName,
-                    store.dispatch,
-                );
+                ));
 
                 next(action);
                 break;
@@ -116,7 +113,7 @@ export default {
                 if (state.app.blocks.size === 0) { return; }
                 if (state.app.writtenAddress !== 0) { return; }
 
-                jprogActions.write(state.app, store.dispatch);
+                store.dispatch(jprogActions.write(state.app));
 
                 next(action);
                 break;

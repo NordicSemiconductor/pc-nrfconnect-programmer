@@ -3,13 +3,10 @@ import { basename } from 'path';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import { hexToArrays } from 'nrf-intel-hex';
-
-
 import hexpad from '../hexpad';
 
-
-export function openFileDialog(dispatch) {
-    return function openFileDialogClosure() {
+export function openFileDialog() {
+    return dispatch => {
         electron.remote.dialog.showOpenDialog(/* window */undefined, {
             title: 'Select a .hex file',
             filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
