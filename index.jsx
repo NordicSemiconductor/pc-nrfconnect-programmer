@@ -35,9 +35,7 @@
  */
 
 import React from 'react';
-// import electron from 'electron';
 import { logger } from 'nrfconnect/core';
-// import nrfjprog from 'pc-nrfjprog-js';
 
 import MemoryLayout from './components/MemoryLayout';
 import FileLegend from './components/FileLegend';
@@ -48,85 +46,13 @@ import './resources/css/index.less';
 
 /* eslint-disable react/prop-types */
 
-/**
- * In this boilerplate app, we show a "dummy" implementation of all available
- * functions. By implementing one or more of the functions below, you can
- * add your own behavior.
- *
- * All of these functions are optional. You could just export an empty object
- * here if you want to start from scratch with the default behavior.
- */
 export default {
-    onInit: () => {
-        logger.info('App initializing');
-    },
-    onReady: () => {
-        logger.info('App initialized');
-    },
-    decorateFirmwareDialog: FirmwareDialog => (
-        props => (
-            <FirmwareDialog {...props} />
-        )
-    ),
-    mapFirmwareDialogState: (state, props) => ({
-        ...props,
-    }),
-    mapFirmwareDialogDispatch: (dispatch, props) => ({
-        ...props,
-    }),
-    decorateLogEntry: LogEntry => (
-        props => (
-            <LogEntry {...props} />
-        )
-    ),
-    decorateLogHeader: LogHeader => (
-        props => (
-            <LogHeader {...props} />
-        )
-    ),
-    mapLogHeaderState: (state, props) => ({
-        ...props,
-    }),
-    mapLogHeaderDispatch: (dispatch, props) => ({
-        ...props,
-    }),
-    decorateLogHeaderButton: LogHeaderButton => (
-        props => (
-            <LogHeaderButton {...props} />
-        )
-    ),
-    decorateLogViewer: LogViewer => (
-        props => (
-            <LogViewer {...props} />
-        )
-    ),
-    mapLogViewerState: (state, props) => ({
-        ...props,
-    }),
-    mapLogViewerDispatch: (dispatch, props) => ({
-        ...props,
-    }),
     decorateMainView: MainView => (
-        props =>
-//             const { title } = props;
-//             let buttonText = 'Select another .hex file';
-//             let filenames = props.filenames;
-//
-//             if (!filenames || !(filenames.length)) {
-// //                 filenames = ['No .hex file selected'];
-//                 buttonText = 'Select a .hex file';
-//             }
-
-//             let filenameLabels = filenames.map(f => (<div>{f}</div>));
-
-//                     <div>{filenameLabels}</div>
-//                     <FileLegend {...props} />
-//                     <button onClick={props.performWrite}>Write</button>
-             (
-                 <MainView {...props}>
-                     <MemoryLayout {...props} />
-                 </MainView>
-            )
+        props => (
+            <MainView {...props}>
+                <MemoryLayout {...props} />
+            </MainView>
+        )
     ),
     mapMainViewState: (state, props) => ({
         ...props,
@@ -137,57 +63,6 @@ export default {
         writtenAddress: state.app.writtenAddress,
         fileColours: state.app.fileColours,
     }),
-    mapMainViewDispatch: (dispatch, props) => ({
-        ...props,
-//         openFileDialog: fileActions.openFileDialog(dispatch),
-//         performWrite: () => {
-//             dispatch({
-//                 type: 'start-write',
-//             });
-//         },
-    }),
-    decorateNavBar: NavBar => (
-        props => (
-            <NavBar {...props} />
-        )
-    ),
-    decorateNavMenu: NavMenu => (
-        props => (
-            <NavMenu
-                {...props}
-                menuItems={[
-//                     { id: 'about', text: 'About', iconClass: 'icon-star' },
-                ]}
-            />
-        )
-    ),
-    mapNavMenuState: (state, props) => ({
-        ...props,
-    }),
-    mapNavMenuDispatch: (dispatch, props) => ({
-        ...props,
-        onItemSelected: item => logger.info(`Selected ${item}`),
-    }),
-    decorateNavMenuItem: NavMenuItem => (
-        props => (
-            <NavMenuItem {...props} />
-        )
-    ),
-    decorateSerialPortSelector: SerialPortSelector => (
-        props => (
-            <SerialPortSelector {...props} />
-        )
-    ),
-
-
-    mapSerialPortSelectorState: (state, props) => ({
-        ...props,
-    }),
-    mapSerialPortSelectorDispatch: (dispatch, props) => ({
-        ...props,
-    }),
-
-
     decorateSidePanel: SidePanel => (
         props => {
             console.log('decorateSidePanel', props);
@@ -206,12 +81,10 @@ export default {
             );
         }
     ),
-    mapSidePanelState: (state, props) =>
-//         console.log('mapSidePanelState', state.app.fileColours);
-         ({
-             ...props,
-             fileColours: state.app.fileColours.entries(),
-         }),
+    mapSidePanelState: (state, props) => ({
+        ...props,
+        fileColours: state.app.fileColours.entries(),
+    }),
     mapSidePanelDispatch: (dispatch, props) => ({
         ...props,
         openFileDialog: fileActions.openFileDialog(dispatch),
@@ -224,9 +97,6 @@ export default {
             dispatch({ type: 'empty-files' });
         },
     }),
-
-
-    // Note: initial state of the application needs to be provided
     reduceApp: (state = {
         blocks: new Map(),
         fileError: null,
