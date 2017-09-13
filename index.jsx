@@ -236,6 +236,23 @@ export default {
         filenames: [],
         fileColours: new Map(),
     }, action) => {
+
+        // Colours from:
+        // https://github.com/d3/d3-scale-chromatic
+        // https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Dark2.js
+//                 const colours = [
+//                     "#1b9e77",
+//                     "#d95f02",
+//                     "#7570b3",
+//                     "#e7298a",
+//                     "#66a61e",
+//                     "#e6ab02",
+//                     "#a6761d",
+//                     "#666666"
+//                 ];
+
+//                 https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Pastel2.js
+
         const colours = [
             '#b3e2cd',
             '#fdcdac',
@@ -282,23 +299,6 @@ export default {
 //                     filenames: [],
                 };
             case 'file-parse':
-
-                // Colours from:
-                // https://github.com/d3/d3-scale-chromatic
-                // https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Dark2.js
-//                 const colours = [
-//                     "#1b9e77",
-//                     "#d95f02",
-//                     "#7570b3",
-//                     "#e7298a",
-//                     "#66a61e",
-//                     "#e6ab02",
-//                     "#a6761d",
-//                     "#666666"
-//                 ];
-
-//                 https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Pastel2.js
-
                 return {
                     ...state,
                     fileError: null,

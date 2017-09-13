@@ -1,7 +1,7 @@
 
 import { logger } from 'nrfconnect/core';
 import nrfjprog from 'pc-nrfjprog-js';
-import { overlapBlockSets } from 'nrf-intel-hex';
+import { overlapBlockSets, flattenOverlaps, paginate } from 'nrf-intel-hex';
 
 
 import hexpad from '../hexpad';
@@ -57,49 +57,35 @@ export function logDeviceInfo(serialNumber, comName, dispatch) {
 }
 
 
-function writeBlock(appState, dispatch) {
+function writeBlock(serialNumber, pages, dispatch) {
 
     let written = 0;
     let erased = 0;
-//                 const writeSize = 64 * 1024;
-    const pageSize = appState.targetPageSize;
 
-    const overlaps = overlapBlockSets(appState.blocks);
+    let pageWriteCalls = Array.from(pages.entries()).map(([address, page])=>{
+        return function(callback) {
+            const pageStart = address;
+            const pageSize = page.length;
+            const pageEnd = pageStart + pageSize;
 
+            console.log(`Erasing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
+            logger.info(`Erasing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
 
-    return function writeBlockClosure() {
-//         const addresses = Array.from(appState.blocks.keys());
+            nrfjprog.erase(serialNumber, {
+                erase_mode: nrfjprog.ERASE_PAGES_INCLUDING_UICR,
+                start_address: pageStart,
+                start_adress: pageStart,   // / Legacy (bugged) property name, see https://github.com/NordicSemiconductor/pc-nrfjprog-js/pull/7
+                end_address: pageEnd,
+            }, err => {
+                if (err) {
+                    console.error(err);
+                    console.error(err.log);
+                    logger.error(err.log);
+                } else {
+                    console.log(`Writing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
+                    logger.info(`Writing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
 
-        for (const [address, overlap ] of overlaps) {
-            const blockStart = address;
-//             const block = appState.blocks.get(blockStart);
-            const block = overlap[ overlap.length - 1 ][1];
-            const blockSize = block.length;
-            const blockEnd = blockStart + blockSize;
-
-            if (written < blockEnd) {
-                const increment = Math.min(pageSize, blockEnd - written);
-                const writeStart = Math.max(blockStart, written);
-                written = writeStart + increment;
-
-                const formattedStart = hexpad(writeStart);
-// const formattedEnd = written.toString(16).toUpperCase().padStart(8, '0');
-// const formattedIncrement = increment.toString(16).toUpperCase().padStart(8, '0');
-
-                const subBlock = Array.from(block.subarray(
-                    writeStart - blockStart,
-                    (writeStart - blockStart) + increment,
-                ));
-
-                const formattedSubblockSize = hexpad(subBlock.length);
-                const formattedEnd = hexpad((writeStart + subBlock.length) - 1);
-                const serialNumber = appState.targetSerialNumber;
-
-                function writeRaw() {
-                    console.log(`Writing at 0x${formattedStart}-0x${formattedEnd}, 0x${formattedSubblockSize}bytes`);
-                    logger.info(`Writing at 0x${formattedStart}-0x${formattedEnd}, 0x${formattedSubblockSize}bytes`);
-
-                    nrfjprog.write(serialNumber, writeStart, subBlock, err => {
+                    nrfjprog.write(serialNumber, pageStart, Array.from(page), err => {
                         if (err) {
                             console.error(err);
                             console.error(err.log);
@@ -107,51 +93,33 @@ function writeBlock(appState, dispatch) {
                         } else {
                             dispatch({
                                 type: 'write-progress',
-                                address: written,
+                                address: pageEnd,
                             });
 
-                            requestAnimationFrame(() => { writeBlockClosure(); });
-//                         setTimeout(()=>{ writeBlockClosure(); }, 3000);
+                            requestAnimationFrame(() => { callback(); });
+//                             requestAnimationFrame(() => { writeBlockClosure(); });
                         }
                     });
                 }
+            });
+        }
+    });
 
-//             setTimeout(fake4KiB, 250);
+    return function writeBlockClosure() {
+//         const addresses = Array.from(appState.blocks.keys());
 
-                if (erased > written) {
-                    writeRaw();
-                } else {
-                    const eraseStart = writeStart - (writeStart % pageSize);
-                    erased = (blockEnd - (blockEnd % pageSize)) + (pageSize - 1);
+        let pageWriteCall = pageWriteCalls.shift();
 
-                    const formattedEraseStart = eraseStart.toString(16).toUpperCase().padStart(8, '0');
-                    const formattedEraseEnd = erased.toString(16).toUpperCase().padStart(8, '0');
-                    console.log(`Erasing 0x${formattedEraseStart}-0x${formattedEraseEnd}`);
-                    logger.info(`Erasing 0x${formattedEraseStart}-0x${formattedEraseEnd}`);
-
-                    nrfjprog.erase(serialNumber, {
-                        erase_mode: nrfjprog.ERASE_PAGES_INCLUDING_UICR,
-                        start_address: eraseStart,
-                        start_adress: eraseStart,   // / Legacy (bugged) property name, see https://github.com/NordicSemiconductor/pc-nrfjprog-js/pull/7
-                        end_address: erased,
-                    }, err => {
-                        if (err) {
-                            console.error(err);
-                            console.error(err.log);
-                            logger.error(err.log);
-                        } else {
-                            writeRaw();
-                        }
-                    });
-                }
-
-                return;
-            }
+        if (!pageWriteCall) {
+            console.log('Finished erasing/writing.');
+            console.log('Finished erasing/writing.');
+            dispatch({
+                type: 'write-progress-finished',
+            });
+        } else {
+            pageWriteCall(writeBlockClosure);
         }
 
-        dispatch({
-            type: 'write-progress-finished',
-        });
     }
 }
 
@@ -161,7 +129,15 @@ export function write(appState, dispatch) {
     // / FIXME: Store a copy of the currently connected s/n, to prevent race conditions
     // / Alternatively, disable the devkit drop-down while a write is in progress.
 
-    let writeBlockClosure = writeBlock(appState, dispatch);
+    const serialNumber = appState.targetSerialNumber;
+    const pages = paginate(
+                    flattenOverlaps(
+                        overlapBlockSets(appState.blocks)
+                    ), appState.targetPageSize);
+
+console.log(pages);
+
+    let writeBlockClosure = writeBlock(serialNumber, pages, dispatch);
 
     writeBlockClosure();
 }
