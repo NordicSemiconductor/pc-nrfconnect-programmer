@@ -35,7 +35,7 @@
  */
 
 import React from 'react';
-import { logger } from 'nrfconnect/core';
+// import { logger } from 'nrfconnect/core';
 
 import MemoryLayout from './components/MemoryLayout';
 import ControlPanel from './components/ControlPanel';

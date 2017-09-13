@@ -42,7 +42,8 @@ function getDeviceModel(deviceInfo) {
         },
     };
 
-    if (deviceInfo.family in deviceModels && deviceInfo.deviceType in deviceModels[deviceInfo.family]) {
+    if (deviceInfo.family in deviceModels &&
+        deviceInfo.deviceType in deviceModels[deviceInfo.family]) {
         return deviceModels[deviceInfo.family][deviceInfo.deviceType];
     }
     return 'Unknown model';
@@ -74,12 +75,8 @@ export function logDeviceInfo(serialNumber, comName) {
 }
 
 function writeBlock(serialNumber, pages, dispatch) {
-
-    let written = 0;
-    let erased = 0;
-
-    let pageWriteCalls = Array.from(pages.entries()).map(([address, page])=>{
-        return function(callback) {
+    const pageWriteCalls = Array.from(pages.entries()).map(
+        ([address, page]) => function writeOnePage(callback) {
             const pageStart = address;
             const pageSize = page.length;
             const pageEnd = pageStart + pageSize;
@@ -90,7 +87,8 @@ function writeBlock(serialNumber, pages, dispatch) {
             nrfjprog.erase(serialNumber, {
                 erase_mode: nrfjprog.ERASE_PAGES_INCLUDING_UICR,
                 start_address: pageStart,
-                start_adress: pageStart,   // / Legacy (bugged) property name, see https://github.com/NordicSemiconductor/pc-nrfjprog-js/pull/7
+                // Legacy (bugged) property name, see https://github.com/NordicSemiconductor/pc-nrfjprog-js/pull/7
+                start_adress: pageStart,
                 end_address: pageEnd,
             }, err => {
                 if (err) {
@@ -101,11 +99,11 @@ function writeBlock(serialNumber, pages, dispatch) {
                     console.log(`Writing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
                     logger.info(`Writing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
 
-                    nrfjprog.write(serialNumber, pageStart, Array.from(page), err => {
-                        if (err) {
-                            console.error(err);
-                            console.error(err.log);
-                            logger.error(err);
+                    nrfjprog.write(serialNumber, pageStart, Array.from(page), err2 => {
+                        if (err2) {
+                            console.error(err2);
+                            console.error(err2.log);
+                            logger.error(err2);
                         } else {
                             dispatch({
                                 type: 'write-progress',
@@ -113,18 +111,18 @@ function writeBlock(serialNumber, pages, dispatch) {
                             });
 
                             requestAnimationFrame(() => { callback(); });
-//                             requestAnimationFrame(() => { writeBlockClosure(); });
+    //                             requestAnimationFrame(() => { writeBlockClosure(); });
                         }
                     });
                 }
             });
-        }
-    });
+        },
+    );
 
     return function writeBlockClosure() {
 //         const addresses = Array.from(appState.blocks.keys());
 
-        let pageWriteCall = pageWriteCalls.shift();
+        const pageWriteCall = pageWriteCalls.shift();
 
         if (!pageWriteCall) {
             console.log('Finished erasing/writing.');
@@ -135,8 +133,7 @@ function writeBlock(serialNumber, pages, dispatch) {
         } else {
             pageWriteCall(writeBlockClosure);
         }
-
-    }
+    };
 }
 
 
@@ -148,15 +145,15 @@ export function write(appState) {
         const serialNumber = appState.targetSerialNumber;
         const pages = paginate(
                         flattenOverlaps(
-                            overlapBlockSets(appState.blocks)
+                            overlapBlockSets(appState.blocks),
                         ), appState.targetPageSize);
 
-    console.log(pages);
-    console.log(arraysToHex(pages, 32));
+        console.log(pages);
+        console.log(arraysToHex(pages, 32));
 
-        let writeBlockClosure = writeBlock(serialNumber, pages, dispatch);
+        const writeBlockClosure = writeBlock(serialNumber, pages, dispatch);
 
         writeBlockClosure();
-    }
+    };
 }
 
