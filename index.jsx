@@ -81,6 +81,9 @@ export default {
         performWrite: () => {
             dispatch({ type: 'start-write' });
         },
+        performRecover: () => {
+            dispatch({ type: 'start-recover' });
+        },
         closeFiles: () => {
             dispatch({ type: 'empty-files' });
         },
@@ -104,6 +107,12 @@ export default {
                 if (state.app.writtenAddress !== 0) { return; }
 
                 store.dispatch(jprogActions.write(state.app));
+
+                next(action);
+                break;
+            }
+            case 'start-recover' : {
+                store.dispatch(jprogActions.recover(store.getState().app));
 
                 next(action);
                 break;

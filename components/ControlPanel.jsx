@@ -49,6 +49,8 @@ const ControlPanel = props => (
         <FileLegend fileColours={props.fileColours} />
 
         <button onClick={props.performWrite}>Write all to devkit</button>
+
+        <button onClick={props.performRecover}>Recover (full erase)</button>
     </div>
 );
 
