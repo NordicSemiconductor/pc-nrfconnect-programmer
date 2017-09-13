@@ -86,6 +86,7 @@ export default {
         },
     }),
     reduceApp: appReducer,
+
     middleware: store => next => action => { // eslint-disable-line
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
