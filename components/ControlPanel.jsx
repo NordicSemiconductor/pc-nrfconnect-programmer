@@ -36,20 +36,27 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import FileLegend from './FileLegend';
 
-const Hello = props => {
-    const { title } = props;
-    return (
-        <h3>{ title }</h3>
-    );
+const ControlPanel = props => (
+    <div>
+        <button onClick={props.closeFiles}>Clear loaded files</button>
+        <button onClick={props.openFileDialog}>Add a .hex file...</button>
+        <button disabled="disabled" style={{ color: 'graytext' }}>Add a recent .hex file...</button>
+        <button disabled="disabled" style={{ color: 'graytext' }}>Add last files written to this device</button>
+        <button disabled="disabled" style={{ color: 'graytext' }}>Reload .hex files</button>
+
+        <FileLegend fileColours={props.fileColours} />
+
+        <button onClick={props.performWrite}>Write all to devkit</button>
+    </div>
+);
+
+ControlPanel.propTypes = {
+    closeFiles: PropTypes.func.isRequired,
+    openFileDialog: PropTypes.func.isRequired,
+    performWrite: PropTypes.func.isRequired,
+    fileColours: PropTypes.instanceOf(Map).isRequired,
 };
 
-Hello.propTypes = {
-    title: PropTypes.string,
-};
-
-Hello.defaultProps = {
-    title: 'default title',
-};
-
-export default Hello;
+export default ControlPanel;
