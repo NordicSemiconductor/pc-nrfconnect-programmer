@@ -48,9 +48,34 @@ import './resources/css/index.less';
 
 const persistentStore = new Store();
 
+
+
+
+
 /* eslint-disable react/prop-types */
 
 export default {
+    onInit: (dispatch) => {
+
+        document.ondragover = document.ondrop = (ev) => {
+            ev.preventDefault();
+        }
+
+        document.body.ondrop = (ev) => {
+            Array.from(ev.dataTransfer.files).forEach((i)=>fileActions.openFile(i.path)(dispatch));
+
+            console.log('drag-and-drop: ', ev.dataTransfer.files);
+            console.log('drag-and-drop: ', ev.dataTransfer.files[0].path);
+            ev.preventDefault();
+
+
+        }
+
+//         logger.info('App initializing');
+    },
+    onReady: () => {
+//         logger.info('App initialized');
+    },
     decorateMainView: MainView => (
         props => (
             <MainView>
@@ -141,7 +166,6 @@ export default {
 
                     console.log('MRU files are:', persistentStore.get('mruFiles'));
                 }
-
 
                 next(action);
                 break;
