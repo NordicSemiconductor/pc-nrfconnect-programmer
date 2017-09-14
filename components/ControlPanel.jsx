@@ -50,14 +50,16 @@ const ControlPanel = props => {
 
     const overlaps = overlapBlockSets(props.blocks);
     console.log(overlaps);
-//     let overlapWarning = "";
-//     for (const [address, overlap] of overlaps) {
-//         if (overlaps.length > 1) {
-//             overlapWarning = (<div>
-//                 Some of the .hex files have overlapping data
-//             </div>);
-//         }
-//     }
+    let overlapWarning = "";
+    for (const [address, overlap] of overlaps) {
+        if (overlap.length > 1) {
+            overlapWarning = (<div className="alert alert-warning">
+                <center><Glyphicon glyph='warning-sign' style={{ fontSize: '3em' }}/></center>
+                <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
+                <p>In regions with overlapping data, data from the file which was <strong>last</strong> added will be used.</p>
+            </div>);
+        }
+    }
 
 
     let mruMenuItems;
@@ -72,7 +74,6 @@ const ControlPanel = props => {
 
 //             <button onClick={props.openFileDialog}>Add .hex files...</button>
 //             <Button disabled="disabled" style={{ color: 'graytext' }}>Add last files written to this device</Button>
-//             { overlapWarning }
 
     return (
         <div>
@@ -95,6 +96,7 @@ const ControlPanel = props => {
 
             <FileLegend fileColours={props.fileColours} />
 
+            { overlapWarning }
 
             <Button onClick={props.performWrite} disabled={ !props.targetIsReady }>
                 <Glyphicon glyph='flash' />Write all to devkit
