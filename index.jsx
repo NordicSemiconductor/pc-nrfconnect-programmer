@@ -36,6 +36,7 @@
 
 import React from 'react';
 // import { logger } from 'nrfconnect/core';
+import Store from 'electron-store';
 
 import MemoryLayout from './components/MemoryLayout';
 import ControlPanel from './components/ControlPanel';
@@ -44,6 +45,8 @@ import * as jprogActions from './actions/jprog';
 import appReducer from './reducers/appReducer';
 
 import './resources/css/index.less';
+
+const persistentStore = new Store();
 
 /* eslint-disable react/prop-types */
 
@@ -74,10 +77,15 @@ export default {
     mapSidePanelState: (state, props) => ({
         ...props,
         fileColours: state.app.fileColours.entries(),
+//         fileColours: state.app.fileColours,
+        mruFiles: state.app.mruFiles,
+        targetIsReady: state.app.targetIsReady,
+        blocks: state.app.blocks
     }),
     mapSidePanelDispatch: (dispatch, props) => ({
         ...props,
         openFileDialog: () => dispatch(fileActions.openFileDialog()),
+        openFile: (filename)=> dispatch(fileActions.openFile(filename)),
         performWrite: () => {
             dispatch({ type: 'start-write' });
         },
@@ -104,7 +112,7 @@ export default {
             case 'start-write' : {
                 const state = store.getState();
                 if (state.app.blocks.size === 0) { return; }
-                if (state.app.writtenAddress !== 0) { return; }
+//                 if (state.app.writtenAddress !== 0) { return; }
 
                 store.dispatch(jprogActions.write(state.app));
 
@@ -113,6 +121,27 @@ export default {
             }
             case 'start-recover' : {
                 store.dispatch(jprogActions.recover(store.getState().app));
+
+                next(action);
+                break;
+            }
+            case 'file-parse' : {
+
+                if (!persistentStore.get('mruFiles')) {
+                    persistentStore.set('mruFiles', []);
+                }
+
+                let mruFiles = persistentStore.get('mruFiles');
+                if (mruFiles.indexOf(action.fullFilename) === -1) {
+                    mruFiles.unshift(action.fullFilename);
+                    mruFiles.splice(10);
+                    persistentStore.set('mruFiles', mruFiles);
+
+                    store.getState().app.mruFiles = mruFiles;
+
+                    console.log('MRU files are:', persistentStore.get('mruFiles'));
+                }
+
 
                 next(action);
                 break;

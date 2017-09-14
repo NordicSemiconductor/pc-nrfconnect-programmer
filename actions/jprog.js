@@ -3,7 +3,7 @@ import { logger } from 'nrfconnect/core';
 import nrfjprog from 'pc-nrfjprog-js';
 import { overlapBlockSets, flattenOverlaps, paginate, arraysToHex } from 'nrf-intel-hex';
 
-import hexpad from '../hexpad';
+// import hexpad from '../hexpad';
 
 function getDeviceInfo(serialNumber) {
     return new Promise((resolve, reject) => {
@@ -166,6 +166,8 @@ function writeHex(serialNumber, hexString, dispatch) {
         console.log('Programming finished: ');
 //         logger.info(`Erasing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
 
+        logger.info('Write procedure finished');
+
         dispatch({
             type: 'write-progress-finished',
         });
@@ -194,6 +196,10 @@ export function write(appState) {
 //         const writeBlockClosure = writeBlock(serialNumber, pages, dispatch);
 //         writeBlockClosure();
 
+        dispatch({
+            type: 'write-progress-start',
+        });
+
         writeHex(serialNumber, arraysToHex(pages, 64), dispatch);
     };
 }
@@ -208,6 +214,10 @@ export function recover(appState) {
             return;
         }
 
+        dispatch({
+            type: 'write-progress-start',
+        });
+
         nrfjprog.recover(serialNumber, (progress)=>{
             console.log('Recovery progress: ', progress);
             logger.info(progress.process);
@@ -219,6 +229,8 @@ export function recover(appState) {
     //             logger.error(err.log);
                 return;
             }
+
+            logger.info('Recovery procedure finished');
 
             dispatch({
                 type: 'write-progress-finished',

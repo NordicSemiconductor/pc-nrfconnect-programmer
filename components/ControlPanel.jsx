@@ -35,30 +35,85 @@
  */
 
 import React from 'react';
+import { Button, Dropdown, MenuItem, Glyphicon } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { overlapBlockSets } from 'nrf-intel-hex';
+
 import FileLegend from './FileLegend';
 
-const ControlPanel = props => (
-    <div>
-        <button onClick={props.closeFiles}>Clear loaded files</button>
-        <button onClick={props.openFileDialog}>Add a .hex file...</button>
-        <button disabled="disabled" style={{ color: 'graytext' }}>Add a recent .hex file...</button>
-        <button disabled="disabled" style={{ color: 'graytext' }}>Add last files written to this device</button>
-        <button disabled="disabled" style={{ color: 'graytext' }}>Reload .hex files</button>
+const ControlPanel = props => {
 
-        <FileLegend fileColours={props.fileColours} />
 
-        <button onClick={props.performWrite}>Write all to devkit</button>
+//     function openRecent(, ev) {
+//         console.log('Open recent: ', ev.target.innerText);
+//     }
 
-        <button onClick={props.performRecover}>Recover (full erase)</button>
-    </div>
-);
+    const overlaps = overlapBlockSets(props.blocks);
+    console.log(overlaps);
+//     let overlapWarning = "";
+//     for (const [address, overlap] of overlaps) {
+//         if (overlaps.length > 1) {
+//             overlapWarning = (<div>
+//                 Some of the .hex files have overlapping data
+//             </div>);
+//         }
+//     }
+
+
+    let mruMenuItems;
+
+    if (props.mruFiles.length) {
+        mruMenuItems = props.mruFiles.map((filename)=>{
+            return (<MenuItem onSelect={ ()=>props.openFile(filename) }>{filename}</MenuItem>);
+        });
+    } else {
+        mruMenuItems = (<MenuItem disabled='disabled'>No recently used files</MenuItem>);
+    }
+
+//             <button onClick={props.openFileDialog}>Add .hex files...</button>
+//             <Button disabled="disabled" style={{ color: 'graytext' }}>Add last files written to this device</Button>
+//             { overlapWarning }
+
+    return (
+        <div>
+            <Button onClick={props.closeFiles}>
+                <Glyphicon glyph='folder-close' />Clear files
+            </Button>
+            <Dropdown pullRight={true}>
+                <Dropdown.Toggle>
+                    <Glyphicon glyph='folder-open' />Add a .hex file
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    { mruMenuItems }
+                    <MenuItem divider='divider' />
+                    <MenuItem onSelect={ props.openFileDialog }>Browse...</MenuItem>
+                </Dropdown.Menu>
+            </Dropdown>
+            <Button disabled="disabled" style={{ color: 'graytext' }}>
+                <Glyphicon glyph='refresh' />Reload .hex files
+            </Button>
+
+            <FileLegend fileColours={props.fileColours} />
+
+
+            <Button onClick={props.performWrite} disabled={ !props.targetIsReady }>
+                <Glyphicon glyph='flash' />Write all to devkit
+            </Button>
+
+            <Button onClick={props.performRecover} disabled={ !props.targetIsReady }>
+                <Glyphicon glyph='trash' />Recover (full erase)
+            </Button>
+        </div>
+    );
+}
 
 ControlPanel.propTypes = {
     closeFiles: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
+    performRecover: PropTypes.func.isRequired,
     fileColours: PropTypes.instanceOf(Map).isRequired,
+//     mruFiles: PropTypes.
 };
 
 export default ControlPanel;

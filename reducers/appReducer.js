@@ -34,6 +34,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import Store from 'electron-store';
+const persistentStore = new Store();
+
+
 // Colours from:
 // https://github.com/d3/d3-scale-chromatic
 const colours = [
@@ -52,9 +56,12 @@ const initialState = {
     fileError: null,
     targetSize: 0x00100000,  // 1MiB. TODO: Set a saner default?
     targetPort: null,
+    targetIsReady: false,   // Flag to denote that a devkit is busy (or unconnected)
     writtenAddress: 0,
     filenames: [],
     fileColours: new Map(),
+    fileModTimes: new Map(),
+    mruFiles: persistentStore.get('mruFiles') || []
 };
 
 export default function reducer(state = initialState, action) {
@@ -65,6 +72,7 @@ export default function reducer(state = initialState, action) {
                 targetPort: action.port.comName,
                 targetSerialNumber: action.port.serialNumber,
                 writtenAddress: 0,
+                targetIsReady: false,
             };
         case 'target-size-known':
             // Fetching target's flash size is async, armor against race conditions
@@ -75,6 +83,7 @@ export default function reducer(state = initialState, action) {
                 ...state,
                 targetSize: action.targetSize,
                 targetPageSize: action.targetPageSize,
+                targetIsReady: true,
             };
         case 'empty-files':
             return {
@@ -93,21 +102,40 @@ export default function reducer(state = initialState, action) {
 //                     filenames: [],
             };
         case 'file-parse':
+            let filenames = state.filenames;
+            if (filenames.indexOf(action.filename) === -1) {
+                filenames.push(action.filename)
+            }
+
             return {
                 ...state,
                 fileError: null,
-                blocks: state.blocks.set(action.filename, action.blocks),
-                filenames: [...state.filenames, action.filename],
+                blocks: new Map(state.blocks.set(action.filename, action.blocks)),
+                filenames: filenames,
                 fileColours: state.fileColours.set(
                     action.filename,
                     colours[(state.blocks.size - 1) % 8],
                 ),
+                fileModTimes: state.fileModTimes.set(action.fileModTime),
                 writtenAddress: 0,
+            };
+        case 'write-progress-start':
+            return {
+                ...state,
+                targetIsReady: false,
             };
         case 'write-progress':
             return {
                 ...state,
                 writtenAddress: action.address,
+                targetIsReady: false,
+            };
+        case 'write-progress-finished':
+            return {
+                ...state,
+//                 writtenAddress: action.address,
+                writtenAddress: 0,
+                targetIsReady: true,
             };
         default:
             return state;

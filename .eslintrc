@@ -44,6 +44,7 @@
             }
         ],
         "import/extensions": ["off"],
+        "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"]
     },
     "no-undef": 1,
     "no-unused-vars": 1,

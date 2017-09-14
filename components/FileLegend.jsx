@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 
 /* eslint no-param-reassign: "off" */
 function drawFileLegend(container, fileColours) {
-    console.log('drawFileLegend', container, fileColours);
+//     console.log('drawFileLegend', container, fileColours);
 
     if (!container) { return; }
 
