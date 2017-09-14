@@ -61,14 +61,22 @@ export default {
             ev.preventDefault();
         }
 
+        document.body.ondragover = (ev) => {
+            console.log('drag-and-drop over: ', ev.dataTransfer);
+
+            if (!ev.dataTransfer.files.length) {
+                ev.dataTransfer.dropEffect = 'none';
+                ev.dataTransfer.effectAllowed = 'none';
+            } else {
+                ev.dataTransfer.effectAllowed = 'uninitialized';
+            }
+        }
+
         document.body.ondrop = (ev) => {
             Array.from(ev.dataTransfer.files).forEach((i)=>fileActions.openFile(i.path)(dispatch));
+//             console.log('drag-and-drop: ', ev.dataTransfer.files[0].path);
 
-            console.log('drag-and-drop: ', ev.dataTransfer.files);
-            console.log('drag-and-drop: ', ev.dataTransfer.files[0].path);
             ev.preventDefault();
-
-
         }
 
 //         logger.info('App initializing');
