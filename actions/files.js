@@ -3,7 +3,12 @@ import { basename } from 'path';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import { hexToArrays } from 'nrf-intel-hex';
+import Store from 'electron-store';
+
 import hexpad from '../hexpad';
+
+const persistentStore = new Store({ name: 'nrf-programmer' });
+
 
 function displayFileError(err, dispatch) {
     const error = `Could not open .hex file: ${err}`;
@@ -119,33 +124,52 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
                 res();
             }
         });
-    }))).then(filenames => filenames.filter(i => !!i)).then(filenames =>
+    }))).then(filenames => filenames.filter(i => !!i)).then(filenames => {
         if (filenames.length === 0) {
             // Resolve inmediately: no files were changed
             return;
         }
 
-         new Promise((res, rej) => {
-             const lastLoaded = (new Date(newestFileTimestamp)).toLocaleString();
+        if (persistentStore.has('behaviour-when-files-not-up-to-date')) {
+            // If the user has checked the "don't ask me again" checkbox before,
+            // perform the saved behaviour
+            const behaviour = persistentStore.get('behaviour-when-files-not-up-to-date');
+            if (behaviour === 'ignore') {
+                return res();
+            } else if (behaviour === 'reload') {
+                return refreshAllFiles(fileLoadTimes)(dispatch);
+            }
+        }
 
-             electron.remote.dialog.showMessageBox({
-                 type: 'warning',
-                 buttons: [
-                     `Use old version (prior to ${lastLoaded})`,
-                     'Reload all files and proceed',
-                     'Cancel',
-                 ],
-                 message: `The following files have changed on disk since they were last loaded:\n${
+        return new Promise((res, rej) => {
+            const lastLoaded = (new Date(newestFileTimestamp)).toLocaleString();
+
+            electron.remote.dialog.showMessageBox({
+                type: 'warning',
+                buttons: [
+                    `Use old version (prior to ${lastLoaded})`,
+                    'Reload all files and proceed',
+                    'Cancel',
+                ],
+                message: `The following files have changed on disk since they were last loaded:\n${
                     filenames.join('\n')}`,
-             }, button => {
-                 if (button === 0) { // Use old version
-                     return res();
-                 } else if (button === 1) { // Reload
-                     return refreshAllFiles(fileLoadTimes)(dispatch).then(res);
-                 } else if (button === 2) { // Cancel
-                     return rej();
-                 }
-             });
-         }));
+                checkboxLabel: 'Don\'t ask again',
+            }, (button, doNotAskAgain) => {
+                if (doNotAskAgain) {
+                    persistentStore.set('behaviour-when-files-not-up-to-date',
+                        button === 0 ? 'ignore' : 'reload'
+                    );
+                }
+
+                if (button === 0) { // Use old version
+                    return res();
+                } else if (button === 1) { // Reload
+                    return refreshAllFiles(fileLoadTimes)(dispatch).then(res);
+                } else if (button === 2) { // Cancel
+                    return rej();
+                }
+            });
+        })
+    });
 }
 

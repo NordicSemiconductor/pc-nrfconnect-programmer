@@ -36,7 +36,7 @@
 
 import Store from 'electron-store';
 
-const persistentStore = new Store();
+const persistentStore = new Store({ name: 'nrf-programmer' });
 
 
 // Colours from:
@@ -63,7 +63,7 @@ const initialState = {
     fileColours: new Map(),
     fileModTimes: new Map(),
     fileLoadTimes: new Map(),
-    mruFiles: persistentStore.get('mruFiles') || [],
+    mruFiles: persistentStore.get('mruFiles') || []
 };
 
 export default function reducer(state = initialState, action) {
@@ -92,9 +92,11 @@ export default function reducer(state = initialState, action) {
                 ...state,
 //                     fileError: action.fileError,
 //                     blocks: new Map(),
+                blocks: new Map(),
                 filenames: [],
                 fileColours: new Map(),
-                blocks: new Map(),
+                fileModTimes: new Map(),
+                fileLoadTimes: new Map(),
             };
         case 'file-error':
             return {
@@ -106,13 +108,13 @@ export default function reducer(state = initialState, action) {
         case 'file-parse':
 //             let filenames = state.filenames;
             if (state.filenames.indexOf(action.filename) === -1) {
-                state.filenames.push(action.filename);
+                state.filenames.push(action.filename)
             }
 
             if (!state.fileColours.has(action.filename)) {
                 state.fileColours.set(
                     action.filename,
-                    colours[(state.blocks.size) % 8],
+                    colours[(state.blocks.size) % 8]
                 );
             }
 
