@@ -35,6 +35,7 @@
  */
 
 import Store from 'electron-store';
+
 const persistentStore = new Store();
 
 
@@ -61,6 +62,7 @@ const initialState = {
     filenames: [],
     fileColours: new Map(),
     fileModTimes: new Map(),
+    fileLoadTimes: new Map(),
     mruFiles: persistentStore.get('mruFiles') || []
 };
 
@@ -102,21 +104,26 @@ export default function reducer(state = initialState, action) {
 //                     filenames: [],
             };
         case 'file-parse':
-            let filenames = state.filenames;
-            if (filenames.indexOf(action.filename) === -1) {
-                filenames.push(action.filename)
+//             let filenames = state.filenames;
+            if (state.filenames.indexOf(action.filename) === -1) {
+                state.filenames.push(action.filename)
+            }
+
+            if (!state.fileColours.has(action.filename)) {
+                state.fileColours.set(
+                    action.filename,
+                    colours[(state.blocks.size) % 8]
+                );
             }
 
             return {
                 ...state,
                 fileError: null,
                 blocks: new Map(state.blocks.set(action.filename, action.blocks)),
-                filenames: filenames,
-                fileColours: state.fileColours.set(
-                    action.filename,
-                    colours[(state.blocks.size - 1) % 8],
-                ),
-                fileModTimes: state.fileModTimes.set(action.fileModTime),
+                filenames: state.filenames,
+                fileColours: state.fileColours,
+                fileModTimes: state.fileModTimes.set(action.filename, action.fileModTime),
+                fileLoadTimes: state.fileLoadTimes.set(action.fullFilename, action.fileLoadTime),
                 writtenAddress: 0,
             };
         case 'write-progress-start':

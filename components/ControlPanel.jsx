@@ -42,21 +42,20 @@ import { overlapBlockSets } from 'nrf-intel-hex';
 import FileLegend from './FileLegend';
 
 const ControlPanel = props => {
-
-
 //     function openRecent(, ev) {
 //         console.log('Open recent: ', ev.target.innerText);
 //     }
 
     const overlaps = overlapBlockSets(props.blocks);
-    console.log(overlaps);
-    let overlapWarning = "";
-    for (const [address, overlap] of overlaps) {
+//     console.log(overlaps);
+    let overlapWarning = '';
+    for (const [undefined, overlap] of overlaps) {
         if (overlap.length > 1) {
             overlapWarning = (<div className="alert alert-warning">
-                <center><Glyphicon glyph='warning-sign' style={{ fontSize: '3em' }}/></center>
+                <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
                 <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
-                <p>In regions with overlapping data, data from the file which was <strong>last</strong> added will be used.</p>
+                <p>In regions with overlapping data, data from the file which was
+                 <strong>last</strong> added will be used.</p>
             </div>);
         }
     }
@@ -65,11 +64,9 @@ const ControlPanel = props => {
     let mruMenuItems;
 
     if (props.mruFiles.length) {
-        mruMenuItems = props.mruFiles.map((filename)=>{
-            return (<MenuItem onSelect={ ()=>props.openFile(filename) }>{filename}</MenuItem>);
-        });
+        mruMenuItems = props.mruFiles.map(filename => (<MenuItem onSelect={() => props.openFile(filename)}>{filename}</MenuItem>));
     } else {
-        mruMenuItems = (<MenuItem disabled='disabled'>No recently used files</MenuItem>);
+        mruMenuItems = (<MenuItem disabled="disabled">No recently used files</MenuItem>);
     }
 
 //             <button onClick={props.openFileDialog}>Add .hex files...</button>
@@ -78,36 +75,36 @@ const ControlPanel = props => {
     return (
         <div>
             <Button onClick={props.closeFiles}>
-                <Glyphicon glyph='folder-close' />Clear files
+                <Glyphicon glyph="folder-close" />Clear files
             </Button>
-            <Dropdown pullRight={true}>
+            <Dropdown pullRight>
                 <Dropdown.Toggle>
-                    <Glyphicon glyph='folder-open' />Add a .hex file
+                    <Glyphicon glyph="folder-open" />Add a .hex file
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     { mruMenuItems }
-                    <MenuItem divider='divider' />
-                    <MenuItem onSelect={ props.openFileDialog }>Browse...</MenuItem>
+                    <MenuItem divider="divider" />
+                    <MenuItem onSelect={props.openFileDialog}>Browse...</MenuItem>
                 </Dropdown.Menu>
             </Dropdown>
-            <Button disabled="disabled" style={{ color: 'graytext' }}>
-                <Glyphicon glyph='refresh' />Reload .hex files
+            <Button onClick={props.refreshAllFiles}>
+                <Glyphicon glyph="refresh" />Reload .hex files
             </Button>
 
             <FileLegend fileColours={props.fileColours} />
 
             { overlapWarning }
 
-            <Button onClick={props.performWrite} disabled={ !props.targetIsReady }>
-                <Glyphicon glyph='flash' />Write all to devkit
+            <Button onClick={props.performWrite} disabled={!props.targetIsReady}>
+                <Glyphicon glyph="flash" />Write all to devkit
             </Button>
 
-            <Button onClick={props.performRecover} disabled={ !props.targetIsReady }>
-                <Glyphicon glyph='trash' />Recover (full erase)
+            <Button onClick={props.performRecover} disabled={!props.targetIsReady}>
+                <Glyphicon glyph="trash" />Recover (full erase)
             </Button>
         </div>
     );
-}
+};
 
 ControlPanel.propTypes = {
     closeFiles: PropTypes.func.isRequired,
@@ -115,6 +112,7 @@ ControlPanel.propTypes = {
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     fileColours: PropTypes.instanceOf(Map).isRequired,
+    mruFiles: PropTypes.instanceOf(Map).isRequired,
 //     mruFiles: PropTypes.
 };
 

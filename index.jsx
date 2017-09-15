@@ -58,11 +58,12 @@ export default {
     onInit: (dispatch) => {
 
         document.ondragover = document.ondrop = (ev) => {
+            /* eslint-disable no-param-reassign */
             ev.preventDefault();
         }
 
         document.body.ondragover = (ev) => {
-            console.log('drag-and-drop over: ', ev.dataTransfer);
+//             console.log('drag-and-drop over: ', ev.dataTransfer);
 
             if (!ev.dataTransfer.files.length) {
                 ev.dataTransfer.dropEffect = 'none';
@@ -119,15 +120,10 @@ export default {
         ...props,
         openFileDialog: () => dispatch(fileActions.openFileDialog()),
         openFile: (filename)=> dispatch(fileActions.openFile(filename)),
-        performWrite: () => {
-            dispatch({ type: 'start-write' });
-        },
-        performRecover: () => {
-            dispatch({ type: 'start-recover' });
-        },
-        closeFiles: () => {
-            dispatch({ type: 'empty-files' });
-        },
+        refreshAllFiles: ()=> { dispatch({ type: 'start-refresh-all-files' }); },
+        performWrite: () => { dispatch({ type: 'start-write' }); },
+        performRecover: () => { dispatch({ type: 'start-recover' }); },
+        closeFiles: () => { dispatch({ type: 'empty-files' }); },
     }),
     reduceApp: appReducer,
 
@@ -158,6 +154,12 @@ export default {
                 next(action);
                 break;
             }
+            case 'start-refresh-all-files' : {
+                store.dispatch(fileActions.refreshAllFiles(store.getState().app.fileLoadTimes));
+
+                next(action);
+                break;
+            }
             case 'file-parse' : {
 
                 if (!persistentStore.get('mruFiles')) {
@@ -174,6 +176,16 @@ export default {
 
                     console.log('MRU files are:', persistentStore.get('mruFiles'));
                 }
+
+//                 store.getState().app.fileModTimes = new Map(
+//                     store.getState().app.fileModTimes.set(
+//                         action.fullFilename,
+//                         action.fileModTime
+//                     )
+//                 );
+
+                console.log('file mod times:', store.getState().app.fileModTimes);
+                console.log('file load times:', store.getState().app.fileLoadTimes);
 
                 next(action);
                 break;

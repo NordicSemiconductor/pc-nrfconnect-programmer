@@ -164,7 +164,7 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
 
     const overlaps = overlapBlockSets(blockSets);
 
-    console.log(overlaps);
+//     console.log(overlaps);
 
     for (const [address, overlap] of overlaps) {
         let blockSize = 0;

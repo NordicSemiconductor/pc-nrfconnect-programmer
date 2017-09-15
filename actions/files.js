@@ -5,7 +5,7 @@ import { logger } from 'nrfconnect/core';
 import { hexToArrays } from 'nrf-intel-hex';
 import hexpad from '../hexpad';
 
-function displayFileError(err) {
+function displayFileError(err, dispatch) {
     const error = `Could not open .hex file: ${err}`;
     logger.error(error);
     dispatch({
@@ -17,7 +17,7 @@ function displayFileError(err) {
 function parseOneFile(filename, dispatch) {
     stat(filename, (err, stats)=>{
         if (err) {
-            displayFileError(err);
+            displayFileError(err, dispatch);
             return;
         }
 
@@ -27,7 +27,7 @@ function parseOneFile(filename, dispatch) {
             logger.info('Parsing .hex file: ', filename);
             logger.info('File was last modified at ', stats.mtime.toLocaleString() );
             if (err2) {
-                displayFileError(err2);
+                displayFileError(err2, dispatch);
                 return;
             }
 
@@ -35,7 +35,7 @@ function parseOneFile(filename, dispatch) {
             try {
                 blocks = hexToArrays(data.toString());
             } catch (ex) {
-                displayFileError(ex);
+                displayFileError(ex, dispatch);
                 return;
             }
 
@@ -51,6 +51,7 @@ function parseOneFile(filename, dispatch) {
                 filename: basename(filename),
                 fullFilename: filename,
                 fileModTime: stats.mtime,
+                fileLoadTime: new Date(),
                 blocks,
             });
         });
@@ -79,13 +80,33 @@ export function openFile(filename) {
     }
 }
 
-// export function loadMRU(dispatch) {
-//     return function loadMRUClosure(serialNumber) {
-//         // / FIXME: Should return a Set of filenames
-//         dispatch({
-//             type: 'FIXME',
-//             serialNumber,
-//         });
-//     };
-// }
+
+export function refreshAllFiles(fileLoadTimes) {
+    return dispatch=>{
+
+        Array.from(fileLoadTimes.entries()).forEach(([filename, loadTime])=>{
+
+            stat(filename, (err, stats)=>{
+                if (err) {
+                    displayFileError(err, dispatch);
+                    return;
+                }
+
+                if (loadTime.getTime() < stats.mtime) {
+                    console.log('Reloading: ', filename);
+                    parseOneFile(filename, dispatch);
+                } else {
+                    console.log('Does not need to be reloaded: ', filename);
+                }
+            });
+        });
+
+        if (false) {
+            parseOneFile(filename, dispatch);
+        }
+
+
+
+    }
+}
 
