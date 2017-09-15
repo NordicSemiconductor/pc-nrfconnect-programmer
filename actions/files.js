@@ -82,22 +82,70 @@ export function openFile(filename) {
 
 
 export function refreshAllFiles(fileLoadTimes) {
-    return dispatch => {
-        Array.from(fileLoadTimes.entries()).forEach(([filename, loadTime]) => {
-            stat(filename, (err, stats) => {
-                if (err) {
-                    displayFileError(err, dispatch);
-                    return;
-                }
+    return dispatch => Promise.all(Array.from(fileLoadTimes.entries()).map(([filename, loadTime]) => new Promise((res, rej) => {
+        stat(filename, (err, stats) => {
+            if (err) {
+                displayFileError(err, dispatch);
+                return rej();
+            }
 
-                if (loadTime.getTime() < stats.mtime) {
-                    logger.info('Reloading: ', filename);
-                    parseOneFile(filename, dispatch);
-                } else {
-                    logger.info('Does not need to be reloaded: ', filename);
-                }
-            });
+            if (loadTime.getTime() < stats.mtime) {
+                logger.info('Reloading: ', filename);
+                parseOneFile(filename, (...args) => { dispatch(...args); res(); });
+            } else {
+                logger.info('Does not need to be reloaded: ', filename);
+                res();
+            }
         });
-    };
+    })));
+}
+
+
+// Checks if the files have changed since they were loaded into the programmer UI.
+// Will display a message box dialog.
+// Expects a Map of filenames to instances of Date when the file was loaded into the UI.
+// Returns a promise: it will resolve when the state of the files is known, or reject
+// if the user wanted to cancel to manually check the status.
+export function checkUpToDateFiles(fileLoadTimes, dispatch) {
+    let newestFileTimestamp = -Infinity;
+
+    // Check if files have changed since they were loaded
+    return Promise.all(Array.from(fileLoadTimes.entries()).map(([filename, loadTime]) => new Promise((res) => {
+        stat(filename, (err, stats) => {
+            if (loadTime.getTime() < stats.mtime) {
+                newestFileTimestamp = Math.max(newestFileTimestamp, stats.mtime);
+                res(filename);
+            } else {
+                res();
+            }
+        });
+    }))).then(filenames => filenames.filter(i => !!i)).then(filenames =>
+        if (filenames.length === 0) {
+            // Resolve inmediately: no files were changed
+            return;
+        }
+
+         new Promise((res, rej) => {
+             const lastLoaded = (new Date(newestFileTimestamp)).toLocaleString();
+
+             electron.remote.dialog.showMessageBox({
+                 type: 'warning',
+                 buttons: [
+                     `Use old version (prior to ${lastLoaded})`,
+                     'Reload all files and proceed',
+                     'Cancel',
+                 ],
+                 message: `The following files have changed on disk since they were last loaded:\n${
+                    filenames.join('\n')}`,
+             }, button => {
+                 if (button === 0) { // Use old version
+                     return res();
+                 } else if (button === 1) { // Reload
+                     return refreshAllFiles(fileLoadTimes)(dispatch).then(res);
+                 } else if (button === 2) { // Cancel
+                     return rej();
+                 }
+             });
+         }));
 }
 
