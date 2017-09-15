@@ -15,7 +15,7 @@ function displayFileError(err, dispatch) {
 }
 
 function parseOneFile(filename, dispatch) {
-    stat(filename, (err, stats)=>{
+    stat(filename, (err, stats) => {
         if (err) {
             displayFileError(err, dispatch);
             return;
@@ -25,7 +25,7 @@ function parseOneFile(filename, dispatch) {
 
         readFile(filename, {}, (err2, data) => {
             logger.info('Parsing .hex file: ', filename);
-            logger.info('File was last modified at ', stats.mtime.toLocaleString() );
+            logger.info('File was last modified at ', stats.mtime.toLocaleString());
             if (err2) {
                 displayFileError(err2, dispatch);
                 return;
@@ -65,7 +65,7 @@ export function openFileDialog() {
             filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
             properties: ['openFile', 'multiSelections'],
         }, filenames => {
-            console.log('Files selected: ', filenames);
+//             console.log('Files selected: ', filenames);
 
             for (const filename of filenames) {
                 parseOneFile(filename, dispatch);
@@ -75,38 +75,29 @@ export function openFileDialog() {
 }
 
 export function openFile(filename) {
-    return dispatch=>{
+    return dispatch => {
         parseOneFile(filename, dispatch);
-    }
+    };
 }
 
 
 export function refreshAllFiles(fileLoadTimes) {
-    return dispatch=>{
-
-        Array.from(fileLoadTimes.entries()).forEach(([filename, loadTime])=>{
-
-            stat(filename, (err, stats)=>{
+    return dispatch => {
+        Array.from(fileLoadTimes.entries()).forEach(([filename, loadTime]) => {
+            stat(filename, (err, stats) => {
                 if (err) {
                     displayFileError(err, dispatch);
                     return;
                 }
 
                 if (loadTime.getTime() < stats.mtime) {
-                    console.log('Reloading: ', filename);
+                    logger.info('Reloading: ', filename);
                     parseOneFile(filename, dispatch);
                 } else {
-                    console.log('Does not need to be reloaded: ', filename);
+                    logger.info('Does not need to be reloaded: ', filename);
                 }
             });
         });
-
-        if (false) {
-            parseOneFile(filename, dispatch);
-        }
-
-
-
-    }
+    };
 }
 

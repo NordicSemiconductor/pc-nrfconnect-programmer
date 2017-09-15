@@ -63,7 +63,7 @@ const initialState = {
     fileColours: new Map(),
     fileModTimes: new Map(),
     fileLoadTimes: new Map(),
-    mruFiles: persistentStore.get('mruFiles') || []
+    mruFiles: persistentStore.get('mruFiles') || [],
 };
 
 export default function reducer(state = initialState, action) {
@@ -106,13 +106,13 @@ export default function reducer(state = initialState, action) {
         case 'file-parse':
 //             let filenames = state.filenames;
             if (state.filenames.indexOf(action.filename) === -1) {
-                state.filenames.push(action.filename)
+                state.filenames.push(action.filename);
             }
 
             if (!state.fileColours.has(action.filename)) {
                 state.fileColours.set(
                     action.filename,
-                    colours[(state.blocks.size) % 8]
+                    colours[(state.blocks.size) % 8],
                 );
             }
 
