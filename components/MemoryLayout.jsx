@@ -50,12 +50,14 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
                                 .padStart(8, '0')}`;
 
         if (side === 'left') {
-            label.style.right = 'calc(75% + 8px)';
+//             label.style.right = 'calc(75% + 8px)';
+            label.style.left = '0px';
 //             label.style.paddingRight = '8px';
             tip.style.borderLeftColor = backgroundColor;
             tip.style.left = 'calc(100% +  8px)';
         } else if (side === 'right') {
-            label.style.left = 'calc(75% + 8px)';
+//             label.style.left = 'calc(75% + 8px)';
+            label.style.right = '0px';
 //             label.style.paddingLeft = '10px';
             tip.style.borderRightColor = backgroundColor;
             tip.style.right = '100%';
@@ -81,8 +83,8 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
             block.style.position = 'absolute';
             block.style.height = `${(100 * blockSize) / max}%`;
             block.style.bottom = `${(100 * address) / max}%`;
-            block.style.left = '25%';
-            block.style.right = '25%';
+            block.style.left = '104px';
+            block.style.right = '104px';
             block.style.minHeight = '2px';
 
             if (colours.length === 1) {
@@ -138,10 +140,14 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
     }
 
 //     let container = document.createElement('div');
-    container.style.width = '500px';
+//     container.style.width = '500px';
+    container.style.minWidth = '250px';
+    container.style.maxWidth = '750px';
 //     container.style.height= '500px';
-    container.style.height = 'calc( 100% - 5em )';
-    container.style.margin = '25px';
+    container.style.height = 'calc( 100% - 2em )';
+//     container.style.margin = '25px';
+    container.style.marginTop = '1em';
+    container.style.marginBottom = '1em';
     container.style.position = 'relative';
     container.style.fontFamily = 'monospace';
     container.style.zIndex = 0;
@@ -151,8 +157,8 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
     const border = document.createElement('div');
     border.style.border = '1px solid black';
     border.style.position = 'absolute';
-    border.style.left = '25%';
-    border.style.right = '25%';
+    border.style.left = '104px';
+    border.style.right = '104px';
     border.style.top = '0';
     border.style.bottom = '0';
     container.append(border);
