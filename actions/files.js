@@ -59,17 +59,51 @@ function parseOneFile(filename, dispatch) {
             const mbrParams         = getUint32(blocks, 0x10001018, true);
             let readbackProtectAddress;
 
-            /// TODO: probe SoftDevice magic numbers
+            /// TODO: Get some .hex files which handle clenr0/rpbConf
 
-            // Sanity checks on clenr0+rpbConf
-            if (rpbConf !== undefined) {
-                if (rpbConf & 0x00F0) {
-                    // Set the address to 0.5GiB - the size of the whole code region
-                    // in the ARM 32-bit address space
-                    readbackProtectAddress = 0x2000000;
-                } else if (rpbConf & 0x000F) {
-                    readbackProtectAddress = clenr0;
+//             // Sanity checks on clenr0+rpbConf
+//             if (rpbConf !== undefined) {
+//                 if ((rpbConf & 0xFF0F) === 0) {
+//                     // Set the address to 0.5GiB - the size of the whole code region
+//                     // in the ARM 32-bit address space
+//                     readbackProtectAddress = 0x2000000;
+//                 } else if ((rpbConf & 0xFFF0) === 0) {
+//                     readbackProtectAddress = clenr0;
+//                 }
+//             }
+
+            let softDeviceStart;
+            let softDeviceEnd;
+
+            // Look for softdevice magic
+            for (let address=0x1000; address < 0x10000; address += 0x1000) {
+                if (getUint32(blocks, address + 0x04, true) === 0x51B1E5DB) {
+                    softDeviceStart = address;
+                    const softDeviceSize = getUint32(blocks, address + 0x08, true)
+//                     softDeviceEnd = address + softDeviceSize;
+                    softDeviceEnd = softDeviceSize;
+                    logger.info('File matches SoftDevice signature. Start/End/ID: ' +
+                        hexpad(address),
+                        hexpad(softDeviceSize),
+                        getUint32(blocks, address + 0x0C, true) & 0x00FF
+                    );
+                    break;
                 }
+            }
+
+
+            // Explicitly log the detected regions/labels
+            if (clenr0 !== undefined) {
+                logger.info('File contains UICR info: code region 0 length ' + hexpad(clenr0));
+            }
+            if (rpbConf !== undefined) {
+                logger.info('File contains UICR info: readback config record: ' + hexpad(rpbConf));
+            }
+            if (bootloaderAddress !== undefined) {
+                logger.info('File contains UICR info: bootloader at ' + hexpad(bootloaderAddress));
+            }
+            if (mbrParams !== undefined) {
+                logger.info('File contains UICR info: MBR parameteres at ' + hexpad(mbrParams));
             }
 
             dispatch({
@@ -85,7 +119,9 @@ function parseOneFile(filename, dispatch) {
                 },
                 labels: {
                     bootloader: bootloaderAddress,
-                    mbrParams: mbrParams
+                    mbrParams: mbrParams,
+                    softDeviceStart: softDeviceStart,
+                    softDeviceEnd: softDeviceEnd
                 }
             });
         });
