@@ -49,20 +49,16 @@ import './resources/css/index.less';
 const persistentStore = new Store({ name: 'nrf-programmer' });
 
 
-
-
-
 /* eslint-disable react/prop-types */
 
 export default {
-    onInit: (dispatch) => {
-
-        document.ondragover = document.ondrop = (ev) => {
+    onInit: dispatch => {
+        document.ondragover = document.ondrop = ev => {
             /* eslint-disable no-param-reassign */
             ev.preventDefault();
-        }
+        };
 
-        document.body.ondragover = (ev) => {
+        document.body.ondragover = ev => {
 //             console.log('drag-and-drop over: ', ev.dataTransfer);
 
             if (!ev.dataTransfer.files.length) {
@@ -71,14 +67,14 @@ export default {
             } else {
                 ev.dataTransfer.effectAllowed = 'uninitialized';
             }
-        }
+        };
 
-        document.body.ondrop = (ev) => {
-            Array.from(ev.dataTransfer.files).forEach((i)=>fileActions.openFile(i.path)(dispatch));
+        document.body.ondrop = ev => {
+            Array.from(ev.dataTransfer.files).forEach(i => fileActions.openFile(i.path)(dispatch));
 //             console.log('drag-and-drop: ', ev.dataTransfer.files[0].path);
 
             ev.preventDefault();
-        }
+        };
 
 //         logger.info('App initializing');
     },
@@ -86,20 +82,29 @@ export default {
 //         logger.info('App initialized');
     },
     decorateMainView: MainView => (
-        props => (
-            <MainView>
-                <MemoryLayout {...props} />
-            </MainView>
-        )
+        props => {
+
+            if (props.fileError) {
+                return (
+                    <MainView>
+                        <div className="alert alert-error">{ props.fileError }</div>
+                    </MainView>
+                );
+            }
+
+            return (
+                <MainView>
+                    <MemoryLayout {...props.loaded} targetSize={ props.targetSize }/>
+                </MainView>
+            )
+        }
     ),
     mapMainViewState: (state, props) => ({
         ...props,
-        fileError: state.app.fileError,
-        blocks: state.app.blocks,
+        loaded: state.app.loaded,
         targetSize: state.app.targetSize,
-        filenames: state.app.filenames,
         writtenAddress: state.app.writtenAddress,
-        fileColours: state.app.fileColours,
+        fileError: state.app.fileError
     }),
     decorateSidePanel: SidePanel => (
         props => (
@@ -110,17 +115,16 @@ export default {
     ),
     mapSidePanelState: (state, props) => ({
         ...props,
-        fileColours: state.app.fileColours.entries(),
+        loaded: state.app.loaded,
 //         fileColours: state.app.fileColours,
         mruFiles: state.app.mruFiles,
         targetIsReady: state.app.targetIsReady,
-        blocks: state.app.blocks
     }),
     mapSidePanelDispatch: (dispatch, props) => ({
         ...props,
         openFileDialog: () => dispatch(fileActions.openFileDialog()),
-        openFile: (filename)=> dispatch(fileActions.openFile(filename)),
-        refreshAllFiles: ()=> { dispatch({ type: 'start-refresh-all-files' }); },
+        openFile: filename => dispatch(fileActions.openFile(filename)),
+        refreshAllFiles: () => { dispatch({ type: 'start-refresh-all-files' }); },
         performWrite: () => { dispatch({ type: 'start-write' }); },
         performRecover: () => { dispatch({ type: 'start-recover' }); },
         closeFiles: () => { dispatch({ type: 'empty-files' }); },
@@ -155,18 +159,17 @@ export default {
                 break;
             }
             case 'start-refresh-all-files' : {
-                store.dispatch(fileActions.refreshAllFiles(store.getState().app.fileLoadTimes));
+                store.dispatch(fileActions.refreshAllFiles(store.getState().app.loaded.fileLoadTimes));
 
                 next(action);
                 break;
             }
             case 'file-parse' : {
-
                 if (!persistentStore.get('mruFiles')) {
                     persistentStore.set('mruFiles', []);
                 }
 
-                let mruFiles = persistentStore.get('mruFiles');
+                const mruFiles = persistentStore.get('mruFiles');
                 if (mruFiles.indexOf(action.fullFilename) === -1) {
                     mruFiles.unshift(action.fullFilename);
                     mruFiles.splice(10);
@@ -184,8 +187,8 @@ export default {
 //                     )
 //                 );
 
-                console.log('file mod times:', store.getState().app.fileModTimes);
-                console.log('file load times:', store.getState().app.fileLoadTimes);
+                console.log('file mod times:', store.getState().app.loaded.fileModTimes);
+                console.log('file load times:', store.getState().app.loaded.fileLoadTimes);
 
                 next(action);
                 break;

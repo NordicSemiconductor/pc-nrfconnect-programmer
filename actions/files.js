@@ -2,7 +2,7 @@ import { readFile, stat } from 'fs';
 import { basename } from 'path';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
-import { hexToArrays } from 'nrf-intel-hex';
+import { hexToArrays, getUint32 } from 'nrf-intel-hex';
 import Store from 'electron-store';
 
 import hexpad from '../hexpad';
@@ -51,6 +51,27 @@ function parseOneFile(filename, dispatch) {
                 logger.info(`Data block: ${hexpad(address)}-${hexpad(address + size)} (${hexpad(size)}`, ' bytes long)');
             }
 
+            // Does this file contain updated info about bootlader and readbac prot?
+            // Try querying the UICR and see if there's valid data in there
+            const clenr0            = getUint32(blocks, 0x10001000, true);
+            const rpbConf           = getUint32(blocks, 0x10001004, true);
+            const bootloaderAddress = getUint32(blocks, 0x10001014, true);
+            const mbrParams         = getUint32(blocks, 0x10001018, true);
+            let readbackProtectAddress;
+
+            /// TODO: probe SoftDevice magic numbers
+
+            // Sanity checks on clenr0+rpbConf
+            if (rpbConf !== undefined) {
+                if (rpbConf & 0x00F0) {
+                    // Set the address to 0.5GiB - the size of the whole code region
+                    // in the ARM 32-bit address space
+                    readbackProtectAddress = 0x2000000;
+                } else if (rpbConf & 0x000F) {
+                    readbackProtectAddress = clenr0;
+                }
+            }
+
             dispatch({
                 type: 'file-parse',
                 filename: basename(filename),
@@ -58,6 +79,14 @@ function parseOneFile(filename, dispatch) {
                 fileModTime: stats.mtime,
                 fileLoadTime: new Date(),
                 blocks,
+                regions: {
+                    region0: clenr0,
+                    readback: readbackProtectAddress
+                },
+                labels: {
+                    bootloader: bootloaderAddress,
+                    mbrParams: mbrParams
+                }
             });
         });
     });
@@ -87,22 +116,25 @@ export function openFile(filename) {
 
 
 export function refreshAllFiles(fileLoadTimes) {
-    return dispatch => Promise.all(Array.from(fileLoadTimes.entries()).map(([filename, loadTime]) => new Promise((res, rej) => {
-        stat(filename, (err, stats) => {
-            if (err) {
-                displayFileError(err, dispatch);
-                return rej();
-            }
+    return dispatch => Promise.all(
+        Array.from(fileLoadTimes.entries()).map(
+            ([filename, loadTime]) => new Promise((res, rej) => {
+                stat(filename, (err, stats) => {
+                    if (err) {
+                        displayFileError(err, dispatch);
+                        return rej();
+                    }
 
-            if (loadTime.getTime() < stats.mtime) {
-                logger.info('Reloading: ', filename);
-                parseOneFile(filename, (...args) => { dispatch(...args); res(); });
-            } else {
-                logger.info('Does not need to be reloaded: ', filename);
-                res();
-            }
-        });
-    })));
+                    if (loadTime.getTime() < stats.mtime) {
+                        logger.info('Reloading: ', filename);
+                        return parseOneFile(filename, (...args) => { dispatch(...args); res(); });
+                    }
+                    logger.info('Does not need to be reloaded: ', filename);
+                    return res();
+                });
+            }),
+        ),
+    );
 }
 
 
@@ -115,19 +147,23 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
     let newestFileTimestamp = -Infinity;
 
     // Check if files have changed since they were loaded
-    return Promise.all(Array.from(fileLoadTimes.entries()).map(([filename, loadTime]) => new Promise((res) => {
-        stat(filename, (err, stats) => {
-            if (loadTime.getTime() < stats.mtime) {
-                newestFileTimestamp = Math.max(newestFileTimestamp, stats.mtime);
-                res(filename);
-            } else {
-                res();
-            }
-        });
-    }))).then(filenames => filenames.filter(i => !!i)).then(filenames => {
+    return Promise.all(
+        Array.from(fileLoadTimes.entries()).map(
+            ([filename, loadTime]) => new Promise(res => {
+                stat(filename, (err, stats) => {
+                    if (loadTime.getTime() < stats.mtime) {
+                        newestFileTimestamp = Math.max(newestFileTimestamp, stats.mtime);
+                        res(filename);
+                    } else {
+                        res();
+                    }
+                });
+            }),
+        ),
+    ).then(filenames => filenames.filter(i => !!i)).then(filenames => {
         if (filenames.length === 0) {
             // Resolve inmediately: no files were changed
-            return;
+            return Promise.resolve();
         }
 
         if (persistentStore.has('behaviour-when-files-not-up-to-date')) {
@@ -135,7 +171,7 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
             // perform the saved behaviour
             const behaviour = persistentStore.get('behaviour-when-files-not-up-to-date');
             if (behaviour === 'ignore') {
-                return res();
+                return Promise.resolve();
             } else if (behaviour === 'reload') {
                 return refreshAllFiles(fileLoadTimes)(dispatch);
             }
@@ -157,7 +193,7 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
             }, (button, doNotAskAgain) => {
                 if (doNotAskAgain) {
                     persistentStore.set('behaviour-when-files-not-up-to-date',
-                        button === 0 ? 'ignore' : 'reload'
+                        button === 0 ? 'ignore' : 'reload',
                     );
                 }
 
@@ -169,7 +205,7 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
                     return rej();
                 }
             });
-        })
+        });
     });
 }
 

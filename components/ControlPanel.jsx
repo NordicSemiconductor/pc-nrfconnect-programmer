@@ -46,7 +46,7 @@ const ControlPanel = props => {
 //         console.log('Open recent: ', ev.target.innerText);
 //     }
 
-    const overlaps = overlapBlockSets(props.blocks);
+    const overlaps = overlapBlockSets(props.loaded.blockSets);
 //     console.log(overlaps);
     let overlapWarning = '';
     for (const [undefined, overlap] of overlaps) {
@@ -91,7 +91,7 @@ const ControlPanel = props => {
                 <Glyphicon glyph="refresh" />Reload .hex files
             </Button>
 
-            <FileLegend fileColours={props.fileColours} />
+            <FileLegend fileColours={props.loaded.fileColours} />
 
             { overlapWarning }
 

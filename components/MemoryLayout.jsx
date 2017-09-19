@@ -3,25 +3,13 @@ import PropTypes from 'prop-types';
 
 import { overlapBlockSets } from 'nrf-intel-hex';
 
-// Colours from:
-// https://github.com/d3/d3-scale-chromatic
-// https://github.com/d3/d3-scale-chromatic/blob/master/src/categorical/Dark2.js
-
-// const colours = [
-//     "#1b9e77",
-//     "#d95f02",
-//     "#7570b3",
-//     "#e7298a",
-//     "#66a61e",
-//     "#e6ab02",
-//     "#a6761d",
-//     "#666666"
-// ];
+import hexpad from '../hexpad';
 
 /* eslint no-param-reassign: "off" */
-function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddress, max) {
+function drawMemoryLayoutDiagram(container, max, data) {
     const min = 0x0;
     const labelStep = 0x10000;
+    const {blockSets, fileColours, writtenAddress, protectedAddress, labels, regions} = data;
 
     if (!container) { return; }
 
@@ -29,6 +17,7 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
         container.removeChild(container.firstChild);
     }
 
+    // Draw a address label at either side of the memory layout
     function drawLabel(address, side = 'left') {
         const backgroundColor = 'rgba(210, 210, 210, 0.75)';
 
@@ -44,10 +33,8 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
         tip.style.top = 0;
 
         label.style.position = 'absolute';
-        label.innerText = `0x${(address)
-                                .toString(16)
-                                .toUpperCase()
-                                .padStart(8, '0')}`;
+        label.style.fontFamily = 'monospace';
+        label.innerText = hexpad(address);
 
         if (side === 'left') {
 //             label.style.right = 'calc(75% + 8px)';
@@ -70,6 +57,24 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
         return label;
     }
 
+    // Draws a horizontal line at the given address, and some text on top
+    function drawInlineLabel(text, address) {
+        const label = document.createElement('div');
+        label.style.position = 'absolute';
+        label.style.textAlign = 'center';
+        label.style.lineHeight = '10px';
+//         label.style.fontFamily = 'sans-serif';
+        label.style.fontSize = '12px';
+
+        label.style.left  = '104px';
+        label.style.right = '104px';
+        label.style.borderBottom = '1px solid black';
+        label.style.bottom = `${(100 * address) / max}%`;
+        label.textContent = text;
+
+        container.append(label);
+    }
+
     const blocksWrapper = document.createElement('div');
     blocksWrapper.style.position = 'absolute';
     blocksWrapper.style.height = '100%';
@@ -77,7 +82,7 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
     blocksWrapper.style.overflow = 'hidden';
     container.append(blocksWrapper);
 
-    function drawBlock(address, blockSize, colours) {
+    function drawBlock(address, blockSize) {
         if ((address + blockSize) > min && address < max) {
             const block = document.createElement('div');
             block.style.position = 'absolute';
@@ -86,57 +91,65 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
             block.style.left = '104px';
             block.style.right = '104px';
             block.style.minHeight = '2px';
-
-            if (colours.length === 1) {
-                block.style.background = colours;
-            } else {
-                const gradientStops = [];
-                let gradientPx = 0;
-                for (const colour of colours) {
-                    gradientStops.push(`${colour} ${gradientPx}px`);
-                    gradientPx += 20;
-                    gradientStops.push(`${colour} ${gradientPx}px`);
-                }
-
-                block.style.background = `repeating-linear-gradient(45deg, ${
-                    gradientStops.join(',')})`;
-            }
-
-
-    //         border.setAttribute('width', 50);
-    //         border.setAttribute('height', 100 * blockSize / max);
-    //         border.setAttribute('x', 25);
-    //         border.setAttribute('y', 100 - 100 * address / max);
-    //         border.setAttribute('fill', '#474d73');
-    //         border.setAttribute('stroke', 'none');
-
             blocksWrapper.append(block);
-
-            const startLabel = drawLabel(address, 'right');
-            container.append(startLabel);
-
-            const endLabel = drawLabel(address + blockSize, 'right');
-            endLabel.style.zIndex = -1;
-            container.append(endLabel);
-
-            let eventNames = ['mouseover', 'mouseout'];
-            if (window.PointerEvent) {
-                eventNames = ['pointerenter', 'pointerout'];
-            }
-            block.addEventListener(eventNames[0], () => {
-//                 console.log('over block');
-                startLabel.style.zIndex = 5;
-                startLabel.style.fontWeight = 'bold';
-                endLabel.style.zIndex = 4;
-                endLabel.style.fontWeight = 'bold';
-            });
-            block.addEventListener(eventNames[1], () => {
-                startLabel.style.zIndex = 0;
-                startLabel.style.fontWeight = 'inherit';
-                endLabel.style.zIndex = -1;
-                endLabel.style.fontWeight = 'inherit';
-            });
+            return block;
         }
+    }
+
+    // Draw a solid block (with one solid colour or more striped colours)
+    function drawSolidBlock(address, blockSize, colours) {
+        let block = drawBlock(address, blockSize);
+        if (!block) { return; }
+
+        if (colours.length === 1) {
+            block.style.background = colours;
+        } else {
+            const gradientStops = [];
+            let gradientPx = 0;
+            for (const colour of colours) {
+                gradientStops.push(`${colour} ${gradientPx}px`);
+                gradientPx += 20;
+                gradientStops.push(`${colour} ${gradientPx}px`);
+            }
+
+            block.style.background = `repeating-linear-gradient(45deg, ${
+                gradientStops.join(',')})`;
+        }
+
+        const startLabel = drawLabel(address, 'right');
+        container.append(startLabel);
+
+        const endLabel = drawLabel(address + blockSize, 'right');
+        endLabel.style.zIndex = -1;
+        container.append(endLabel);
+
+//         let eventNames = ['mouseover', 'mouseout'];
+//         if (window.PointerEvent) {
+//             eventNames = ['pointerenter', 'pointerout'];
+//         }
+//         block.addEventListener(eventNames[0], () => {
+// //                 console.log('over block');
+//             startLabel.style.zIndex = 5;
+//             startLabel.style.fontWeight = 'bold';
+//             endLabel.style.zIndex = 4;
+//             endLabel.style.fontWeight = 'bold';
+//         });
+//         block.addEventListener(eventNames[1], () => {
+//             startLabel.style.zIndex = 0;
+//             startLabel.style.fontWeight = 'inherit';
+//             endLabel.style.zIndex = -1;
+//             endLabel.style.fontWeight = 'inherit';
+//         });
+    }
+
+    // Draw a block of transparent stripes
+    function drawStripeBlock(address, blockSize, colour) {
+        let block = drawBlock(address, blockSize);
+        if (!block) { return; }
+
+        block.style.background = `repeating-linear-gradient(-45deg, ${colour} 0px, transparent 1px, transparent 10px, ${colour} 11px)`;
+        block.style.borderTop = `solid 1px ${colour}`;
+        block.style.borderBottom = `solid 1px ${colour}`;
     }
 
 //     let container = document.createElement('div');
@@ -149,7 +162,7 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
     container.style.marginTop = '1em';
     container.style.marginBottom = '1em';
     container.style.position = 'relative';
-    container.style.fontFamily = 'monospace';
+//     container.style.fontFamily = 'monospace';
     container.style.zIndex = 0;
     container.style.lineHeight = '16px';
     container.style.fontSize = '16px';
@@ -183,19 +196,29 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
 //             }
             blockColours.push(fileColours.get(filename));
         }
-        // / TODO: fetch colours for this block or overlap
-
 
 //         const blockSize = blocks.get(address).length;
         if (writtenAddress > address) {
             const size = Math.min(writtenAddress - address, blockSize);
-            drawBlock(address, size, ['#cc4040']);
+            drawSolidBlock(address, size, ['#cc4040']);
         }
         if (writtenAddress < (address + blockSize)) {
             const start = Math.max(writtenAddress, address);
             const size = (address + blockSize) - start;
-            drawBlock(start, size, blockColours);
+            drawSolidBlock(start, size, blockColours);
         }
+    }
+
+//     if (protectedAddress) {
+//         drawStripeBlock(0, 0x18000, '#ff0000');
+//     }
+
+    for (const label of labels) {
+        drawInlineLabel(...label);
+    }
+
+    for (const region of regions) {
+        drawStripeBlock(...region);
     }
 
 //     const addresses = Array.from(blocks.keys());
@@ -206,23 +229,38 @@ function drawMemoryLayoutDiagram(container, blockSets, fileColours, writtenAddre
 
 
 const MemoryLayout = props => {
-    const { targetSize, blocks, fileError, fileColours, writtenAddress } = props;
+    const { targetSize, blockSets, fileError, fileColours, writtenAddress, labels, regions } = props;
 
     if (fileError) {
         return (
-            <div>{ fileError }</div>
+            <div className="alert alert-error">{ fileError }</div>
         );
     }
+
+    // Symbolize code region 0 / readback-protected region
+    let symbolRegions = Object.entries(regions).map(([region, length])=>{
+        if (region === 'region0') {
+            return [0, length, '#4040FF'];
+        } else if (region === 'readback') {
+            return [0, length, '#FF4040'];
+        }
+        return [0, length, '#000000'];
+    });
+
+
     return (
         <div ref={
             el => {
                 drawMemoryLayoutDiagram(
-                el,
-                blocks,
-                fileColours,
-                writtenAddress,
-                targetSize,
-            );
+                    el,
+                    targetSize, {
+                        blockSets: blockSets,
+                        fileColours: fileColours,
+                        writtenAddress: writtenAddress,
+                        labels: Object.entries(labels),
+                        regions: symbolRegions
+                    }
+                );
             }
         }
         />
@@ -231,16 +269,16 @@ const MemoryLayout = props => {
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
-    blocks: PropTypes.instanceOf(Map),
+    blockSets: PropTypes.instanceOf(Map),
     fileColours: PropTypes.instanceOf(Map),
     writtenAddress: PropTypes.number,
     fileError: PropTypes.string,
 };
 
 MemoryLayout.defaultProps = {
-//     targetSize: 0x100000,  // 1MiB
-    targetSize: 0x080000,  // 0.5MiB
-    blocks: new Map(),
+    targetSize: 0x100000,  // 1MiB
+//     targetSize: 0x080000,  // 0.5MiB
+    blockSets: new Map(),
     fileColours: new Map(),
     writtenAddress: 0,  // From 0 to here will be assumed written, from here to the top pending
     fileError: null,

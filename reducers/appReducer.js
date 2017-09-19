@@ -53,17 +53,24 @@ const colours = [
 ];
 
 const initialState = {
-    blocks: new Map(),
-    fileError: null,
     targetSize: 0x00100000,  // 1MiB. TODO: Set a saner default?
     targetPort: null,
     targetIsReady: false,   // Flag to denote that a devkit is busy (or unconnected)
+
     writtenAddress: 0,
-    filenames: [],
-    fileColours: new Map(),
-    fileModTimes: new Map(),
-    fileLoadTimes: new Map(),
-    mruFiles: persistentStore.get('mruFiles') || []
+    fileError: null,
+
+    loaded: {
+        blockSets: new Map(),
+        filenames: [],
+        fileColours: new Map(),
+        fileModTimes: new Map(),
+        fileLoadTimes: new Map(),
+        regions: {}, // heruistically detected code region 0, and memory readback protection
+        labels: {}  // heruistically detected bootloader, mbr, mbr params
+    },
+
+    mruFiles: persistentStore.get('mruFiles') || [],
 };
 
 export default function reducer(state = initialState, action) {
@@ -92,11 +99,17 @@ export default function reducer(state = initialState, action) {
                 ...state,
 //                     fileError: action.fileError,
 //                     blocks: new Map(),
-                blocks: new Map(),
-                filenames: [],
-                fileColours: new Map(),
-                fileModTimes: new Map(),
-                fileLoadTimes: new Map(),
+                writtenAddress: 0,
+                fileError: null,
+                loaded: {
+                    blockSets: new Map(),
+                    filenames: [],
+                    fileColours: new Map(),
+                    fileModTimes: new Map(),
+                    fileLoadTimes: new Map(),
+                    regions: {},
+                    labels: {}
+                },
             };
         case 'file-error':
             return {
@@ -107,26 +120,44 @@ export default function reducer(state = initialState, action) {
             };
         case 'file-parse':
 //             let filenames = state.filenames;
-            if (state.filenames.indexOf(action.filename) === -1) {
-                state.filenames.push(action.filename)
+            if (state.loaded.filenames.indexOf(action.filename) === -1) {
+                state.loaded.filenames.push(action.filename);
             }
 
-            if (!state.fileColours.has(action.filename)) {
-                state.fileColours.set(
+            if (!state.loaded.fileColours.has(action.filename)) {
+                state.loaded.fileColours.set(
                     action.filename,
-                    colours[(state.blocks.size) % 8]
+                    colours[(state.loaded.blockSets.size) % 8],
                 );
+            }
+
+            for (const [region, length] of Object.entries(action.regions)) {
+                if (length !== undefined) {
+                    state.loaded.regions[region] = length;
+                }
+            }
+
+            for (const [label, address] of Object.entries(action.labels)) {
+                if (address !== undefined) {
+                    state.loaded.labels[label] = address;
+                }
             }
 
             return {
                 ...state,
-                fileError: null,
-                blocks: new Map(state.blocks.set(action.filename, action.blocks)),
-                filenames: state.filenames,
-                fileColours: state.fileColours,
-                fileModTimes: state.fileModTimes.set(action.filename, action.fileModTime),
-                fileLoadTimes: state.fileLoadTimes.set(action.fullFilename, action.fileLoadTime),
                 writtenAddress: 0,
+                fileError: null,
+
+                loaded: {
+                    blockSets: new Map(state.loaded.blockSets.set(action.filename, action.blocks)),
+                    filenames: state.loaded.filenames,
+                    fileColours: state.loaded.fileColours,
+                    fileModTimes: state.loaded.fileModTimes.set(action.filename, action.fileModTime),
+                    fileLoadTimes: state.loaded.fileLoadTimes.set(action.fullFilename, action.fileLoadTime),
+                    regions: state.loaded.regions,
+                    labels: state.loaded.labels,
+                },
+
             };
         case 'write-progress-start':
             return {

@@ -55,7 +55,6 @@ function getDeviceModel(deviceInfo) {
 }
 
 
-
 // Display some information about a devkit. Called on a devkit connection.
 export function logDeviceInfo(serialNumber, comName) {
     return dispatch => {
@@ -155,8 +154,7 @@ function writeHex(serialNumber, hexString, dispatch) {
 //         chip_erase_mode: nrfjprog.ERASE_PAGES_INCLUDING_UICR,
         chip_erase_mode: nrfjprog.ERASE_PAGES,
 
-    }, (progress) => { // Progress callback
-
+    }, progress => { // Progress callback
 //         console.log(`Programming progress: 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
 //         console.log('Programming progress: ', progress);
         logger.info(progress.process);
@@ -165,12 +163,11 @@ function writeHex(serialNumber, hexString, dispatch) {
 //             type: 'write-progress',
 //             address: pageEnd,
 //         });
-
-    }, (err) => {   // Finish callback
+    }, err => {   // Finish callback
         if (err) {
             console.error(err);
             console.error(err.log);
-            err.log.split('\n').forEach((line)=>logger.error(line));
+            err.log.split('\n').forEach(line => logger.error(line));
 //             logger.error(err.log);
             return;
         }
@@ -187,12 +184,10 @@ function writeHex(serialNumber, hexString, dispatch) {
 }
 
 
-
 // Does some sanity checks, joins the loaded .hex files, flattens overlaps,
 // paginates the result to fit flash pages, and calls writeHex()
 export function write(appState) {
     return dispatch => {
-
         const serialNumber = appState.targetSerialNumber;
         const pageSize = appState.targetPageSize;
         if (!serialNumber || !pageSize) {
@@ -200,10 +195,10 @@ export function write(appState) {
             return;
         }
 
-        checkUpToDateFiles(appState.fileLoadTimes, dispatch).then(()=>{
+        checkUpToDateFiles(appState.loaded.fileLoadTimes, dispatch).then(() => {
             const pages = paginate(
                 flattenOverlaps(
-                    overlapBlockSets(appState.blocks),
+                    overlapBlockSets(appState.loaded.blockSets),
                 ), pageSize);
 
 //         console.log(pages);
@@ -217,8 +212,7 @@ export function write(appState) {
             });
 
             writeHex(serialNumber, arraysToHex(pages, 64), dispatch);
-        }).catch(()=>{});
-
+        }).catch(() => {});
     };
 }
 
@@ -236,14 +230,14 @@ export function recover(appState) {
             type: 'write-progress-start',
         });
 
-        nrfjprog.recover(serialNumber, (progress)=>{
+        nrfjprog.recover(serialNumber, progress => {
             console.log('Recovery progress: ', progress);
             logger.info(progress.process);
-        }, (err)=>{
+        }, err => {
             if (err) {
                 console.error(err);
                 console.error(err.log);
-                err.log.split('\n').forEach((line)=>logger.error(line));
+                err.log.split('\n').forEach(line => logger.error(line));
     //             logger.error(err.log);
                 return;
             }
