@@ -9,7 +9,7 @@ import hexpad from '../hexpad';
 function drawMemoryLayoutDiagram(container, max, data) {
     const min = 0x0;
     const labelStep = 0x10000;
-    const {blockSets, fileColours, writtenAddress, protectedAddress, labels, regions} = data;
+    const { blockSets, fileColours, writtenAddress, protectedAddress, labels, regions } = data;
 
     if (!container) { return; }
 
@@ -66,7 +66,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
 //         label.style.fontFamily = 'sans-serif';
         label.style.fontSize = '12px';
 
-        label.style.left  = '104px';
+        label.style.left = '104px';
         label.style.right = '104px';
         label.style.borderBottom = '1px solid black';
         label.style.bottom = `${(100 * address) / max}%`;
@@ -98,7 +98,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
     // Draw a solid block (with one solid colour or more striped colours)
     function drawSolidBlock(address, blockSize, colours) {
-        let block = drawBlock(address, blockSize);
+        const block = drawBlock(address, blockSize);
         if (!block) { return; }
 
         if (colours.length === 1) {
@@ -144,7 +144,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
     // Draw a block of transparent stripes
     function drawStripeBlock(address, blockSize, colour) {
-        let block = drawBlock(address, blockSize);
+        const block = drawBlock(address, blockSize);
         if (!block) { return; }
 
         block.style.background = `repeating-linear-gradient(-45deg, ${colour} 0px, transparent 1px, transparent 10px, ${colour} 11px)`;
@@ -238,7 +238,7 @@ const MemoryLayout = props => {
     }
 
     // Symbolize code region 0 / readback-protected region
-    let symbolRegions = Object.entries(regions).map(([region, length])=>{
+    const symbolRegions = Object.entries(regions).map(([region, length]) => {
         if (region === 'region0') {
             return [0, length, '#4040FF'];
         } else if (region === 'readback') {
@@ -254,12 +254,12 @@ const MemoryLayout = props => {
                 drawMemoryLayoutDiagram(
                     el,
                     targetSize, {
-                        blockSets: blockSets,
-                        fileColours: fileColours,
-                        writtenAddress: writtenAddress,
+                        blockSets,
+                        fileColours,
+                        writtenAddress,
                         labels: Object.entries(labels),
-                        regions: symbolRegions
-                    }
+                        regions: symbolRegions,
+                    },
                 );
             }
         }

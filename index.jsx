@@ -36,7 +36,7 @@
 
 import React from 'react';
 // import { logger } from 'nrfconnect/core';
-import Store from 'electron-store';
+// import Store from 'electron-store';
 
 import MemoryLayout from './components/MemoryLayout';
 import ControlPanel from './components/ControlPanel';
@@ -46,15 +46,17 @@ import appReducer from './reducers/appReducer';
 
 import './resources/css/index.less';
 
-const persistentStore = new Store({ name: 'nrf-programmer' });
+// const persistentStore = new Store({ name: 'nrf-programmer' });
 
 
 /* eslint-disable react/prop-types */
 
 export default {
     onInit: dispatch => {
+        /* eslint-disable no-multi-assign */
         document.ondragover = document.ondrop = ev => {
-            /* eslint-disable no-param-reassign */
+        /* eslint-enable no-multi-assign */
+        /* eslint-disable no-param-reassign */
             ev.preventDefault();
         };
 
@@ -75,6 +77,7 @@ export default {
 
             ev.preventDefault();
         };
+        /* eslint-enable no-param-reassign */
 
 //         logger.info('App initializing');
     },
@@ -83,7 +86,6 @@ export default {
     },
     decorateMainView: MainView => (
         props => {
-
             if (props.fileError) {
                 return (
                     <MainView>
@@ -94,9 +96,9 @@ export default {
 
             return (
                 <MainView>
-                    <MemoryLayout {...props.loaded} targetSize={ props.targetSize }/>
+                    <MemoryLayout {...props.loaded} targetSize={props.targetSize} />
                 </MainView>
-            )
+            );
         }
     ),
     mapMainViewState: (state, props) => ({
@@ -104,7 +106,7 @@ export default {
         loaded: state.app.loaded,
         targetSize: state.app.targetSize,
         writtenAddress: state.app.writtenAddress,
-        fileError: state.app.fileError
+        fileError: state.app.fileError,
     }),
     decorateSidePanel: SidePanel => (
         props => (
@@ -119,6 +121,7 @@ export default {
 //         fileColours: state.app.fileColours,
         mruFiles: state.app.mruFiles,
         targetIsReady: state.app.targetIsReady,
+        targetSize: state.app.targetSize,
     }),
     mapSidePanelDispatch: (dispatch, props) => ({
         ...props,
@@ -144,7 +147,7 @@ export default {
             }
             case 'start-write' : {
                 const state = store.getState();
-                if (state.app.blocks.size === 0) { return; }
+                if (state.app.loaded.blockSets.size === 0) { return; }
 //                 if (state.app.writtenAddress !== 0) { return; }
 
                 store.dispatch(jprogActions.write(state.app));
@@ -159,40 +162,44 @@ export default {
                 break;
             }
             case 'start-refresh-all-files' : {
-                store.dispatch(fileActions.refreshAllFiles(store.getState().app.loaded.fileLoadTimes));
+                store.dispatch(
+                    fileActions.refreshAllFiles(
+                        store.getState().app.loaded.fileLoadTimes,
+                    ),
+                );
 
                 next(action);
                 break;
             }
-            case 'file-parse' : {
-                if (!persistentStore.get('mruFiles')) {
-                    persistentStore.set('mruFiles', []);
-                }
-
-                const mruFiles = persistentStore.get('mruFiles');
-                if (mruFiles.indexOf(action.fullFilename) === -1) {
-                    mruFiles.unshift(action.fullFilename);
-                    mruFiles.splice(10);
-                    persistentStore.set('mruFiles', mruFiles);
-
-                    store.getState().app.mruFiles = mruFiles;
-
-                    console.log('MRU files are:', persistentStore.get('mruFiles'));
-                }
-
-//                 store.getState().app.fileModTimes = new Map(
-//                     store.getState().app.fileModTimes.set(
-//                         action.fullFilename,
-//                         action.fileModTime
-//                     )
-//                 );
-
-                console.log('file mod times:', store.getState().app.loaded.fileModTimes);
-                console.log('file load times:', store.getState().app.loaded.fileLoadTimes);
-
-                next(action);
-                break;
-            }
+//             case 'file-parse' : {
+//                 if (!persistentStore.get('mruFiles')) {
+//                     persistentStore.set('mruFiles', []);
+//                 }
+//
+//                 const mruFiles = persistentStore.get('mruFiles');
+//                 if (mruFiles.indexOf(action.fullFilename) === -1) {
+//                     mruFiles.unshift(action.fullFilename);
+//                     mruFiles.splice(10);
+//                     persistentStore.set('mruFiles', mruFiles);
+//
+//                     store.getState().app.mruFiles = mruFiles;
+//
+//                     console.log('MRU files are:', persistentStore.get('mruFiles'));
+//                 }
+//
+// //                 store.getState().app.fileModTimes = new Map(
+// //                     store.getState().app.fileModTimes.set(
+// //                         action.fullFilename,
+// //                         action.fileModTime
+// //                     )
+// //                 );
+//
+//                 console.log('file mod times:', store.getState().app.loaded.fileModTimes);
+//                 console.log('file load times:', store.getState().app.loaded.fileLoadTimes);
+//
+//                 next(action);
+//                 break;
+//             }
             default: {
                 next(action);
             }

@@ -67,7 +67,7 @@ const initialState = {
         fileModTimes: new Map(),
         fileLoadTimes: new Map(),
         regions: {}, // heruistically detected code region 0, and memory readback protection
-        labels: {}  // heruistically detected bootloader, mbr, mbr params
+        labels: {},  // heruistically detected bootloader, mbr, mbr params
     },
 
     mruFiles: persistentStore.get('mruFiles') || [],
@@ -108,7 +108,7 @@ export default function reducer(state = initialState, action) {
                     fileModTimes: new Map(),
                     fileLoadTimes: new Map(),
                     regions: {},
-                    labels: {}
+                    labels: {},
                 },
             };
         case 'file-error':
@@ -143,10 +143,24 @@ export default function reducer(state = initialState, action) {
                 }
             }
 
+            if (!persistentStore.get('mruFiles')) {
+                persistentStore.set('mruFiles', []);
+            }
+
+            const mruFiles = persistentStore.get('mruFiles');
+            if (mruFiles.indexOf(action.fullFilename) === -1) {
+                mruFiles.unshift(action.fullFilename);
+                mruFiles.splice(10);
+                persistentStore.set('mruFiles', mruFiles);
+
+                console.log('MRU files are:', persistentStore.get('mruFiles'));
+            }
+
             return {
                 ...state,
                 writtenAddress: 0,
                 fileError: null,
+                mruFiles,
 
                 loaded: {
                     blockSets: new Map(state.loaded.blockSets.set(action.filename, action.blocks)),
