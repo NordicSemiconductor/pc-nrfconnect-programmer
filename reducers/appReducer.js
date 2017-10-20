@@ -118,28 +118,29 @@ export default function reducer(state = initialState, action) {
 //                     blocks: new Map(),
 //                     filenames: [],
             };
-        case 'file-parse':
+        case 'file-parse': {
 //             let filenames = state.filenames;
-            if (state.loaded.filenames.indexOf(action.filename) === -1) {
-                state.loaded.filenames.push(action.filename);
+            const { loaded } = state;
+            if (loaded.filenames.indexOf(action.filename) === -1) {
+                loaded.filenames.push(action.filename);
             }
 
-            if (!state.loaded.fileColours.has(action.filename)) {
-                state.loaded.fileColours.set(
+            if (!loaded.fileColours.has(action.filename)) {
+                loaded.fileColours.set(
                     action.filename,
-                    colours[(state.loaded.blockSets.size) % 8],
+                    colours[(loaded.blockSets.size) % 8],
                 );
             }
 
             for (const [region, length] of Object.entries(action.regions)) {
                 if (length !== undefined) {
-                    state.loaded.regions[region] = length;
+                    loaded.regions[region] = length;
                 }
             }
 
             for (const [label, address] of Object.entries(action.labels)) {
                 if (address !== undefined) {
-                    state.loaded.labels[label] = address;
+                    loaded.labels[label] = address;
                 }
             }
 
@@ -163,16 +164,19 @@ export default function reducer(state = initialState, action) {
                 mruFiles,
 
                 loaded: {
-                    blockSets: new Map(state.loaded.blockSets.set(action.filename, action.blocks)),
-                    filenames: state.loaded.filenames,
-                    fileColours: state.loaded.fileColours,
-                    fileModTimes: state.loaded.fileModTimes.set(action.filename, action.fileModTime),
-                    fileLoadTimes: state.loaded.fileLoadTimes.set(action.fullFilename, action.fileLoadTime),
-                    regions: state.loaded.regions,
-                    labels: state.loaded.labels,
+                    blockSets: new Map(loaded.blockSets.set(action.filename, action.blocks)),
+                    filenames: loaded.filenames,
+                    fileColours: loaded.fileColours,
+                    fileModTimes: loaded.fileModTimes.set(action.filename, action.fileModTime),
+                    fileLoadTimes: loaded.fileLoadTimes.set(
+                        action.fullFilename, action.fileLoadTime,
+                    ),
+                    regions: loaded.regions,
+                    labels: loaded.labels,
                 },
 
             };
+        }
         case 'write-progress-start':
             return {
                 ...state,
