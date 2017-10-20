@@ -252,10 +252,8 @@ export function write(appState) {
 }
 
 
-export function recover(appState) {
+export function recover(serialNumber) {
     return dispatch => {
-        const serialNumber = appState.target.serialNumber;
-
         if (!serialNumber) {
             logger.error('Select a device before recovering');
             return;

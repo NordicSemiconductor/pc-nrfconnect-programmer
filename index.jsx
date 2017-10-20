@@ -36,11 +36,10 @@
 
 import React from 'react';
 import { logger } from 'nrfconnect/core';
-// import Store from 'electron-store';
 
-import MemoryLayout from './components/MemoryLayout';
-import ControlPanel from './components/ControlPanel';
-import * as fileActions from './actions/files';
+import ControlPanel from './containers/controlPanel';
+import AppMainView from './containers/appMainView';
+import { openFile, refreshAllFiles } from './actions/files';
 import * as jprogActions from './actions/jprog';
 import appReducer from './reducers';
 
@@ -55,68 +54,33 @@ export default {
         };
         document.ondragover = document.ondrop;
 
-        document.body.ondragover = ev => {
+        document.body.ondragover = event => {
             /* eslint-disable no-param-reassign */
-            if (!ev.dataTransfer.files.length) {
-                ev.dataTransfer.dropEffect = 'none';
-                ev.dataTransfer.effectAllowed = 'none';
+            if (!event.dataTransfer.files.length) {
+                event.dataTransfer.dropEffect = 'none';
+                event.dataTransfer.effectAllowed = 'none';
             } else {
-                ev.dataTransfer.effectAllowed = 'uninitialized';
+                event.dataTransfer.effectAllowed = 'uninitialized';
             }
         };
 
-        document.body.ondrop = ev => {
-            Array.from(ev.dataTransfer.files).forEach(i => fileActions.openFile(i.path)(dispatch));
-            ev.preventDefault();
+        document.body.ondrop = event => {
+            Array.from(event.dataTransfer.files).forEach(i => {
+                dispatch(openFile(i.path));
+            });
+            event.preventDefault();
         };
     },
-    decorateMainView: MainView => (
-        props => {
-            if (props.fileError) {
-                return (
-                    <MainView>
-                        <div className="alert alert-error">{ props.fileError }</div>
-                    </MainView>
-                );
-            }
-
-            return (
-                <MainView>
-                    <MemoryLayout {...props.loaded} targetSize={props.targetSize} />
-                </MainView>
-            );
-        }
+    decorateMainView: MainView => () => (
+        <MainView>
+            <AppMainView />
+        </MainView>
     ),
-    mapMainViewState: (state, props) => ({
-        ...props,
-        loaded: state.app.file.loaded,
-        targetSize: state.app.target.size,
-        writtenAddress: state.app.target.writtenAddress,
-        fileError: state.app.file.fileError,
-    }),
-    decorateSidePanel: SidePanel => (
-        props => (
-            <SidePanel>
-                <ControlPanel {...props} />
-            </SidePanel>
-        )
+    decorateSidePanel: SidePanel => () => (
+        <SidePanel>
+            <ControlPanel />
+        </SidePanel>
     ),
-    mapSidePanelState: (state, props) => ({
-        ...props,
-        loaded: state.app.file.loaded,
-        mruFiles: state.app.file.mruFiles,
-        targetIsReady: state.app.target.isReady,
-        targetSize: state.app.target.size,
-    }),
-    mapSidePanelDispatch: (dispatch, props) => ({
-        ...props,
-        openFileDialog: () => dispatch(fileActions.openFileDialog()),
-        openFile: filename => dispatch(fileActions.openFile(filename)),
-        refreshAllFiles: () => { dispatch({ type: 'START-REFRESH-ALL-FILES' }); },
-        performWrite: () => { dispatch({ type: 'START-WRITE' }); },
-        performRecover: () => { dispatch({ type: 'START-RECOVER' }); },
-        closeFiles: () => { dispatch({ type: 'EMPTY-FILES' }); },
-    }),
     reduceApp: appReducer,
 
     mapSerialPortSelectorState: (state, props) => ({
@@ -125,9 +89,11 @@ export default {
     }),
 
     middleware: store => next => action => { // eslint-disable-line
+        const state = store.getState();
+        const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                store.dispatch(jprogActions.logDeviceInfo(
+                dispatch(jprogActions.logDeviceInfo(
                     action.port.serialNumber,
                     action.port.comName,
                 ));
@@ -137,25 +103,19 @@ export default {
                 logger.info('Target device closed.');
                 break;
             }
-            case 'START-WRITE' : {
-                const state = store.getState();
+            case 'START-WRITE': {
                 if (state.app.file.loaded.blockSets.size === 0) {
                     return;
                 }
-
-                store.dispatch(jprogActions.write(state.app));
+                dispatch(jprogActions.write(state.app));
                 break;
             }
-            case 'START-RECOVER' : {
-                store.dispatch(jprogActions.recover(store.getState().app));
+            case 'START-RECOVER': {
+                dispatch(jprogActions.recover(state.app.target.serialNumber));
                 break;
             }
-            case 'START-REFRESH-ALL-FILES' : {
-                store.dispatch(
-                    fileActions.refreshAllFiles(
-                        store.getState().app.loaded.fileLoadTimes,
-                    ),
-                );
+            case 'START-REFRESH-ALL-FILES': {
+                dispatch(refreshAllFiles(state.app.loaded.fileLoadTimes));
                 break;
             }
             default:
