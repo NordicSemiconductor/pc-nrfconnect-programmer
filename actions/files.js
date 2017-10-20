@@ -50,7 +50,7 @@ function displayFileError(err, dispatch) {
     const error = `Could not open .hex file: ${err}`;
     logger.error(error);
     dispatch({
-        type: 'file-error',
+        type: 'FILE-ERROR',
         fileError: error,
     });
 }
@@ -145,7 +145,7 @@ function parseOneFile(filename, dispatch) {
             }
 
             dispatch({
-                type: 'file-parse',
+                type: 'FILE-PARSE',
                 filename: basename(filename),
                 fullFilename: filename,
                 fileModTime: stats.mtime,
@@ -255,7 +255,7 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
             const lastLoaded = (new Date(newestFileTimestamp)).toLocaleString();
 
             electron.remote.dialog.showMessageBox({
-                type: 'warning',
+                type: 'WARNING',
                 buttons: [
                     `Use old version (prior to ${lastLoaded})`,
                     'Reload all files and proceed',

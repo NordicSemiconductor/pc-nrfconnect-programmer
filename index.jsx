@@ -127,10 +127,10 @@ export default {
         ...props,
         openFileDialog: () => dispatch(fileActions.openFileDialog()),
         openFile: filename => dispatch(fileActions.openFile(filename)),
-        refreshAllFiles: () => { dispatch({ type: 'start-refresh-all-files' }); },
-        performWrite: () => { dispatch({ type: 'start-write' }); },
-        performRecover: () => { dispatch({ type: 'start-recover' }); },
-        closeFiles: () => { dispatch({ type: 'empty-files' }); },
+        refreshAllFiles: () => { dispatch({ type: 'START-REFRESH-ALL-FILES' }); },
+        performWrite: () => { dispatch({ type: 'START-WRITE' }); },
+        performRecover: () => { dispatch({ type: 'START-RECOVER' }); },
+        closeFiles: () => { dispatch({ type: 'EMPTY-FILES' }); },
     }),
     reduceApp: appReducer,
 
@@ -145,7 +145,7 @@ export default {
                 next(action);
                 break;
             }
-            case 'start-write' : {
+            case 'START-WRITE' : {
                 const state = store.getState();
                 if (state.app.loaded.blockSets.size === 0) { return; }
 //                 if (state.app.writtenAddress !== 0) { return; }
@@ -155,13 +155,13 @@ export default {
                 next(action);
                 break;
             }
-            case 'start-recover' : {
+            case 'START-RECOVER' : {
                 store.dispatch(jprogActions.recover(store.getState().app));
 
                 next(action);
                 break;
             }
-            case 'start-refresh-all-files' : {
+            case 'START-REFRESH-ALL-FILES' : {
                 store.dispatch(
                     fileActions.refreshAllFiles(
                         store.getState().app.loaded.fileLoadTimes,
@@ -171,35 +171,6 @@ export default {
                 next(action);
                 break;
             }
-//             case 'file-parse' : {
-//                 if (!persistentStore.get('mruFiles')) {
-//                     persistentStore.set('mruFiles', []);
-//                 }
-//
-//                 const mruFiles = persistentStore.get('mruFiles');
-//                 if (mruFiles.indexOf(action.fullFilename) === -1) {
-//                     mruFiles.unshift(action.fullFilename);
-//                     mruFiles.splice(10);
-//                     persistentStore.set('mruFiles', mruFiles);
-//
-//                     store.getState().app.mruFiles = mruFiles;
-//
-//                     console.log('MRU files are:', persistentStore.get('mruFiles'));
-//                 }
-//
-// //                 store.getState().app.fileModTimes = new Map(
-// //                     store.getState().app.fileModTimes.set(
-// //                         action.fullFilename,
-// //                         action.fileModTime
-// //                     )
-// //                 );
-//
-//                 console.log('file mod times:', store.getState().app.loaded.fileModTimes);
-//                 console.log('file load times:', store.getState().app.loaded.fileLoadTimes);
-//
-//                 next(action);
-//                 break;
-//             }
             default: {
                 next(action);
             }

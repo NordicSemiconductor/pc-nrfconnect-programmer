@@ -83,7 +83,7 @@ export default function reducer(state = initialState, action) {
                 writtenAddress: 0,
                 targetIsReady: false,
             };
-        case 'target-size-known':
+        case 'TARGET-SIZE-KNOWN':
             // Fetching target's flash size is async, armor against race conditions
             if (action.targetPort !== state.targetPort) {
                 return state;
@@ -94,7 +94,7 @@ export default function reducer(state = initialState, action) {
                 targetPageSize: action.targetPageSize,
                 targetIsReady: true,
             };
-        case 'empty-files':
+        case 'EMPTY-FILES':
             return {
                 ...state,
 //                     fileError: action.fileError,
@@ -111,14 +111,14 @@ export default function reducer(state = initialState, action) {
                     labels: {},
                 },
             };
-        case 'file-error':
+        case 'FILE-ERROR':
             return {
                 ...state,
                 fileError: action.fileError,
 //                     blocks: new Map(),
 //                     filenames: [],
             };
-        case 'file-parse': {
+        case 'FILE-PARSE': {
 //             let filenames = state.filenames;
             const { loaded } = state;
             if (loaded.filenames.indexOf(action.filename) === -1) {
@@ -177,18 +177,18 @@ export default function reducer(state = initialState, action) {
 
             };
         }
-        case 'write-progress-start':
+        case 'WRITE-PROGRESS-START':
             return {
                 ...state,
                 targetIsReady: false,
             };
-        case 'write-progress':
+        case 'WRITE-PROGRESS':
             return {
                 ...state,
                 writtenAddress: action.address,
                 targetIsReady: false,
             };
-        case 'write-progress-finished':
+        case 'WRITE-PROGRESS-FINISHED':
             return {
                 ...state,
 //                 writtenAddress: action.address,
