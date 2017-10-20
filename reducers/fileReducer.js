@@ -38,6 +38,9 @@ import Store from 'electron-store';
 
 const persistentStore = new Store({ name: 'nrf-programmer' });
 
+if (!persistentStore.get('mruFiles')) {
+    persistentStore.set('mruFiles', []);
+}
 
 // Colours from:
 // https://github.com/d3/d3-scale-chromatic
@@ -53,11 +56,6 @@ const colours = [
 ];
 
 const initialState = {
-    targetSize: 0x00100000,  // 1MiB. TODO: Set a saner default?
-    targetPort: null,
-    targetIsReady: false,   // Flag to denote that a devkit is busy (or unconnected)
-
-    writtenAddress: 0,
     fileError: null,
 
     loaded: {
@@ -70,36 +68,14 @@ const initialState = {
         labels: {},  // heruistically detected bootloader, mbr, mbr params
     },
 
-    mruFiles: persistentStore.get('mruFiles') || [],
+    mruFiles: persistentStore.get('mruFiles'),
 };
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case 'SERIAL_PORT_SELECTED':
-            return {
-                ...state,
-                targetPort: action.port.comName,
-                targetSerialNumber: action.port.serialNumber,
-                writtenAddress: 0,
-                targetIsReady: false,
-            };
-        case 'TARGET-SIZE-KNOWN':
-            // Fetching target's flash size is async, armor against race conditions
-            if (action.targetPort !== state.targetPort) {
-                return state;
-            }
-            return {
-                ...state,
-                targetSize: action.targetSize,
-                targetPageSize: action.targetPageSize,
-                targetIsReady: true,
-            };
         case 'EMPTY-FILES':
             return {
                 ...state,
-//                     fileError: action.fileError,
-//                     blocks: new Map(),
-                writtenAddress: 0,
                 fileError: null,
                 loaded: {
                     blockSets: new Map(),
@@ -115,11 +91,8 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 fileError: action.fileError,
-//                     blocks: new Map(),
-//                     filenames: [],
             };
         case 'FILE-PARSE': {
-//             let filenames = state.filenames;
             const { loaded } = state;
             if (loaded.filenames.indexOf(action.filename) === -1) {
                 loaded.filenames.push(action.filename);
@@ -144,10 +117,6 @@ export default function reducer(state = initialState, action) {
                 }
             }
 
-            if (!persistentStore.get('mruFiles')) {
-                persistentStore.set('mruFiles', []);
-            }
-
             const mruFiles = persistentStore.get('mruFiles');
             if (mruFiles.indexOf(action.fullFilename) === -1) {
                 mruFiles.unshift(action.fullFilename);
@@ -159,10 +128,8 @@ export default function reducer(state = initialState, action) {
 
             return {
                 ...state,
-                writtenAddress: 0,
                 fileError: null,
                 mruFiles,
-
                 loaded: {
                     blockSets: new Map(loaded.blockSets.set(action.filename, action.blocks)),
                     filenames: loaded.filenames,
@@ -177,25 +144,7 @@ export default function reducer(state = initialState, action) {
 
             };
         }
-        case 'WRITE-PROGRESS-START':
-            return {
-                ...state,
-                targetIsReady: false,
-            };
-        case 'WRITE-PROGRESS':
-            return {
-                ...state,
-                writtenAddress: action.address,
-                targetIsReady: false,
-            };
-        case 'WRITE-PROGRESS-FINISHED':
-            return {
-                ...state,
-//                 writtenAddress: action.address,
-                writtenAddress: 0,
-                targetIsReady: true,
-            };
         default:
-            return state;
     }
+    return state;
 }

@@ -223,17 +223,17 @@ function writeHex(serialNumber, hexString, dispatch) {
 // paginates the result to fit flash pages, and calls writeHex()
 export function write(appState) {
     return dispatch => {
-        const serialNumber = appState.targetSerialNumber;
-        const pageSize = appState.targetPageSize;
+        const serialNumber = appState.target.serialNumber;
+        const pageSize = appState.target.pageSize;
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
             return;
         }
 
-        checkUpToDateFiles(appState.loaded.fileLoadTimes, dispatch).then(() => {
+        checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
             const pages = paginate(
                 flattenOverlaps(
-                    overlapBlockSets(appState.loaded.blockSets),
+                    overlapBlockSets(appState.file.loaded.blockSets),
                 ), pageSize);
 
 //         console.log(pages);
@@ -254,7 +254,7 @@ export function write(appState) {
 
 export function recover(appState) {
     return dispatch => {
-        const serialNumber = appState.targetSerialNumber;
+        const serialNumber = appState.target.serialNumber;
 
         if (!serialNumber) {
             logger.error('Select a device before recovering');

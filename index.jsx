@@ -35,34 +35,28 @@
  */
 
 import React from 'react';
-// import { logger } from 'nrfconnect/core';
+import { logger } from 'nrfconnect/core';
 // import Store from 'electron-store';
 
 import MemoryLayout from './components/MemoryLayout';
 import ControlPanel from './components/ControlPanel';
 import * as fileActions from './actions/files';
 import * as jprogActions from './actions/jprog';
-import appReducer from './reducers/appReducer';
+import appReducer from './reducers';
 
 import './resources/css/index.less';
-
-// const persistentStore = new Store({ name: 'nrf-programmer' });
-
 
 /* eslint-disable react/prop-types */
 
 export default {
     onInit: dispatch => {
-        /* eslint-disable no-multi-assign */
-        document.ondragover = document.ondrop = ev => {
-        /* eslint-enable no-multi-assign */
-        /* eslint-disable no-param-reassign */
+        document.ondrop = ev => {
             ev.preventDefault();
         };
+        document.ondragover = document.ondrop;
 
         document.body.ondragover = ev => {
-//             console.log('drag-and-drop over: ', ev.dataTransfer);
-
+            /* eslint-disable no-param-reassign */
             if (!ev.dataTransfer.files.length) {
                 ev.dataTransfer.dropEffect = 'none';
                 ev.dataTransfer.effectAllowed = 'none';
@@ -73,16 +67,8 @@ export default {
 
         document.body.ondrop = ev => {
             Array.from(ev.dataTransfer.files).forEach(i => fileActions.openFile(i.path)(dispatch));
-//             console.log('drag-and-drop: ', ev.dataTransfer.files[0].path);
-
             ev.preventDefault();
         };
-        /* eslint-enable no-param-reassign */
-
-//         logger.info('App initializing');
-    },
-    onReady: () => {
-//         logger.info('App initialized');
     },
     decorateMainView: MainView => (
         props => {
@@ -103,10 +89,10 @@ export default {
     ),
     mapMainViewState: (state, props) => ({
         ...props,
-        loaded: state.app.loaded,
-        targetSize: state.app.targetSize,
-        writtenAddress: state.app.writtenAddress,
-        fileError: state.app.fileError,
+        loaded: state.app.file.loaded,
+        targetSize: state.app.target.size,
+        writtenAddress: state.app.target.writtenAddress,
+        fileError: state.app.file.fileError,
     }),
     decorateSidePanel: SidePanel => (
         props => (
@@ -117,11 +103,10 @@ export default {
     ),
     mapSidePanelState: (state, props) => ({
         ...props,
-        loaded: state.app.loaded,
-//         fileColours: state.app.fileColours,
-        mruFiles: state.app.mruFiles,
-        targetIsReady: state.app.targetIsReady,
-        targetSize: state.app.targetSize,
+        loaded: state.app.file.loaded,
+        mruFiles: state.app.file.mruFiles,
+        targetIsReady: state.app.target.isReady,
+        targetSize: state.app.target.size,
     }),
     mapSidePanelDispatch: (dispatch, props) => ({
         ...props,
@@ -134,6 +119,11 @@ export default {
     }),
     reduceApp: appReducer,
 
+    mapSerialPortSelectorState: (state, props) => ({
+        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
+        ...props,
+    }),
+
     middleware: store => next => action => { // eslint-disable-line
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
@@ -141,24 +131,23 @@ export default {
                     action.port.serialNumber,
                     action.port.comName,
                 ));
-
-                next(action);
+                break;
+            }
+            case 'SERIAL_PORT_DESELECTED': {
+                logger.info('Target device closed.');
                 break;
             }
             case 'START-WRITE' : {
                 const state = store.getState();
-                if (state.app.loaded.blockSets.size === 0) { return; }
-//                 if (state.app.writtenAddress !== 0) { return; }
+                if (state.app.file.loaded.blockSets.size === 0) {
+                    return;
+                }
 
                 store.dispatch(jprogActions.write(state.app));
-
-                next(action);
                 break;
             }
             case 'START-RECOVER' : {
                 store.dispatch(jprogActions.recover(store.getState().app));
-
-                next(action);
                 break;
             }
             case 'START-REFRESH-ALL-FILES' : {
@@ -167,13 +156,10 @@ export default {
                         store.getState().app.loaded.fileLoadTimes,
                     ),
                 );
-
-                next(action);
                 break;
             }
-            default: {
-                next(action);
-            }
+            default:
         }
+        next(action);
     },
 };
