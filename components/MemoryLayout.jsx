@@ -318,8 +318,8 @@ MemoryLayout.propTypes = {
     fileColours: PropTypes.instanceOf(Map),
     writtenAddress: PropTypes.number,
     fileError: PropTypes.string,
-    labels: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),
-    regions: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)),
+    labels: PropTypes.shape({}),
+    regions: PropTypes.shape({}),
 };
 
 MemoryLayout.defaultProps = {
@@ -329,8 +329,8 @@ MemoryLayout.defaultProps = {
     fileColours: new Map(),
     writtenAddress: 0,  // From 0 to here will be assumed written, from here to the top pending
     fileError: null,
-    labels: [],
-    regions: [],
+    labels: {},
+    regions: {},
 };
 
 export default MemoryLayout;

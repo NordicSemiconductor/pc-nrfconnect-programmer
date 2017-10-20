@@ -84,8 +84,8 @@ const ControlPanel = props => {
     let mruMenuItems;
 
     if (props.mruFiles.length) {
-        mruMenuItems = props.mruFiles.map(filename => (
-            <MenuItem onSelect={() => props.openFile(filename)}>{filename}</MenuItem>
+        mruMenuItems = props.mruFiles.map((filename, i) => (
+            <MenuItem key={`${i + 1}`} onSelect={() => props.openFile(filename)}>{filename}</MenuItem>
         ));
     } else {
         mruMenuItems = (<MenuItem disabled="disabled">No recently used files</MenuItem>);
@@ -96,13 +96,13 @@ const ControlPanel = props => {
             <Button onClick={props.closeFiles}>
                 <Glyphicon glyph="folder-close" />Clear files
             </Button>
-            <Dropdown pullRight>
+            <Dropdown pullRight id="files-dropdown">
                 <Dropdown.Toggle>
                     <Glyphicon glyph="folder-open" />Add a .hex file
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     { mruMenuItems }
-                    <MenuItem divider="divider" />
+                    <MenuItem divider />
                     <MenuItem onSelect={props.openFileDialog}>Browse...</MenuItem>
                 </Dropdown.Menu>
             </Dropdown>
@@ -131,8 +131,7 @@ ControlPanel.propTypes = {
     openFileDialog: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
-    fileColours: PropTypes.instanceOf(Map).isRequired,
-    mruFiles: PropTypes.instanceOf(Map).isRequired,
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     loaded: PropTypes.shape({
         fileColours: PropTypes.instanceOf(Map),
         blockSets: PropTypes.instanceOf(Map),
@@ -140,7 +139,6 @@ ControlPanel.propTypes = {
     targetSize: PropTypes.number.isRequired,
     refreshAllFiles: PropTypes.func.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
-//     mruFiles: PropTypes.
 };
 
 export default ControlPanel;
