@@ -34,23 +34,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.core-main-view {
-/*   border: 2px dotted red; */
-  height: 100%;
-}
+import { combineReducers } from 'redux';
 
-.core-main-layout > div.core-side-panel {
-/*   border: 2px dotted red; */
-  height: 100%;
-  overflow-y: visible;
+import target from './targetReducer';
+import file from './fileReducer';
 
-  button {
-    display: block;
-    width: 12em;
-    text-align: left;
+const rootReducer = combineReducers({
+    target,
+    file,
+});
 
-    span.glyphicon {
-        margin-right: 5px;
-    }
-  }
-}
+export default rootReducer;

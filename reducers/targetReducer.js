@@ -34,23 +34,76 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.core-main-view {
-/*   border: 2px dotted red; */
-  height: 100%;
-}
+const initialState = {
+    size: 0x00100000,  // 1MiB. TODO: Set a saner default?
+    port: null,
+    isReady: false,   // Flag to denote that a devkit is busy (or unconnected)
+    pageSize: 0,
+    writtenAddress: 0,
+    serialNumber: null,
+};
 
-.core-main-layout > div.core-side-panel {
-/*   border: 2px dotted red; */
-  height: 100%;
-  overflow-y: visible;
+export default function target(state = initialState, action) {
+    switch (action.type) {
+        case 'SERIAL_PORT_SELECTED':
+            return {
+                ...state,
+                port: action.port.comName,
+                serialNumber: action.port.serialNumber,
+                writtenAddress: 0,
+                isReady: false,
+            };
 
-  button {
-    display: block;
-    width: 12em;
-    text-align: left;
+        case 'SERIAL_PORT_DESELECTED':
+            return initialState;
 
-    span.glyphicon {
-        margin-right: 5px;
+        case 'TARGET_SIZE_KNOWN':
+            // Fetching target's flash size is async, armor against race conditions
+            if (action.targetPort !== state.port) {
+                return state;
+            }
+
+            return {
+                ...state,
+                size: action.targetSize,
+                pageSize: action.targetPageSize,
+                isReady: true,
+            };
+
+        case 'EMPTY_FILES':
+            return {
+                ...state,
+                writtenAddress: 0,
+            };
+
+        case 'FILE_PARSE': {
+            return {
+                ...state,
+                writtenAddress: 0,
+            };
+        }
+
+        case 'WRITE_PROGRESS_START':
+            return {
+                ...state,
+                isReady: false,
+            };
+
+        case 'WRITE_PROGRESS':
+            return {
+                ...state,
+                writtenAddress: action.address,
+                isReady: false,
+            };
+
+        case 'WRITE_PROGRESS_FINISHED':
+            return {
+                ...state,
+                writtenAddress: 0,
+                isReady: true,
+            };
+
+        default:
     }
-  }
+    return state;
 }

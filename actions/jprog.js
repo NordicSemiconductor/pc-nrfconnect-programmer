@@ -1,3 +1,38 @@
+/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+ *
+ * All rights reserved.
+ *
+ * Use in source and binary forms, redistribution in binary form only, with
+ * or without modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 2. Neither the name of Nordic Semiconductor ASA nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ * 3. This software, with or without modification, must only be used with a Nordic
+ *    Semiconductor ASA integrated circuit.
+ *
+ * 4. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+ * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 // import electron from 'electron';
 import { logger } from 'nrfconnect/core';
@@ -69,7 +104,7 @@ export function logDeviceInfo(serialNumber, comName) {
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
                 // in middleware and log it from there?
                 dispatch({
-                    type: 'target-size-known',
+                    type: 'TARGET_SIZE_KNOWN',
                     targetPort: comName,
                     targetSize: codeSize,
                     targetPageSize: codePageSize,
@@ -178,7 +213,7 @@ function writeHex(serialNumber, hexString, dispatch) {
         logger.info('Write procedure finished');
 
         dispatch({
-            type: 'write-progress-finished',
+            type: 'WRITE_PROGRESS_FINISHED',
         });
     });
 }
@@ -188,17 +223,17 @@ function writeHex(serialNumber, hexString, dispatch) {
 // paginates the result to fit flash pages, and calls writeHex()
 export function write(appState) {
     return dispatch => {
-        const serialNumber = appState.targetSerialNumber;
-        const pageSize = appState.targetPageSize;
+        const serialNumber = appState.target.serialNumber;
+        const pageSize = appState.target.pageSize;
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
             return;
         }
 
-        checkUpToDateFiles(appState.loaded.fileLoadTimes, dispatch).then(() => {
+        checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
             const pages = paginate(
                 flattenOverlaps(
-                    overlapBlockSets(appState.loaded.blockSets),
+                    overlapBlockSets(appState.file.loaded.blockSets),
                 ), pageSize);
 
 //         console.log(pages);
@@ -208,7 +243,7 @@ export function write(appState) {
 //         writeBlockClosure();
 
             dispatch({
-                type: 'write-progress-start',
+                type: 'WRITE_PROGRESS_START',
             });
 
             writeHex(serialNumber, arraysToHex(pages, 64), dispatch);
@@ -217,17 +252,15 @@ export function write(appState) {
 }
 
 
-export function recover(appState) {
+export function recover(serialNumber) {
     return dispatch => {
-        const serialNumber = appState.targetSerialNumber;
-
         if (!serialNumber) {
             logger.error('Select a device before recovering');
             return;
         }
 
         dispatch({
-            type: 'write-progress-start',
+            type: 'WRITE_PROGRESS_START',
         });
 
         nrfjprog.recover(serialNumber, progress => {
@@ -245,9 +278,8 @@ export function recover(appState) {
             logger.info('Recovery procedure finished');
 
             dispatch({
-                type: 'write-progress-finished',
+                type: 'WRITE_PROGRESS_FINISHED',
             });
         });
     };
 }
-

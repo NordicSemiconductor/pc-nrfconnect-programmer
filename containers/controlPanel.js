@@ -34,23 +34,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.core-main-view {
-/*   border: 2px dotted red; */
-  height: 100%;
-}
+import { connect } from 'react-redux';
+import ControlPanel from '../components/ControlPanel';
+import * as fileActions from '../actions/files';
 
-.core-main-layout > div.core-side-panel {
-/*   border: 2px dotted red; */
-  height: 100%;
-  overflow-y: visible;
-
-  button {
-    display: block;
-    width: 12em;
-    text-align: left;
-
-    span.glyphicon {
-        margin-right: 5px;
-    }
-  }
-}
+export default connect(
+    (state, props) => ({
+        ...props,
+        loaded: state.app.file.loaded,
+        mruFiles: state.app.file.mruFiles,
+        targetIsReady: state.app.target.isReady,
+        targetSize: state.app.target.size,
+    }),
+    (dispatch, props) => ({
+        ...props,
+        openFileDialog: () => dispatch(fileActions.openFileDialog()),
+        openFile: filename => dispatch(fileActions.openFile(filename)),
+        refreshAllFiles: () => { dispatch({ type: 'START-REFRESH-ALL-FILES' }); },
+        performWrite: () => { dispatch({ type: 'START-WRITE' }); },
+        performRecover: () => { dispatch({ type: 'START-RECOVER' }); },
+        closeFiles: () => { dispatch({ type: 'EMPTY_FILES' }); },
+    }),
+)(ControlPanel);

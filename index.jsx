@@ -35,174 +35,91 @@
  */
 
 import React from 'react';
-// import { logger } from 'nrfconnect/core';
-// import Store from 'electron-store';
+import { logger } from 'nrfconnect/core';
 
-import MemoryLayout from './components/MemoryLayout';
-import ControlPanel from './components/ControlPanel';
-import * as fileActions from './actions/files';
+import ControlPanel from './containers/controlPanel';
+import AppMainView from './containers/appMainView';
+import { openFile, refreshAllFiles } from './actions/files';
 import * as jprogActions from './actions/jprog';
-import appReducer from './reducers/appReducer';
+import appReducer from './reducers';
 
 import './resources/css/index.less';
-
-// const persistentStore = new Store({ name: 'nrf-programmer' });
-
 
 /* eslint-disable react/prop-types */
 
 export default {
     onInit: dispatch => {
-        /* eslint-disable no-multi-assign */
-        document.ondragover = document.ondrop = ev => {
-        /* eslint-enable no-multi-assign */
-        /* eslint-disable no-param-reassign */
+        document.ondrop = ev => {
             ev.preventDefault();
         };
+        document.ondragover = document.ondrop;
 
-        document.body.ondragover = ev => {
-//             console.log('drag-and-drop over: ', ev.dataTransfer);
-
-            if (!ev.dataTransfer.files.length) {
-                ev.dataTransfer.dropEffect = 'none';
-                ev.dataTransfer.effectAllowed = 'none';
+        document.body.ondragover = event => {
+            /* eslint-disable no-param-reassign */
+            if (!event.dataTransfer.files.length) {
+                event.dataTransfer.dropEffect = 'none';
+                event.dataTransfer.effectAllowed = 'none';
             } else {
-                ev.dataTransfer.effectAllowed = 'uninitialized';
+                event.dataTransfer.effectAllowed = 'uninitialized';
             }
         };
 
-        document.body.ondrop = ev => {
-            Array.from(ev.dataTransfer.files).forEach(i => fileActions.openFile(i.path)(dispatch));
-//             console.log('drag-and-drop: ', ev.dataTransfer.files[0].path);
-
-            ev.preventDefault();
+        document.body.ondrop = event => {
+            Array.from(event.dataTransfer.files).forEach(i => {
+                dispatch(openFile(i.path));
+            });
+            event.preventDefault();
         };
-        /* eslint-enable no-param-reassign */
-
-//         logger.info('App initializing');
     },
-    onReady: () => {
-//         logger.info('App initialized');
-    },
-    decorateMainView: MainView => (
-        props => {
-            if (props.fileError) {
-                return (
-                    <MainView>
-                        <div className="alert alert-error">{ props.fileError }</div>
-                    </MainView>
-                );
-            }
-
-            return (
-                <MainView>
-                    <MemoryLayout {...props.loaded} targetSize={props.targetSize} />
-                </MainView>
-            );
-        }
+    decorateMainView: MainView => () => (
+        <MainView>
+            <AppMainView />
+        </MainView>
     ),
-    mapMainViewState: (state, props) => ({
-        ...props,
-        loaded: state.app.loaded,
-        targetSize: state.app.targetSize,
-        writtenAddress: state.app.writtenAddress,
-        fileError: state.app.fileError,
-    }),
-    decorateSidePanel: SidePanel => (
-        props => (
-            <SidePanel>
-                <ControlPanel {...props} />
-            </SidePanel>
-        )
+    decorateSidePanel: SidePanel => () => (
+        <SidePanel>
+            <ControlPanel />
+        </SidePanel>
     ),
-    mapSidePanelState: (state, props) => ({
-        ...props,
-        loaded: state.app.loaded,
-//         fileColours: state.app.fileColours,
-        mruFiles: state.app.mruFiles,
-        targetIsReady: state.app.targetIsReady,
-        targetSize: state.app.targetSize,
-    }),
-    mapSidePanelDispatch: (dispatch, props) => ({
-        ...props,
-        openFileDialog: () => dispatch(fileActions.openFileDialog()),
-        openFile: filename => dispatch(fileActions.openFile(filename)),
-        refreshAllFiles: () => { dispatch({ type: 'start-refresh-all-files' }); },
-        performWrite: () => { dispatch({ type: 'start-write' }); },
-        performRecover: () => { dispatch({ type: 'start-recover' }); },
-        closeFiles: () => { dispatch({ type: 'empty-files' }); },
-    }),
     reduceApp: appReducer,
 
+    mapSerialPortSelectorState: (state, props) => ({
+        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
+        ...props,
+    }),
+
     middleware: store => next => action => { // eslint-disable-line
+        const state = store.getState();
+        const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                store.dispatch(jprogActions.logDeviceInfo(
+                dispatch(jprogActions.logDeviceInfo(
                     action.port.serialNumber,
                     action.port.comName,
                 ));
-
-                next(action);
                 break;
             }
-            case 'start-write' : {
-                const state = store.getState();
-                if (state.app.loaded.blockSets.size === 0) { return; }
-//                 if (state.app.writtenAddress !== 0) { return; }
-
-                store.dispatch(jprogActions.write(state.app));
-
-                next(action);
+            case 'SERIAL_PORT_DESELECTED': {
+                logger.info('Target device closed.');
                 break;
             }
-            case 'start-recover' : {
-                store.dispatch(jprogActions.recover(store.getState().app));
-
-                next(action);
+            case 'START-WRITE': {
+                if (state.app.file.loaded.blockSets.size === 0) {
+                    return;
+                }
+                dispatch(jprogActions.write(state.app));
                 break;
             }
-            case 'start-refresh-all-files' : {
-                store.dispatch(
-                    fileActions.refreshAllFiles(
-                        store.getState().app.loaded.fileLoadTimes,
-                    ),
-                );
-
-                next(action);
+            case 'START-RECOVER': {
+                dispatch(jprogActions.recover(state.app.target.serialNumber));
                 break;
             }
-//             case 'file-parse' : {
-//                 if (!persistentStore.get('mruFiles')) {
-//                     persistentStore.set('mruFiles', []);
-//                 }
-//
-//                 const mruFiles = persistentStore.get('mruFiles');
-//                 if (mruFiles.indexOf(action.fullFilename) === -1) {
-//                     mruFiles.unshift(action.fullFilename);
-//                     mruFiles.splice(10);
-//                     persistentStore.set('mruFiles', mruFiles);
-//
-//                     store.getState().app.mruFiles = mruFiles;
-//
-//                     console.log('MRU files are:', persistentStore.get('mruFiles'));
-//                 }
-//
-// //                 store.getState().app.fileModTimes = new Map(
-// //                     store.getState().app.fileModTimes.set(
-// //                         action.fullFilename,
-// //                         action.fileModTime
-// //                     )
-// //                 );
-//
-//                 console.log('file mod times:', store.getState().app.loaded.fileModTimes);
-//                 console.log('file load times:', store.getState().app.loaded.fileLoadTimes);
-//
-//                 next(action);
-//                 break;
-//             }
-            default: {
-                next(action);
+            case 'START-REFRESH-ALL-FILES': {
+                dispatch(refreshAllFiles(state.app.loaded.fileLoadTimes));
+                break;
             }
+            default:
         }
+        next(action);
     },
 };

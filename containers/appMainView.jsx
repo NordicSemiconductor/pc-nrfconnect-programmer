@@ -34,23 +34,41 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.core-main-view {
-/*   border: 2px dotted red; */
-  height: 100%;
-}
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import MemoryLayout from '../components/MemoryLayout';
 
-.core-main-layout > div.core-side-panel {
-/*   border: 2px dotted red; */
-  height: 100%;
-  overflow-y: visible;
+const AppMainView = (
+    props => {
+        const { fileError, loaded, targetSize } = props;
+        if (fileError) {
+            return (
+                <div className="alert alert-error">{ fileError }</div>
+            );
+        }
 
-  button {
-    display: block;
-    width: 12em;
-    text-align: left;
-
-    span.glyphicon {
-        margin-right: 5px;
+        return (
+            <MemoryLayout {...loaded} targetSize={targetSize} />
+        );
     }
-  }
-}
+);
+
+AppMainView.propTypes = {
+    fileError: PropTypes.string,
+    loaded: PropTypes.shape({}).isRequired,
+    targetSize: PropTypes.number.isRequired,
+};
+
+AppMainView.defaultProps = {
+    fileError: null,
+};
+
+export default connect(
+    (state, props) => ({
+        ...props,
+        loaded: state.app.file.loaded,
+        targetSize: state.app.target.size,
+        fileError: state.app.file.fileError,
+    }),
+)(AppMainView);
