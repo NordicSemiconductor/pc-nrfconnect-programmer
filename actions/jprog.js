@@ -104,7 +104,7 @@ export function logDeviceInfo(serialNumber, comName) {
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
                 // in middleware and log it from there?
                 dispatch({
-                    type: 'TARGET-SIZE-KNOWN',
+                    type: 'TARGET_SIZE_KNOWN',
                     targetPort: comName,
                     targetSize: codeSize,
                     targetPageSize: codePageSize,
@@ -213,7 +213,7 @@ function writeHex(serialNumber, hexString, dispatch) {
         logger.info('Write procedure finished');
 
         dispatch({
-            type: 'WRITE-PROGRESS-FINISHED',
+            type: 'WRITE_PROGRESS_FINISHED',
         });
     });
 }
@@ -243,7 +243,7 @@ export function write(appState) {
 //         writeBlockClosure();
 
             dispatch({
-                type: 'WRITE-PROGRESS-START',
+                type: 'WRITE_PROGRESS_START',
             });
 
             writeHex(serialNumber, arraysToHex(pages, 64), dispatch);
@@ -260,7 +260,7 @@ export function recover(serialNumber) {
         }
 
         dispatch({
-            type: 'WRITE-PROGRESS-START',
+            type: 'WRITE_PROGRESS_START',
         });
 
         nrfjprog.recover(serialNumber, progress => {
@@ -278,7 +278,7 @@ export function recover(serialNumber) {
             logger.info('Recovery procedure finished');
 
             dispatch({
-                type: 'WRITE-PROGRESS-FINISHED',
+                type: 'WRITE_PROGRESS_FINISHED',
             });
         });
     };

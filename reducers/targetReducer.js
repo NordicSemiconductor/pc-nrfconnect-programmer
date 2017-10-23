@@ -57,7 +57,7 @@ export default function target(state = initialState, action) {
         case 'SERIAL_PORT_DESELECTED':
             return initialState;
 
-        case 'TARGET-SIZE-KNOWN':
+        case 'TARGET_SIZE_KNOWN':
             // Fetching target's flash size is async, armor against race conditions
             if (action.targetPort !== state.port) {
                 return state;
@@ -70,33 +70,33 @@ export default function target(state = initialState, action) {
                 isReady: true,
             };
 
-        case 'EMPTY-FILES':
+        case 'EMPTY_FILES':
             return {
                 ...state,
                 writtenAddress: 0,
             };
 
-        case 'FILE-PARSE': {
+        case 'FILE_PARSE': {
             return {
                 ...state,
                 writtenAddress: 0,
             };
         }
 
-        case 'WRITE-PROGRESS-START':
+        case 'WRITE_PROGRESS_START':
             return {
                 ...state,
                 isReady: false,
             };
 
-        case 'WRITE-PROGRESS':
+        case 'WRITE_PROGRESS':
             return {
                 ...state,
                 writtenAddress: action.address,
                 isReady: false,
             };
 
-        case 'WRITE-PROGRESS-FINISHED':
+        case 'WRITE_PROGRESS_FINISHED':
             return {
                 ...state,
                 writtenAddress: 0,

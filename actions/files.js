@@ -50,7 +50,7 @@ function displayFileError(err, dispatch) {
     const error = `Could not open .hex file: ${err}`;
     logger.error(error);
     dispatch({
-        type: 'FILE-ERROR',
+        type: 'FILE_ERROR',
         fileError: error,
     });
 }
@@ -145,7 +145,7 @@ function parseOneFile(filename, dispatch) {
             }
 
             dispatch({
-                type: 'FILE-PARSE',
+                type: 'FILE_PARSE',
                 filename: basename(filename),
                 fullFilename: filename,
                 fileModTime: stats.mtime,

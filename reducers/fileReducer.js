@@ -73,7 +73,7 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case 'EMPTY-FILES':
+        case 'EMPTY_FILES':
             return {
                 ...state,
                 fileError: null,
@@ -87,12 +87,12 @@ export default function reducer(state = initialState, action) {
                     labels: {},
                 },
             };
-        case 'FILE-ERROR':
+        case 'FILE_ERROR':
             return {
                 ...state,
                 fileError: action.fileError,
             };
-        case 'FILE-PARSE': {
+        case 'FILE_PARSE': {
             const { loaded } = state;
             if (loaded.filenames.indexOf(action.filename) === -1) {
                 loaded.filenames.push(action.filename);
