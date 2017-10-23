@@ -255,7 +255,7 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
             const lastLoaded = (new Date(newestFileTimestamp)).toLocaleString();
 
             electron.remote.dialog.showMessageBox({
-                type: 'WARNING',
+                type: 'warning',
                 buttons: [
                     `Use old version (prior to ${lastLoaded})`,
                     'Reload all files and proceed',
