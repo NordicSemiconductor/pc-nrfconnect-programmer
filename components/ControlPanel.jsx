@@ -37,7 +37,8 @@
 import React from 'react';
 import { Button, Dropdown, MenuItem, Glyphicon } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { overlapBlockSets } from 'nrf-intel-hex';
+// import { overlapBlockSets } from 'nrf-intel-hex';
+import MemoryMap from 'nrf-intel-hex';
 
 import FileLegend from './FileLegend';
 import hexpad from '../hexpad';
@@ -47,10 +48,10 @@ const ControlPanel = props => {
 //         console.log('Open recent: ', ev.target.innerText);
 //     }
 
-    const overlaps = overlapBlockSets(props.loaded.blockSets);
+    const overlaps = MemoryMap.overlapMemoryMaps(props.loaded.memMaps);
 //     console.log(overlaps);
     let overlapWarning = '';
-    const outsideFlashBlocks = [];
+    let outsideFlashBlocks = [];
     for (const [startAddress, overlap] of overlaps) {
         if (overlap.length > 1) {
             overlapWarning = (<div className="alert alert-warning">
@@ -65,9 +66,10 @@ const ControlPanel = props => {
 
         // This assumes UICR at 0x10001000, size 4KiB
 //         if (startAddress >= 0x10001000) {
-        if ((startAddress < 0x10001000 && endAddress > props.targetSize) ||
+        if ((startAddress  < 0x10001000 && endAddress > props.targetSize ) ||
             (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
-            outsideFlashBlocks.push(`${hexpad(startAddress)}-${hexpad(endAddress)}`);
+
+            outsideFlashBlocks.push( hexpad(startAddress) + '-' + hexpad(endAddress) );
         }
     }
     let outsideFlashWarning;
@@ -84,12 +86,13 @@ const ControlPanel = props => {
     let mruMenuItems;
 
     if (props.mruFiles.length) {
-        mruMenuItems = props.mruFiles.map((filename, i) => (
-            <MenuItem key={`${i + 1}`} onSelect={() => props.openFile(filename)}>{filename}</MenuItem>
-        ));
+        mruMenuItems = props.mruFiles.map(filename => (<MenuItem onSelect={() => props.openFile(filename)}>{filename}</MenuItem>));
     } else {
         mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
     }
+
+//             <button onClick={props.openFileDialog}>Add .hex files...</button>
+//             <Button disabled="disabled" style={{ color: 'graytext' }}>Add last files written to this device</Button>
 
     return (
         <div>
@@ -102,7 +105,7 @@ const ControlPanel = props => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     { mruMenuItems }
-                    <MenuItem divider />
+                    <MenuItem divider="divider" />
                     <MenuItem onSelect={props.openFileDialog}>Browse...</MenuItem>
                 </Dropdown.Menu>
             </Dropdown>
@@ -132,14 +135,9 @@ ControlPanel.propTypes = {
     openFileDialog: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
-    loaded: PropTypes.shape({
-        fileColours: PropTypes.instanceOf(Map),
-        blockSets: PropTypes.instanceOf(Map),
-    }).isRequired,
-    targetSize: PropTypes.number.isRequired,
-    refreshAllFiles: PropTypes.func.isRequired,
-    targetIsReady: PropTypes.bool.isRequired,
+    fileColours: PropTypes.instanceOf(Map).isRequired,
+    mruFiles: PropTypes.instanceOf(Map).isRequired,
+//     mruFiles: PropTypes.
 };
 
 export default ControlPanel;

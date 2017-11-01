@@ -38,7 +38,8 @@ import { readFile, stat } from 'fs';
 import { basename } from 'path';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
-import { hexToArrays, getUint32 } from 'nrf-intel-hex';
+// import { hexToArrays, getUint32 } from 'nrf-intel-hex';
+import MemoryMap from 'nrf-intel-hex';
 import Store from 'electron-store';
 
 import hexpad from '../hexpad';
@@ -89,16 +90,16 @@ function parseOneFile(filename, dispatch) {
             }
             addMruFile(filename);
 
-            let blocks;
+            let memMap;
             try {
-                blocks = hexToArrays(data.toString());
+                memMap = MemoryMap.fromHex(data.toString());
             } catch (ex) {
                 displayFileError(ex, dispatch);
                 return;
             }
 
             // Display some info in the log.
-            for (const [address, block] of blocks) {
+            for (const [address, block] of memMap) {
                 const size = block.length;
 
                 logger.info(`Data block: ${hexpad(address)}-${hexpad(address + size)} (${hexpad(size)}`, ' bytes long)');
@@ -106,10 +107,10 @@ function parseOneFile(filename, dispatch) {
 
             // Does this file contain updated info about bootlader and readbac prot?
             // Try querying the UICR and see if there's valid data in there
-            const clenr0 = getUint32(blocks, 0x10001000, true);
-            const rpbConf = getUint32(blocks, 0x10001004, true);
-            const bootloaderAddress = getUint32(blocks, 0x10001014, true);
-            const mbrParams = getUint32(blocks, 0x10001018, true);
+            const clenr0 = memMap.getUint32(0x10001000, true);
+            const rpbConf = memMap.getUint32(0x10001004, true);
+            const bootloaderAddress = memMap.getUint32(0x10001014, true);
+            const mbrParams = memMap.getUint32(0x10001018, true);
             let readbackProtectAddress;
 
             // / TODO: Get some .hex files which handle clenr0/rpbConf
@@ -130,17 +131,15 @@ function parseOneFile(filename, dispatch) {
 
             // Look for softdevice magic
             for (let address = 0x1000; address < 0x10000; address += 0x1000) {
-                if (getUint32(blocks, address + 0x04, true) === 0x51B1E5DB) {
+                if (memMap.getUint32(address + 0x04, true) === 0x51B1E5DB) {
                     softDeviceStart = address;
-                    const softDeviceSize = getUint32(blocks, address + 0x08, true);
+                    const softDeviceSize = memMap.getUint32(address + 0x08, true);
 //                     softDeviceEnd = address + softDeviceSize;
                     softDeviceEnd = softDeviceSize;
                     logger.info(`File matches SoftDevice signature. Start/End/ID: ${
                         hexpad(address)}`,
                         hexpad(softDeviceSize),
-
-                        // eslint-disable-next-line
-                        getUint32(blocks, address + 0x0C, true) & 0x00FF,
+                        memMap.getUint32(address + 0x0C, true) & 0x00FF, // eslint-disable-line no-bitwise
                     );
                     break;
                 }
@@ -167,7 +166,7 @@ function parseOneFile(filename, dispatch) {
                 fullFilename: filename,
                 fileModTime: stats.mtime,
                 fileLoadTime: new Date(),
-                blocks,
+                memMap,
                 regions: {
                     region0: clenr0,
                     readback: readbackProtectAddress,
@@ -301,10 +300,11 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
                     return res();
                 } else if (button === 1) { // Reload
                     return refreshAllFiles(fileLoadTimes)(dispatch).then(res);
+                } else if (button === 2) { // Cancel
+                    return rej();
                 }
-                // cancel
-                return rej();
             });
         });
     });
 }
+
