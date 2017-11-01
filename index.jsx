@@ -115,7 +115,7 @@ export default {
                 break;
             }
             case 'START-REFRESH-ALL-FILES': {
-                dispatch(refreshAllFiles(state.app.loaded.fileLoadTimes));
+                dispatch(refreshAllFiles(state.app.file.loaded.fileLoadTimes));
                 break;
             }
             default:

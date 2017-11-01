@@ -117,7 +117,7 @@ export function logDeviceInfo(serialNumber, comName) {
 }
 
 
-// // Previos write function - manual erase and write of each page.
+// // Previous write function - manual erase and write of each page.
 // function writeBlock(serialNumber, pages, dispatch) {
 //
 //     const pageWriteCalls = Array.from(pages.entries()).map(
@@ -223,17 +223,17 @@ function writeHex(serialNumber, hexString, dispatch) {
 // paginates the result to fit flash pages, and calls writeHex()
 export function write(appState) {
     return dispatch => {
-        const serialNumber = appState.target.serialNumber;
-        const pageSize = appState.target.pageSize;
+        const serialNumber = appState.targetSerialNumber;
+        const pageSize = appState.targetPageSize;
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
             return;
         }
 
-        checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
+        checkUpToDateFiles(appState.loaded.fileLoadTimes, dispatch).then(() => {
             const pages = paginate(
                 flattenOverlaps(
-                    overlapBlockSets(appState.file.loaded.blockSets),
+                    overlapBlockSets(appState.loaded.blockSets),
                 ), pageSize);
 
 //         console.log(pages);
@@ -252,8 +252,10 @@ export function write(appState) {
 }
 
 
-export function recover(serialNumber) {
+export function recover(appState) {
     return dispatch => {
+        const serialNumber = appState.targetSerialNumber;
+
         if (!serialNumber) {
             logger.error('Select a device before recovering');
             return;
@@ -283,3 +285,4 @@ export function recover(serialNumber) {
         });
     };
 }
+

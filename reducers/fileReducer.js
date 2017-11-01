@@ -59,7 +59,7 @@ const initialState = {
     fileError: null,
 
     loaded: {
-        blockSets: new Map(),
+        memMaps: new Map(),
         filenames: [],
         fileColours: new Map(),
         fileModTimes: new Map(),
@@ -78,7 +78,7 @@ export default function reducer(state = initialState, action) {
                 ...state,
                 fileError: null,
                 loaded: {
-                    blockSets: new Map(),
+                    memMaps: new Map(),
                     filenames: [],
                     fileColours: new Map(),
                     fileModTimes: new Map(),
@@ -101,7 +101,7 @@ export default function reducer(state = initialState, action) {
             if (!loaded.fileColours.has(action.filename)) {
                 loaded.fileColours.set(
                     action.filename,
-                    colours[(loaded.blockSets.size) % 8],
+                    colours[(loaded.memMaps.size) % 8],
                 );
             }
 
@@ -131,7 +131,7 @@ export default function reducer(state = initialState, action) {
                 fileError: null,
                 mruFiles,
                 loaded: {
-                    blockSets: new Map(loaded.blockSets.set(action.filename, action.blocks)),
+                    memMaps: new Map(loaded.memMaps.set(action.filename, action.memMap)),
                     filenames: loaded.filenames,
                     fileColours: loaded.fileColours,
                     fileModTimes: loaded.fileModTimes.set(action.filename, action.fileModTime),

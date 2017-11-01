@@ -34,6 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import MemoryMap from 'nrf-intel-hex';
+
 const initialState = {
     size: 0x00100000,  // 1MiB. TODO: Set a saner default?
     port: null,
@@ -41,6 +43,7 @@ const initialState = {
     pageSize: 0,
     writtenAddress: 0,
     serialNumber: null,
+    memMap: new MemoryMap(),
 };
 
 export default function target(state = initialState, action) {
