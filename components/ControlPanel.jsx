@@ -51,7 +51,7 @@ const ControlPanel = props => {
     const overlaps = MemoryMap.overlapMemoryMaps(props.loaded.memMaps);
 //     console.log(overlaps);
     let overlapWarning = '';
-    let outsideFlashBlocks = [];
+    const outsideFlashBlocks = [];
     for (const [startAddress, overlap] of overlaps) {
         if (overlap.length > 1) {
             overlapWarning = (<div className="alert alert-warning">
@@ -66,10 +66,9 @@ const ControlPanel = props => {
 
         // This assumes UICR at 0x10001000, size 4KiB
 //         if (startAddress >= 0x10001000) {
-        if ((startAddress  < 0x10001000 && endAddress > props.targetSize ) ||
+        if ((startAddress < 0x10001000 && endAddress > props.targetSize) ||
             (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
-
-            outsideFlashBlocks.push( hexpad(startAddress) + '-' + hexpad(endAddress) );
+            outsideFlashBlocks.push(`${hexpad(startAddress)}-${hexpad(endAddress)}`);
         }
     }
     let outsideFlashWarning;
@@ -99,7 +98,7 @@ const ControlPanel = props => {
             <Button onClick={props.closeFiles}>
                 <Glyphicon glyph="folder-close" />Clear files
             </Button>
-            <Dropdown pullRight>
+            <Dropdown pullRight id="files-dropdown">
                 <Dropdown.Toggle>
                     <Glyphicon glyph="folder-open" />Add a .hex file
                 </Dropdown.Toggle>

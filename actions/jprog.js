@@ -37,7 +37,8 @@
 // import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import nrfjprog from 'pc-nrfjprog-js';
-import { overlapBlockSets, flattenOverlaps, paginate, arraysToHex } from 'nrf-intel-hex';
+// import { overlapBlockSets, flattenOverlaps, paginate, arraysToHex } from 'nrf-intel-hex';
+import MemoryMap from 'nrf-intel-hex';
 // import { stat } from 'fs';
 import { checkUpToDateFiles } from './files';
 
@@ -231,10 +232,9 @@ export function write(appState) {
         }
 
         checkUpToDateFiles(appState.loaded.fileLoadTimes, dispatch).then(() => {
-            const pages = paginate(
-                flattenOverlaps(
-                    overlapBlockSets(appState.loaded.blockSets),
-                ), pageSize);
+            const pages = MemoryMap.flattenOverlaps(
+                MemoryMap.overlapMemoryMaps(appState.loaded.memMaps),
+            ).paginate(pageSize);
 
 //         console.log(pages);
 //         console.log(arraysToHex(pages, 64));
@@ -246,7 +246,7 @@ export function write(appState) {
                 type: 'WRITE_PROGRESS_START',
             });
 
-            writeHex(serialNumber, arraysToHex(pages, 64), dispatch);
+            writeHex(serialNumber, pages.asHexString(64), dispatch);
         }).catch(() => {});
     };
 }
