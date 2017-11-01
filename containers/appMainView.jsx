@@ -41,9 +41,47 @@ import MemoryLayout from '../components/MemoryLayout';
 
 const AppMainView = (
     props => {
-        const { loaded, targetSize } = props;
+        const { fileError, loaded, targetSize, targetMemMap } = props;
+        if (fileError) {
+            return (
+                <div className="alert alert-error">{ fileError }</div>
+            );
+        }
+
+        const target = {
+            memMaps: new Map([['', targetMemMap]]),
+            fileError: loaded.fileError,
+            fileColours: new Map([['', '#808080']]),
+            writtenAddress: 0,
+            labels: [],
+            regions: []
+        }
+
         return (
-            <MemoryLayout {...loaded} targetSize={targetSize} />
+            <div style={{
+                    position:'relative',
+                    width: '100%',
+                    height: '100%'
+            }}>
+                <div style={{
+                    position:'absolute',
+                    top:0,
+                    bottom:0,
+                    left:0,
+                    width: '50%'
+                }}>
+                    <MemoryLayout {...target} targetSize={targetSize}/>
+                </div>
+                <div style={{
+                    position:'absolute',
+                    top:0,
+                    bottom:0,
+                    right:0,
+                    width: '50%'
+                }}>
+                    <MemoryLayout {...loaded} targetSize={targetSize}/>
+                </div>
+            </div>
         );
     }
 );
@@ -57,6 +95,7 @@ export default connect(
     (state, props) => ({
         ...props,
         loaded: state.app.file.loaded,
+        targetMemMap: state.app.target.memMap,
         targetSize: state.app.target.size,
     }),
 )(AppMainView);

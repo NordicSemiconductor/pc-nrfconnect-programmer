@@ -104,7 +104,7 @@ export default {
                 break;
             }
             case 'START_WRITE': {
-                if (state.app.file.loaded.blockSets.size === 0) {
+                if (state.app.file.loaded.memMaps.size === 0) {
                     return;
                 }
                 dispatch(jprogActions.write(state.app));
