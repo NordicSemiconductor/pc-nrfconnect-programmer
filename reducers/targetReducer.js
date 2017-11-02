@@ -44,6 +44,8 @@ const initialState = {
     writtenAddress: 0,
     serialNumber: null,
     memMap: new MemoryMap(),
+    regions: {}, // heruistically detected code region 0, and memory readback protection
+    labels: {},  // heruistically detected bootloader, mbr, mbr params
 };
 
 export default function target(state = initialState, action) {
@@ -71,7 +73,9 @@ export default function target(state = initialState, action) {
                 size: action.targetSize,
                 pageSize: action.targetPageSize,
                 isReady: true,
-                memMap: action.targetMemMap
+                memMap: action.targetMemMap,
+                regions: action.targetRegions,
+                labels: action.targetLabels,
             };
 
         case 'EMPTY_FILES':
