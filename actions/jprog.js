@@ -41,6 +41,7 @@ import nrfjprog from 'pc-nrfjprog-js';
 import MemoryMap from 'nrf-intel-hex';
 // import { stat } from 'fs';
 import { checkUpToDateFiles } from './files';
+import memRegions from '../memRegions';
 
 // import hexpad from '../hexpad';
 
@@ -59,7 +60,11 @@ function getDeviceInfo(serialNumber) {
                 nrfjprog.read(serialNumber, info.codeAddress, info.codeSize, (err, bytes) => {
                     info.memMap = MemoryMap.fromPaddedUint8Array(new Uint8Array(bytes), 0xFF, 256);
 
-                    logger.info('Non-volatile memory has been read. ' + info.memMap.size + ' non-empty memory blocks identified.');
+                    logger.info(`Non-volatile memory has been read. ${info.memMap.size} non-empty memory blocks identified.`);
+
+                    const { regions, labels } = memRegions(info.memMap);
+                    info.regions = regions;
+                    info.labels = labels;
 
                     resolve(info);
                 });
@@ -109,7 +114,6 @@ export function logDeviceInfo(serialNumber, comName) {
     return dispatch => {
         getDeviceInfo(serialNumber)
             .then(info => {
-
                 // Suggestion: Do this the other way around. F.ex. dispatch a
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
                 // in middleware and log it from there?
@@ -118,7 +122,9 @@ export function logDeviceInfo(serialNumber, comName) {
                     targetPort: comName,
                     targetSize: info.codeSize,
                     targetPageSize: info.codePageSize,
-                    targetMemMap: info.memMap
+                    targetMemMap: info.memMap,
+                    targetRegions: info.regions,
+                    targetLabels: info.labels,
                 });
             })
             .catch(error => {
