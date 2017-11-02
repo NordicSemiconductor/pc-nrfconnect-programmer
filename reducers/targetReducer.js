@@ -73,6 +73,14 @@ export default function target(state = initialState, action) {
                 size: action.targetSize,
                 pageSize: action.targetPageSize,
                 isReady: true,
+//                 memMap: action.targetMemMap,
+//                 regions: action.targetRegions,
+//                 labels: action.targetLabels,
+            };
+
+        case 'TARGET_CONTENTS_KNOWN':
+            return {
+                ...state,
                 memMap: action.targetMemMap,
                 regions: action.targetRegions,
                 labels: action.targetLabels,

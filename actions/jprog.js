@@ -57,22 +57,42 @@ function getDeviceInfo(serialNumber) {
 
                 logger.info('Reading device non-volatile memory. This may take a few seconds.');
 
-                nrfjprog.read(serialNumber, info.codeAddress, info.codeSize, (err, bytes) => {
-                    info.memMap = MemoryMap.fromPaddedUint8Array(new Uint8Array(bytes), 0xFF, 256);
-
-                    logger.info(`Non-volatile memory has been read. ${info.memMap.size} non-empty memory blocks identified.`);
-
-                    const { regions, labels } = memRegions(info.memMap);
-                    info.regions = regions;
-                    info.labels = labels;
-
-                    resolve(info);
-                });
+                resolve(info);
             }
         });
     });
 }
 
+
+function getDeviceMemMap(serialNumber, deviceInfo) {
+    return new Promise((resolve, reject) => {
+        nrfjprog.read(serialNumber, deviceInfo.codeAddress, deviceInfo.codeSize, (err, flashBytes) => {
+            if (err) {
+                reject(err);
+            } else {
+                nrfjprog.read(serialNumber, deviceInfo.uicrAddress, deviceInfo.infoPageSize, (err, uicrBytes) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+
+                        const memMap = MemoryMap.fromPaddedUint8Array(new Uint8Array(flashBytes), 0xFF, 256);
+                        memMap.set(deviceInfo.uicrAddress, new Uint8Array(uicrBytes));
+
+                        logger.info(`Non-volatile memory has been read. ${memMap.size} non-empty memory blocks identified.`);
+
+                        const { regions, labels } = memRegions(memMap, deviceInfo.uicrAddress);
+
+                        resolve({
+                            memMap: memMap,
+                            regions,
+                            labels
+                        });
+                    }
+                });
+            }
+        });
+    });
+}
 
 // Get some useful strings from the constants in jprog.
 function getDeviceModel(deviceInfo) {
@@ -122,10 +142,19 @@ export function logDeviceInfo(serialNumber, comName) {
                     targetPort: comName,
                     targetSize: info.codeSize,
                     targetPageSize: info.codePageSize,
-                    targetMemMap: info.memMap,
-                    targetRegions: info.regions,
-                    targetLabels: info.labels,
                 });
+
+                getDeviceMemMap(serialNumber, info).then((contents)=>{
+                    dispatch({
+                        type: 'TARGET_CONTENTS_KNOWN',
+                        targetPort: comName,
+                        targetSize: info.codeSize,
+                        targetPageSize: info.codePageSize,
+                        targetMemMap: contents.memMap,
+                        targetRegions: contents.regions,
+                        targetLabels: contents.labels,
+                    });
+                })
             })
             .catch(error => {
                 logger.error(`Could not fetch memory size of target devkit: ${error.message}`);
