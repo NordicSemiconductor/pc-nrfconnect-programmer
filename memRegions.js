@@ -1,6 +1,7 @@
 
 import { logger } from 'nrfconnect/core';
 import hexpad from './hexpad';
+import { hexpad2 } from './hexpad';
 
 
 // Given an instance of MemoryMap, return the heruistically detected
@@ -31,21 +32,23 @@ export default function memRegions(memMap, uicrStartAddr = 0x10001000) {
 //                 }
 //             }
 
-    let softDeviceStart;
-    let softDeviceEnd;
-
     // Look for softdevice magic
     for (let address = 0x1000; address < 0x10000; address += 0x1000) {
         if (memMap.getUint32(address + 0x04, true) === 0x51B1E5DB) {
-            labels.softDeviceStart = address;
+//             labels.softDeviceStart = address;
             const softDeviceSize = memMap.getUint32(address + 0x08, true);
 //                     softDeviceEnd = address + softDeviceSize;
-            labels.softDeviceEnd = softDeviceSize;
+            labels['SoftDevice end'] = softDeviceSize;
+
+            const fwId = memMap.getUint32(address + 0x0C, true) & 0x00FF; // eslint-disable-line no-bitwise
+            labels['SoftDevice start, id ' + hexpad2(fwId)] = address;
+
             logger.info(`Found match for SoftDevice signature. Start/End/ID: ${
                 hexpad(address)}`,
                 hexpad(softDeviceSize),
-                memMap.getUint32(address + 0x0C, true) & 0x00FF, // eslint-disable-line no-bitwise
+                hexpad2(fwId)
             );
+
             break;
         }
     }
@@ -64,7 +67,7 @@ export default function memRegions(memMap, uicrStartAddr = 0x10001000) {
         logger.info(`UICR info found: bootloader at ${hexpad(bootloaderAddress)}`);
     }
     if (mbrParams) {
-        labels.mbrParams = mbrParams;
+        labels['MBR parameters'] = mbrParams;
         logger.info(`UICR info found: MBR parameteres at ${hexpad(mbrParams)}`);
     }
 

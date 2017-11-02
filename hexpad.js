@@ -5,3 +5,7 @@
 export default function hexpad(n) {
     return `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
 }
+
+export function hexpad2(n) {
+    return `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+}
