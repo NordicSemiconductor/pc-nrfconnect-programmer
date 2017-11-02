@@ -71,6 +71,7 @@ export default function target(state = initialState, action) {
                 size: action.targetSize,
                 pageSize: action.targetPageSize,
                 isReady: true,
+                memMap: action.targetMemMap
             };
 
         case 'EMPTY_FILES':
