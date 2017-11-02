@@ -50,7 +50,19 @@ function getDeviceInfo(serialNumber) {
             if (err) {
                 reject(err);
             } else {
-                resolve(info);
+                logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(info)}. ` +
+                    `RAM: ${info.ramSize / 1024}KiB. Flash: ${info.codeSize / 1024}KiB in pages of ` +
+                    `${info.codePageSize / 1024}KiB.`);
+
+                logger.info('Reading device non-volatile memory. This may take a few seconds.');
+
+                nrfjprog.read(serialNumber, info.codeAddress, info.codeSize, (err, bytes) => {
+                    info.memMap = MemoryMap.fromPaddedUint8Array(new Uint8Array(bytes), 0xFF, 256);
+
+                    logger.info('Non-volatile memory has been read. ' + info.memMap.size + ' non-empty memory blocks identified.');
+
+                    resolve(info);
+                });
             }
         });
     });
@@ -92,14 +104,11 @@ function getDeviceModel(deviceInfo) {
 
 
 // Display some information about a devkit. Called on a devkit connection.
+// This also triggers reading the whole memory contents of the device.
 export function logDeviceInfo(serialNumber, comName) {
     return dispatch => {
         getDeviceInfo(serialNumber)
             .then(info => {
-                const { codeSize, codePageSize, ramSize } = info;
-                logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(info)}. ` +
-                    `RAM: ${ramSize / 1024}KiB. Flash: ${codeSize / 1024}KiB in pages of ` +
-                    `${codePageSize / 1024}KiB.`);
 
                 // Suggestion: Do this the other way around. F.ex. dispatch a
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
@@ -107,8 +116,9 @@ export function logDeviceInfo(serialNumber, comName) {
                 dispatch({
                     type: 'TARGET_SIZE_KNOWN',
                     targetPort: comName,
-                    targetSize: codeSize,
-                    targetPageSize: codePageSize,
+                    targetSize: info.codeSize,
+                    targetPageSize: info.codePageSize,
+                    targetMemMap: info.memMap
                 });
             })
             .catch(error => {
