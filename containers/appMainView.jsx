@@ -48,38 +48,56 @@ const AppMainView = (
             );
         }
 
-        const targetData = {
-            memMaps: new Map([['', target.memMap]]),
-            fileError: loaded.fileError,
-            fileColours: new Map([['', '#C0C0C0']]),
-            writtenAddress: 0,
-            labels: target.labels,
-            regions: target.regions
+        let targetMap;
+        if (!target.serialNumber) {
+            targetMap = (
+                <div style={{
+                    position:'absolute',
+                    top: 'calc(50% - 50px)'
+                }}>Connect to a DevKit to see the contents of its non-volatile memory here.</div>
+            );
+        } else if (target.serialNumber && target.isReady) {
+            const targetData = {
+                memMaps: new Map([['', target.memMap]]),
+                fileError: loaded.fileError,
+                fileColours: new Map([['', '#C0C0C0']]),
+                writtenAddress: 0,
+                labels: target.labels,
+                regions: target.regions,
+            };
+
+            targetMap = <MemoryLayout {...targetData} targetSize={target.size} />;
+        } else {
+            targetMap = <div className="memlayout-spinner" />;
         }
+
 
         return (
             <div style={{
-                    position:'relative',
-                    width: '100%',
-                    height: '100%'
-            }}>
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+            }}
+            >
                 <div style={{
-                    position:'absolute',
-                    top:0,
-                    bottom:0,
-                    left:0,
-                    width: '50%'
-                }}>
-                    <MemoryLayout {...targetData} targetSize={target.size}/>
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    width: '50%',
+                }}
+                >
+                    {targetMap}
                 </div>
                 <div style={{
-                    position:'absolute',
-                    top:0,
-                    bottom:0,
-                    right:0,
-                    width: '50%'
-                }}>
-                    <MemoryLayout {...loaded} targetSize={target.size}/>
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    right: 0,
+                    width: '50%',
+                }}
+                >
+                    <MemoryLayout {...loaded} targetSize={target.size} />
                 </div>
             </div>
         );

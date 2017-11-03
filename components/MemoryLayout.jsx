@@ -45,7 +45,7 @@ import hexpad from '../hexpad';
 function drawMemoryLayoutDiagram(container, max, data) {
     const min = 0x0;
     const labelStep = 0x10000;
-    const { memMaps, fileColours, writtenAddress, protectedAddress, labels, regions } = data;
+    const { memMaps, fileColours, writtenAddress, labels, regions } = data;
 
     if (!container) { return; }
 

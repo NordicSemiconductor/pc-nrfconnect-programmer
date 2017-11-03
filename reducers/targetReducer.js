@@ -72,7 +72,7 @@ export default function target(state = initialState, action) {
                 ...state,
                 size: action.targetSize,
                 pageSize: action.targetPageSize,
-                isReady: true,
+                isReady: false,
             };
 
         case 'TARGET_CONTENTS_KNOWN':
@@ -81,6 +81,7 @@ export default function target(state = initialState, action) {
                 memMap: action.targetMemMap,
                 regions: action.targetRegions,
                 labels: action.targetLabels,
+                isReady: true,
             };
 
         case 'EMPTY_FILES':
