@@ -243,6 +243,8 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
                 } else if (button === 2) { // Cancel
                     return rej();
                 }
+                // Should never be reached
+                return rej();
             });
         });
     });

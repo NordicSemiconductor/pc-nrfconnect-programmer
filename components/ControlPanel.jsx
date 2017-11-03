@@ -85,13 +85,12 @@ const ControlPanel = props => {
     let mruMenuItems;
 
     if (props.mruFiles.length) {
-        mruMenuItems = props.mruFiles.map(filename => (<MenuItem onSelect={() => props.openFile(filename)}>{filename}</MenuItem>));
+        mruMenuItems = props.mruFiles.map(filename =>
+            (<MenuItem onSelect={() => props.openFile(filename)}>{filename}</MenuItem>),
+        );
     } else {
         mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
     }
-
-//             <button onClick={props.openFileDialog}>Add .hex files...</button>
-//             <Button disabled="disabled" style={{ color: 'graytext' }}>Add last files written to this device</Button>
 
     return (
         <div>

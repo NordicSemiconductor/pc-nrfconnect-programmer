@@ -45,54 +45,6 @@ import memRegions from '../memRegions';
 
 // import hexpad from '../hexpad';
 
-function getDeviceInfo(serialNumber) {
-    return new Promise((resolve, reject) => {
-        nrfjprog.getDeviceInfo(serialNumber, (err, info) => {
-            if (err) {
-                reject(err);
-            } else {
-                logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(info)}. ` +
-                    `RAM: ${info.ramSize / 1024}KiB. Flash: ${info.codeSize / 1024}KiB in pages of ` +
-                    `${info.codePageSize / 1024}KiB.`);
-
-                logger.info('Reading device non-volatile memory. This may take a few seconds.');
-
-                resolve(info);
-            }
-        });
-    });
-}
-
-
-function getDeviceMemMap(serialNumber, deviceInfo) {
-    return new Promise((resolve, reject) => {
-        nrfjprog.read(serialNumber, deviceInfo.codeAddress, deviceInfo.codeSize, (err, flashBytes) => {
-            if (err) {
-                reject(err);
-            } else {
-                nrfjprog.read(serialNumber, deviceInfo.uicrAddress, deviceInfo.infoPageSize, (err, uicrBytes) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-
-                        const memMap = MemoryMap.fromPaddedUint8Array(new Uint8Array(flashBytes), 0xFF, 256);
-                        memMap.set(deviceInfo.uicrAddress, new Uint8Array(uicrBytes));
-
-                        logger.info(`Non-volatile memory has been read. ${memMap.size} non-empty memory blocks identified.`);
-
-                        const { regions, labels } = memRegions(memMap, deviceInfo.uicrAddress);
-
-                        resolve({
-                            memMap: memMap,
-                            regions,
-                            labels
-                        });
-                    }
-                });
-            }
-        });
-    });
-}
 
 // Get some useful strings from the constants in jprog.
 function getDeviceModel(deviceInfo) {
@@ -127,6 +79,57 @@ function getDeviceModel(deviceInfo) {
     return 'Unknown model';
 }
 
+function getDeviceInfo(serialNumber) {
+    return new Promise((resolve, reject) => {
+        nrfjprog.getDeviceInfo(serialNumber, (err, info) => {
+            if (err) {
+                reject(err);
+            } else {
+                logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(info)}. ` +
+                    `RAM: ${info.ramSize / 1024}KiB. Flash: ${info.codeSize / 1024}KiB in pages of ` +
+                    `${info.codePageSize / 1024}KiB.`);
+
+                logger.info('Reading device non-volatile memory. This may take a few seconds.');
+
+                resolve(info);
+            }
+        });
+    });
+}
+
+
+function getDeviceMemMap(serialNumber, devInfo) {
+    return new Promise((resolve, reject) => {
+        nrfjprog.read(serialNumber, devInfo.codeAddress, devInfo.codeSize, (err1, flashBytes) => {
+            if (err1) {
+                reject(err1);
+            } else {
+                nrfjprog.read(serialNumber, devInfo.uicrAddress, devInfo.infoPageSize,
+                (err2, uicrBytes) => {
+                    if (err2) {
+                        reject(err2);
+                    } else {
+                        const memMap = MemoryMap.fromPaddedUint8Array(
+                            new Uint8Array(flashBytes), 0xFF, 256,
+                        );
+                        memMap.set(devInfo.uicrAddress, new Uint8Array(uicrBytes));
+
+                        logger.info(`Non-volatile memory has been read. ${memMap.size} non-empty memory blocks identified.`);
+
+                        const { regions, labels } = memRegions(memMap, devInfo.uicrAddress);
+
+                        resolve({
+                            memMap,
+                            regions,
+                            labels,
+                        });
+                    }
+                });
+            }
+        });
+    });
+}
+
 
 // Display some information about a devkit. Called on a devkit connection.
 // This also triggers reading the whole memory contents of the device.
@@ -144,7 +147,7 @@ export function logDeviceInfo(serialNumber, comName) {
                     targetPageSize: info.codePageSize,
                 });
 
-                getDeviceMemMap(serialNumber, info).then((contents)=>{
+                getDeviceMemMap(serialNumber, info).then(contents => {
                     dispatch({
                         type: 'TARGET_CONTENTS_KNOWN',
                         targetPort: comName,
@@ -154,7 +157,7 @@ export function logDeviceInfo(serialNumber, comName) {
                         targetRegions: contents.regions,
                         targetLabels: contents.labels,
                     });
-                })
+                });
             })
             .catch(error => {
                 logger.error(`Could not fetch memory size of target devkit: ${error.message}`);
@@ -269,16 +272,16 @@ function writeHex(serialNumber, hexString, dispatch) {
 // paginates the result to fit flash pages, and calls writeHex()
 export function write(appState) {
     return dispatch => {
-        const serialNumber = appState.targetSerialNumber;
-        const pageSize = appState.targetPageSize;
+        const serialNumber = appState.target.serialNumber;
+        const pageSize = appState.target.pageSize;
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
             return;
         }
 
-        checkUpToDateFiles(appState.loaded.fileLoadTimes, dispatch).then(() => {
+        checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
             const pages = MemoryMap.flattenOverlaps(
-                MemoryMap.overlapMemoryMaps(appState.loaded.memMaps),
+                MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
             ).paginate(pageSize);
 
 //         console.log(pages);
@@ -297,10 +300,8 @@ export function write(appState) {
 }
 
 
-export function recover(appState) {
+export function recover(serialNumber) {
     return dispatch => {
-        const serialNumber = appState.targetSerialNumber;
-
         if (!serialNumber) {
             logger.error('Select a device before recovering');
             return;
