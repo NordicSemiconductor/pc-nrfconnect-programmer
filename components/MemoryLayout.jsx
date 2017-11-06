@@ -269,18 +269,11 @@ const MemoryLayout = props => {
     const {
         targetSize,
         blockSets,
-        fileError,
         fileColours,
         writtenAddress,
         labels,
         regions,
     } = props;
-
-    if (fileError) {
-        return (
-            <div className="alert alert-error">{ fileError }</div>
-        );
-    }
 
     // Symbolize code region 0 / readback-protected region
     const symbolRegions = Object.entries(regions).map(([region, length]) => {
@@ -317,7 +310,6 @@ MemoryLayout.propTypes = {
     blockSets: PropTypes.instanceOf(Map),
     fileColours: PropTypes.instanceOf(Map),
     writtenAddress: PropTypes.number,
-    fileError: PropTypes.string,
     labels: PropTypes.shape({}),
     regions: PropTypes.shape({}),
 };
@@ -328,7 +320,6 @@ MemoryLayout.defaultProps = {
     blockSets: new Map(),
     fileColours: new Map(),
     writtenAddress: 0,  // From 0 to here will be assumed written, from here to the top pending
-    fileError: null,
     labels: {},
     regions: {},
 };

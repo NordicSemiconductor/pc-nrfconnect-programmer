@@ -50,8 +50,8 @@ function displayFileError(err, dispatch) {
     const error = `Could not open .hex file: ${err}`;
     logger.error(error);
     dispatch({
-        type: 'FILE_ERROR',
-        fileError: error,
+        type: 'ERROR_DIALOG_SHOW',
+        message: error,
     });
 }
 

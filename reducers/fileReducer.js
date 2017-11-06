@@ -56,8 +56,6 @@ const colours = [
 ];
 
 const initialState = {
-    fileError: null,
-
     loaded: {
         blockSets: new Map(),
         filenames: [],
@@ -76,7 +74,6 @@ export default function reducer(state = initialState, action) {
         case 'EMPTY_FILES':
             return {
                 ...state,
-                fileError: null,
                 loaded: {
                     blockSets: new Map(),
                     filenames: [],
@@ -86,11 +83,6 @@ export default function reducer(state = initialState, action) {
                     regions: {},
                     labels: {},
                 },
-            };
-        case 'FILE_ERROR':
-            return {
-                ...state,
-                fileError: action.fileError,
             };
         case 'FILE_PARSE': {
             const { loaded } = state;
