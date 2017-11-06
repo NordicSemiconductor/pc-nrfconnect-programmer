@@ -56,12 +56,12 @@ function displayFileError(err, dispatch) {
 }
 
 function removeMruFile(filename) {
-    const files = persistentStore.get('mruFiles');
+    const files = persistentStore.get('mruFiles', []);
     persistentStore.set('mruFiles', files.filter(file => file !== filename));
 }
 
 function addMruFile(filename) {
-    const files = persistentStore.get('mruFiles');
+    const files = persistentStore.get('mruFiles', []);
     if (files.indexOf(filename) === -1) {
         files.unshift(filename);
         files.splice(10);
@@ -207,7 +207,7 @@ export function openFile(filename) {
 
 export function loadMruFiles() {
     return dispatch => {
-        const files = persistentStore.get('mruFiles');
+        const files = persistentStore.get('mruFiles', []);
         dispatch({
             type: 'LOAD_MRU_FILES_SUCCESS',
             files,
