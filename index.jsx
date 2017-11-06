@@ -103,18 +103,18 @@ export default {
                 logger.info('Target device closed.');
                 break;
             }
-            case 'START-WRITE': {
+            case 'START_WRITE': {
                 if (state.app.file.loaded.blockSets.size === 0) {
                     return;
                 }
                 dispatch(jprogActions.write(state.app));
                 break;
             }
-            case 'START-RECOVER': {
+            case 'START_RECOVER': {
                 dispatch(jprogActions.recover(state.app.target.serialNumber));
                 break;
             }
-            case 'START-REFRESH-ALL-FILES': {
+            case 'START_REFRESH_ALL_FILES': {
                 dispatch(refreshAllFiles(state.app.loaded.fileLoadTimes));
                 break;
             }
