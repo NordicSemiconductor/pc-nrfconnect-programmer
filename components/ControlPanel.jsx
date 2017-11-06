@@ -88,7 +88,7 @@ const ControlPanel = props => {
             <MenuItem key={`${i + 1}`} onSelect={() => props.openFile(filename)}>{filename}</MenuItem>
         ));
     } else {
-        mruMenuItems = (<MenuItem disabled="disabled">No recently used files</MenuItem>);
+        mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
     }
 
     return (
