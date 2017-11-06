@@ -97,7 +97,7 @@ const ControlPanel = props => {
                 <Glyphicon glyph="folder-close" />Clear files
             </Button>
             <Dropdown pullRight id="files-dropdown">
-                <Dropdown.Toggle>
+                <Dropdown.Toggle onClick={props.onToggleFileList}>
                     <Glyphicon glyph="folder-open" />Add a .hex file
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
@@ -128,6 +128,7 @@ const ControlPanel = props => {
 
 ControlPanel.propTypes = {
     closeFiles: PropTypes.func.isRequired,
+    onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,

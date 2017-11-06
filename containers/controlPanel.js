@@ -48,11 +48,12 @@ export default connect(
     }),
     (dispatch, props) => ({
         ...props,
+        onToggleFileList: () => dispatch(fileActions.loadMruFiles()),
         openFileDialog: () => dispatch(fileActions.openFileDialog()),
         openFile: filename => dispatch(fileActions.openFile(filename)),
-        refreshAllFiles: () => { dispatch({ type: 'START-REFRESH-ALL-FILES' }); },
-        performWrite: () => { dispatch({ type: 'START-WRITE' }); },
-        performRecover: () => { dispatch({ type: 'START-RECOVER' }); },
+        refreshAllFiles: () => { dispatch({ type: 'START_REFRESH_ALL_FILES' }); },
+        performWrite: () => { dispatch({ type: 'START_WRITE' }); },
+        performRecover: () => { dispatch({ type: 'START_RECOVER' }); },
         closeFiles: () => { dispatch({ type: 'EMPTY_FILES' }); },
     }),
 )(ControlPanel);
