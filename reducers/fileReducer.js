@@ -64,8 +64,8 @@ const initialState = {
         fileColours: new Map(),
         fileModTimes: new Map(),
         fileLoadTimes: new Map(),
-        regions: {}, // heruistically detected code region 0, and memory readback protection
-        labels: {},  // heruistically detected bootloader, mbr, mbr params
+        regions: {}, // heuristically detected code region 0, and memory readback protection
+        labels: {},  // heuristically detected bootloader, mbr, mbr params
     },
 
     mruFiles: persistentStore.get('mruFiles'),

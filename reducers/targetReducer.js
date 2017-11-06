@@ -44,8 +44,8 @@ const initialState = {
     writtenAddress: 0,
     serialNumber: null,
     memMap: new MemoryMap(),
-    regions: {}, // heruistically detected code region 0, and memory readback protection
-    labels: {},  // heruistically detected bootloader, mbr, mbr params
+    regions: {}, // heuristically detected code region 0, and memory readback protection
+    labels: {},  // heuristically detected bootloader, mbr, mbr params
 };
 
 export default function target(state = initialState, action) {
