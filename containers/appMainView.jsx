@@ -41,13 +41,7 @@ import MemoryLayout from '../components/MemoryLayout';
 
 const AppMainView = (
     props => {
-        const { fileError, loaded, targetSize } = props;
-        if (fileError) {
-            return (
-                <div className="alert alert-error">{ fileError }</div>
-            );
-        }
-
+        const { loaded, targetSize } = props;
         return (
             <MemoryLayout {...loaded} targetSize={targetSize} />
         );
@@ -55,13 +49,8 @@ const AppMainView = (
 );
 
 AppMainView.propTypes = {
-    fileError: PropTypes.string,
     loaded: PropTypes.shape({}).isRequired,
     targetSize: PropTypes.number.isRequired,
-};
-
-AppMainView.defaultProps = {
-    fileError: null,
 };
 
 export default connect(
@@ -69,6 +58,5 @@ export default connect(
         ...props,
         loaded: state.app.file.loaded,
         targetSize: state.app.target.size,
-        fileError: state.app.file.fileError,
     }),
 )(AppMainView);

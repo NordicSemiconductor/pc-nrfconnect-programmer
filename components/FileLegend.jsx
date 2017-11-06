@@ -94,13 +94,6 @@ function drawFileLegend(container, fileColours) {
 
 const FileLegend = props => {
     const { fileColours } = props;
-/*
-    if (fileError) {
-        return (
-            <div>{ fileError }</div>
-        );
-    } */
-
     return (
         <table
             ref={el => { drawFileLegend(el, fileColours); }}
