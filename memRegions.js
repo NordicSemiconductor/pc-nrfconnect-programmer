@@ -4,7 +4,7 @@ import hexpad from './hexpad';
 import { hexpad2 } from './hexpad';
 
 
-// Given an instance of MemoryMap, return the heruistically detected
+// Given an instance of MemoryMap, return the heuristically detected
 // regions and labels for nRF SoCs.
 
 export default function memRegions(memMap, uicrStartAddr = 0x10001000) {
