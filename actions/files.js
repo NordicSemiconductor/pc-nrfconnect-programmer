@@ -55,10 +55,25 @@ function displayFileError(err, dispatch) {
     });
 }
 
+function removeMruFile(filename) {
+    const files = persistentStore.get('mruFiles');
+    persistentStore.set('mruFiles', files.filter(file => file !== filename));
+}
+
+function addMruFile(filename) {
+    const files = persistentStore.get('mruFiles');
+    if (files.indexOf(filename) === -1) {
+        files.unshift(filename);
+        files.splice(10);
+        persistentStore.set('mruFiles', files);
+    }
+}
+
 function parseOneFile(filename, dispatch) {
     stat(filename, (err, stats) => {
         if (err) {
             displayFileError(err, dispatch);
+            removeMruFile(filename);
             return;
         }
 
@@ -69,8 +84,10 @@ function parseOneFile(filename, dispatch) {
             logger.info('File was last modified at ', stats.mtime.toLocaleString());
             if (err2) {
                 displayFileError(err2, dispatch);
+                removeMruFile(filename);
                 return;
             }
+            addMruFile(filename);
 
             let blocks;
             try {
@@ -188,6 +205,15 @@ export function openFile(filename) {
     };
 }
 
+export function loadMruFiles() {
+    return dispatch => {
+        const files = persistentStore.get('mruFiles');
+        dispatch({
+            type: 'LOAD_MRU_FILES_SUCCESS',
+            files,
+        });
+    };
+}
 
 export function refreshAllFiles(fileLoadTimes) {
     return dispatch => Promise.all(

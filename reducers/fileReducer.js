@@ -34,14 +34,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Store from 'electron-store';
-
-const persistentStore = new Store({ name: 'nrf-programmer' });
-
-if (!persistentStore.get('mruFiles')) {
-    persistentStore.set('mruFiles', []);
-}
-
 // Colours from:
 // https://github.com/d3/d3-scale-chromatic
 const colours = [
@@ -68,7 +60,7 @@ const initialState = {
         labels: {},  // heruistically detected bootloader, mbr, mbr params
     },
 
-    mruFiles: persistentStore.get('mruFiles'),
+    mruFiles: [],
 };
 
 export default function reducer(state = initialState, action) {
@@ -117,19 +109,9 @@ export default function reducer(state = initialState, action) {
                 }
             }
 
-            const mruFiles = persistentStore.get('mruFiles');
-            if (mruFiles.indexOf(action.fullFilename) === -1) {
-                mruFiles.unshift(action.fullFilename);
-                mruFiles.splice(10);
-                persistentStore.set('mruFiles', mruFiles);
-
-                console.log('MRU files are:', persistentStore.get('mruFiles'));
-            }
-
             return {
                 ...state,
                 fileError: null,
-                mruFiles,
                 loaded: {
                     blockSets: new Map(loaded.blockSets.set(action.filename, action.blocks)),
                     filenames: loaded.filenames,
@@ -144,6 +126,11 @@ export default function reducer(state = initialState, action) {
 
             };
         }
+        case 'LOAD_MRU_FILES_SUCCESS':
+            return {
+                ...state,
+                mruFiles: action.files || [],
+            };
         default:
     }
     return state;

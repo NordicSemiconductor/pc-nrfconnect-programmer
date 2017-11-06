@@ -48,6 +48,7 @@ export default connect(
     }),
     (dispatch, props) => ({
         ...props,
+        onToggleFileList: () => dispatch(fileActions.loadMruFiles()),
         openFileDialog: () => dispatch(fileActions.openFileDialog()),
         openFile: filename => dispatch(fileActions.openFile(filename)),
         refreshAllFiles: () => { dispatch({ type: 'START_REFRESH_ALL_FILES' }); },
