@@ -37,14 +37,13 @@
 // Colours from:
 // https://github.com/d3/d3-scale-chromatic
 const colours = [
-    '#b3e2cd',
-    '#fdcdac',
-    '#cbd5e8',
-    '#f4cae4',
-    '#e6f5c9',
-    '#fff2ae',
-    '#f1e2cc',
-    '#cccccc',
+    '#e78ac3',
+    '#ffd92f',
+    '#8da0cb',
+    '#a6d854',
+    '#e5c494',
+    '#66c2a5',
+    '#b3b3b3',
 ];
 
 const initialState = {
@@ -85,7 +84,7 @@ export default function reducer(state = initialState, action) {
             if (!loaded.fileColours.has(action.filename)) {
                 loaded.fileColours.set(
                     action.filename,
-                    colours[(loaded.blockSets.size) % 8],
+                    colours[(loaded.blockSets.size) % colours.length],
                 );
             }
 
