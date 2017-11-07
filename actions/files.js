@@ -42,7 +42,7 @@ import { logger } from 'nrfconnect/core';
 import MemoryMap from 'nrf-intel-hex';
 import Store from 'electron-store';
 
-import hexpad from '../hexpad';
+import { hexpad8 } from '../hexpad';
 import memRegions from '../memRegions';
 
 const persistentStore = new Store({ name: 'nrf-programmer' });
@@ -103,7 +103,7 @@ function parseOneFile(filename, dispatch) {
             for (const [address, block] of memMap) {
                 const size = block.length;
 
-                logger.info(`Data block: ${hexpad(address)}-${hexpad(address + size)} (${hexpad(size)}`, ' bytes long)');
+                logger.info(`Data block: ${hexpad8(address)}-${hexpad8(address + size)} (${hexpad8(size)}`, ' bytes long)');
             }
 
             const { regions, labels } = memRegions(memMap);

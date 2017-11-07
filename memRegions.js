@@ -1,7 +1,6 @@
 
 import { logger } from 'nrfconnect/core';
-import hexpad from './hexpad';
-import { hexpad2 } from './hexpad';
+import { hexpad8, hexpad2 } from './hexpad';
 
 
 // Given an instance of MemoryMap, return the heuristically detected
@@ -47,8 +46,8 @@ export default function memRegions(memMap, uicrStartAddr = 0x10001000) {
             labels[`SoftDevice start, id ${hexpad2(fwId)}`] = address;
 
             logger.info(`Found match for SoftDevice signature. Start/End/ID: ${
-                hexpad(address)}`,
-                hexpad(softDeviceSize),
+                hexpad8(address)}`,
+                hexpad8(softDeviceSize),
                 hexpad2(fwId),
             );
 
@@ -67,11 +66,11 @@ export default function memRegions(memMap, uicrStartAddr = 0x10001000) {
 //     }
     if (bootloaderAddress) {
         labels.bootloader = bootloaderAddress;
-        logger.info(`UICR info found: bootloader at ${hexpad(bootloaderAddress)}`);
+        logger.info(`UICR info found: bootloader at ${hexpad8(bootloaderAddress)}`);
     }
     if (mbrParams) {
         labels['MBR parameters'] = mbrParams;
-        logger.info(`UICR info found: MBR parameteres at ${hexpad(mbrParams)}`);
+        logger.info(`UICR info found: MBR parameteres at ${hexpad8(mbrParams)}`);
     }
 
     return {

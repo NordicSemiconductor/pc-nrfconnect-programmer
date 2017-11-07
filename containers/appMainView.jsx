@@ -41,20 +41,16 @@ import MemoryLayout from '../components/MemoryLayout';
 
 const AppMainView = (
     props => {
-        const { fileError, loaded, target } = props;
-        if (fileError) {
-            return (
-                <div className="alert alert-error">{ fileError }</div>
-            );
-        }
+        const { loaded, target } = props;
 
         let targetMap;
         if (!target.serialNumber) {
             targetMap = (
                 <div style={{
-                    position:'absolute',
-                    top: 'calc(50% - 50px)'
-                }}>Connect to a DevKit to see the contents of its non-volatile memory here.</div>
+                    position: 'absolute',
+                    top: 'calc(50% - 50px)',
+                }}
+                >Connect to a DevKit to see the contents of its non-volatile memory here.</div>
             );
         } else if (target.serialNumber && target.isReady) {
             const targetData = {
@@ -106,7 +102,7 @@ const AppMainView = (
 
 AppMainView.propTypes = {
     loaded: PropTypes.shape({}).isRequired,
-    targetSize: PropTypes.number.isRequired,
+    target: PropTypes.shape({}).isRequired,
 };
 
 export default connect(

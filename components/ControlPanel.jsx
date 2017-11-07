@@ -37,11 +37,10 @@
 import React from 'react';
 import { Button, Dropdown, MenuItem, Glyphicon } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-// import { overlapBlockSets } from 'nrf-intel-hex';
 import MemoryMap from 'nrf-intel-hex';
 
 import FileLegend from './FileLegend';
-import hexpad from '../hexpad';
+import { hexpad8 } from '../hexpad';
 
 const ControlPanel = props => {
 //     function openRecent(, ev) {
@@ -68,7 +67,7 @@ const ControlPanel = props => {
 //         if (startAddress >= 0x10001000) {
         if ((startAddress < 0x10001000 && endAddress > props.targetSize) ||
             (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
-            outsideFlashBlocks.push(`${hexpad(startAddress)}-${hexpad(endAddress)}`);
+            outsideFlashBlocks.push(`${hexpad8(startAddress)}-${hexpad8(endAddress)}`);
         }
     }
     let outsideFlashWarning;
@@ -85,9 +84,9 @@ const ControlPanel = props => {
     let mruMenuItems;
 
     if (props.mruFiles.length) {
-        mruMenuItems = props.mruFiles.map(filename =>
-            (<MenuItem onSelect={() => props.openFile(filename)}>{filename}</MenuItem>),
-        );
+        mruMenuItems = props.mruFiles.map((filename, i) => (
+            <MenuItem key={`${i + 1}`} onSelect={() => props.openFile(filename)}>{filename}</MenuItem>
+        ));
     } else {
         mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
     }
@@ -103,7 +102,7 @@ const ControlPanel = props => {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                     { mruMenuItems }
-                    <MenuItem divider="divider" />
+                    <MenuItem divider />
                     <MenuItem onSelect={props.openFileDialog}>Browse...</MenuItem>
                 </Dropdown.Menu>
             </Dropdown>
@@ -133,9 +132,14 @@ ControlPanel.propTypes = {
     openFileDialog: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
-    fileColours: PropTypes.instanceOf(Map).isRequired,
-    mruFiles: PropTypes.instanceOf(Map).isRequired,
-//     mruFiles: PropTypes.
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    loaded: PropTypes.shape({
+        fileColours: PropTypes.instanceOf(Map),
+        memMaps: PropTypes.instanceOf(Map),
+    }).isRequired,
+    targetSize: PropTypes.number.isRequired,
+    refreshAllFiles: PropTypes.func.isRequired,
+    targetIsReady: PropTypes.bool.isRequired,
 };
 
 export default ControlPanel;
