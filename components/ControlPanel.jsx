@@ -37,17 +37,17 @@
 import React from 'react';
 import { Button, Dropdown, MenuItem, Glyphicon } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-import { overlapBlockSets } from 'nrf-intel-hex';
+import MemoryMap from 'nrf-intel-hex';
 
 import FileLegend from './FileLegend';
-import hexpad from '../hexpad';
+import { hexpad8 } from '../hexpad';
 
 const ControlPanel = props => {
 //     function openRecent(, ev) {
 //         console.log('Open recent: ', ev.target.innerText);
 //     }
 
-    const overlaps = overlapBlockSets(props.loaded.blockSets);
+    const overlaps = MemoryMap.overlapMemoryMaps(props.loaded.memMaps);
 //     console.log(overlaps);
     let overlapWarning = '';
     const outsideFlashBlocks = [];
@@ -67,7 +67,7 @@ const ControlPanel = props => {
 //         if (startAddress >= 0x10001000) {
         if ((startAddress < 0x10001000 && endAddress > props.targetSize) ||
             (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
-            outsideFlashBlocks.push(`${hexpad(startAddress)}-${hexpad(endAddress)}`);
+            outsideFlashBlocks.push(`${hexpad8(startAddress)}-${hexpad8(endAddress)}`);
         }
     }
     let outsideFlashWarning;
@@ -135,7 +135,7 @@ ControlPanel.propTypes = {
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     loaded: PropTypes.shape({
         fileColours: PropTypes.instanceOf(Map),
-        blockSets: PropTypes.instanceOf(Map),
+        memMaps: PropTypes.instanceOf(Map),
     }).isRequired,
     targetSize: PropTypes.number.isRequired,
     refreshAllFiles: PropTypes.func.isRequired,

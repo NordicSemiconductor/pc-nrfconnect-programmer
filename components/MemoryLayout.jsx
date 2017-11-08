@@ -37,15 +37,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { overlapBlockSets } from 'nrf-intel-hex';
+import MemoryMap from 'nrf-intel-hex';
 
-import hexpad from '../hexpad';
+import { hexpad8 } from '../hexpad';
 
 /* eslint no-param-reassign: "off" */
 function drawMemoryLayoutDiagram(container, max, data) {
     const min = 0x0;
     const labelStep = 0x10000;
-    const { blockSets, fileColours, writtenAddress, labels, regions } = data;
+    const { memMaps, fileColours, writtenAddress, labels, regions } = data;
 
     if (!container) { return; }
 
@@ -70,7 +70,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
         label.style.position = 'absolute';
         label.style.fontFamily = 'monospace';
-        label.innerText = hexpad(address);
+        label.innerText = hexpad8(address);
 
         if (side === 'left') {
 //             label.style.right = 'calc(75% + 8px)';
@@ -218,7 +218,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
         container.append(label);
     }
 
-    const overlaps = overlapBlockSets(blockSets);
+    const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
 //     console.log(overlaps);
 
@@ -268,7 +268,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
 const MemoryLayout = props => {
     const {
         targetSize,
-        blockSets,
+        memMaps,
         fileColours,
         writtenAddress,
         labels,
@@ -292,7 +292,7 @@ const MemoryLayout = props => {
                 drawMemoryLayoutDiagram(
                     el,
                     targetSize, {
-                        blockSets,
+                        memMaps,
                         fileColours,
                         writtenAddress,
                         labels: Object.entries(labels),
@@ -307,7 +307,7 @@ const MemoryLayout = props => {
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
-    blockSets: PropTypes.instanceOf(Map),
+    memMaps: PropTypes.instanceOf(Map),
     fileColours: PropTypes.instanceOf(Map),
     writtenAddress: PropTypes.number,
     labels: PropTypes.shape({}),
@@ -317,7 +317,7 @@ MemoryLayout.propTypes = {
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
 //     targetSize: 0x080000,  // 0.5MiB
-    blockSets: new Map(),
+    memMaps: new Map(),
     fileColours: new Map(),
     writtenAddress: 0,  // From 0 to here will be assumed written, from here to the top pending
     labels: {},
