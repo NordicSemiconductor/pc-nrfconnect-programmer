@@ -34,17 +34,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import nrfjprog from 'pc-nrfjprog-js';
-// import { overlapBlockSets, flattenOverlaps, paginate, arraysToHex } from 'nrf-intel-hex';
 import MemoryMap from 'nrf-intel-hex';
-// import { stat } from 'fs';
 import { checkUpToDateFiles } from './files';
 import memRegions from '../memRegions';
-
-// import hexpad from '../hexpad';
-
 
 // Get some useful strings from the constants in jprog.
 function getDeviceModel(deviceInfo) {

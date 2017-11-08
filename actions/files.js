@@ -38,7 +38,6 @@ import { readFile, stat } from 'fs';
 import { basename } from 'path';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
-// import { hexToArrays, getUint32 } from 'nrf-intel-hex';
 import MemoryMap from 'nrf-intel-hex';
 import Store from 'electron-store';
 
