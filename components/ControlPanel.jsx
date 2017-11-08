@@ -93,9 +93,6 @@ const ControlPanel = props => {
 
     return (
         <div>
-            <Button onClick={props.closeFiles}>
-                <Glyphicon glyph="folder-close" />Clear files
-            </Button>
             <Dropdown pullRight id="files-dropdown">
                 <Dropdown.Toggle onClick={props.onToggleFileList}>
                     <Glyphicon glyph="folder-open" />Add a .hex file
@@ -109,19 +106,22 @@ const ControlPanel = props => {
             <Button onClick={props.refreshAllFiles}>
                 <Glyphicon glyph="refresh" />Reload .hex files
             </Button>
+            <Button onClick={props.closeFiles}>
+                <Glyphicon glyph="minus-sign" />Clear files
+                </Button>
+
+            <Button onClick={props.performWrite} disabled={!props.targetIsReady}>
+                <Glyphicon glyph="save" />Write all to devkit
+            </Button>
+
+            <Button onClick={props.performRecover} disabled={!props.targetIsReady}>
+                <Glyphicon glyph="remove-sign" />Recover (full erase)
+            </Button>
 
             <FileLegend fileColours={props.loaded.fileColours} />
 
             { overlapWarning }
             { outsideFlashWarning }
-
-            <Button onClick={props.performWrite} disabled={!props.targetIsReady}>
-                <Glyphicon glyph="flash" />Write all to devkit
-            </Button>
-
-            <Button onClick={props.performRecover} disabled={!props.targetIsReady}>
-                <Glyphicon glyph="trash" />Recover (full erase)
-            </Button>
         </div>
     );
 };

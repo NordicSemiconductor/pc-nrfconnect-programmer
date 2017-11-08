@@ -64,7 +64,7 @@ function drawFileLegend(container, fileColours) {
         container.removeChild(container.firstChild);
     }
 
-    container.style.width = '15em'; // DEBUG
+    container.style.width = '100%'; // DEBUG
     container.style.wordBreak = 'break-all';
 
     for (const [filename, colour] of fileColours) {
@@ -80,7 +80,13 @@ function drawFileLegend(container, fileColours) {
         colourSquare.style.float = 'left';
         colourSquare.style.marginRight = '0.2em';
 
-        label.innerText = filename.replace(/\.hex$/, '');
+        // label.title = filename.replace(/\.hex$/, '');
+        label.title = filename;
+        if (label.title.length > 25) {
+            label.innerText = label.title.substr(0, 12);
+            label.innerText += '...';
+            label.innerText += label.title.substr(label.title.length - 12, 12);
+        }
 
         legend.style.borderBottom = '1px #dedede solid';
 
