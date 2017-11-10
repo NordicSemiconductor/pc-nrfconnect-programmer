@@ -80,13 +80,15 @@ function drawFileLegend(container, fileColours) {
         colourSquare.style.float = 'left';
         colourSquare.style.marginRight = '0.2em';
 
-        // label.title = filename.replace(/\.hex$/, '');
         label.title = filename;
-        if (label.title.length > 25) {
-            label.innerText = label.title.substr(0, 12);
-            label.innerText += '…';
-            label.innerText += label.title.substr(label.title.length - 12, 12);
-        }
+        label.innerText = filename;
+        label.style.cssText = `
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 185px;
+            display: block;
+        `;
 
         legend.style.borderBottom = '1px #dedede solid';
 
