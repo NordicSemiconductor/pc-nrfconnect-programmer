@@ -34,6 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import MemoryMap from 'nrf-intel-hex';
+
 const initialState = {
     size: 0x00100000,  // 1MiB. TODO: Set a saner default?
     port: null,
@@ -41,6 +43,9 @@ const initialState = {
     pageSize: 0,
     writtenAddress: 0,
     serialNumber: null,
+    memMap: new MemoryMap(),
+    regions: {}, // heuristically detected code region 0, and memory readback protection
+    labels: {},  // heuristically detected bootloader, mbr, mbr params
 };
 
 export default function target(state = initialState, action) {
@@ -67,6 +72,15 @@ export default function target(state = initialState, action) {
                 ...state,
                 size: action.targetSize,
                 pageSize: action.targetPageSize,
+                isReady: false,
+            };
+
+        case 'TARGET_CONTENTS_KNOWN':
+            return {
+                ...state,
+                memMap: action.targetMemMap,
+                regions: action.targetRegions,
+                labels: action.targetLabels,
                 isReady: true,
             };
 

@@ -3249,9 +3249,9 @@ npmlog@^4.0.2:
     gauge "~2.7.3"
     set-blocking "~2.0.0"
 
-nrf-intel-hex@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/nrf-intel-hex/-/nrf-intel-hex-0.4.0.tgz#c5d4c979627cb8c46d01d50813144b4801a15df0"
+nrf-intel-hex@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/nrf-intel-hex/-/nrf-intel-hex-1.0.1.tgz#4e4af95b4bb469e293fe21cfaa088c01f3425686"
 
 nth-check@~1.0.1:
   version "1.0.1"

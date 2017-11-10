@@ -37,25 +37,24 @@
 // Colours from:
 // https://github.com/d3/d3-scale-chromatic
 const colours = [
-    '#b3e2cd',
-    '#fdcdac',
-    '#cbd5e8',
-    '#f4cae4',
-    '#e6f5c9',
-    '#fff2ae',
-    '#f1e2cc',
-    '#cccccc',
+    '#e78ac3',
+    '#ffd92f',
+    '#8da0cb',
+    '#a6d854',
+    '#e5c494',
+    '#66c2a5',
+    '#b3b3b3',
 ];
 
 const initialState = {
     loaded: {
-        blockSets: new Map(),
+        memMaps: new Map(),
         filenames: [],
         fileColours: new Map(),
         fileModTimes: new Map(),
         fileLoadTimes: new Map(),
-        regions: {}, // heruistically detected code region 0, and memory readback protection
-        labels: {},  // heruistically detected bootloader, mbr, mbr params
+        regions: {}, // heuristically detected code region 0, and memory readback protection
+        labels: {},  // heuristically detected bootloader, mbr, mbr params
     },
 
     mruFiles: [],
@@ -67,7 +66,7 @@ export default function reducer(state = initialState, action) {
             return {
                 ...state,
                 loaded: {
-                    blockSets: new Map(),
+                    memMaps: new Map(),
                     filenames: [],
                     fileColours: new Map(),
                     fileModTimes: new Map(),
@@ -85,7 +84,7 @@ export default function reducer(state = initialState, action) {
             if (!loaded.fileColours.has(action.filename)) {
                 loaded.fileColours.set(
                     action.filename,
-                    colours[(loaded.blockSets.size) % 8],
+                    colours[(loaded.memMaps.size) % colours.length],
                 );
             }
 
@@ -105,7 +104,7 @@ export default function reducer(state = initialState, action) {
                 ...state,
                 fileError: null,
                 loaded: {
-                    blockSets: new Map(loaded.blockSets.set(action.filename, action.blocks)),
+                    memMaps: new Map(loaded.memMaps.set(action.filename, action.memMap)),
                     filenames: loaded.filenames,
                     fileColours: loaded.fileColours,
                     fileModTimes: loaded.fileModTimes.set(action.filename, action.fileModTime),

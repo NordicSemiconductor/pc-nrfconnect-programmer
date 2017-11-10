@@ -34,27 +34,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import nrfjprog from 'pc-nrfjprog-js';
-import { overlapBlockSets, flattenOverlaps, paginate, arraysToHex } from 'nrf-intel-hex';
-// import { stat } from 'fs';
+import MemoryMap from 'nrf-intel-hex';
 import { checkUpToDateFiles } from './files';
-
-// import hexpad from '../hexpad';
-
-function getDeviceInfo(serialNumber) {
-    return new Promise((resolve, reject) => {
-        nrfjprog.getDeviceInfo(serialNumber, (err, info) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(info);
-            }
-        });
-    });
-}
-
+import memRegions from '../memRegions';
 
 // Get some useful strings from the constants in jprog.
 function getDeviceModel(deviceInfo) {
@@ -89,25 +73,84 @@ function getDeviceModel(deviceInfo) {
     return 'Unknown model';
 }
 
+function getDeviceInfo(serialNumber) {
+    return new Promise((resolve, reject) => {
+        nrfjprog.getDeviceInfo(serialNumber, (err, info) => {
+            if (err) {
+                reject(err);
+            } else {
+                logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(info)}. ` +
+                    `RAM: ${info.ramSize / 1024}KiB. Flash: ${info.codeSize / 1024}KiB in pages of ` +
+                    `${info.codePageSize / 1024}KiB.`);
+
+                logger.info('Reading device non-volatile memory. This may take a few seconds.');
+
+                resolve(info);
+            }
+        });
+    });
+}
+
+
+function getDeviceMemMap(serialNumber, devInfo) {
+    return new Promise((resolve, reject) => {
+        nrfjprog.read(serialNumber, devInfo.codeAddress, devInfo.codeSize, (err1, flashBytes) => {
+            if (err1) {
+                reject(err1);
+            } else {
+                nrfjprog.read(serialNumber, devInfo.uicrAddress, devInfo.infoPageSize,
+                (err2, uicrBytes) => {
+                    if (err2) {
+                        reject(err2);
+                    } else {
+                        const memMap = MemoryMap.fromPaddedUint8Array(
+                            new Uint8Array(flashBytes), 0xFF, 256,
+                        );
+                        memMap.set(devInfo.uicrAddress, new Uint8Array(uicrBytes));
+
+                        logger.info(`Non-volatile memory has been read. ${memMap.size} non-empty memory blocks identified.`);
+
+                        const { regions, labels } = memRegions(memMap, devInfo.uicrAddress);
+
+                        resolve({
+                            memMap,
+                            regions,
+                            labels,
+                        });
+                    }
+                });
+            }
+        });
+    });
+}
+
 
 // Display some information about a devkit. Called on a devkit connection.
+// This also triggers reading the whole memory contents of the device.
 export function logDeviceInfo(serialNumber, comName) {
     return dispatch => {
         getDeviceInfo(serialNumber)
             .then(info => {
-                const { codeSize, codePageSize, ramSize } = info;
-                logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(info)}. ` +
-                    `RAM: ${ramSize / 1024}KiB. Flash: ${codeSize / 1024}KiB in pages of ` +
-                    `${codePageSize / 1024}KiB.`);
-
                 // Suggestion: Do this the other way around. F.ex. dispatch a
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
                 // in middleware and log it from there?
                 dispatch({
                     type: 'TARGET_SIZE_KNOWN',
                     targetPort: comName,
-                    targetSize: codeSize,
-                    targetPageSize: codePageSize,
+                    targetSize: info.codeSize,
+                    targetPageSize: info.codePageSize,
+                });
+
+                getDeviceMemMap(serialNumber, info).then(contents => {
+                    dispatch({
+                        type: 'TARGET_CONTENTS_KNOWN',
+                        targetPort: comName,
+                        targetSize: info.codeSize,
+                        targetPageSize: info.codePageSize,
+                        targetMemMap: contents.memMap,
+                        targetRegions: contents.regions,
+                        targetLabels: contents.labels,
+                    });
                 });
             })
             .catch(error => {
@@ -117,7 +160,7 @@ export function logDeviceInfo(serialNumber, comName) {
 }
 
 
-// // Previos write function - manual erase and write of each page.
+// // Previous write function - manual erase and write of each page.
 // function writeBlock(serialNumber, pages, dispatch) {
 //
 //     const pageWriteCalls = Array.from(pages.entries()).map(
@@ -231,10 +274,9 @@ export function write(appState) {
         }
 
         checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
-            const pages = paginate(
-                flattenOverlaps(
-                    overlapBlockSets(appState.file.loaded.blockSets),
-                ), pageSize);
+            const pages = MemoryMap.flattenOverlaps(
+                MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
+            ).paginate(pageSize);
 
 //         console.log(pages);
 //         console.log(arraysToHex(pages, 64));
@@ -246,7 +288,7 @@ export function write(appState) {
                 type: 'WRITE_PROGRESS_START',
             });
 
-            writeHex(serialNumber, arraysToHex(pages, 64), dispatch);
+            writeHex(serialNumber, pages.asHexString(64), dispatch);
         }).catch(() => {});
     };
 }
@@ -283,3 +325,4 @@ export function recover(serialNumber) {
         });
     };
 }
+
