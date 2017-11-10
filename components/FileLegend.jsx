@@ -84,7 +84,7 @@ function drawFileLegend(container, fileColours) {
         label.title = filename;
         if (label.title.length > 25) {
             label.innerText = label.title.substr(0, 12);
-            label.innerText += '...';
+            label.innerText += '…';
             label.innerText += label.title.substr(label.title.length - 12, 12);
         }
 

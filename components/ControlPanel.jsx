@@ -93,6 +93,8 @@ const ControlPanel = props => {
 
     return (
         <div>
+            { overlapWarning }
+            { outsideFlashWarning }
             <Dropdown pullRight id="files-dropdown">
                 <Dropdown.Toggle onClick={props.onToggleFileList}>
                     <Glyphicon glyph="folder-open" />Add a .hex file
@@ -120,8 +122,6 @@ const ControlPanel = props => {
 
             <FileLegend fileColours={props.loaded.fileColours} />
 
-            { overlapWarning }
-            { outsideFlashWarning }
         </div>
     );
 };
