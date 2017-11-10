@@ -42,21 +42,23 @@ const FileLegend = props => {
     const fileColourArray = Array.from(fileColours);
     return (
         <table className="file-legend">
-            {
-                fileColourArray.map(([filename, colour], i) => (
-                    <tr key={`file-${i + 1}`}>
-                        <td>
-                            <div
-                                className="legend-colour"
-                                style={{ backgroundColor: colour }}
-                            />
-                        </td>
-                        <td title={filename} className="file-label">
-                            { filename }
-                        </td>
-                    </tr>
-                ))
-            }
+            <tbody>
+                {
+                    fileColourArray.map(([filename, colour], i) => (
+                        <tr key={`file-${i + 1}`}>
+                            <td>
+                                <div
+                                    className="legend-colour"
+                                    style={{ backgroundColor: colour }}
+                                />
+                            </td>
+                            <td title={filename} className="file-label">
+                                { filename }
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
         </table>
     );
 };
