@@ -32,12 +32,15 @@
   },
   "devDependencies": {
     "babel-loader": "^7.1.2",
+    "nrf-intel-hex": "^1.0.1",
     "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.0.0"
   },
   "dependencies": {
-    "electron-store": "^1.2.0",
-    "nrf-intel-hex": "^1.0.1"
+    "electron-store": "^1.2.0"
   },
+  "bundledDependencies": [
+    "electron-store"
+  ],
   "jest": {
     "moduleNameMapper": {
       "nrfconnect/core": "<rootDir>/mocks/coreMock.js"
