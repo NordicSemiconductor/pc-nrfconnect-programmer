@@ -38,11 +38,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import MemoryMap from 'nrf-intel-hex';
+import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../hexpad';
 
 /* eslint no-param-reassign: "off" */
 function drawMemoryLayoutDiagram(container, max, data) {
+    /// TODO: Have some way of providing a formatter function for the addresses
     const min = 0x0;
     const labelStep = 0x10000;
     const { memMaps, fileColours, writtenAddress, labels, regions } = data;
@@ -53,47 +55,68 @@ function drawMemoryLayoutDiagram(container, max, data) {
         container.removeChild(container.firstChild);
     }
 
+    const svgRight = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svgRight.style.position = 'absolute';
+    svgRight.style.height = '100%';
+    svgRight.style.right = '96px';
+    svgRight.style.width = '8px';
+    svgRight.style.overflow = 'hidden';
+    container.append(svgRight);
+
+    const svgLeft = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svgLeft.style.position = 'absolute';
+    svgLeft.style.height = '100%';
+    svgLeft.style.left = '96px';
+    svgLeft.style.width = '8px';
+    svgLeft.style.overflow = 'hidden';
+    container.append(svgLeft);
+
+    const leftLabels = [];
+    const rightLabels = [];
+    const leftLabelLines = new Map();
+    const rightLabelLines = new Map();
     // Draw a address label at either side of the memory layout
     function drawLabel(address, side = 'left') {
+        if (side === 'left' && leftLabelLines.has(address)) { return; }
+        else if (rightLabelLines.has(address)) { return; }
+
         const backgroundColor = 'rgba(210, 210, 210, 0.75)';
 
         const label = document.createElement('div');
-        const tip = document.createElement('div');
-
-        tip.style.position = 'absolute';
-        tip.style.width = 0;
-        tip.style.background = 'transparent';
-        tip.style.height = '0';
-        tip.style.border = '8px solid transparent';
-        tip.style.marginLeft = '-8px';
-        tip.style.top = 0;
-
         label.style.position = 'absolute';
         label.style.fontFamily = 'monospace';
         label.innerText = hexpad8(address);
 
+        const labelLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        labelLine.style.strokeWidth = '1';
+        labelLine.style.stroke = 'black';
+
         if (side === 'left') {
-//             label.style.right = 'calc(75% + 8px)';
             label.style.left = '0px';
-//             label.style.paddingRight = '8px';
-            tip.style.borderLeftColor = backgroundColor;
-            tip.style.left = 'calc(100% +  8px)';
+            svgLeft.append(labelLine);
+            leftLabelLines.set(address, labelLine);
+            leftLabels.push([address, label]);
+            labelLine.setAttribute("x1", 8);
+            labelLine.setAttribute("x2", 0);
         } else if (side === 'right') {
-//             label.style.left = 'calc(75% + 8px)';
             label.style.right = '0px';
-//             label.style.paddingLeft = '10px';
-            tip.style.borderRightColor = backgroundColor;
-            tip.style.right = '100%';
+            svgRight.append(labelLine);
+            rightLabelLines.set(address, labelLine);
+            rightLabels.push([address, label]);
+            labelLine.setAttribute("x1", 0);
+            labelLine.setAttribute("x2", 8);
         }
+        container.append(label);
 
         label.style.bottom = `calc( ${(100 * address) / max}% - 8px )`;
         label.style.background = backgroundColor;
 
-        label.append(tip);
         return label;
     }
 
     // Draws a horizontal line at the given address, and some text on top
+    // TODO: Allow for text on the bottom
+    // TODO: Add an address label too, check it doesn't already exist (or use a `Set`)
     function drawInlineLabel(text, address) {
         const label = document.createElement('div');
         label.style.position = 'absolute';
@@ -109,6 +132,8 @@ function drawMemoryLayoutDiagram(container, max, data) {
         label.textContent = text;
 
         container.append(label);
+
+        drawLabel(address, 'right');
     }
 
     const blocksWrapper = document.createElement('div');
@@ -154,11 +179,8 @@ function drawMemoryLayoutDiagram(container, max, data) {
         }
 
         const startLabel = drawLabel(address, 'right');
-        container.append(startLabel);
-
         const endLabel = drawLabel(address + blockSize, 'right');
-        endLabel.style.zIndex = -1;
-        container.append(endLabel);
+//         endLabel.style.zIndex = -1;
 
 //         let eventNames = ['mouseover', 'mouseout'];
 //         if (window.PointerEvent) {
@@ -215,7 +237,6 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
     for (let i = min; i <= max; i += labelStep) {
         const label = drawLabel(i);
-        container.append(label);
     }
 
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
@@ -258,10 +279,57 @@ function drawMemoryLayoutDiagram(container, max, data) {
         drawStripeBlock(...region);
     }
 
-//     const addresses = Array.from(blocks.keys());
-//     for (let i = 0, l = addresses.length; i < l; i += 1) {
-//         const address = addresses[i];
-//     }
+    // "re-paints" the addresses at each side by moving them around, as well as their
+    // lines
+    function relocateBlockLabels(){
+
+        // Assume the height is a specific number of *integer* pixels, as to
+        // avoid sub-pixel artifacts.
+        const totalHeight = Math.floor(parseFloat(
+            window.getComputedStyle(container).height   // This is always in pixels as per spec
+        )) - 1;
+        const totalWidth = parseFloat(
+            window.getComputedStyle(container).width    // This is always in pixels as per spec
+        );
+        console.log('Should adapt to ', totalHeight);
+
+        svgLeft.style.height = (totalHeight + 1) + 'px';
+        svgRight.style.height = (totalHeight + 1) + 'px';
+
+        function relocateSide(labels, lines) {
+            console.log('Should relocate address labels:', labels);
+
+            const labelHeights = labels.map(([addr, el])=> {
+                const labelHeight = parseFloat(window.getComputedStyle(el).height);
+                return [ ((totalHeight * addr) / max) - (labelHeight / 2), labelHeight ];
+            });
+            console.log('Input to unclutter1d:', labelHeights);
+
+            const unclutteredHeights = unclutter1d(labelHeights, -8, totalHeight +8);
+            console.log('Output of unclutter1d:', unclutteredHeights);
+
+            labels.forEach(([addr, el], i)=>{
+                const line = lines.get(addr);
+                const origHeight = labelHeights[i][0];
+                el.style.bottom = unclutteredHeights[i][0] + 'px';
+
+//                 line.setAttribute("x1", totalWidth - 104);
+//                 line.setAttribute("x2", totalWidth - 96);
+
+//                 line.setAttribute("y1", Math.round(totalHeight - origHeight - 8) + 0.5);
+//                 line.setAttribute("y2", Math.round(totalHeight - unclutteredHeights[i][0] - 8) + 0.5);
+                line.setAttribute("y1", totalHeight - origHeight - 8 + 0.5);
+                line.setAttribute("y2", totalHeight - unclutteredHeights[i][0] - 8 + 0.5);
+            });
+        }
+
+        relocateSide(leftLabels, leftLabelLines);
+        relocateSide(rightLabels, rightLabelLines);
+    }
+
+    /// TODO: Should call this whenever the size changes
+    relocateBlockLabels();
+    window.addEventListener('resize', relocateBlockLabels);
 }
 
 

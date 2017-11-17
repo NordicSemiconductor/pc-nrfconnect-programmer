@@ -4639,6 +4639,10 @@ uid-number@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/uid-number/-/uid-number-0.0.6.tgz#0ea10e8035e8eb5b8e4449f06da1c730663baa81"
 
+unclutter1d@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/unclutter1d/-/unclutter1d-0.1.0+rc1.tgz#cef486a34680ed923e41af16401009dc76c09758"
+
 uncontrollable@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/uncontrollable/-/uncontrollable-4.1.0.tgz#e0358291252e1865222d90939b19f2f49f81c1a9"

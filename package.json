@@ -36,7 +36,8 @@
     "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.0.0"
   },
   "dependencies": {
-    "electron-store": "^1.2.0"
+    "electron-store": "^1.2.0",
+    "unclutter1d": "^0.1.0"
   },
   "bundledDependencies": [
     "electron-store"
