@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "electron-store": "^1.2.0",
-    "unclutter1d": "^0.1.0"
+    "unclutter1d": "^0.2.0"
   },
   "bundledDependencies": [
     "electron-store"

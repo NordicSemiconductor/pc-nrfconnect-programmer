@@ -44,7 +44,7 @@ import { hexpad8 } from '../hexpad';
 
 /* eslint no-param-reassign: "off" */
 function drawMemoryLayoutDiagram(container, max, data) {
-    /// TODO: Have some way of providing a formatter function for the addresses
+    // / TODO: Have some way of providing a formatter function for the addresses
     const min = 0x0;
     const labelStep = 0x10000;
     const { memMaps, fileColours, writtenAddress, labels, regions } = data;
@@ -60,7 +60,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
     svgRight.style.height = '100%';
     svgRight.style.right = '96px';
     svgRight.style.width = '8px';
-    svgRight.style.overflow = 'hidden';
+//     svgRight.style.overflow = 'hidden';
     container.append(svgRight);
 
     const svgLeft = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -68,7 +68,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
     svgLeft.style.height = '100%';
     svgLeft.style.left = '96px';
     svgLeft.style.width = '8px';
-    svgLeft.style.overflow = 'hidden';
+//     svgLeft.style.overflow = 'hidden';
     container.append(svgLeft);
 
     const leftLabels = [];
@@ -96,22 +96,20 @@ function drawMemoryLayoutDiagram(container, max, data) {
             svgLeft.append(labelLine);
             leftLabelLines.set(address, labelLine);
             leftLabels.push([address, label]);
-            labelLine.setAttribute("x1", 8);
-            labelLine.setAttribute("x2", 0);
+            labelLine.setAttribute('x1', 8);
+            labelLine.setAttribute('x2', 0);
         } else if (side === 'right') {
             label.style.right = '0px';
             svgRight.append(labelLine);
             rightLabelLines.set(address, labelLine);
             rightLabels.push([address, label]);
-            labelLine.setAttribute("x1", 0);
-            labelLine.setAttribute("x2", 8);
+            labelLine.setAttribute('x1', 0);
+            labelLine.setAttribute('x2', 8);
         }
         container.append(label);
 
         label.style.bottom = `calc( ${(100 * address) / max}% - 8px )`;
         label.style.background = backgroundColor;
-
-        return label;
     }
 
     // Draws a horizontal line at the given address, and some text on top
@@ -178,8 +176,8 @@ function drawMemoryLayoutDiagram(container, max, data) {
                 gradientStops.join(',')})`;
         }
 
-        const startLabel = drawLabel(address, 'right');
-        const endLabel = drawLabel(address + blockSize, 'right');
+        drawLabel(address, 'right');
+        drawLabel(address + blockSize, 'right');
 //         endLabel.style.zIndex = -1;
 
 //         let eventNames = ['mouseover', 'mouseout'];
@@ -236,7 +234,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
     container.append(border);
 
     for (let i = min; i <= max; i += labelStep) {
-        const label = drawLabel(i);
+        drawLabel(i);
     }
 
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
@@ -281,45 +279,56 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
     // "re-paints" the addresses at each side by moving them around, as well as their
     // lines
-    function relocateBlockLabels(){
-
+    function relocateBlockLabels() {
         // Assume the height is a specific number of *integer* pixels, as to
         // avoid sub-pixel artifacts.
         const totalHeight = Math.floor(parseFloat(
-            window.getComputedStyle(container).height   // This is always in pixels as per spec
+            window.getComputedStyle(container).height,   // This is always in pixels as per spec
         )) - 1;
-        const totalWidth = parseFloat(
-            window.getComputedStyle(container).width    // This is always in pixels as per spec
-        );
-        console.log('Should adapt to ', totalHeight);
+//         const totalWidth = parseFloat(
+//             window.getComputedStyle(container).width,    // This is always in pixels as per spec
+//         );
 
-        svgLeft.style.height = (totalHeight + 1) + 'px';
-        svgRight.style.height = (totalHeight + 1) + 'px';
+//         console.log('Should adapt to ', totalHeight);
 
-        function relocateSide(labels, lines) {
-            console.log('Should relocate address labels:', labels);
+        svgLeft.style.height = `${totalHeight + 1}px`;
+        svgRight.style.height = `${totalHeight + 1}px`;
+//         svgLeft.style.top = '1px';
+//         svgRight.style.top = '1px';
 
-            const labelHeights = labels.map(([addr, el])=> {
+        function relocateSide(sideLabels, lines) {
+//             console.log('Should relocate address labels:', sideLabels);
+
+            const labelHeights = sideLabels.map(([addr, el]) => {
                 const labelHeight = parseFloat(window.getComputedStyle(el).height);
-                return [ ((totalHeight * addr) / max) - (labelHeight / 2), labelHeight ];
+
+                return [((totalHeight * addr) / max) - (labelHeight / 2), labelHeight];
             });
-            console.log('Input to unclutter1d:', labelHeights);
+//             console.log('Input to unclutter1d:', labelHeights);
+            if (labelHeights.length && isNaN(labelHeights[0][1])) {
+                // If the height of the first element is NaN, it means that this set of
+                // labels have been removed from the DOM.
+                window.removeEventListener('resize', relocateBlockLabels);
+                return;
+            }
 
-            const unclutteredHeights = unclutter1d(labelHeights, -8, totalHeight +8);
-            console.log('Output of unclutter1d:', unclutteredHeights);
+            const unclutteredHeights = unclutter1d(labelHeights, -8, totalHeight + 8);
+//             console.log('Output of unclutter1d:', unclutteredHeights);
 
-            labels.forEach(([addr, el], i)=>{
+            sideLabels.forEach(([addr, el], i) => {
                 const line = lines.get(addr);
                 const origHeight = labelHeights[i][0];
-                el.style.bottom = unclutteredHeights[i][0] + 'px';
+                el.style.bottom = `${unclutteredHeights[i][0]}px`;
 
 //                 line.setAttribute("x1", totalWidth - 104);
 //                 line.setAttribute("x2", totalWidth - 96);
 
-//                 line.setAttribute("y1", Math.round(totalHeight - origHeight - 8) + 0.5);
-//                 line.setAttribute("y2", Math.round(totalHeight - unclutteredHeights[i][0] - 8) + 0.5);
-                line.setAttribute("y1", totalHeight - origHeight - 8 + 0.5);
-                line.setAttribute("y2", totalHeight - unclutteredHeights[i][0] - 8 + 0.5);
+//         line.setAttribute("y1", Math.round(totalHeight - origHeight - 8) + 0.5);
+//         line.setAttribute("y2", Math.round(totalHeight - unclutteredHeights[i][0] - 8) + 0.5);
+//         line.setAttribute("y1", Math.ceil(totalHeight - origHeight - 8) + 0.5);
+//         line.setAttribute("y2", Math.ceil(totalHeight - unclutteredHeights[i][0] - 8) + 0.5);
+                line.setAttribute('y1', totalHeight - origHeight - 7.5);
+                line.setAttribute('y2', totalHeight - unclutteredHeights[i][0] - 7.5);
             });
         }
 
@@ -327,7 +336,6 @@ function drawMemoryLayoutDiagram(container, max, data) {
         relocateSide(rightLabels, rightLabelLines);
     }
 
-    /// TODO: Should call this whenever the size changes
     relocateBlockLabels();
     window.addEventListener('resize', relocateBlockLabels);
 }
@@ -385,6 +393,7 @@ MemoryLayout.propTypes = {
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
 //     targetSize: 0x080000,  // 0.5MiB
+//     targetSize: 0x040000,  // 1/4 MiB
     memMaps: new Map(),
     fileColours: new Map(),
     writtenAddress: 0,  // From 0 to here will be assumed written, from here to the top pending
