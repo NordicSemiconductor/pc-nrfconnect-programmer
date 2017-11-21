@@ -60,7 +60,6 @@ function drawMemoryLayoutDiagram(container, max, data) {
     svgRight.style.height = '100%';
     svgRight.style.right = '96px';
     svgRight.style.width = '8px';
-//     svgRight.style.overflow = 'hidden';
     container.append(svgRight);
 
     const svgLeft = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -68,9 +67,9 @@ function drawMemoryLayoutDiagram(container, max, data) {
     svgLeft.style.height = '100%';
     svgLeft.style.left = '96px';
     svgLeft.style.width = '8px';
-//     svgLeft.style.overflow = 'hidden';
     container.append(svgLeft);
 
+    // TODO: Consider using `Set` instead for checking duplicate addresses
     const leftLabels = [];
     const rightLabels = [];
     const leftLabelLines = new Map();
@@ -113,13 +112,11 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
     // Draws a horizontal line at the given address, and some text on top
     // TODO: Allow for text on the bottom
-    // TODO: Add an address label too, check it doesn't already exist (or use a `Set`)
     function drawInlineLabel(text, address) {
         const label = document.createElement('div');
         label.style.position = 'absolute';
         label.style.textAlign = 'center';
         label.style.lineHeight = '10px';
-//         label.style.fontFamily = 'sans-serif';
         label.style.fontSize = '12px';
 
         label.style.left = '104px';
@@ -177,25 +174,6 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
         drawLabel(address, 'right');
         drawLabel(address + blockSize, 'right');
-//         endLabel.style.zIndex = -1;
-
-//         let eventNames = ['mouseover', 'mouseout'];
-//         if (window.PointerEvent) {
-//             eventNames = ['pointerenter', 'pointerout'];
-//         }
-//         block.addEventListener(eventNames[0], () => {
-// //                 console.log('over block');
-//             startLabel.style.zIndex = 5;
-//             startLabel.style.fontWeight = 'bold';
-//             endLabel.style.zIndex = 4;
-//             endLabel.style.fontWeight = 'bold';
-//         });
-//         block.addEventListener(eventNames[1], () => {
-//             startLabel.style.zIndex = 0;
-//             startLabel.style.fontWeight = 'inherit';
-//             endLabel.style.zIndex = -1;
-//             endLabel.style.fontWeight = 'inherit';
-//         });
     }
 
     // Draw a block of transparent stripes
@@ -208,17 +186,12 @@ function drawMemoryLayoutDiagram(container, max, data) {
         block.style.borderBottom = `solid 1px ${colour}`;
     }
 
-//     let container = document.createElement('div');
-//     container.style.width = '500px';
     container.style.minWidth = '250px';
     container.style.maxWidth = '750px';
-//     container.style.height= '500px';
     container.style.height = 'calc( 100% - 2em )';
-//     container.style.margin = '25px';
     container.style.marginTop = '1em';
     container.style.marginBottom = '1em';
     container.style.position = 'relative';
-//     container.style.fontFamily = 'monospace';
     container.style.zIndex = 0;
     container.style.lineHeight = '16px';
     container.style.fontSize = '16px';
@@ -238,21 +211,15 @@ function drawMemoryLayoutDiagram(container, max, data) {
 
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
-//     console.log(overlaps);
-
     for (const [address, overlap] of overlaps) {
         let blockSize = 0;
         const blockColours = [];
 
         for (const [filename, bytes] of overlap) {
             blockSize = bytes.length;
-//             if (colour) {
-//                 console.log('FIXME: Should display several overlapping colours');
-//             }
             blockColours.push(fileColours.get(filename));
         }
 
-//         const blockSize = blocks.get(address).length;
         if (writtenAddress > address) {
             const size = Math.min(writtenAddress - address, blockSize);
             drawSolidBlock(address, size, ['#cc4040']);
@@ -263,10 +230,6 @@ function drawMemoryLayoutDiagram(container, max, data) {
             drawSolidBlock(start, size, blockColours);
         }
     }
-
-//     if (protectedAddress) {
-//         drawStripeBlock(0, 0x18000, '#ff0000');
-//     }
 
     for (const label of labels) {
         drawInlineLabel(...label);
@@ -284,26 +247,16 @@ function drawMemoryLayoutDiagram(container, max, data) {
         const totalHeight = Math.floor(parseFloat(
             window.getComputedStyle(container).height,   // This is always in pixels as per spec
         )) - 1;
-//         const totalWidth = parseFloat(
-//             window.getComputedStyle(container).width,    // This is always in pixels as per spec
-//         );
-
-//         console.log('Should adapt to ', totalHeight);
 
         svgLeft.style.height = `${totalHeight + 1}px`;
         svgRight.style.height = `${totalHeight + 1}px`;
-//         svgLeft.style.top = '1px';
-//         svgRight.style.top = '1px';
 
         function relocateSide(sideLabels, lines) {
-//             console.log('Should relocate address labels:', sideLabels);
-
             const labelHeights = sideLabels.map(([addr, el]) => {
                 const labelHeight = parseFloat(window.getComputedStyle(el).height);
 
                 return [((totalHeight * addr) / max) - (labelHeight / 2), labelHeight];
             });
-//             console.log('Input to unclutter1d:', labelHeights);
             if (labelHeights.length && isNaN(labelHeights[0][1])) {
                 // If the height of the first element is NaN, it means that this set of
                 // labels have been removed from the DOM.
@@ -312,20 +265,12 @@ function drawMemoryLayoutDiagram(container, max, data) {
             }
 
             const unclutteredHeights = unclutter1d(labelHeights, -8, totalHeight + 8);
-//             console.log('Output of unclutter1d:', unclutteredHeights);
 
             sideLabels.forEach(([addr, el], i) => {
                 const line = lines.get(addr);
                 const origHeight = labelHeights[i][0];
                 el.style.bottom = `${unclutteredHeights[i][0]}px`;
 
-//                 line.setAttribute("x1", totalWidth - 104);
-//                 line.setAttribute("x2", totalWidth - 96);
-
-//         line.setAttribute("y1", Math.round(totalHeight - origHeight - 8) + 0.5);
-//         line.setAttribute("y2", Math.round(totalHeight - unclutteredHeights[i][0] - 8) + 0.5);
-//         line.setAttribute("y1", Math.ceil(totalHeight - origHeight - 8) + 0.5);
-//         line.setAttribute("y2", Math.ceil(totalHeight - unclutteredHeights[i][0] - 8) + 0.5);
                 line.setAttribute('y1', totalHeight - origHeight - 7.5);
                 line.setAttribute('y2', totalHeight - unclutteredHeights[i][0] - 7.5);
             });
