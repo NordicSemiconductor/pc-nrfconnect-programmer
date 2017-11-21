@@ -77,8 +77,7 @@ function drawMemoryLayoutDiagram(container, max, data) {
     const rightLabelLines = new Map();
     // Draw a address label at either side of the memory layout
     function drawLabel(address, side = 'left') {
-        if (side === 'left' && leftLabelLines.has(address)) { return; }
-        else if (rightLabelLines.has(address)) { return; }
+        if (side === 'left' && leftLabelLines.has(address)) { return; } else if (rightLabelLines.has(address)) { return; }
 
         const backgroundColor = 'rgba(210, 210, 210, 0.75)';
 
