@@ -196,7 +196,7 @@ class MemoryLayout extends React.Component {
 
         this.leftSvgContainer = (<svg style={{
             position: 'absolute',
-            height: (this.state.computedHeight + 1) + 'px',
+            height: `${this.state.computedHeight + 1}px`,
             left: '96px',
             width: '8px',
         }}
@@ -206,7 +206,7 @@ class MemoryLayout extends React.Component {
 
         this.rightSvgContainer = (<svg style={{
             position: 'absolute',
-            height: (this.state.computedHeight + 1) + 'px',
+            height: `${this.state.computedHeight + 1}px`,
             right: '96px',
             width: '8px',
         }}
