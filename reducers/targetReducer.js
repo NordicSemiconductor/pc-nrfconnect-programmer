@@ -38,6 +38,7 @@ import MemoryMap from 'nrf-intel-hex';
 
 const initialState = {
     size: 0x00100000,  // 1MiB. TODO: Set a saner default?
+//     size: 0x00040000,  // 1/4 MiB. TODO: Set a saner default?
     port: null,
     isReady: false,   // Flag to denote that a devkit is busy (or unconnected)
     pageSize: 0,
