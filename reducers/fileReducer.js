@@ -48,6 +48,8 @@ const colours = [
     '#b3b3b3',
 ];
 
+const usedColours = [];
+
 const initialState = {
     loaded: {},
     memMaps: [],
@@ -77,8 +79,11 @@ export default function reducer(state = initialState, action) {
                 [filePath, memMap],
             ];
 
-            const colour = colours.shift();
-            colours.push(colour);
+            let colour = colours.shift();
+            while (!colour || usedColours.includes(colour)) {
+                colour = `#${Math.trunc((Math.random() * 0xffffff)).toString(16).padStart(6, '0')}`;
+            }
+            usedColours.push(colour);
 
             const newState = {
                 ...state,
