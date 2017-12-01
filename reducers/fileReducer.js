@@ -77,6 +77,9 @@ export default function reducer(state = initialState, action) {
                 [filePath, memMap],
             ];
 
+            const colour = colours.shift();
+            colours.push(colour);
+
             const newState = {
                 ...state,
                 fileError: null,
@@ -84,7 +87,7 @@ export default function reducer(state = initialState, action) {
                     ...loaded,
                     [filePath]: {
                         filename: basename(filePath),
-                        colour: colours[(Object.keys(loaded).length + 1) % colours.length],
+                        colour,
                         modTime,
                         loadTime,
                         memMap,
