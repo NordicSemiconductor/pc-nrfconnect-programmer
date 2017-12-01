@@ -170,25 +170,6 @@ export function refreshAllFiles() {
                 return resolve();
             });
         })),
-        // Array.from(fileLoadTimes.entries()).map(
-        //     ([filename, loadTime]) => new Promise((res, rej) => {
-        //         stat(filename, (err, stats) => {
-        //             if (err) {
-        //                 displayFileError(err, dispatch);
-        //                 return rej();
-        //             }
-        //
-        //             if (loadTime.getTime() < stats.mtime) {
-        //                 logger.info('Reloading: ', filename);
-        //                 return parseOneFile(filename, (...args) => {
-        //                     dispatch(...args); res();
-        //                 });
-        //             }
-        //             logger.info('Does not need to be reloaded: ', filename);
-        //             return res();
-        //         });
-        //     }),
-        // ),
     );
 }
 
@@ -214,18 +195,6 @@ export function checkUpToDateFiles(dispatch, getState) {
                 }
             });
         })),
-        // Array.from(fileLoadTimes.entries()).map(
-        //     ([filename, loadTime]) => new Promise(res => {
-        //         stat(filename, (err, stats) => {
-        //             if (loadTime.getTime() < stats.mtime) {
-        //                 newestFileTimestamp = Math.max(newestFileTimestamp, stats.mtime);
-        //                 res(filename);
-        //             } else {
-        //                 res();
-        //             }
-        //         });
-        //     }),
-        // ),
     ).then(filenames => filenames.filter(i => !!i)).then(filenames => {
         if (filenames.length === 0) {
             // Resolve immediately: no files were changed
