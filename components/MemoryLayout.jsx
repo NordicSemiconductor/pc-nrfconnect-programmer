@@ -68,7 +68,7 @@ class MemoryLayout extends React.Component {
         // avoid sub-pixel artifacts.
         const totalHeight = Math.floor(parseFloat(
             window.getComputedStyle(this.node).height,   // This is always in pixels as per spec
-        )) - 1 - labelHeight;
+        )) - 1;
 
         if (this.state.computedHeight !== totalHeight) {
             this.setState({ computedHeight: totalHeight });
@@ -199,6 +199,7 @@ class MemoryLayout extends React.Component {
             height: `${this.state.computedHeight + 1}px`,
             left: '104px',
             width: '8px',
+            bottom: `${labelHeight / 2}px`,
         }}
         >
             { addressLabels.left.map(i => i.line) }
@@ -209,6 +210,7 @@ class MemoryLayout extends React.Component {
             height: `${this.state.computedHeight + 1}px`,
             right: '104px',
             width: '8px',
+            bottom: `${labelHeight / 2}px`,
         }}
         >
             { addressLabels.right.map(i => i.line) }
@@ -232,20 +234,29 @@ class MemoryLayout extends React.Component {
                     background: 'white',
 
                 }}
-                ref={node => { this.node = node; }}
             >
-                <div style={{
-                    position: 'absolute',
-                    height: `calc( 100% - ${labelHeight}px)`,
-                    width: `calc( 100% - ${labelHeight}px)`,
+                <h1 style={{
+                    marginTop: 0,
+                    marginBottom: `${labelHeight / 2}px`,
                 }}
+                >{this.props.title}</h1>
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: `${labelHeight * 4}px`,
+                        bottom: `${labelHeight / 2}px`,
+                        left: `${labelHeight / 2}px`,
+                        right: `${labelHeight / 2}px`,
+                    }}
+                    ref={node => { this.node = node; }}
                 >
                     { addressLabels.left.map(i => i.label) }
                     { addressLabels.right.map(i => i.label) }
                 </div>
                 <div style={{
                     position: 'absolute',
-                    height: `calc( 100% - ${labelHeight}px)`,
+                    top: `${labelHeight * 4}px`,
+                    bottom: `${labelHeight / 2}px`,
                     left: '112px',
                     right: '112px',
                     overflow: 'hidden',
@@ -273,6 +284,7 @@ MemoryLayout.defaultProps = {
 //                             // from here to the top pending
     labels: {},
 //     regions: {},
+    title: '',
 };
 
 
@@ -283,6 +295,7 @@ MemoryLayout.propTypes = {
 //     writtenAddress: PropTypes.number,
     labels: PropTypes.shape({}),
 //     regions: PropTypes.shape({}),
+    title: PropTypes.string,
 };
 
 

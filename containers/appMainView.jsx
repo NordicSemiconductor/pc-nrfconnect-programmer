@@ -62,7 +62,11 @@ const AppMainView = (
                 regions: target.regions,
             };
 
-            targetMap = <MemoryLayout {...targetData} targetSize={target.size} />;
+            targetMap = (<MemoryLayout
+                {...targetData}
+                targetSize={target.size}
+                title="Target device"
+            />);
         } else {
             targetMap = <div className="memlayout-spinner" />;
         }
@@ -93,7 +97,11 @@ const AppMainView = (
                     width: 'calc(50% - 8px)',
                 }}
                 >
-                    <MemoryLayout {...loaded} targetSize={target.size} />
+                    <MemoryLayout
+                        {...loaded}
+                        targetSize={target.size}
+                        title=".hex files"
+                    />
                 </div>
             </div>
         );
