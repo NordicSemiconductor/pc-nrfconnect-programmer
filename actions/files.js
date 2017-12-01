@@ -109,8 +109,8 @@ function parseOneFile(filename, dispatch) {
             dispatch({
                 type: 'FILE_PARSE',
                 filePath: filename,
-                fileModTime: stats.mtime,
-                fileLoadTime: new Date(),
+                modTime: stats.mtime,
+                loadTime: new Date(),
                 memMap,
                 regions,
                 labels,
@@ -126,8 +126,6 @@ export function openFileDialog() {
             filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
             properties: ['openFile', 'multiSelections'],
         }, filenames => {
-//             console.log('Files selected: ', filenames);
-
             for (const filename of filenames) {
                 parseOneFile(filename, dispatch);
             }
@@ -151,25 +149,46 @@ export function loadMruFiles() {
     };
 }
 
-export function refreshAllFiles(fileLoadTimes) {
-    return dispatch => Promise.all(
-        Array.from(fileLoadTimes.entries()).map(
-            ([filename, loadTime]) => new Promise((res, rej) => {
-                stat(filename, (err, stats) => {
-                    if (err) {
-                        displayFileError(err, dispatch);
-                        return rej();
-                    }
+export function refreshAllFiles() {
+    return (dispatch, getState) => Promise.all(
+        Object.keys(getState().app.file.loaded).map(filePath => new Promise((resolve, reject) => {
+            const entry = getState().app.file.loaded[filePath];
+            stat(filePath, (err, stats) => {
+                if (err) {
+                    displayFileError(err, dispatch);
+                    return reject();
+                }
 
-                    if (loadTime.getTime() < stats.mtime) {
-                        logger.info('Reloading: ', filename);
-                        return parseOneFile(filename, (...args) => { dispatch(...args); res(); });
-                    }
-                    logger.info('Does not need to be reloaded: ', filename);
-                    return res();
-                });
-            }),
-        ),
+                if (entry.loadTime.getTime() < stats.mtime) {
+                    logger.info('Reloading: ', filePath);
+                    return parseOneFile(filePath, (...args) => {
+                        dispatch(...args);
+                        resolve();
+                    });
+                }
+                logger.info('Does not need to be reloaded: ', filePath);
+                return resolve();
+            });
+        })),
+        // Array.from(fileLoadTimes.entries()).map(
+        //     ([filename, loadTime]) => new Promise((res, rej) => {
+        //         stat(filename, (err, stats) => {
+        //             if (err) {
+        //                 displayFileError(err, dispatch);
+        //                 return rej();
+        //             }
+        //
+        //             if (loadTime.getTime() < stats.mtime) {
+        //                 logger.info('Reloading: ', filename);
+        //                 return parseOneFile(filename, (...args) => {
+        //                     dispatch(...args); res();
+        //                 });
+        //             }
+        //             logger.info('Does not need to be reloaded: ', filename);
+        //             return res();
+        //         });
+        //     }),
+        // ),
     );
 }
 
@@ -179,26 +198,37 @@ export function refreshAllFiles(fileLoadTimes) {
 // Expects a Map of filenames to instances of Date when the file was loaded into the UI.
 // Returns a promise: it will resolve when the state of the files is known, or reject
 // if the user wanted to cancel to manually check the status.
-export function checkUpToDateFiles(fileLoadTimes, dispatch) {
+export function checkUpToDateFiles(dispatch, getState) {
+    const { loaded } = getState().app.file;
     let newestFileTimestamp = -Infinity;
 
     // Check if files have changed since they were loaded
     return Promise.all(
-        Array.from(fileLoadTimes.entries()).map(
-            ([filename, loadTime]) => new Promise(res => {
-                stat(filename, (err, stats) => {
-                    if (loadTime.getTime() < stats.mtime) {
-                        newestFileTimestamp = Math.max(newestFileTimestamp, stats.mtime);
-                        res(filename);
-                    } else {
-                        res();
-                    }
-                });
-            }),
-        ),
+        Object.keys(loaded).map(filePath => new Promise(resolve => {
+            stat(filePath, (err, stats) => {
+                if (loaded[filePath].loadTime.getTime() < stats.mtime) {
+                    newestFileTimestamp = Math.max(newestFileTimestamp, stats.mtime);
+                    resolve(filePath);
+                } else {
+                    resolve();
+                }
+            });
+        })),
+        // Array.from(fileLoadTimes.entries()).map(
+        //     ([filename, loadTime]) => new Promise(res => {
+        //         stat(filename, (err, stats) => {
+        //             if (loadTime.getTime() < stats.mtime) {
+        //                 newestFileTimestamp = Math.max(newestFileTimestamp, stats.mtime);
+        //                 res(filename);
+        //             } else {
+        //                 res();
+        //             }
+        //         });
+        //     }),
+        // ),
     ).then(filenames => filenames.filter(i => !!i)).then(filenames => {
         if (filenames.length === 0) {
-            // Resolve inmediately: no files were changed
+            // Resolve immediately: no files were changed
             return Promise.resolve();
         }
 
@@ -209,7 +239,7 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
             if (behaviour === 'ignore') {
                 return Promise.resolve();
             } else if (behaviour === 'reload') {
-                return refreshAllFiles(fileLoadTimes)(dispatch);
+                return dispatch(refreshAllFiles());
             }
         }
 
@@ -236,7 +266,7 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
                 if (button === 0) { // Use old version
                     return res();
                 } else if (button === 1) { // Reload
-                    return refreshAllFiles(fileLoadTimes)(dispatch).then(res);
+                    return dispatch(refreshAllFiles()).then(res);
                 } else if (button === 2) { // Cancel
                     return rej();
                 }

@@ -41,7 +41,7 @@ import MemoryLayout from '../components/MemoryLayout';
 
 const AppMainView = (
     props => {
-        const { loaded, target } = props;
+        const { file, target } = props;
 
         let targetMap;
         if (!target.serialNumber) {
@@ -53,20 +53,22 @@ const AppMainView = (
                 >Connect to a DevKit to see the contents of its non-volatile memory here.</div>
             );
         } else if (target.serialNumber && target.isReady) {
-            const targetData = {
-                memMaps: new Map([['', target.memMap]]),
-                fileError: loaded.fileError,
-                fileColours: new Map([['', '#C0C0C0']]),
+            const targetDevice = {
+                filename: 'targetDevice',
+                fileError: file.fileError,
+                colour: '#C0C0C0',
                 writtenAddress: 0,
                 labels: target.labels,
                 regions: target.regions,
             };
-
-            targetMap = (<MemoryLayout
-                {...targetData}
-                targetSize={target.size}
-                title="nRF 5x"
-            />);
+            targetMap = (
+                <MemoryLayout
+                    loaded={{ targetDevice }}
+                    memMaps={[['targetDevice', target.memMap]]}
+                    targetSize={target.size}
+                    title="nRF 5x"
+                />
+            );
         } else {
             targetMap = <div className="memlayout-spinner" />;
         }
@@ -98,7 +100,8 @@ const AppMainView = (
                 }}
                 >
                     <MemoryLayout
-                        {...loaded}
+                        loaded={file.loaded}
+                        memMaps={file.memMaps}
                         targetSize={target.size}
                         title="Files"
                     />
@@ -109,14 +112,14 @@ const AppMainView = (
 );
 
 AppMainView.propTypes = {
-    loaded: PropTypes.shape({}).isRequired,
+    file: PropTypes.shape({}).isRequired,
     target: PropTypes.shape({}).isRequired,
 };
 
 export default connect(
     (state, props) => ({
         ...props,
-        loaded: state.app.file.loaded,
+        file: state.app.file,
         target: state.app.target,
     }),
 )(AppMainView);

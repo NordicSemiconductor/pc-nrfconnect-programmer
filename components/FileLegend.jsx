@@ -36,24 +36,31 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Glyphicon } from 'react-bootstrap';
 
 const FileLegend = props => {
-    const { fileColours } = props;
-    const fileColourArray = Array.from(fileColours);
+    const { files, remove } = props;
     return (
         <table className="file-legend">
             <tbody>
                 {
-                    fileColourArray.map(([filename, colour], i) => (
+                    Object.keys(files).map((filePath, i) => (
                         <tr key={`file-${i + 1}`}>
                             <td>
                                 <div
                                     className="legend-colour"
-                                    style={{ backgroundColor: colour }}
+                                    style={{ backgroundColor: files[filePath].colour }}
                                 />
                             </td>
-                            <td title={filename} className="file-label">
-                                { filename }
+                            <td title={files[filePath].filename} className="file-label">
+                                { files[filePath].filename }
+                            </td>
+                            <td>
+                                <Glyphicon
+                                    glyph="remove-sign"
+                                    onClick={() => { remove(filePath); }}
+                                    title="Remove this file"
+                                />
                             </td>
                         </tr>
                     ))
@@ -64,11 +71,12 @@ const FileLegend = props => {
 };
 
 FileLegend.propTypes = {
-    fileColours: PropTypes.instanceOf(Map),
+    files: PropTypes.shape({}),
+    remove: PropTypes.func.isRequired,
 };
 
 FileLegend.defaultProps = {
-    fileColours: new Map(),
+    files: {},
 };
 
 export default FileLegend;

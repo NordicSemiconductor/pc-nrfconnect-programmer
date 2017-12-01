@@ -64,7 +64,9 @@ class MemoryLayout extends React.Component {
     }
 
     relocateLabels() {
-        if (!this.node) { return; }
+        if (!this.node) {
+            return;
+        }
 
         // Assume the height is a specific number of *integer* pixels, as to
         // avoid sub-pixel artifacts.
@@ -81,18 +83,28 @@ class MemoryLayout extends React.Component {
         const {
             targetSize,
             memMaps,
-            fileColours,
-            labels,
+            loaded,
         } = this.props;
 
         const blocks = [];
         const inlineLabels = [];
         const min = 0x0;
         const max = targetSize;
+        const labelz = {};
 
         const addressLabels = { left: new Set(), right: new Set() };
 
         const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
+
+        for (const [, { labels }] of Object.entries(loaded)) {
+            if (labels) {
+                for (const [label, address] of Object.entries(labels)) {
+                    if (address !== undefined) {
+                        labelz[label] = address;
+                    }
+                }
+            }
+        }
 
         for (const [address, overlap] of overlaps) {
             // Draw a solid block (with one solid colour or more striped colours)
@@ -102,7 +114,7 @@ class MemoryLayout extends React.Component {
 
             for (const [filename, bytes] of overlap) {
                 blockSize = bytes.length;
-                blockColours.push(fileColours.get(filename));
+                blockColours.push(loaded[filename].colour);
             }
 
             if (address + blockSize > min && address < max) {
@@ -121,34 +133,42 @@ class MemoryLayout extends React.Component {
                         gradientStops.join(',')})`;
                 }
 
-                blocks.push(<div style={{
-                    position: 'absolute',
-                    height: `${(100 * blockSize) / max}%`,
-                    bottom: `${(100 * address) / max}%`,
-                    width: '100%',
-                    minHeight: '2px',
-                    background: blockBackground,
-                }}
-                />);
+                blocks.push(
+                    <div
+                        key={`block-${blocks.length}`}
+                        style={{
+                            position: 'absolute',
+                            height: `${(100 * blockSize) / max}%`,
+                            bottom: `${(100 * address) / max}%`,
+                            width: '100%',
+                            minHeight: '2px',
+                            background: blockBackground,
+                        }}
+                    />,
+                );
 
                 addressLabels.right.add(address);
                 addressLabels.right.add(address + blockSize);
             }
         }
 
-        for (const [inlineLabelText, inlineLabelAddress] of Object.entries(labels)) {
+        for (const [inlineLabelText, inlineLabelAddress] of Object.entries(labelz)) {
             // Draws a horizontal line at the given address, and some text on top
             // TODO: Allow for text on the bottom
-            inlineLabels.push(<div style={{
-                position: 'absolute',
-                textAlign: 'center',
-                lineHeight: '10px',
-                fontSize: '12px',
-                width: '100%',
-                borderBottom: '1px solid black',
-                bottom: `${(100 * inlineLabelAddress) / max}%`,
-            }}
-            >{ inlineLabelText }</div>);
+            inlineLabels.push(
+                <div
+                    key={`inline-label-${inlineLabels.length}`}
+                    style={{
+                        position: 'absolute',
+                        textAlign: 'center',
+                        lineHeight: '10px',
+                        fontSize: '12px',
+                        width: '100%',
+                        borderBottom: '1px solid black',
+                        bottom: `${(100 * inlineLabelAddress) / max}%`,
+                    }}
+                >{ inlineLabelText }</div>,
+            );
 
             addressLabels.right.add(inlineLabelAddress);
         }
@@ -161,7 +181,7 @@ class MemoryLayout extends React.Component {
         for (const side of Object.keys(addressLabels)) {
             addressLabels[side] = Array.from(addressLabels[side]);
             const labelHeights = addressLabels[side].map(addr => [
-                ((this.state.computedHeight * addr) / this.props.targetSize) - (labelHeight / 2),
+                ((this.state.computedHeight * addr) / targetSize) - (labelHeight / 2),
                 labelHeight,
             ]);
 
@@ -190,6 +210,31 @@ class MemoryLayout extends React.Component {
                     bottom: `${unclutteredHeights[i][0]}px`,
                 }}
                 >{ hexpad8(addr) }</div>);
+// =======
+//                 const line = (
+//                     <line
+//                         key={`line-${i + 1}-${side}`}
+//                         {...lineAttrs}
+//                         y1={svgTotalHeight - labelHeights[i][0]}
+//                         y2={svgTotalHeight - unclutteredHeights[i][0]}
+//                         stroke="black"
+//                         strokeWidth="1"
+//                     />
+//                 );
+//
+//                 const label = (
+//                     <div
+//                         key={`label-${i + 1}-${side}`}
+//                         style={{
+//                             ...labelStyle,
+//                             position: 'absolute',
+//                             fontFamily: 'monospace',
+//                             backgroundColor: 'rgba(210, 210, 210, 0.75)',
+//                             bottom: `${unclutteredHeights[i][0]}px`,
+//                         }}
+//                     >{ hexpad8(addr) }</div>
+//                 );
+// >>>>>>> Updated actions, components and containers to use the new state
 
                 return { line, label };
             });
@@ -212,6 +257,33 @@ class MemoryLayout extends React.Component {
         >
             { addressLabels.right.map(i => i.line) }
         </svg>);
+// =======
+//         this.leftSvgContainer = (
+//             <svg
+//                 style={{
+//                     position: 'absolute',
+//                     height: `${this.state.computedHeight + 1}px`,
+//                     left: '96px',
+//                     width: '8px',
+//                 }}
+//             >
+//                 { addressLabels.left.map(i => i.line) }
+//             </svg>
+//         );
+//
+//         this.rightSvgContainer = (
+//             <svg
+//                 style={{
+//                     position: 'absolute',
+//                     height: `${this.state.computedHeight + 1}px`,
+//                     right: '96px',
+//                     width: '8px',
+//                 }}
+//             >
+//                 { addressLabels.right.map(i => i.line) }
+//             </svg>
+//         );
+// >>>>>>> Updated actions, components and containers to use the new state
 
 
         window.requestAnimationFrame(() => this.relocateLabels());
@@ -253,6 +325,27 @@ class MemoryLayout extends React.Component {
                         alignItems: 'stretch',
                     }}
                     ref={node => { this.node = node; }}
+// =======
+//                 <div
+//                     style={{
+//                         position: 'absolute',
+//                         height: '100%',
+//                         width: '100%',
+//                     }}
+//                 >
+//                     { addressLabels.left.map(i => i.label) }
+//                     { addressLabels.right.map(i => i.label) }
+//                 </div>
+//                 <div
+//                     style={{
+//                         position: 'absolute',
+//                         height: '100%',
+//                         left: '104px',
+//                         right: '104px',
+//                         overflow: 'hidden',
+//                         border: '1px solid black',
+//                     }}
+// >>>>>>> Updated actions, components and containers to use the new state
                 >
                     <div
                         style={{
@@ -292,25 +385,37 @@ class MemoryLayout extends React.Component {
 
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
-//     targetSize: 0x080000,  // 0.5MiB
-//     targetSize: 0x040000,  // 1/4 MiB
-    memMaps: new Map(),
-    fileColours: new Map(),
-//         writtenAddress: 0,  // From 0 to here will be assumed written,
-//                             // from here to the top pending
-    labels: {},
-//     regions: {},
+// <<<<<<< HEAD
+// //     targetSize: 0x080000,  // 0.5MiB
+// //     targetSize: 0x040000,  // 1/4 MiB
+//     memMaps: new Map(),
+//     fileColours: new Map(),
+// //         writtenAddress: 0,  // From 0 to here will be assumed written,
+// //                             // from here to the top pending
+//     labels: {},
+// //     regions: {},
+// =======
+    memMaps: [],
+    loaded: {},
     title: '',
 };
 
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
-    memMaps: PropTypes.instanceOf(Map),
-    fileColours: PropTypes.instanceOf(Map),
-//     writtenAddress: PropTypes.number,
-    labels: PropTypes.shape({}),
-//     regions: PropTypes.shape({}),
+// <<<<<<< HEAD
+//     memMaps: PropTypes.instanceOf(Map),
+//     fileColours: PropTypes.instanceOf(Map),
+// //     writtenAddress: PropTypes.number,
+//     labels: PropTypes.shape({}),
+// //     regions: PropTypes.shape({}),
+// =======
+    memMaps: PropTypes.arrayOf(
+        PropTypes.arrayOf(
+            PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        ),
+    ).isRequired,
+    loaded: PropTypes.shape({}),
     title: PropTypes.string,
 };
 
