@@ -35,7 +35,6 @@
  */
 
 import { readFile, stat } from 'fs';
-import { basename } from 'path';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import MemoryMap from 'nrf-intel-hex';
@@ -109,8 +108,7 @@ function parseOneFile(filename, dispatch) {
 
             dispatch({
                 type: 'FILE_PARSE',
-                filename: basename(filename),
-                fullFilename: filename,
+                filePath: filename,
                 fileModTime: stats.mtime,
                 fileLoadTime: new Date(),
                 memMap,
@@ -248,4 +246,3 @@ export function checkUpToDateFiles(fileLoadTimes, dispatch) {
         });
     });
 }
-
