@@ -68,7 +68,7 @@ class MemoryLayout extends React.Component {
         // avoid sub-pixel artifacts.
         const totalHeight = Math.floor(parseFloat(
             window.getComputedStyle(this.node).height,   // This is always in pixels as per spec
-        )) - 1;
+        )) - 1 - labelHeight;
 
         if (this.state.computedHeight !== totalHeight) {
             this.setState({ computedHeight: totalHeight });
@@ -185,7 +185,7 @@ class MemoryLayout extends React.Component {
                     ...labelStyle,
                     position: 'absolute',
                     fontFamily: 'monospace',
-                    backgroundColor: 'rgba(210, 210, 210, 0.75)',
+                    backgroundColor: 'rgba(240, 240, 240, 0.75)',
                     bottom: `${unclutteredHeights[i][0]}px`,
                 }}
                 >{ hexpad8(addr) }</div>);
@@ -197,7 +197,7 @@ class MemoryLayout extends React.Component {
         this.leftSvgContainer = (<svg style={{
             position: 'absolute',
             height: `${this.state.computedHeight + 1}px`,
-            left: '96px',
+            left: '104px',
             width: '8px',
         }}
         >
@@ -207,7 +207,7 @@ class MemoryLayout extends React.Component {
         this.rightSvgContainer = (<svg style={{
             position: 'absolute',
             height: `${this.state.computedHeight + 1}px`,
-            right: '96px',
+            right: '104px',
             width: '8px',
         }}
         >
@@ -222,20 +222,22 @@ class MemoryLayout extends React.Component {
                 style={{
                     minWidth: '250px',
                     maxWidth: '750px',
-                    height: 'calc( 100% - 2em )',
-                    marginTop: '1em',
-                    marginBottom: '1em',
+                    height: '100%',
                     position: 'relative',
                     zIndex: '0',
                     lineHeight: `${labelHeight}px`,
                     fontSize: `${labelHeight}px`,
+                    boxShadow: '0px 0px 4px 0px #777A89',
+                    padding: `${labelHeight / 2}px`,
+                    background: 'white',
+
                 }}
                 ref={node => { this.node = node; }}
             >
                 <div style={{
                     position: 'absolute',
-                    height: '100%',
-                    width: '100%',
+                    height: `calc( 100% - ${labelHeight}px)`,
+                    width: `calc( 100% - ${labelHeight}px)`,
                 }}
                 >
                     { addressLabels.left.map(i => i.label) }
@@ -243,9 +245,9 @@ class MemoryLayout extends React.Component {
                 </div>
                 <div style={{
                     position: 'absolute',
-                    height: '100%',
-                    left: '104px',
-                    right: '104px',
+                    height: `calc( 100% - ${labelHeight}px)`,
+                    left: '112px',
+                    right: '112px',
                     overflow: 'hidden',
                     border: '1px solid black',
                 }}

@@ -80,7 +80,7 @@ const AppMainView = (
                     top: 0,
                     bottom: 0,
                     left: 0,
-                    width: '50%',
+                    width: 'calc(50% - 8px)',
                 }}
                 >
                     {targetMap}
@@ -90,7 +90,7 @@ const AppMainView = (
                     top: 0,
                     bottom: 0,
                     right: 0,
-                    width: '50%',
+                    width: 'calc(50% - 8px)',
                 }}
                 >
                     <MemoryLayout {...loaded} targetSize={target.size} />
