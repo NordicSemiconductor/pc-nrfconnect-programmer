@@ -53,8 +53,8 @@ const initialState = {
         fileColours: new Map(),
         fileModTimes: new Map(),
         fileLoadTimes: new Map(),
+        fileLabels: new Map(), // heuristically detected bootloader, mbr, mbr params
         regions: {}, // heuristically detected code region 0, and memory readback protection
-        labels: {},  // heuristically detected bootloader, mbr, mbr params
     },
 
     mruFiles: [],
@@ -71,20 +71,29 @@ export default function reducer(state = initialState, action) {
                     fileColours: new Map(),
                     fileModTimes: new Map(),
                     fileLoadTimes: new Map(),
+                    fileLabels: new Map(),
                     regions: {},
                     labels: {},
                 },
             };
         case 'FILE_PARSE': {
             const { loaded } = state;
-            if (loaded.filenames.indexOf(action.filename) === -1) {
-                loaded.filenames.push(action.filename);
+
+            // Find the first slot in the 'loaded.filenames' which is undefined,
+            // because deleting items will turn this into a sparse array.
+            if (loaded.filenames.indexOf(action.fullFilename) === -1) {
+                for (let i = 0, l = loaded.filenames.length + 1; i < l; i += 1) {
+                    if (loaded.filenames[i] === undefined) {
+                        loaded.filenames[i] = action.fullFilename;
+                        break;
+                    }
+                }
             }
 
-            if (!loaded.fileColours.has(action.filename)) {
+            if (!loaded.fileColours.has(action.fullFilename)) {
                 loaded.fileColours.set(
-                    action.filename,
-                    colours[(loaded.memMaps.size) % colours.length],
+                    action.fullFilename,
+                    colours[(loaded.filenames.indexOf(action.fullFilename)) % colours.length],
                 );
             }
 
@@ -94,27 +103,51 @@ export default function reducer(state = initialState, action) {
                 }
             }
 
-            for (const [label, address] of Object.entries(action.labels)) {
-                if (address !== undefined) {
-                    loaded.labels[label] = address;
-                }
+            if (!loaded.fileLabels.has(action.fullFilename)) {
+                loaded.fileLabels.set(
+                    action.fullFilename,
+                    action.labels,
+                );
             }
 
             return {
                 ...state,
                 fileError: null,
                 loaded: {
-                    memMaps: new Map(loaded.memMaps.set(action.filename, action.memMap)),
+                    memMaps: new Map(loaded.memMaps.set(action.fullFilename, action.memMap)),
                     filenames: loaded.filenames,
                     fileColours: loaded.fileColours,
-                    fileModTimes: loaded.fileModTimes.set(action.filename, action.fileModTime),
+                    fileModTimes: loaded.fileModTimes.set(action.fullFilename, action.fileModTime),
                     fileLoadTimes: loaded.fileLoadTimes.set(
                         action.fullFilename, action.fileLoadTime,
                     ),
+                    fileLabels: loaded.fileLabels,
                     regions: loaded.regions,
-                    labels: loaded.labels,
                 },
 
+            };
+        }
+
+        case 'REMOVE_FILE': {
+            const { loaded } = state;
+            const { filePath } = action;
+
+            const newLoaded = { ...loaded };
+
+//             const newMemMaps = memMaps.filter(element => element[0] !== filePath);
+
+            newLoaded.memMaps.delete(filePath);
+            newLoaded.fileColours.delete(filePath);
+            newLoaded.fileModTimes.delete(filePath);
+            newLoaded.fileLoadTimes.delete(filePath);
+            newLoaded.fileLabels.delete(filePath);
+
+            const i = loaded.filenames.indexOf(filePath);
+            delete (loaded.filenames[i]);
+
+            return {
+                ...state,
+                loaded: newLoaded,
             };
         }
         case 'LOAD_MRU_FILES_SUCCESS':

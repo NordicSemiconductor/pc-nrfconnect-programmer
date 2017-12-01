@@ -67,6 +67,16 @@ const AppMainView = (
             targetMap = <div className="memlayout-spinner" />;
         }
 
+        const inverseLabels = {};
+        loaded.fileLabels.forEach(fileLabels => {
+            Object.entries(fileLabels).forEach(([label, addr]) => {
+                inverseLabels[addr] = label;
+            });
+        });
+        const labels = {};
+        Object.entries(inverseLabels).forEach(([addr, label]) => {
+            labels[label] = addr;
+        });
 
         return (
             <div style={{
@@ -93,7 +103,7 @@ const AppMainView = (
                     width: '50%',
                 }}
                 >
-                    <MemoryLayout {...loaded} targetSize={target.size} />
+                    <MemoryLayout {...loaded} labels={labels} targetSize={target.size} />
                 </div>
             </div>
         );

@@ -55,5 +55,6 @@ export default connect(
         performWrite: () => { dispatch({ type: 'START_WRITE' }); },
         performRecover: () => { dispatch({ type: 'START_RECOVER' }); },
         closeFiles: () => { dispatch({ type: 'EMPTY_FILES' }); },
+        removeFile: filePath => { dispatch({ type: 'REMOVE_FILE', filePath }); },
     }),
 )(ControlPanel);

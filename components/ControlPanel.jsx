@@ -118,7 +118,7 @@ const ControlPanel = props => {
                 <Glyphicon glyph="remove-sign" />Recover (full erase)
             </Button>
 
-            <FileLegend fileColours={props.loaded.fileColours} />
+            <FileLegend fileColours={props.loaded.fileColours} remove={props.removeFile} />
 
             { overlapWarning }
             { outsideFlashWarning }
@@ -140,6 +140,7 @@ ControlPanel.propTypes = {
     targetSize: PropTypes.number.isRequired,
     refreshAllFiles: PropTypes.func.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
+    removeFile: PropTypes.func.isRequired,
 };
 
 export default ControlPanel;
