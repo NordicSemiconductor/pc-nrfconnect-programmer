@@ -238,7 +238,7 @@ class MemoryLayout extends React.Component {
                     marginLeft: `${labelHeight / 2}px`,
                     fontSize: `${labelHeight * 1.5}px`,
                     lineHeight: `${labelHeight * 4}px`,
-                    borderBottom: '1px solid #c0c0c0'
+                    borderBottom: '1px solid #c0c0c0',
                 }}
                 >{this.props.title}</h1>
                 <div
