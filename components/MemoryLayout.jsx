@@ -235,16 +235,19 @@ class MemoryLayout extends React.Component {
                 <h1 style={{
                     marginTop: 0,
                     marginBottom: `${labelHeight / 2}px`,
-                    fontSize: `${labelHeight * 2}px`,
-                    lineHeight: `${labelHeight * 2}px`,
+                    marginLeft: `${labelHeight / 2}px`,
+                    fontSize: `${labelHeight * 1.5}px`,
+                    lineHeight: `${labelHeight * 4}px`,
+                    borderBottom: '1px solid #c0c0c0'
                 }}
                 >{this.props.title}</h1>
                 <div
                     style={{ position: 'absolute',
-                        top: `${labelHeight * 3.5}px`,
+                        top: `${labelHeight * 4.5}px`,
                         bottom: `${labelHeight / 2}px`,
                         right: 0,
                         left: 0,
+                        margin: `${labelHeight * 1.5}px`,
                         display: 'flex',
                         flexFlow: 'row nowrap',
                         alignItems: 'stretch',
