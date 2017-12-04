@@ -198,7 +198,7 @@ class MemoryLayout extends React.Component {
         this.leftSvgContainer = (<svg style={{
             flex: '0 1 auto',
             position: 'relative',
-            width: lineWidth + 'px'
+            width: `${lineWidth}px`,
         }}
         >
             { addressLabels.left.map(i => i.line) }
@@ -207,7 +207,7 @@ class MemoryLayout extends React.Component {
         this.rightSvgContainer = (<svg style={{
             flex: '0 1 auto',
             position: 'relative',
-            width: lineWidth + 'px'
+            width: `${lineWidth}px`,
         }}
         >
             { addressLabels.right.map(i => i.line) }
@@ -247,7 +247,7 @@ class MemoryLayout extends React.Component {
                         left: 0,
                         display: 'flex',
                         flexFlow: 'row nowrap',
-                        alignItems: 'stretch'
+                        alignItems: 'stretch',
                     }}
                     ref={node => { this.node = node; }}
                 >
@@ -255,16 +255,16 @@ class MemoryLayout extends React.Component {
                         style={{
                             flex: '0 1 auto',
                             position: 'relative',
-                            minWidth: labelWidth + 'px'
+                            minWidth: `${labelWidth}px`,
                         }}
                     >
                         { addressLabels.left.map(i => i.label) }
                     </div>
                     { this.leftSvgContainer }
                     <div style={{
-                            flex: '1 1 auto',
-                            position: 'relative',
-                border: '1px solid black'
+                        flex: '1 1 auto',
+                        position: 'relative',
+                        border: '1px solid black',
                     }}
                     >
                         { blocks }
@@ -275,7 +275,7 @@ class MemoryLayout extends React.Component {
                         style={{
                             flex: '0 1 auto',
                             position: 'relative',
-                            minWidth: labelWidth + 'px'
+                            minWidth: `${labelWidth}px`,
                         }}
                     >
                         { addressLabels.right.map(i => i.label) }
