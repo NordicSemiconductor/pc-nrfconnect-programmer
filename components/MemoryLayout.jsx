@@ -42,7 +42,9 @@ import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../hexpad';
 
-const labelHeight = 16; // in CSS pixels
+const labelHeight = 12; // in CSS pixels
+const lineWidth = 8;    // in CSS pixels. This is the width of the SVG container for the lines.
+const labelWidth = 80; // in CSS pixels. Should be replaced with some flexboxes anyway.
 
 class MemoryLayout extends React.Component {
 
@@ -168,7 +170,7 @@ class MemoryLayout extends React.Component {
                 this.state.computedHeight + (labelHeight / 2));
 
             const lineAttrs = side === 'left' ? { x1: 8, x2: 0 } : { x1: 0, x2: 8 };
-            const labelStyle = side === 'left' ? { left: '0px' } : { right: '0px' };
+            const labelStyle = side === 'left' ? { right: '0px' } : { left: '0px' };
 
             const svgTotalHeight = this.state.computedHeight - ((labelHeight / 2) - 0.5);
 
@@ -185,7 +187,6 @@ class MemoryLayout extends React.Component {
                     ...labelStyle,
                     position: 'absolute',
                     fontFamily: 'monospace',
-                    backgroundColor: 'rgba(240, 240, 240, 0.75)',
                     bottom: `${unclutteredHeights[i][0]}px`,
                 }}
                 >{ hexpad8(addr) }</div>);
@@ -195,22 +196,18 @@ class MemoryLayout extends React.Component {
         }
 
         this.leftSvgContainer = (<svg style={{
-            position: 'absolute',
-            height: `${this.state.computedHeight + 1}px`,
-            left: '104px',
-            width: '8px',
-            bottom: `${labelHeight / 2}px`,
+            flex: '0 1 auto',
+            position: 'relative',
+            width: lineWidth + 'px'
         }}
         >
             { addressLabels.left.map(i => i.line) }
         </svg>);
 
         this.rightSvgContainer = (<svg style={{
-            position: 'absolute',
-            height: `${this.state.computedHeight + 1}px`,
-            right: '104px',
-            width: '8px',
-            bottom: `${labelHeight / 2}px`,
+            flex: '0 1 auto',
+            position: 'relative',
+            width: lineWidth + 'px'
         }}
         >
             { addressLabels.right.map(i => i.line) }
@@ -238,36 +235,52 @@ class MemoryLayout extends React.Component {
                 <h1 style={{
                     marginTop: 0,
                     marginBottom: `${labelHeight / 2}px`,
+                    fontSize: `${labelHeight * 2}px`,
+                    lineHeight: `${labelHeight * 2}px`,
                 }}
                 >{this.props.title}</h1>
                 <div
-                    style={{
-                        position: 'absolute',
-                        top: `${labelHeight * 4}px`,
+                    style={{ position: 'absolute',
+                        top: `${labelHeight * 3.5}px`,
                         bottom: `${labelHeight / 2}px`,
-                        left: `${labelHeight / 2}px`,
-                        right: `${labelHeight / 2}px`,
+                        right: 0,
+                        left: 0,
+                        display: 'flex',
+                        flexFlow: 'row nowrap',
+                        alignItems: 'stretch'
                     }}
                     ref={node => { this.node = node; }}
                 >
-                    { addressLabels.left.map(i => i.label) }
-                    { addressLabels.right.map(i => i.label) }
+                    <div
+                        style={{
+                            flex: '0 1 auto',
+                            position: 'relative',
+                            minWidth: labelWidth + 'px'
+                        }}
+                    >
+                        { addressLabels.left.map(i => i.label) }
+                    </div>
+                    { this.leftSvgContainer }
+                    <div style={{
+                            flex: '1 1 auto',
+                            position: 'relative',
+                border: '1px solid black'
+                    }}
+                    >
+                        { blocks }
+                        { inlineLabels }
+                    </div>
+                    { this.rightSvgContainer }
+                    <div
+                        style={{
+                            flex: '0 1 auto',
+                            position: 'relative',
+                            minWidth: labelWidth + 'px'
+                        }}
+                    >
+                        { addressLabels.right.map(i => i.label) }
+                    </div>
                 </div>
-                <div style={{
-                    position: 'absolute',
-                    top: `${labelHeight * 4}px`,
-                    bottom: `${labelHeight / 2}px`,
-                    left: '112px',
-                    right: '112px',
-                    overflow: 'hidden',
-                    border: '1px solid black',
-                }}
-                >
-                    { blocks }
-                    { inlineLabels }
-                </div>
-                { this.leftSvgContainer }
-                { this.rightSvgContainer }
             </div>
         );
     }

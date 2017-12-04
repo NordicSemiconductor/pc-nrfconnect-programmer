@@ -65,7 +65,7 @@ const AppMainView = (
             targetMap = (<MemoryLayout
                 {...targetData}
                 targetSize={target.size}
-                title="Target device"
+                title="nRF 5x"
             />);
         } else {
             targetMap = <div className="memlayout-spinner" />;
@@ -100,7 +100,7 @@ const AppMainView = (
                     <MemoryLayout
                         {...loaded}
                         targetSize={target.size}
-                        title=".hex files"
+                        title="Files"
                     />
                 </div>
             </div>
