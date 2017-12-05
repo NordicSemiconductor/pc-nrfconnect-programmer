@@ -36,9 +36,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Glyphicon } from 'react-bootstrap';
+import { basename } from 'path';
 
 const FileLegend = props => {
-    const { fileColours } = props;
+    const { fileColours, remove } = props;
     const fileColourArray = Array.from(fileColours);
     return (
         <table className="file-legend">
@@ -52,8 +54,15 @@ const FileLegend = props => {
                                     style={{ backgroundColor: colour }}
                                 />
                             </td>
-                            <td title={filename} className="file-label">
-                                { filename }
+                            <td title={basename(filename)} className="file-label">
+                                { basename(filename) }
+                            </td>
+                            <td>
+                                <Glyphicon
+                                    glyph="remove-sign"
+                                    onClick={() => { remove(filename); }}
+                                    title="Remove this file"
+                                />
                             </td>
                         </tr>
                     ))
@@ -65,6 +74,7 @@ const FileLegend = props => {
 
 FileLegend.propTypes = {
     fileColours: PropTypes.instanceOf(Map),
+    remove: PropTypes.func.isRequired,
 };
 
 FileLegend.defaultProps = {
