@@ -75,17 +75,27 @@ function getDeviceModel(deviceInfo) {
 
 function getDeviceInfo(serialNumber) {
     return new Promise((resolve, reject) => {
-        nrfjprog.getDeviceInfo(serialNumber, (err, info) => {
-            if (err) {
-                reject(err);
+        nrfjprog.getProbeInfo(serialNumber, (err1, probeInfo) => {
+            if (err1) {
+                reject(err1);
             } else {
-                logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(info)}. ` +
-                    `RAM: ${info.ramSize / 1024}KiB. Flash: ${info.codeSize / 1024}KiB in pages of ` +
-                    `${info.codePageSize / 1024}KiB.`);
+                logger.info('Segger serial: ', probeInfo.serialNumber);
+                logger.info('Segger speed: ', probeInfo.clockSpeedkHz, ' kHz');
+                logger.info('Segger version: ', probeInfo.firmwareString);
 
-                logger.info('Reading device non-volatile memory. This may take a few seconds.');
+                nrfjprog.getDeviceInfo(serialNumber, (err2, devInfo) => {
+                    if (err2) {
+                        reject(err2);
+                    } else {
+                        logger.info(`Probed ${serialNumber}. Model: ${getDeviceModel(devInfo)}. ` +
+                        `RAM: ${devInfo.ramSize / 1024}KiB. Flash: ${devInfo.codeSize / 1024}KiB in pages of ` +
+                        `${devInfo.codePageSize / 1024}KiB.`);
 
-                resolve(info);
+                        logger.info('Reading device non-volatile memory. This may take a few seconds.');
+
+                        resolve(devInfo);
+                    }
+                });
             }
         });
     });
