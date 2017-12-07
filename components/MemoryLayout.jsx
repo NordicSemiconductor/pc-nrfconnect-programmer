@@ -42,7 +42,9 @@ import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../hexpad';
 
-const labelHeight = 16; // in CSS pixels
+const labelHeight = 12; // in CSS pixels
+const lineWidth = 8;    // in CSS pixels. This is the width of the SVG container for the lines.
+const labelWidth = 80; // in CSS pixels. Should be replaced with some flexboxes anyway.
 
 class MemoryLayout extends React.Component {
 
@@ -168,7 +170,7 @@ class MemoryLayout extends React.Component {
                 this.state.computedHeight + (labelHeight / 2));
 
             const lineAttrs = side === 'left' ? { x1: 8, x2: 0 } : { x1: 0, x2: 8 };
-            const labelStyle = side === 'left' ? { left: '0px' } : { right: '0px' };
+            const labelStyle = side === 'left' ? { right: '0px' } : { left: '0px' };
 
             const svgTotalHeight = this.state.computedHeight - ((labelHeight / 2) - 0.5);
 
@@ -185,7 +187,6 @@ class MemoryLayout extends React.Component {
                     ...labelStyle,
                     position: 'absolute',
                     fontFamily: 'monospace',
-                    backgroundColor: 'rgba(210, 210, 210, 0.75)',
                     bottom: `${unclutteredHeights[i][0]}px`,
                 }}
                 >{ hexpad8(addr) }</div>);
@@ -195,20 +196,18 @@ class MemoryLayout extends React.Component {
         }
 
         this.leftSvgContainer = (<svg style={{
-            position: 'absolute',
-            height: `${this.state.computedHeight + 1}px`,
-            left: '96px',
-            width: '8px',
+            flex: '0 1 auto',
+            position: 'relative',
+            width: `${lineWidth}px`,
         }}
         >
             { addressLabels.left.map(i => i.line) }
         </svg>);
 
         this.rightSvgContainer = (<svg style={{
-            position: 'absolute',
-            height: `${this.state.computedHeight + 1}px`,
-            right: '96px',
-            width: '8px',
+            flex: '0 1 auto',
+            position: 'relative',
+            width: `${lineWidth}px`,
         }}
         >
             { addressLabels.right.map(i => i.line) }
@@ -222,39 +221,69 @@ class MemoryLayout extends React.Component {
                 style={{
                     minWidth: '250px',
                     maxWidth: '750px',
-                    height: 'calc( 100% - 2em )',
-                    marginTop: '1em',
-                    marginBottom: '1em',
+                    height: '100%',
                     position: 'relative',
                     zIndex: '0',
                     lineHeight: `${labelHeight}px`,
                     fontSize: `${labelHeight}px`,
+                    boxShadow: '0px 0px 4px 0px #777A89',
+                    padding: `${labelHeight / 2}px`,
+                    background: 'white',
+
                 }}
-                ref={node => { this.node = node; }}
             >
-                <div style={{
-                    position: 'absolute',
-                    height: '100%',
-                    width: '100%',
+                <h1 style={{
+                    marginTop: 0,
+                    marginBottom: `${labelHeight / 2}px`,
+                    marginLeft: `${labelHeight / 2}px`,
+                    fontSize: `${labelHeight * 1.5}px`,
+                    lineHeight: `${labelHeight * 4}px`,
+                    borderBottom: '1px solid #c0c0c0',
                 }}
+                >{this.props.title}</h1>
+                <div
+                    style={{ position: 'absolute',
+                        top: `${labelHeight * 4.5}px`,
+                        bottom: `${labelHeight / 2}px`,
+                        right: 0,
+                        left: 0,
+                        margin: `${labelHeight * 1.5}px`,
+                        display: 'flex',
+                        flexFlow: 'row nowrap',
+                        alignItems: 'stretch',
+                    }}
+                    ref={node => { this.node = node; }}
                 >
-                    { addressLabels.left.map(i => i.label) }
-                    { addressLabels.right.map(i => i.label) }
+                    <div
+                        style={{
+                            flex: '0 1 auto',
+                            position: 'relative',
+                            minWidth: `${labelWidth}px`,
+                        }}
+                    >
+                        { addressLabels.left.map(i => i.label) }
+                    </div>
+                    { this.leftSvgContainer }
+                    <div style={{
+                        flex: '1 1 auto',
+                        position: 'relative',
+                        border: '1px solid black',
+                    }}
+                    >
+                        { blocks }
+                        { inlineLabels }
+                    </div>
+                    { this.rightSvgContainer }
+                    <div
+                        style={{
+                            flex: '0 1 auto',
+                            position: 'relative',
+                            minWidth: `${labelWidth}px`,
+                        }}
+                    >
+                        { addressLabels.right.map(i => i.label) }
+                    </div>
                 </div>
-                <div style={{
-                    position: 'absolute',
-                    height: '100%',
-                    left: '104px',
-                    right: '104px',
-                    overflow: 'hidden',
-                    border: '1px solid black',
-                }}
-                >
-                    { blocks }
-                    { inlineLabels }
-                </div>
-                { this.leftSvgContainer }
-                { this.rightSvgContainer }
             </div>
         );
     }
@@ -271,6 +300,7 @@ MemoryLayout.defaultProps = {
 //                             // from here to the top pending
     labels: {},
 //     regions: {},
+    title: '',
 };
 
 
@@ -281,6 +311,7 @@ MemoryLayout.propTypes = {
 //     writtenAddress: PropTypes.number,
     labels: PropTypes.shape({}),
 //     regions: PropTypes.shape({}),
+    title: PropTypes.string,
 };
 
 

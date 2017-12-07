@@ -62,7 +62,11 @@ const AppMainView = (
                 regions: target.regions,
             };
 
-            targetMap = <MemoryLayout {...targetData} targetSize={target.size} />;
+            targetMap = (<MemoryLayout
+                {...targetData}
+                targetSize={target.size}
+                title="nRF 5x"
+            />);
         } else {
             targetMap = <div className="memlayout-spinner" />;
         }
@@ -80,7 +84,7 @@ const AppMainView = (
                     top: 0,
                     bottom: 0,
                     left: 0,
-                    width: '50%',
+                    width: 'calc(50% - 8px)',
                 }}
                 >
                     {targetMap}
@@ -90,10 +94,14 @@ const AppMainView = (
                     top: 0,
                     bottom: 0,
                     right: 0,
-                    width: '50%',
+                    width: 'calc(50% - 8px)',
                 }}
                 >
-                    <MemoryLayout {...loaded} targetSize={target.size} />
+                    <MemoryLayout
+                        {...loaded}
+                        targetSize={target.size}
+                        title="Files"
+                    />
                 </div>
             </div>
         );
