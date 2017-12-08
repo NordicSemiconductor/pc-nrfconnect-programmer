@@ -141,6 +141,14 @@ export function logDeviceInfo(serialNumber, comName) {
     return dispatch => {
         getDeviceInfo(serialNumber)
             .then(info => {
+
+                let targetFamily;
+                if (info.family === nrfjprog.NRF51_FAMILY) {
+                    targetFamily = 'nRF51';
+                } else if (info.family === nrfjprog.NRF52_FAMILY) {
+                    targetFamily = 'nRF52';
+                }
+
                 // Suggestion: Do this the other way around. F.ex. dispatch a
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
                 // in middleware and log it from there?
@@ -149,6 +157,7 @@ export function logDeviceInfo(serialNumber, comName) {
                     targetPort: comName,
                     targetSize: info.codeSize,
                     targetPageSize: info.codePageSize,
+                    targetFamily
                 });
 
                 getDeviceMemMap(serialNumber, info).then(contents => {
@@ -237,9 +246,9 @@ export function logDeviceInfo(serialNumber, comName) {
 
 // Sends a .hex string to jprog.program()
 function writeHex(serialNumber, hexString, dispatch) {
+
     nrfjprog.program(serialNumber, hexString, {
         inputFormat: nrfjprog.INPUT_FORMAT_HEX_STRING,
-//         chip_erase_mode: nrfjprog.ERASE_PAGES_INCLUDING_UICR,
         chip_erase_mode: nrfjprog.ERASE_PAGES,
 
     }, progress => { // Progress callback
@@ -277,9 +286,23 @@ function writeHex(serialNumber, hexString, dispatch) {
 export function write(appState) {
     return dispatch => {
         const serialNumber = appState.target.serialNumber;
-        const pageSize = appState.target.pageSize;
+//         const pageSize = appState.target.pageSize;
+//         let eraseMode = nrfjprog.ERASE_PAGES_INCLUDING_UICR;
+// //         let eraseMode = nrfjprog.ERASE_PAGES;
+//
+//         if (appState.targetFamily === 'nRF51') {
+//             // The nRF51 family does not have a ERASEUICR register in the NVMC,
+//             // so the "erase pages and UICR" mode is not available.
+//             eraseMode = nrfjprog.ERASE_PAGES;
+//         }
+
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
+            return;
+        }
+
+        if (!canWrite(appState)) {
+            logger.error('Can not write in the current state. Try erasing all non-volatile memory in the target.');
             return;
         }
 
@@ -304,6 +327,44 @@ export function write(appState) {
 }
 
 
+// Whether the current hex files can be written to the current target.
+// Returns a boolean.
+// The typical use case is having some .hex files that use the UICR, and a DevKit
+// that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
+// nRF SoC has readback protection enabled (and the loaded .hex files write the
+// readback-protected region).
+// In all those cases, this function will return false, and the user should not be
+// able to press the "program" button.
+// There are also instances where the UICR can be erased and overwritten, but
+// unfortunately the casuistics are just too complex.
+export function canWrite(appState) {
+    const loaded = appState.file.loaded;
+    const target = appState.target;
+
+    // TODO: get the UICR address from the target definition. This value
+    // works for nRF51s and nRF52s, but other targets might use a different one!!!
+    const uicrAddr = 0x10001000;
+    const uicrSize = 0x400;
+
+    const flattenedFiles = MemoryMap.flattenOverlaps(
+        MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
+    );
+
+    const uicrUpdates = flattenedFiles.slice(uicrAddr, uicrSize);
+
+    if (!appState.target.memMap.contains(uicrUpdates)) {
+        // UICR is different, and must be erased first.
+        // This will also fail if the target's UICR hasn't been (or cannot be) read.
+        return true;
+    }
+
+        // UICR is not updated
+        return false;
+    }
+}
+
+
+// Calls nrfprog.recover().
 export function recover(serialNumber) {
     return dispatch => {
         if (!serialNumber) {

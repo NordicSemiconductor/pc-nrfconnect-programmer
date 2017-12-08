@@ -30,7 +30,7 @@ export default function memRegions(memMap, uicrStartAddr = 0x10001000) {
 
     // Does this memMap contain updated info about bootlader and readbac prot?
     // Try querying the UICR and see if there's valid data in there
-    const clenr0 = memMap.getUint32(uicrStartAddr, true);
+    let clenr0 = memMap.getUint32(uicrStartAddr, true);
     const rpbConf = memMap.getUint32(uicrStartAddr + 0x04, true);
 
     const bootloaderAddress = memMap.getUint32(uicrStartAddr + 0x14, true);
@@ -41,6 +41,7 @@ export default function memRegions(memMap, uicrStartAddr = 0x10001000) {
 
     // Sanity checks on clenr0+rpbConf
     if (rpbConf !== undefined && rpbConf !== 0xFFFFFFFF) {
+        if (clenr0 === undefined) { clenr0 = 0xFFFFFFFF; }
         logger.info(`Found readback protection info: ${hexpad8(clenr0)}, ${hexpad8(rpbConf)}`);
 //                 if ((rpbConf & 0xFF0F) === 0) {
 //                     // Set the address to 0.5GiB - the size of the whole code region
