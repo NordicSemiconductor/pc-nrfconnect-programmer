@@ -37,6 +37,7 @@
 import { connect } from 'react-redux';
 import ControlPanel from '../components/ControlPanel';
 import * as fileActions from '../actions/files';
+import * as jprogActions from '../actions/jprog';
 
 export default connect(
     (state, props) => ({
@@ -44,6 +45,7 @@ export default connect(
         loaded: state.app.file.loaded,
         mruFiles: state.app.file.mruFiles,
         targetIsReady: state.app.target.isReady,
+        targetIsWritable: jprogActions.canWrite(state.app),
         targetSize: state.app.target.size,
     }),
     (dispatch, props) => ({

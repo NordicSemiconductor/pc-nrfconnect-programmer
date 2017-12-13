@@ -141,7 +141,6 @@ export function logDeviceInfo(serialNumber, comName) {
     return dispatch => {
         getDeviceInfo(serialNumber)
             .then(info => {
-
                 let targetFamily;
                 if (info.family === nrfjprog.NRF51_FAMILY) {
                     targetFamily = 'nRF51';
@@ -157,7 +156,6 @@ export function logDeviceInfo(serialNumber, comName) {
                     targetPort: comName,
                     targetSize: info.codeSize,
                     targetPageSize: info.codePageSize,
-                    targetFamily
                 });
 
                 getDeviceMemMap(serialNumber, info).then(contents => {
@@ -246,7 +244,6 @@ export function logDeviceInfo(serialNumber, comName) {
 
 // Sends a .hex string to jprog.program()
 function writeHex(serialNumber, hexString, dispatch) {
-
     nrfjprog.program(serialNumber, hexString, {
         inputFormat: nrfjprog.INPUT_FORMAT_HEX_STRING,
         chip_erase_mode: nrfjprog.ERASE_PAGES,
@@ -281,30 +278,73 @@ function writeHex(serialNumber, hexString, dispatch) {
 }
 
 
+// Whether the current hex files can be written to the current target.
+// Returns a boolean.
+// The typical use case is having some .hex files that use the UICR, and a DevKit
+// that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
+// nRF SoC has readback protection enabled (and the loaded .hex files write the
+// readback-protected region).
+// In all those cases, this function will return false, and the user should not be
+// able to press the "program" button.
+// There are also instances where the UICR can be erased and overwritten, but
+// unfortunately the casuistics are just too complex.
+export function canWrite(appState) {
+    const loaded = appState.file.loaded;
+    const target = appState.target;
+
+        // TODO: get the UICR address from the target definition. This value
+        // works for nRF51s and nRF52s, but other targets might use a different one!!!
+    const uicrAddr = 0x10001000;
+    const uicrSize = 0x400;
+
+        // Check if target's UICR is already erased (all 0xFFs)
+    const blankUicr = new MemoryMap([[uicrAddr, (new Uint8Array(uicrSize)).fill(0xFF)]]);
+    if (target.memMap.contains(blankUicr)) {
+        console.log('canWrite: true (blank UICR)');
+        return true;
+    }
+
+    const flattenedFiles = MemoryMap.flattenOverlaps(
+            MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
+        );
+
+    const uicrUpdates = flattenedFiles.slice(uicrAddr, uicrSize);
+
+    if (!target.memMap.contains(uicrUpdates)) {
+            // UICR is different, and must be erased first.
+            // This will also fail if the target's UICR hasn't been (or cannot be) read.
+        console.log('canWrite: false (must erase all)');
+        return false;
+    }
+
+        // UICR is either not present in the files, or matches the device exactly.
+    console.log('canWrite: true (no UICR updates)');
+    return true;
+}
+
+
 // Does some sanity checks, joins the loaded .hex files, flattens overlaps,
 // paginates the result to fit flash pages, and calls writeHex()
 export function write(appState) {
     return dispatch => {
         const serialNumber = appState.target.serialNumber;
-//         const pageSize = appState.target.pageSize;
-//         let eraseMode = nrfjprog.ERASE_PAGES_INCLUDING_UICR;
-// //         let eraseMode = nrfjprog.ERASE_PAGES;
-//
-//         if (appState.targetFamily === 'nRF51') {
-//             // The nRF51 family does not have a ERASEUICR register in the NVMC,
-//             // so the "erase pages and UICR" mode is not available.
-//             eraseMode = nrfjprog.ERASE_PAGES;
-//         }
+        const pageSize = appState.target.pageSize;
 
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
             return;
         }
 
+        // Sanity check. Should never happen, as any write operations should be already
+        // disabled in the UI.
         if (!canWrite(appState)) {
             logger.error('Can not write in the current state. Try erasing all non-volatile memory in the target.');
             return;
         }
+
+        /// FIXME: Check if the target's UICR is blank. If not, slice the flattened
+        /// hex files so that the code doesn't try to overwrite UICR.
+        /// This is part of the «UICR can only be written to after an "erase all"» logic
 
         checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
             const pages = MemoryMap.flattenOverlaps(
@@ -325,44 +365,6 @@ export function write(appState) {
         }).catch(() => {});
     };
 }
-
-
-// Whether the current hex files can be written to the current target.
-// Returns a boolean.
-// The typical use case is having some .hex files that use the UICR, and a DevKit
-// that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
-// nRF SoC has readback protection enabled (and the loaded .hex files write the
-// readback-protected region).
-// In all those cases, this function will return false, and the user should not be
-// able to press the "program" button.
-// There are also instances where the UICR can be erased and overwritten, but
-// unfortunately the casuistics are just too complex.
-export function canWrite(appState) {
-    const loaded = appState.file.loaded;
-    const target = appState.target;
-
-    // TODO: get the UICR address from the target definition. This value
-    // works for nRF51s and nRF52s, but other targets might use a different one!!!
-    const uicrAddr = 0x10001000;
-    const uicrSize = 0x400;
-
-    const flattenedFiles = MemoryMap.flattenOverlaps(
-        MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
-    );
-
-    const uicrUpdates = flattenedFiles.slice(uicrAddr, uicrSize);
-
-    if (!appState.target.memMap.contains(uicrUpdates)) {
-        // UICR is different, and must be erased first.
-        // This will also fail if the target's UICR hasn't been (or cannot be) read.
-        return true;
-    }
-
-        // UICR is not updated
-        return false;
-    }
-}
-
 
 // Calls nrfprog.recover().
 export function recover(serialNumber) {
