@@ -210,31 +210,6 @@ class MemoryLayout extends React.Component {
                     bottom: `${unclutteredHeights[i][0]}px`,
                 }}
                 >{ hexpad8(addr) }</div>);
-// =======
-//                 const line = (
-//                     <line
-//                         key={`line-${i + 1}-${side}`}
-//                         {...lineAttrs}
-//                         y1={svgTotalHeight - labelHeights[i][0]}
-//                         y2={svgTotalHeight - unclutteredHeights[i][0]}
-//                         stroke="black"
-//                         strokeWidth="1"
-//                     />
-//                 );
-//
-//                 const label = (
-//                     <div
-//                         key={`label-${i + 1}-${side}`}
-//                         style={{
-//                             ...labelStyle,
-//                             position: 'absolute',
-//                             fontFamily: 'monospace',
-//                             backgroundColor: 'rgba(210, 210, 210, 0.75)',
-//                             bottom: `${unclutteredHeights[i][0]}px`,
-//                         }}
-//                     >{ hexpad8(addr) }</div>
-//                 );
-// >>>>>>> Updated actions, components and containers to use the new state
 
                 return { line, label };
             });
@@ -257,33 +232,6 @@ class MemoryLayout extends React.Component {
         >
             { addressLabels.right.map(i => i.line) }
         </svg>);
-// =======
-//         this.leftSvgContainer = (
-//             <svg
-//                 style={{
-//                     position: 'absolute',
-//                     height: `${this.state.computedHeight + 1}px`,
-//                     left: '96px',
-//                     width: '8px',
-//                 }}
-//             >
-//                 { addressLabels.left.map(i => i.line) }
-//             </svg>
-//         );
-//
-//         this.rightSvgContainer = (
-//             <svg
-//                 style={{
-//                     position: 'absolute',
-//                     height: `${this.state.computedHeight + 1}px`,
-//                     right: '96px',
-//                     width: '8px',
-//                 }}
-//             >
-//                 { addressLabels.right.map(i => i.line) }
-//             </svg>
-//         );
-// >>>>>>> Updated actions, components and containers to use the new state
 
 
         window.requestAnimationFrame(() => this.relocateLabels());
@@ -325,27 +273,6 @@ class MemoryLayout extends React.Component {
                         alignItems: 'stretch',
                     }}
                     ref={node => { this.node = node; }}
-// =======
-//                 <div
-//                     style={{
-//                         position: 'absolute',
-//                         height: '100%',
-//                         width: '100%',
-//                     }}
-//                 >
-//                     { addressLabels.left.map(i => i.label) }
-//                     { addressLabels.right.map(i => i.label) }
-//                 </div>
-//                 <div
-//                     style={{
-//                         position: 'absolute',
-//                         height: '100%',
-//                         left: '104px',
-//                         right: '104px',
-//                         overflow: 'hidden',
-//                         border: '1px solid black',
-//                     }}
-// >>>>>>> Updated actions, components and containers to use the new state
                 >
                     <div
                         style={{
@@ -385,16 +312,6 @@ class MemoryLayout extends React.Component {
 
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
-// <<<<<<< HEAD
-// //     targetSize: 0x080000,  // 0.5MiB
-// //     targetSize: 0x040000,  // 1/4 MiB
-//     memMaps: new Map(),
-//     fileColours: new Map(),
-// //         writtenAddress: 0,  // From 0 to here will be assumed written,
-// //                             // from here to the top pending
-//     labels: {},
-// //     regions: {},
-// =======
     memMaps: [],
     loaded: {},
     title: '',
@@ -403,13 +320,6 @@ MemoryLayout.defaultProps = {
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
-// <<<<<<< HEAD
-//     memMaps: PropTypes.instanceOf(Map),
-//     fileColours: PropTypes.instanceOf(Map),
-// //     writtenAddress: PropTypes.number,
-//     labels: PropTypes.shape({}),
-// //     regions: PropTypes.shape({}),
-// =======
     memMaps: PropTypes.arrayOf(
         PropTypes.arrayOf(
             PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
