@@ -80,7 +80,6 @@ export default function reducer(state = initialState, action) {
             ];
 
             let colour;
-            console.log('Picking colour. Pool is ', availableColours);
             if (availableColours.length) {
                 colour = availableColours.shift();
             } else {
@@ -124,7 +123,6 @@ export default function reducer(state = initialState, action) {
             // Return this colour to the pool, but only if it was in the pool in the first place
             if (colours.indexOf(oldColour) !== -1) {
                 availableColours.push(oldColour);
-                console.log('Colour returned to pool, now ', availableColours);
             }
 
             return {
