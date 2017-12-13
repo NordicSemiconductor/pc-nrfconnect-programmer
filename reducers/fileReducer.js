@@ -48,13 +48,12 @@ const colours = [
     '#b3b3b3',
 ];
 
-const usedColours = [];
-
 const initialState = {
     loaded: {},
     memMaps: [],
     fileError: null,
     mruFiles: [],
+    availableColours: Array.from(colours),
 };
 
 export default function reducer(state = initialState, action) {
@@ -64,10 +63,11 @@ export default function reducer(state = initialState, action) {
             return {
                 ...initialState,
                 mruFiles,
+                availableColours: Array.from(colours),
             };
         }
         case 'FILE_PARSE': {
-            const { loaded } = state;
+            const { loaded, availableColours } = state;
             const { filePath, memMap, modTime, loadTime, regions, labels } = action;
 
             if (loaded[action.filePath]) {
@@ -79,11 +79,16 @@ export default function reducer(state = initialState, action) {
                 [filePath, memMap],
             ];
 
-            let colour = colours.shift();
-            while (!colour || usedColours.includes(colour)) {
-                colour = `#${Math.trunc((Math.random() * 0xffffff)).toString(16).padStart(6, '0')}`;
+            let colour;
+            console.log('Picking colour. Pool is ', availableColours);
+            if (availableColours.length) {
+                colour = availableColours.shift();
+            } else {
+                const hue = Math.random() * 360;
+                const saturation = 35 + (Math.random() * 65);
+                const lightness = 50 + (Math.random() * 35);
+                colour = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
             }
-            usedColours.push(colour);
 
             const newState = {
                 ...state,
@@ -107,18 +112,26 @@ export default function reducer(state = initialState, action) {
         }
 
         case 'REMOVE_FILE': {
-            const { loaded, memMaps } = state;
+            const { loaded, memMaps, availableColours } = state;
             const { filePath } = action;
 
             const newLoaded = { ...loaded };
+            const oldColour = newLoaded[filePath].colour;
             delete newLoaded[filePath];
 
             const newMemMaps = memMaps.filter(element => element[0] !== filePath);
+
+            // Return this colour to the pool, but only if it was in the pool in the first place
+            if (colours.indexOf(oldColour) !== -1) {
+                availableColours.push(oldColour);
+                console.log('Colour returned to pool, now ', availableColours);
+            }
 
             return {
                 ...state,
                 loaded: newLoaded,
                 memMaps: newMemMaps,
+                availableColours,
             };
         }
 
