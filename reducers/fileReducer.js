@@ -34,6 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { basename } from 'path';
+
 // Colours from:
 // https://github.com/d3/d3-scale-chromatic
 const colours = [
@@ -47,76 +49,90 @@ const colours = [
 ];
 
 const initialState = {
-    loaded: {
-        memMaps: new Map(),
-        filenames: [],
-        fileColours: new Map(),
-        fileModTimes: new Map(),
-        fileLoadTimes: new Map(),
-        regions: {}, // heuristically detected code region 0, and memory readback protection
-        labels: {},  // heuristically detected bootloader, mbr, mbr params
-    },
-
+    loaded: {},
+    memMaps: [],
+    fileError: null,
     mruFiles: [],
+    availableColours: Array.from(colours),
 };
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case 'EMPTY_FILES':
+        case 'EMPTY_FILES': {
+            const { mruFiles } = state;
             return {
-                ...state,
-                loaded: {
-                    memMaps: new Map(),
-                    filenames: [],
-                    fileColours: new Map(),
-                    fileModTimes: new Map(),
-                    fileLoadTimes: new Map(),
-                    regions: {},
-                    labels: {},
-                },
+                ...initialState,
+                mruFiles,
+                availableColours: Array.from(colours),
             };
+        }
         case 'FILE_PARSE': {
-            const { loaded } = state;
-            if (loaded.filenames.indexOf(action.filename) === -1) {
-                loaded.filenames.push(action.filename);
+            const { loaded, availableColours } = state;
+            const { filePath, memMap, modTime, loadTime, regions, labels } = action;
+
+            if (loaded[action.filePath]) {
+                break;
             }
 
-            if (!loaded.fileColours.has(action.filename)) {
-                loaded.fileColours.set(
-                    action.filename,
-                    colours[(loaded.memMaps.size) % colours.length],
-                );
+            const memMaps = [
+                ...state.memMaps,
+                [filePath, memMap],
+            ];
+
+            let colour;
+            if (availableColours.length) {
+                colour = availableColours.shift();
+            } else {
+                const hue = Math.random() * 360;
+                const saturation = 35 + (Math.random() * 65);
+                const lightness = 50 + (Math.random() * 35);
+                colour = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
             }
 
-            for (const [region, length] of Object.entries(action.regions)) {
-                if (length !== undefined) {
-                    loaded.regions[region] = length;
-                }
-            }
-
-            for (const [label, address] of Object.entries(action.labels)) {
-                if (address !== undefined) {
-                    loaded.labels[label] = address;
-                }
-            }
-
-            return {
+            const newState = {
                 ...state,
                 fileError: null,
                 loaded: {
-                    memMaps: new Map(loaded.memMaps.set(action.filename, action.memMap)),
-                    filenames: loaded.filenames,
-                    fileColours: loaded.fileColours,
-                    fileModTimes: loaded.fileModTimes.set(action.filename, action.fileModTime),
-                    fileLoadTimes: loaded.fileLoadTimes.set(
-                        action.fullFilename, action.fileLoadTime,
-                    ),
-                    regions: loaded.regions,
-                    labels: loaded.labels,
+                    ...loaded,
+                    [filePath]: {
+                        filename: basename(filePath),
+                        colour,
+                        modTime,
+                        loadTime,
+                        memMap,
+                        regions,
+                        labels,
+                    },
                 },
+                memMaps,
+            };
 
+            return newState;
+        }
+
+        case 'REMOVE_FILE': {
+            const { loaded, memMaps, availableColours } = state;
+            const { filePath } = action;
+
+            const newLoaded = { ...loaded };
+            const oldColour = newLoaded[filePath].colour;
+            delete newLoaded[filePath];
+
+            const newMemMaps = memMaps.filter(element => element[0] !== filePath);
+
+            // Return this colour to the pool, but only if it was in the pool in the first place
+            if (colours.indexOf(oldColour) !== -1) {
+                availableColours.push(oldColour);
+            }
+
+            return {
+                ...state,
+                loaded: newLoaded,
+                memMaps: newMemMaps,
+                availableColours,
             };
         }
+
         case 'LOAD_MRU_FILES_SUCCESS':
             return {
                 ...state,

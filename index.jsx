@@ -105,18 +105,18 @@ export default {
                 break;
             }
             case 'START_WRITE': {
-                if (state.app.file.loaded.memMaps.size === 0) {
+                if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                dispatch(jprogActions.write(state.app));
+                dispatch(jprogActions.write());
                 break;
             }
             case 'START_RECOVER': {
-                dispatch(jprogActions.recover(state.app.target.serialNumber));
+                dispatch(jprogActions.recover());
                 break;
             }
             case 'START_REFRESH_ALL_FILES': {
-                dispatch(refreshAllFiles(state.app.file.loaded.fileLoadTimes));
+                dispatch(refreshAllFiles());
                 break;
             }
             default:

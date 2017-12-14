@@ -43,12 +43,8 @@ import FileLegend from './FileLegend';
 import { hexpad8 } from '../hexpad';
 
 const ControlPanel = props => {
-//     function openRecent(, ev) {
-//         console.log('Open recent: ', ev.target.innerText);
-//     }
+    const overlaps = MemoryMap.overlapMemoryMaps(props.memMaps);
 
-    const overlaps = MemoryMap.overlapMemoryMaps(props.loaded.memMaps);
-//     console.log(overlaps);
     let overlapWarning = '';
     const outsideFlashBlocks = [];
     for (const [startAddress, overlap] of overlaps) {
@@ -57,14 +53,13 @@ const ControlPanel = props => {
                 <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
                 <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
                 <p>In regions with overlapping data, data from the file which
-                was <strong>last</strong> added will be used.</p>
+                    was <strong>last</strong> added will be used.</p>
             </div>);
         }
 
         const endAddress = startAddress + overlap[0][1].length;
 
         // This assumes UICR at 0x10001000, size 4KiB
-//         if (startAddress >= 0x10001000) {
         if ((startAddress < 0x10001000 && endAddress > props.targetSize) ||
             (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
             outsideFlashBlocks.push(`${hexpad8(startAddress)}-${hexpad8(endAddress)}`);
@@ -75,7 +70,7 @@ const ControlPanel = props => {
         outsideFlashWarning = (<div className="alert alert-warning">
             <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
             <p><strong>Caution!</strong> There is data outside the
-            user-writable areas ({ outsideFlashBlocks.join(', ') }).</p>
+                user-writable areas ({ outsideFlashBlocks.join(', ') }).</p>
             <p> Check that the .hex files are appropiate for the current device.</p>
         </div>);
     }
@@ -108,7 +103,7 @@ const ControlPanel = props => {
             </Button>
             <Button onClick={props.closeFiles}>
                 <Glyphicon glyph="minus-sign" />Clear files
-                </Button>
+            </Button>
 
             <Button onClick={props.performWrite} disabled={!props.targetIsReady || !props.targetIsWritable}>
                 <Glyphicon glyph="save" />Write all to devkit
@@ -118,7 +113,7 @@ const ControlPanel = props => {
                 <Glyphicon glyph="remove-sign" />Recover (full erase)
             </Button>
 
-            <FileLegend fileColours={props.loaded.fileColours} />
+            <FileLegend files={props.loaded} remove={props.removeFile} />
 
             { overlapWarning }
             { outsideFlashWarning }
@@ -133,14 +128,17 @@ ControlPanel.propTypes = {
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
-    loaded: PropTypes.shape({
-        fileColours: PropTypes.instanceOf(Map),
-        memMaps: PropTypes.instanceOf(Map),
-    }).isRequired,
+    loaded: PropTypes.shape({}).isRequired,
+    memMaps: PropTypes.arrayOf(
+        PropTypes.arrayOf(
+            PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        ),
+    ).isRequired,
     targetSize: PropTypes.number.isRequired,
     refreshAllFiles: PropTypes.func.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
+    removeFile: PropTypes.func.isRequired,
 };
 
 export default ControlPanel;

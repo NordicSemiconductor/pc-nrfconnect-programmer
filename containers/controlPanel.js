@@ -43,6 +43,7 @@ export default connect(
     (state, props) => ({
         ...props,
         loaded: state.app.file.loaded,
+        memMaps: state.app.file.memMaps,
         mruFiles: state.app.file.mruFiles,
         targetIsReady: state.app.target.isReady,
         targetIsWritable: jprogActions.canWrite(state.app),
@@ -57,5 +58,6 @@ export default connect(
         performWrite: () => { dispatch({ type: 'START_WRITE' }); },
         performRecover: () => { dispatch({ type: 'START_RECOVER' }); },
         closeFiles: () => { dispatch({ type: 'EMPTY_FILES' }); },
+        removeFile: filePath => { dispatch({ type: 'REMOVE_FILE', filePath }); },
     }),
 )(ControlPanel);

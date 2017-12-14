@@ -305,7 +305,7 @@ export function canWrite(appState) {
     }
 
     const flattenedFiles = MemoryMap.flattenOverlaps(
-            MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
+            MemoryMap.overlapMemoryMaps(appState.file.memMaps),
         );
 
     const uicrUpdates = flattenedFiles.slice(uicrAddr, uicrSize);
@@ -325,8 +325,9 @@ export function canWrite(appState) {
 
 // Does some sanity checks, joins the loaded .hex files, flattens overlaps,
 // paginates the result to fit flash pages, and calls writeHex()
-export function write(appState) {
-    return dispatch => {
+export function write() {
+    return (dispatch, getState) => {
+        const appState = getState().app;
         const serialNumber = appState.target.serialNumber;
         const pageSize = appState.target.pageSize;
         const uicrAddr = 0x10001000;
@@ -348,9 +349,9 @@ export function write(appState) {
         /// hex files so that the code doesn't try to overwrite UICR.
         /// This is part of the «UICR can only be written to after an "erase all"» logic
 
-        checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
+        checkUpToDateFiles(dispatch, getState).then(() => {
             let pages = MemoryMap.flattenOverlaps(
-                MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
+                MemoryMap.overlapMemoryMaps(appState.file.memMaps),
             ).paginate(pageSize);
 
             // Check if target's UICR is already erased (all 0xFFs)
@@ -379,8 +380,10 @@ export function write(appState) {
 }
 
 // Calls nrfprog.recover().
-export function recover(serialNumber) {
-    return dispatch => {
+export function recover() {
+    return (dispatch, getState) => {
+        const appState = getState().app;
+        const serialNumber = appState.target.serialNumber;
         if (!serialNumber) {
             logger.error('Select a device before recovering');
             return;
@@ -397,8 +400,7 @@ export function recover(serialNumber) {
             if (err) {
                 console.error(err);
                 console.error(err.log);
-                err.log.split('\n').forEach(line => logger.error(line));
-    //             logger.error(err.log);
+                err.log.split('\n').forEach(logger.error);
                 return;
             }
 
@@ -410,4 +412,3 @@ export function recover(serialNumber) {
         });
     };
 }
-
