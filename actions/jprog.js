@@ -297,7 +297,7 @@ export function canWrite(appState) {
     const uicrAddr = 0x10001000;
     const uicrSize = 0x400;
 
-        // Check if target's UICR is already erased (all 0xFFs)
+    // Check if target's UICR is already erased (all 0xFFs)
     const blankUicr = new MemoryMap([[uicrAddr, (new Uint8Array(uicrSize)).fill(0xFF)]]);
     if (target.memMap.contains(blankUicr)) {
         console.log('canWrite: true (blank UICR)');
@@ -329,6 +329,8 @@ export function write(appState) {
     return dispatch => {
         const serialNumber = appState.target.serialNumber;
         const pageSize = appState.target.pageSize;
+        const uicrAddr = 0x10001000;
+        const uicrSize = 0x400;
 
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
@@ -347,9 +349,19 @@ export function write(appState) {
         /// This is part of the «UICR can only be written to after an "erase all"» logic
 
         checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
-            const pages = MemoryMap.flattenOverlaps(
+            let pages = MemoryMap.flattenOverlaps(
                 MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
             ).paginate(pageSize);
+
+            // Check if target's UICR is already erased (all 0xFFs)
+            const blankUicr = new MemoryMap([[uicrAddr, (new Uint8Array(uicrSize)).fill(0xFF)]]);
+            if (!appState.target.memMap.contains(blankUicr)) {
+                // Because canWrite() has been run, we can be sure that the UICR in the flattened
+                // hex files is the same as the non-blank UICR of the target.
+                logger.info('Target\'s UICR is not blank, skipping UICR updates.');
+                console.log('Target\'s UICR is not blank, skipping UICR updates.');
+                pages = pages.slice(0, uicrAddr);
+            }
 
 //         console.log(pages);
 //         console.log(arraysToHex(pages, 64));
