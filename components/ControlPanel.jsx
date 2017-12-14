@@ -105,7 +105,10 @@ const ControlPanel = props => {
                 <Glyphicon glyph="minus-sign" />Clear files
             </Button>
 
-            <Button onClick={props.performWrite} disabled={!props.targetIsReady || !props.targetIsWritable}>
+            <Button
+                onClick={props.performWrite}
+                disabled={!props.targetIsReady || !props.targetIsWritable}
+            >
                 <Glyphicon glyph="save" />Write all to devkit
             </Button>
 

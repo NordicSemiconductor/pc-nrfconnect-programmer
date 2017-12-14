@@ -42,7 +42,6 @@ import AppMainView from './containers/appMainView';
 import { openFile, refreshAllFiles } from './actions/files';
 import * as jprogActions from './actions/jprog';
 import appReducer from './reducers';
-import nrfjprog from 'pc-nrfjprog-js';
 
 import './resources/css/index.less';
 

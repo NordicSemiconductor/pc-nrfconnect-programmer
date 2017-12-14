@@ -141,13 +141,6 @@ export function logDeviceInfo(serialNumber, comName) {
     return dispatch => {
         getDeviceInfo(serialNumber)
             .then(info => {
-                let targetFamily;
-                if (info.family === nrfjprog.NRF51_FAMILY) {
-                    targetFamily = 'nRF51';
-                } else if (info.family === nrfjprog.NRF52_FAMILY) {
-                    targetFamily = 'nRF52';
-                }
-
                 // Suggestion: Do this the other way around. F.ex. dispatch a
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
                 // in middleware and log it from there?
@@ -289,11 +282,10 @@ function writeHex(serialNumber, hexString, dispatch) {
 // There are also instances where the UICR can be erased and overwritten, but
 // unfortunately the casuistics are just too complex.
 export function canWrite(appState) {
-    const loaded = appState.file.loaded;
     const target = appState.target;
 
-        // TODO: get the UICR address from the target definition. This value
-        // works for nRF51s and nRF52s, but other targets might use a different one!!!
+    // TODO: get the UICR address from the target definition. This value
+    // works for nRF51s and nRF52s, but other targets might use a different one!!!
     const uicrAddr = 0x10001000;
     const uicrSize = 0x400;
 
@@ -311,13 +303,13 @@ export function canWrite(appState) {
     const uicrUpdates = flattenedFiles.slice(uicrAddr, uicrSize);
 
     if (!target.memMap.contains(uicrUpdates)) {
-            // UICR is different, and must be erased first.
-            // This will also fail if the target's UICR hasn't been (or cannot be) read.
+        // UICR is different, and must be erased first.
+        // This will also fail if the target's UICR hasn't been (or cannot be) read.
         console.log('canWrite: false (must erase all)');
         return false;
     }
 
-        // UICR is either not present in the files, or matches the device exactly.
+    // UICR is either not present in the files, or matches the device exactly.
     console.log('canWrite: true (no UICR updates)');
     return true;
 }
@@ -345,9 +337,9 @@ export function write() {
             return;
         }
 
-        /// FIXME: Check if the target's UICR is blank. If not, slice the flattened
-        /// hex files so that the code doesn't try to overwrite UICR.
-        /// This is part of the «UICR can only be written to after an "erase all"» logic
+        // FIXME: Check if the target's UICR is blank. If not, slice the flattened
+        // hex files so that the code doesn't try to overwrite UICR.
+        // This is part of the «UICR can only be written to after an "erase all"» logic
 
         checkUpToDateFiles(dispatch, getState).then(() => {
             let pages = MemoryMap.flattenOverlaps(
