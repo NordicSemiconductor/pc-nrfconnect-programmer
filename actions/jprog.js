@@ -274,8 +274,9 @@ function writeHex(serialNumber, hexString, dispatch) {
 
 // Does some sanity checks, joins the loaded .hex files, flattens overlaps,
 // paginates the result to fit flash pages, and calls writeHex()
-export function write(appState) {
-    return dispatch => {
+export function write() {
+    return (dispatch, getState) => {
+        const appState = getState().app;
         const serialNumber = appState.target.serialNumber;
         const pageSize = appState.target.pageSize;
         if (!serialNumber || !pageSize) {
@@ -283,16 +284,10 @@ export function write(appState) {
             return;
         }
 
-        checkUpToDateFiles(appState.file.loaded.fileLoadTimes, dispatch).then(() => {
+        checkUpToDateFiles(dispatch, getState).then(() => {
             const pages = MemoryMap.flattenOverlaps(
-                MemoryMap.overlapMemoryMaps(appState.file.loaded.memMaps),
+                MemoryMap.overlapMemoryMaps(appState.file.memMaps),
             ).paginate(pageSize);
-
-//         console.log(pages);
-//         console.log(arraysToHex(pages, 64));
-
-//         const writeBlockClosure = writeBlock(serialNumber, pages, dispatch);
-//         writeBlockClosure();
 
             dispatch({
                 type: 'WRITE_PROGRESS_START',
@@ -304,8 +299,10 @@ export function write(appState) {
 }
 
 
-export function recover(serialNumber) {
-    return dispatch => {
+export function recover() {
+    return (dispatch, getState) => {
+        const appState = getState().app;
+        const serialNumber = appState.target.serialNumber;
         if (!serialNumber) {
             logger.error('Select a device before recovering');
             return;
@@ -322,8 +319,7 @@ export function recover(serialNumber) {
             if (err) {
                 console.error(err);
                 console.error(err.log);
-                err.log.split('\n').forEach(line => logger.error(line));
-    //             logger.error(err.log);
+                err.log.split('\n').forEach(logger.error);
                 return;
             }
 
@@ -335,4 +331,3 @@ export function recover(serialNumber) {
         });
     };
 }
-
