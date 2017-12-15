@@ -239,7 +239,6 @@ export function logDeviceInfo(serialNumber, comName) {
 function writeHex(serialNumber, hexString, dispatch) {
     nrfjprog.program(serialNumber, hexString, {
         inputFormat: nrfjprog.INPUT_FORMAT_HEX_STRING,
-//         chip_erase_mode: nrfjprog.ERASE_PAGES_INCLUDING_UICR,
         chip_erase_mode: nrfjprog.ERASE_PAGES,
 
     }, progress => { // Progress callback
@@ -272,6 +271,47 @@ function writeHex(serialNumber, hexString, dispatch) {
 }
 
 
+// Whether the current hex files can be written to the current target.
+// Returns a boolean.
+// The typical use case is having some .hex files that use the UICR, and a DevKit
+// that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
+// nRF SoC has readback protection enabled (and the loaded .hex files write the
+// readback-protected region).
+// In all those cases, this function will return false, and the user should not be
+// able to press the "program" button.
+// There are also instances where the UICR can be erased and overwritten, but
+// unfortunately the casuistics are just too complex.
+export function canWrite(appState) {
+    const target = appState.target;
+
+    // TODO: get the UICR address from the target definition. This value
+    // works for nRF51s and nRF52s, but other targets might use a different one!!!
+    const uicrAddr = 0x10001000;
+    const uicrSize = 0x400;
+
+    // Check if target's UICR is already erased (all 0xFFs)
+    const blankUicr = new MemoryMap([[uicrAddr, (new Uint8Array(uicrSize)).fill(0xFF)]]);
+    if (target.memMap.contains(blankUicr)) {
+        return true;
+    }
+
+    const flattenedFiles = MemoryMap.flattenOverlaps(
+            MemoryMap.overlapMemoryMaps(appState.file.memMaps),
+        );
+
+    const uicrUpdates = flattenedFiles.slice(uicrAddr, uicrSize);
+
+    if (!target.memMap.contains(uicrUpdates)) {
+        // UICR is different, and must be erased first.
+        // This will also fail if the target's UICR hasn't been (or cannot be) read.
+        return false;
+    }
+
+    // UICR is either not present in the files, or matches the device exactly.
+    return true;
+}
+
+
 // Does some sanity checks, joins the loaded .hex files, flattens overlaps,
 // paginates the result to fit flash pages, and calls writeHex()
 export function write() {
@@ -279,15 +319,44 @@ export function write() {
         const appState = getState().app;
         const serialNumber = appState.target.serialNumber;
         const pageSize = appState.target.pageSize;
+        const uicrAddr = 0x10001000;
+        const uicrSize = 0x400;
+
         if (!serialNumber || !pageSize) {
             logger.error('Select a device before writing');
             return;
         }
 
+        // Sanity check. Should never happen, as any write operations should be already
+        // disabled in the UI.
+        if (!canWrite(appState)) {
+            logger.error('Can not write in the current state. Try erasing all non-volatile memory in the target.');
+            return;
+        }
+
+        // FIXME: Check if the target's UICR is blank. If not, slice the flattened
+        // hex files so that the code doesn't try to overwrite UICR.
+        // This is part of the «UICR can only be written to after an "erase all"» logic
+
         checkUpToDateFiles(dispatch, getState).then(() => {
-            const pages = MemoryMap.flattenOverlaps(
+            let pages = MemoryMap.flattenOverlaps(
                 MemoryMap.overlapMemoryMaps(appState.file.memMaps),
             ).paginate(pageSize);
+
+            // Check if target's UICR is already erased (all 0xFFs)
+            const blankUicr = new MemoryMap([[uicrAddr, (new Uint8Array(uicrSize)).fill(0xFF)]]);
+            if (!appState.target.memMap.contains(blankUicr)) {
+                // Because canWrite() has been run, we can be sure that the UICR in the flattened
+                // hex files is the same as the non-blank UICR of the target.
+                logger.info('Target\'s UICR is not blank, skipping UICR updates.');
+                pages = pages.slice(0, uicrAddr);
+            }
+
+//         console.log(pages);
+//         console.log(arraysToHex(pages, 64));
+
+//         const writeBlockClosure = writeBlock(serialNumber, pages, dispatch);
+//         writeBlockClosure();
 
             dispatch({
                 type: 'WRITE_PROGRESS_START',
@@ -298,7 +367,7 @@ export function write() {
     };
 }
 
-
+// Calls nrfprog.recover().
 export function recover() {
     return (dispatch, getState) => {
         const appState = getState().app;

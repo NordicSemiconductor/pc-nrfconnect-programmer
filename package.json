@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "babel-loader": "^7.1.2",
-    "nrf-intel-hex": "^1.0.1",
+    "nrf-intel-hex": "^1.1.0",
     "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.0.0"
   },
   "dependencies": {

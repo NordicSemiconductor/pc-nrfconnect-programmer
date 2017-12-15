@@ -105,7 +105,10 @@ const ControlPanel = props => {
                 <Glyphicon glyph="minus-sign" />Clear files
             </Button>
 
-            <Button onClick={props.performWrite} disabled={!props.targetIsReady}>
+            <Button
+                onClick={props.performWrite}
+                disabled={!props.targetIsReady || !props.targetIsWritable}
+            >
                 <Glyphicon glyph="save" />Write all to devkit
             </Button>
 
@@ -137,6 +140,7 @@ ControlPanel.propTypes = {
     targetSize: PropTypes.number.isRequired,
     refreshAllFiles: PropTypes.func.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
+    targetIsWritable: PropTypes.bool.isRequired,
     removeFile: PropTypes.func.isRequired,
 };
 
