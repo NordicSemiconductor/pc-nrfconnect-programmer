@@ -292,7 +292,6 @@ export function canWrite(appState) {
     // Check if target's UICR is already erased (all 0xFFs)
     const blankUicr = new MemoryMap([[uicrAddr, (new Uint8Array(uicrSize)).fill(0xFF)]]);
     if (target.memMap.contains(blankUicr)) {
-        console.log('canWrite: true (blank UICR)');
         return true;
     }
 
@@ -305,12 +304,10 @@ export function canWrite(appState) {
     if (!target.memMap.contains(uicrUpdates)) {
         // UICR is different, and must be erased first.
         // This will also fail if the target's UICR hasn't been (or cannot be) read.
-        console.log('canWrite: false (must erase all)');
         return false;
     }
 
     // UICR is either not present in the files, or matches the device exactly.
-    console.log('canWrite: true (no UICR updates)');
     return true;
 }
 
@@ -352,7 +349,6 @@ export function write() {
                 // Because canWrite() has been run, we can be sure that the UICR in the flattened
                 // hex files is the same as the non-blank UICR of the target.
                 logger.info('Target\'s UICR is not blank, skipping UICR updates.');
-                console.log('Target\'s UICR is not blank, skipping UICR updates.');
                 pages = pages.slice(0, uicrAddr);
             }
 

@@ -47,7 +47,6 @@ const initialState = {
     memMap: new MemoryMap(),
     regions: {}, // heuristically detected code region 0, and memory readback protection
     labels: {},  // heuristically detected bootloader, mbr, mbr params
-    family: undefined,
 };
 
 export default function target(state = initialState, action) {
@@ -74,7 +73,6 @@ export default function target(state = initialState, action) {
                 ...state,
                 size: action.targetSize,
                 pageSize: action.targetPageSize,
-                family: action.targetFamily,
                 isReady: false,
             };
 
