@@ -37,8 +37,52 @@
 import { logger } from 'nrfconnect/core';
 import nrfjprog from 'pc-nrfjprog-js';
 import MemoryMap from 'nrf-intel-hex';
-import { checkUpToDateFiles } from './files';
+import { checkUpToDateFiles } from './fileActions';
 import memRegions from '../memRegions';
+
+export const TARGET_SIZE_KNOWN = 'TARGET_SIZE_KNOWN';
+export const TARGET_CONTENTS_KNOWN = 'TARGET_CONTENTS_KNOWN';
+export const WRITE_PROGRESS_START = 'WRITE_PROGRESS_START';
+export const WRITE_PROGRESS_FINISHED = 'WRITE_PROGRESS_FINISHED';
+
+function targetSizeKnownAction(targetPort, targetSize, targetPageSize) {
+    return {
+        type: TARGET_SIZE_KNOWN,
+        targetPort,
+        targetSize,
+        targetPageSize,
+    };
+}
+
+function targetContentsKnownAction(
+    targetPort,
+    targetSize,
+    targetPageSize,
+    targetMemMap,
+    targetRegions,
+    targetLabels) {
+    return {
+        type: TARGET_CONTENTS_KNOWN,
+        targetPort,
+        targetSize,
+        targetPageSize,
+        targetMemMap,
+        targetRegions,
+        targetLabels,
+    };
+}
+
+function writeProgressFinishedAction() {
+    return {
+        type: WRITE_PROGRESS_FINISHED,
+    };
+}
+
+function writeProgressStartAction() {
+    return {
+        type: WRITE_PROGRESS_START,
+    };
+}
 
 // Get some useful strings from the constants in jprog.
 function getDeviceModel(deviceInfo) {
@@ -101,7 +145,6 @@ function getDeviceInfo(serialNumber) {
     });
 }
 
-
 function getDeviceMemMap(serialNumber, devInfo) {
     return new Promise((resolve, reject) => {
         nrfjprog.read(serialNumber, devInfo.codeAddress, devInfo.codeSize, (err1, flashBytes) => {
@@ -134,7 +177,6 @@ function getDeviceMemMap(serialNumber, devInfo) {
     });
 }
 
-
 // Display some information about a devkit. Called on a devkit connection.
 // This also triggers reading the whole memory contents of the device.
 export function logDeviceInfo(serialNumber, comName) {
@@ -144,23 +186,17 @@ export function logDeviceInfo(serialNumber, comName) {
                 // Suggestion: Do this the other way around. F.ex. dispatch a
                 // LOAD_TARGET_INFO action, listen to LOAD_TARGET_INFO_SUCCESS
                 // in middleware and log it from there?
-                dispatch({
-                    type: 'TARGET_SIZE_KNOWN',
-                    targetPort: comName,
-                    targetSize: info.codeSize,
-                    targetPageSize: info.codePageSize,
-                });
+                dispatch(targetSizeKnownAction(comName, info.codeSize, info.codePageSize));
 
                 getDeviceMemMap(serialNumber, info).then(contents => {
-                    dispatch({
-                        type: 'TARGET_CONTENTS_KNOWN',
-                        targetPort: comName,
-                        targetSize: info.codeSize,
-                        targetPageSize: info.codePageSize,
-                        targetMemMap: contents.memMap,
-                        targetRegions: contents.regions,
-                        targetLabels: contents.labels,
-                    });
+                    dispatch(targetContentsKnownAction(
+                        comName,
+                        info.codeSize,
+                        info.codePageSize,
+                        contents.memMap,
+                        contents.regions,
+                        contents.labels,
+                    ));
                 });
             })
             .catch(error => {
@@ -169,107 +205,23 @@ export function logDeviceInfo(serialNumber, comName) {
     };
 }
 
-
-// // Previous write function - manual erase and write of each page.
-// function writeBlock(serialNumber, pages, dispatch) {
-//
-//     const pageWriteCalls = Array.from(pages.entries()).map(
-//         ([address, page]) => function writeOnePage(callback) {
-//             const pageStart = address;
-//             const pageSize = page.length;
-//             const pageEnd = pageStart + pageSize;
-//
-//             console.log(`Erasing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
-//             logger.info(`Erasing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
-//
-//             nrfjprog.erase(serialNumber, {
-//                 erase_mode: nrfjprog.ERASE_PAGES_INCLUDING_UICR,
-//                 start_address: pageStart,
-//                 // Legacy (bugged) property name, see https://github.com/NordicSemiconductor/pc-nrfjprog-js/pull/7
-//                 start_adress: pageStart,
-//                 end_address: pageEnd,
-//             }, err => {
-//                 if (err) {
-//                     console.error(err);
-//                     console.error(err.log);
-//                     logger.error(err.log);
-//                 } else {
-//                     console.log(`Writing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
-//                     logger.info(`Writing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
-//
-//                     nrfjprog.write(serialNumber, pageStart, Array.from(page), err2 => {
-//                         if (err2) {
-//                             console.error(err2);
-//                             console.error(err2.log);
-//                             logger.error(err2);
-//                         } else {
-//                             dispatch({
-//                                 type: 'write-progress',
-//                                 address: pageEnd,
-//                             });
-//
-//                             requestAnimationFrame(() => { callback(); });
-//     //                             requestAnimationFrame(() => { writeBlockClosure(); });
-//                         }
-//                     });
-//                 }
-//             });
-//         }
-//     );
-//
-//     return function writeBlockClosure() {
-// //         const addresses = Array.from(appState.blocks.keys());
-//
-//         const pageWriteCall = pageWriteCalls.shift();
-//
-//         if (!pageWriteCall) {
-//             console.log('Finished erasing/writing.');
-//             console.log('Finished erasing/writing.');
-//             dispatch({
-//                 type: 'write-progress-finished',
-//             });
-//         } else {
-//             pageWriteCall(writeBlockClosure);
-//         }
-//     };
-// }
-
-
 // Sends a .hex string to jprog.program()
-function writeHex(serialNumber, hexString, dispatch) {
+function writeHex(dispatch, serialNumber, hexString) {
     nrfjprog.program(serialNumber, hexString, {
         inputFormat: nrfjprog.INPUT_FORMAT_HEX_STRING,
         chip_erase_mode: nrfjprog.ERASE_PAGES,
 
-    }, progress => { // Progress callback
-//         console.log(`Programming progress: 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
-//         console.log('Programming progress: ', progress);
+    }, progress => {
         logger.info(progress.process);
-
-//         dispatch({
-//             type: 'write-progress',
-//             address: pageEnd,
-//         });
-    }, err => {   // Finish callback
+    }, err => {
         if (err) {
-            console.error(err);
-            console.error(err.log);
             err.log.split('\n').forEach(line => logger.error(line));
-//             logger.error(err.log);
             return;
         }
-//         console.log(`Programming progress: 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
-//         console.log('Programming finished: ');
-//         logger.info(`Erasing 0x${hexpad(pageStart)}-0x${hexpad(pageEnd)}`);
-
         logger.info('Write procedure finished');
-
-        dispatch({
-            type: 'WRITE_PROGRESS_FINISHED',
-        });
+        dispatch(writeProgressFinishedAction());
     });
 }
-
 
 // Whether the current hex files can be written to the current target.
 // Returns a boolean.
@@ -306,7 +258,6 @@ export function canWrite(appState) {
         // This will also fail if the target's UICR hasn't been (or cannot be) read.
         return false;
     }
-
     // UICR is either not present in the files, or matches the device exactly.
     return true;
 }
@@ -337,7 +288,6 @@ export function write() {
         // FIXME: Check if the target's UICR is blank. If not, slice the flattened
         // hex files so that the code doesn't try to overwrite UICR.
         // This is part of the «UICR can only be written to after an "erase all"» logic
-
         checkUpToDateFiles(dispatch, getState).then(() => {
             let pages = MemoryMap.flattenOverlaps(
                 MemoryMap.overlapMemoryMaps(appState.file.memMaps),
@@ -351,18 +301,8 @@ export function write() {
                 logger.info('Target\'s UICR is not blank, skipping UICR updates.');
                 pages = pages.slice(0, uicrAddr);
             }
-
-//         console.log(pages);
-//         console.log(arraysToHex(pages, 64));
-
-//         const writeBlockClosure = writeBlock(serialNumber, pages, dispatch);
-//         writeBlockClosure();
-
-            dispatch({
-                type: 'WRITE_PROGRESS_START',
-            });
-
-            writeHex(serialNumber, pages.asHexString(64), dispatch);
+            dispatch(writeProgressStartAction());
+            writeHex(dispatch, serialNumber, pages.asHexString(64));
         }).catch(() => {});
     };
 }
@@ -377,26 +317,17 @@ export function recover() {
             return;
         }
 
-        dispatch({
-            type: 'WRITE_PROGRESS_START',
-        });
+        dispatch(writeProgressStartAction());
 
         nrfjprog.recover(serialNumber, progress => {
-            console.log('Recovery progress: ', progress);
             logger.info(progress.process);
         }, err => {
             if (err) {
-                console.error(err);
-                console.error(err.log);
                 err.log.split('\n').forEach(logger.error);
                 return;
             }
-
             logger.info('Recovery procedure finished');
-
-            dispatch({
-                type: 'WRITE_PROGRESS_FINISHED',
-            });
+            dispatch(writeProgressFinishedAction());
         });
     };
 }

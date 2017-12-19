@@ -36,8 +36,8 @@
 
 import { connect } from 'react-redux';
 import ControlPanel from '../components/ControlPanel';
-import * as fileActions from '../actions/files';
-import * as jprogActions from '../actions/jprog';
+import * as fileActions from '../actions/fileActions';
+import * as jprogActions from '../actions/jprogActions';
 
 export default connect(
     (state, props) => ({

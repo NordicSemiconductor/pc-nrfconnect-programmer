@@ -39,8 +39,8 @@ import { logger } from 'nrfconnect/core';
 
 import ControlPanel from './containers/controlPanel';
 import AppMainView from './containers/appMainView';
-import { openFile, refreshAllFiles } from './actions/files';
-import * as jprogActions from './actions/jprog';
+import { openFile, refreshAllFiles } from './actions/fileActions';
+import * as jprogActions from './actions/jprogActions';
 import appReducer from './reducers';
 
 import './resources/css/index.less';
