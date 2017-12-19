@@ -45,22 +45,21 @@ import appReducer from './reducers';
 
 import './resources/css/index.less';
 
-/* eslint-disable react/prop-types */
-
 export default {
     onInit: dispatch => {
-        document.ondrop = ev => {
-            ev.preventDefault();
+        document.ondrop = event => {
+            event.preventDefault();
         };
+
         document.ondragover = document.ondrop;
 
         document.body.ondragover = event => {
-            /* eslint-disable no-param-reassign */
-            if (!event.dataTransfer.files.length) {
-                event.dataTransfer.dropEffect = 'none';
-                event.dataTransfer.effectAllowed = 'none';
+            const dragOverEvent = event;
+            if (!dragOverEvent.dataTransfer.files.length) {
+                dragOverEvent.dataTransfer.dropEffect = 'none';
+                dragOverEvent.dataTransfer.effectAllowed = 'none';
             } else {
-                event.dataTransfer.effectAllowed = 'uninitialized';
+                dragOverEvent.dataTransfer.effectAllowed = 'uninitialized';
             }
         };
 
@@ -82,13 +81,11 @@ export default {
         </SidePanel>
     ),
     reduceApp: appReducer,
-
     mapSerialPortSelectorState: (state, props) => ({
         portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
         ...props,
     }),
-
-    middleware: store => next => action => { // eslint-disable-line
+    middleware: store => next => action => {
         const state = store.getState();
         const { dispatch } = store;
         switch (action.type) {
