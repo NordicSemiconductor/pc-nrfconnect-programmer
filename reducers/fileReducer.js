@@ -135,7 +135,7 @@ export default function reducer(state = initialState, action) {
             };
         }
 
-        case fileActions.FILES_LOAD_MRU_SUCCESS: {
+        case fileActions.MRU_FILES_LOAD_SUCCESS: {
             return {
                 ...state,
                 mruFiles: action.files || [],

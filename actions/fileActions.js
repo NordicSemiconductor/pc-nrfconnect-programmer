@@ -49,7 +49,7 @@ export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
 export const FILE_PARSE = 'FILE_PARSE';
 export const FILE_REMOVE = 'FILE_REMOVE';
 export const FILES_EMPTY = 'FILES_EMPTY';
-export const FILES_LOAD_MRU_SUCCESS = 'FILES_LOAD_MRU_SUCCESS';
+export const MRU_FILES_LOAD_SUCCESS = 'MRU_FILES_LOAD_SUCCESS';
 
 export function errorDialogShowAction(error) {
     return {
@@ -83,9 +83,9 @@ export function filesEmptyActoin() {
     };
 }
 
-export function loadMruFilesSuccessAction(files) {
+export function mruFilesLoadSuccessAction(files) {
     return {
-        type: FILES_LOAD_MRU_SUCCESS,
+        type: MRU_FILES_LOAD_SUCCESS,
         files,
     };
 }
@@ -174,7 +174,7 @@ export function openFile(filename) {
 export function loadMruFiles() {
     return dispatch => {
         const files = persistentStore.get('mruFiles', []);
-        dispatch(loadMruFilesSuccessAction(files));
+        dispatch(mruFilesLoadSuccessAction(files));
     };
 }
 
