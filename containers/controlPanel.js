@@ -57,7 +57,7 @@ export default connect(
         refreshAllFiles: () => { dispatch(targetActions.refreshAllFilesStartAction()); },
         performWrite: () => { dispatch(targetActions.writeStartAction()); },
         performRecover: () => { dispatch(targetActions.recoverStartAction()); },
-        closeFiles: () => { dispatch(fileActions.filesEmptyActoin()); },
+        closeFiles: () => { dispatch(fileActions.filesEmptyAction()); },
         removeFile: filePath => { dispatch(fileActions.fileRemoveAction(filePath)); },
     }),
 )(ControlPanel);

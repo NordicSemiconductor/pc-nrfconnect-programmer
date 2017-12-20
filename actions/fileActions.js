@@ -77,7 +77,7 @@ export function fileRemoveAction(filePath) {
     };
 }
 
-export function filesEmptyActoin() {
+export function filesEmptyAction() {
     return {
         type: FILES_EMPTY,
     };
