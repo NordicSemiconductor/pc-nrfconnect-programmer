@@ -133,10 +133,10 @@ function parseOneFile(dispatch, filename) {
                 return;
             }
 
-            for (const [address, block] of memMap) {
+            memMap.forEach(([address, block]) => {
                 const size = block.length;
                 logger.info(`Data block: ${hexpad8(address)}-${hexpad8(address + size)} (${hexpad8(size)}`, ' bytes long)');
-            }
+            });
 
             const { regions, labels } = memRegions(memMap);
 
@@ -155,9 +155,9 @@ export function openFileDialog() {
                 properties: ['openFile', 'multiSelections'],
             },
             filenames => {
-                for (const filename of filenames) {
+                filenames.forEach(filename => {
                     parseOneFile(dispatch, filename);
-                }
+                });
             });
     };
 }

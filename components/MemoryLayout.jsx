@@ -96,26 +96,26 @@ class MemoryLayout extends React.Component {
 
         const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
-        for (const [, { labels }] of Object.entries(loaded)) {
+        Object.entries(loaded).forEach(([, { labels }]) => {
             if (labels) {
-                for (const [label, address] of Object.entries(labels)) {
+                Object.entries(labels).forEach(([label, address]) => {
                     if (address !== undefined) {
                         labelz[label] = address;
                     }
-                }
+                });
             }
-        }
+        });
 
-        for (const [address, overlap] of overlaps) {
+        overlaps.forEach(([address, overlap]) => {
             // Draw a solid block (with one solid colour or more striped colours)
             let blockSize = 0;
             const blockColours = [];
             let blockBackground = '';
 
-            for (const [filename, bytes] of overlap) {
+            overlap.forEach(([filename, bytes]) => {
                 blockSize = bytes.length;
                 blockColours.push(loaded[filename].colour);
-            }
+            });
 
             if (address + blockSize > min && address < max) {
                 if (blockColours.length === 1) {
@@ -123,62 +123,60 @@ class MemoryLayout extends React.Component {
                 } else {
                     const gradientStops = [];
                     let gradientPx = 0;
-                    for (const colour of blockColours) {
+                    blockColours.forEach(colour => {
                         gradientStops.push(`${colour} ${gradientPx}px`);
                         gradientPx += 20;
                         gradientStops.push(`${colour} ${gradientPx}px`);
-                    }
+                    });
 
                     blockBackground = `repeating-linear-gradient(45deg, ${
                         gradientStops.join(',')})`;
                 }
 
-                blocks.push(
-                    <div
-                        key={`block-${blocks.length}`}
-                        style={{
-                            position: 'absolute',
-                            height: `${(100 * blockSize) / max}%`,
-                            bottom: `${(100 * address) / max}%`,
-                            width: '100%',
-                            minHeight: '2px',
-                            background: blockBackground,
-                        }}
-                    />,
+                blocks.push(<div
+                    key={`block-${blocks.length}`}
+                    style={{
+                        position: 'absolute',
+                        height: `${(100 * blockSize) / max}%`,
+                        bottom: `${(100 * address) / max}%`,
+                        width: '100%',
+                        minHeight: '2px',
+                        background: blockBackground,
+                    }}
+                />,
                 );
 
                 addressLabels.right.add(address);
                 addressLabels.right.add(address + blockSize);
             }
-        }
+        });
 
-        for (const [inlineLabelText, inlineLabelAddress] of Object.entries(labelz)) {
+        Object.entries(labelz).forEach(([inlineLabelText, inlineLabelAddress]) => {
             // Draws a horizontal line at the given address, and some text on top
             // TODO: Allow for text on the bottom
-            inlineLabels.push(
-                <div
-                    // key={`inline-label-${inlineLabels.length}`}
-                    style={{
-                        position: 'absolute',
-                        textAlign: 'center',
-                        lineHeight: '10px',
-                        fontSize: '12px',
-                        width: '100%',
-                        borderBottom: '1px solid black',
-                        bottom: `${(100 * inlineLabelAddress) / max}%`,
-                    }}
-                >{ inlineLabelText }</div>,
+            inlineLabels.push(<div
+                // key={`inline-label-${inlineLabels.length}`}
+                style={{
+                    position: 'absolute',
+                    textAlign: 'center',
+                    lineHeight: '10px',
+                    fontSize: '12px',
+                    width: '100%',
+                    borderBottom: '1px solid black',
+                    bottom: `${(100 * inlineLabelAddress) / max}%`,
+                }}
+            >{ inlineLabelText }</div>,
             );
 
             addressLabels.right.add(inlineLabelAddress);
-        }
+        });
 
         const labelStep = 0x10000;
         for (let i = min; i <= max; i += labelStep) {
             addressLabels.left.add(i);
         }
 
-        for (const side of Object.keys(addressLabels)) {
+        Object.keys(addressLabels).forEach(side => {
             addressLabels[side] = Array.from(addressLabels[side]);
             const labelHeights = addressLabels[side].map(addr => [
                 ((this.state.computedHeight * addr) / targetSize) - (labelHeight / 2),
@@ -216,7 +214,7 @@ class MemoryLayout extends React.Component {
 
                 return { line, label };
             });
-        }
+        });
 
         this.leftSvgContainer = (<svg style={{
             flex: '0 1 auto',
