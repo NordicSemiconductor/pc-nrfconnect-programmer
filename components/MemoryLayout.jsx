@@ -157,7 +157,7 @@ class MemoryLayout extends React.Component {
             // TODO: Allow for text on the bottom
             inlineLabels.push(
                 <div
-                    key={`inline-label-${inlineLabels.length}`}
+                    // key={`inline-label-${inlineLabels.length}`}
                     style={{
                         position: 'absolute',
                         textAlign: 'center',
@@ -201,14 +201,17 @@ class MemoryLayout extends React.Component {
                     y2={svgTotalHeight - unclutteredHeights[i][0]}
                     stroke="black"
                     strokeWidth="1"
+                    key={`${addr}`}
                 />);
 
-                const label = (<div style={{
-                    ...labelStyle,
-                    position: 'absolute',
-                    fontFamily: 'monospace',
-                    bottom: `${unclutteredHeights[i][0]}px`,
-                }}
+                const label = (<div
+                    style={{
+                        ...labelStyle,
+                        position: 'absolute',
+                        fontFamily: 'monospace',
+                        bottom: `${unclutteredHeights[i][0]}px`,
+                    }}
+                    key={`${addr}`}
                 >{ hexpad8(addr) }</div>);
 
                 return { line, label };
@@ -232,6 +235,7 @@ class MemoryLayout extends React.Component {
         >
             { addressLabels.right.map(i => i.line) }
         </svg>);
+
 
         window.requestAnimationFrame(() => this.relocateLabels());
 
@@ -308,12 +312,14 @@ class MemoryLayout extends React.Component {
     }
 }
 
+
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
     memMaps: [],
     loaded: {},
     title: '',
 };
+
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
@@ -325,5 +331,6 @@ MemoryLayout.propTypes = {
     loaded: PropTypes.shape({}),
     title: PropTypes.string,
 };
+
 
 export default MemoryLayout;
