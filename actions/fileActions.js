@@ -105,10 +105,10 @@ function addMruFile(filename) {
 }
 
 function parseOneFile(dispatch, filename) {
-    stat(filename, (err, stats) => {
-        if (err) {
-            logger.error(`Could not open .hex file: ${err}`);
-            dispatch(errorDialogShowAction(err));
+    stat(filename, (statsError, stats) => {
+        if (statsError) {
+            logger.error(`Could not open .hex file: ${statsError}`);
+            dispatch(errorDialogShowAction(statsError));
             removeMruFile(filename);
             return;
         }
