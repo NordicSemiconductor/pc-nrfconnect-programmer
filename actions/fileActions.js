@@ -90,12 +90,6 @@ export function mruFilesLoadSuccessAction(files) {
     };
 }
 
-function displayFileError(dispatch, err) {
-    const error = `Could not open .hex file: ${err}`;
-    logger.error(error);
-    dispatch(errorDialogShowAction(error));
-}
-
 function removeMruFile(filename) {
     const files = persistentStore.get('mruFiles', []);
     persistentStore.set('mruFiles', files.filter(file => file !== filename));
@@ -113,7 +107,8 @@ function addMruFile(filename) {
 function parseOneFile(dispatch, filename) {
     stat(filename, (err, stats) => {
         if (err) {
-            displayFileError(dispatch, err);
+            logger.error(`Could not open .hex file: ${err}`);
+            dispatch(errorDialogShowAction(err));
             removeMruFile(filename);
             return;
         }
@@ -122,7 +117,8 @@ function parseOneFile(dispatch, filename) {
             logger.info('Parsing .hex file: ', filename);
             logger.info('File was last modified at ', stats.mtime.toLocaleString());
             if (err2) {
-                displayFileError(dispatch, err2);
+                logger.error(`Could not open .hex file: ${err2}`);
+                dispatch(errorDialogShowAction(err2));
                 removeMruFile(filename);
                 return;
             }
@@ -132,7 +128,8 @@ function parseOneFile(dispatch, filename) {
             try {
                 memMap = MemoryMap.fromHex(data.toString());
             } catch (e) {
-                displayFileError(dispatch, e);
+                logger.error(`Could not open .hex file: ${e}`);
+                dispatch(errorDialogShowAction(e));
                 return;
             }
 
@@ -184,7 +181,8 @@ export function refreshAllFiles() {
             const entry = getState().app.file.loaded[filePath];
             stat(filePath, (err, stats) => {
                 if (err) {
-                    displayFileError(dispatch, err);
+                    logger.error(`Could not open .hex file: ${err}`);
+                    dispatch(errorDialogShowAction(err));
                     return reject();
                 }
                 if (entry.loadTime.getTime() < stats.mtime) {
