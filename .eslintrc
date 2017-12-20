@@ -1,5 +1,4 @@
 {
-    "root": true,
     "extends": [
         "eslint:recommended",
         "airbnb"
@@ -43,13 +42,13 @@
                 "ignore": [ "nrfconnect/.*", "pc-ble-driver-js", "pc-nrfjprog-js", "serialport", "electron" ]
             }
         ],
-        "import/extensions": ["off"],
-        "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"]
+        "import/extensions": ["off"]
     },
     "no-undef": 1,
     "no-unused-vars": 1,
     "plugins": [
-        "react"
+        "react",
+        "import"
     ],
     "env": {
         "es6": true,
