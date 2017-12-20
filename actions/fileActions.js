@@ -113,12 +113,12 @@ function parseOneFile(dispatch, filename) {
             return;
         }
 
-        readFile(filename, {}, (err2, data) => {
+        readFile(filename, {}, (readError, data) => {
             logger.info('Parsing .hex file: ', filename);
             logger.info('File was last modified at ', stats.mtime.toLocaleString());
-            if (err2) {
-                logger.error(`Could not open .hex file: ${err2}`);
-                dispatch(errorDialogShowAction(err2));
+            if (readError) {
+                logger.error(`Could not open .hex file: ${readError}`);
+                dispatch(errorDialogShowAction(readError));
                 removeMruFile(filename);
                 return;
             }
