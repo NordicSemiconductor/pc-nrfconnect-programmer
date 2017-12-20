@@ -36,8 +36,9 @@
 
 import { basename } from 'path';
 
-// Colours from:
-// https://github.com/d3/d3-scale-chromatic
+import * as fileActions from '../actions/fileActions';
+
+// Colours from: https://github.com/d3/d3-scale-chromatic
 const colours = [
     '#e78ac3',
     '#ffd92f',
@@ -58,7 +59,7 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
     switch (action.type) {
-        case 'EMPTY_FILES': {
+        case fileActions.FILES_EMPTY: {
             const { mruFiles } = state;
             return {
                 ...initialState,
@@ -66,7 +67,8 @@ export default function reducer(state = initialState, action) {
                 availableColours: Array.from(colours),
             };
         }
-        case 'FILE_PARSE': {
+
+        case fileActions.FILE_PARSE: {
             const { loaded, availableColours } = state;
             const { filePath, memMap, modTime, loadTime, regions, labels } = action;
 
@@ -110,7 +112,7 @@ export default function reducer(state = initialState, action) {
             return newState;
         }
 
-        case 'REMOVE_FILE': {
+        case fileActions.FILE_REMOVE: {
             const { loaded, memMaps, availableColours } = state;
             const { filePath } = action;
 
@@ -133,11 +135,13 @@ export default function reducer(state = initialState, action) {
             };
         }
 
-        case 'LOAD_MRU_FILES_SUCCESS':
+        case fileActions.FILES_LOAD_MRU_SUCCESS: {
             return {
                 ...state,
                 mruFiles: action.files || [],
             };
+        }
+
         default:
     }
     return state;

@@ -233,7 +233,6 @@ class MemoryLayout extends React.Component {
             { addressLabels.right.map(i => i.line) }
         </svg>);
 
-
         window.requestAnimationFrame(() => this.relocateLabels());
 
         return (
@@ -309,14 +308,12 @@ class MemoryLayout extends React.Component {
     }
 }
 
-
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
     memMaps: [],
     loaded: {},
     title: '',
 };
-
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
@@ -328,6 +325,5 @@ MemoryLayout.propTypes = {
     loaded: PropTypes.shape({}),
     title: PropTypes.string,
 };
-
 
 export default MemoryLayout;

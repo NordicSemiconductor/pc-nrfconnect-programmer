@@ -47,16 +47,18 @@ const persistentStore = new Store({ name: 'nrf-programmer' });
 
 export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
 export const FILE_PARSE = 'FILE_PARSE';
-export const LOAD_MRU_FILES_SUCCESS = 'LOAD_MRU_FILES_SUCCESS';
+export const FILE_REMOVE = 'FILE_REMOVE';
+export const FILES_EMPTY = 'FILES_EMPTY';
+export const FILES_LOAD_MRU_SUCCESS = 'FILES_LOAD_MRU_SUCCESS';
 
-function errorDialogShowAction(error) {
+export function errorDialogShowAction(error) {
     return {
         type: ERROR_DIALOG_SHOW,
         message: error,
     };
 }
 
-function fileParseAction(filePath, modTime, loadTime, memMap, regions, labels) {
+export function fileParseAction(filePath, modTime, loadTime, memMap, regions, labels) {
     return {
         type: FILE_PARSE,
         filePath,
@@ -68,9 +70,22 @@ function fileParseAction(filePath, modTime, loadTime, memMap, regions, labels) {
     };
 }
 
-function loadMruFilesSuccessAction(files) {
+export function fileRemoveAction(filePath) {
     return {
-        type: LOAD_MRU_FILES_SUCCESS,
+        type: FILE_REMOVE,
+        filePath,
+    };
+}
+
+export function filesEmptyActoin() {
+    return {
+        type: FILES_EMPTY,
+    };
+}
+
+export function loadMruFilesSuccessAction(files) {
+    return {
+        type: FILES_LOAD_MRU_SUCCESS,
         files,
     };
 }

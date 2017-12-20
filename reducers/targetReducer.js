@@ -35,6 +35,8 @@
  */
 
 import MemoryMap from 'nrf-intel-hex';
+import * as fileActions from '../actions/fileActions';
+import * as targetActions from '../actions/targetActions';
 
 const initialState = {
     size: 0x00100000,  // 1MiB. TODO: Set a saner default?
@@ -63,7 +65,7 @@ export default function target(state = initialState, action) {
         case 'SERIAL_PORT_DESELECTED':
             return initialState;
 
-        case 'TARGET_SIZE_KNOWN':
+        case targetActions.TARGET_SIZE_KNOWN:
             // Fetching target's flash size is async, armor against race conditions
             if (action.targetPort !== state.port) {
                 return state;
@@ -76,7 +78,7 @@ export default function target(state = initialState, action) {
                 isReady: false,
             };
 
-        case 'TARGET_CONTENTS_KNOWN':
+        case targetActions.TARGET_CONTENTS_KNOWN:
             return {
                 ...state,
                 memMap: action.targetMemMap,
@@ -85,33 +87,33 @@ export default function target(state = initialState, action) {
                 isReady: true,
             };
 
-        case 'EMPTY_FILES':
+        case fileActions.FILES_EMTPY:
             return {
                 ...state,
                 writtenAddress: 0,
             };
 
-        case 'FILE_PARSE': {
+        case fileActions.FILE_PARSE: {
             return {
                 ...state,
                 writtenAddress: 0,
             };
         }
 
-        case 'WRITE_PROGRESS_START':
+        case targetActions.WRITE_PROGRESS_START:
             return {
                 ...state,
                 isReady: false,
             };
 
-        case 'WRITE_PROGRESS':
+        case targetActions.WRITE_PROGRESS:
             return {
                 ...state,
                 writtenAddress: action.address,
                 isReady: false,
             };
 
-        case 'WRITE_PROGRESS_FINISHED':
+        case targetActions.WRITE_PROGRESS_FINISHED:
             return {
                 ...state,
                 writtenAddress: 0,

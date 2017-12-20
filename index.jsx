@@ -39,8 +39,8 @@ import { logger } from 'nrfconnect/core';
 
 import ControlPanel from './containers/controlPanel';
 import AppMainView from './containers/appMainView';
-import { openFile, refreshAllFiles } from './actions/fileActions';
-import * as jprogActions from './actions/jprogActions';
+import * as fileActions from './actions/fileActions';
+import * as targetActions from './actions/targetActions';
 import appReducer from './reducers';
 
 import './resources/css/index.less';
@@ -65,7 +65,7 @@ export default {
 
         document.body.ondrop = event => {
             Array.from(event.dataTransfer.files).forEach(i => {
-                dispatch(openFile(i.path));
+                dispatch(fileActions.openFile(i.path));
             });
             event.preventDefault();
         };
@@ -90,7 +90,7 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                dispatch(jprogActions.logDeviceInfo(
+                dispatch(targetActions.logDeviceInfo(
                     action.port.serialNumber,
                     action.port.comName,
                 ));
@@ -100,19 +100,19 @@ export default {
                 logger.info('Target device closed.');
                 break;
             }
-            case 'START_WRITE': {
+            case targetActions.WRITE_START: {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                dispatch(jprogActions.write());
+                dispatch(targetActions.write());
                 break;
             }
-            case 'START_RECOVER': {
-                dispatch(jprogActions.recover());
+            case targetActions.RECOVER_START: {
+                dispatch(targetActions.recover());
                 break;
             }
-            case 'START_REFRESH_ALL_FILES': {
-                dispatch(refreshAllFiles());
+            case targetActions.REFRESH_ALL_FILES_START: {
+                dispatch(fileActions.refreshAllFiles());
                 break;
             }
             default:

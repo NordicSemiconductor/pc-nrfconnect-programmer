@@ -44,8 +44,11 @@ export const TARGET_SIZE_KNOWN = 'TARGET_SIZE_KNOWN';
 export const TARGET_CONTENTS_KNOWN = 'TARGET_CONTENTS_KNOWN';
 export const WRITE_PROGRESS_START = 'WRITE_PROGRESS_START';
 export const WRITE_PROGRESS_FINISHED = 'WRITE_PROGRESS_FINISHED';
+export const REFRESH_ALL_FILES_START = 'REFRESH_ALL_FILES_START';
+export const WRITE_START = 'WRITE_START';
+export const RECOVER_START = 'RECOVER_START';
 
-function targetSizeKnownAction(targetPort, targetSize, targetPageSize) {
+export function targetSizeKnownAction(targetPort, targetSize, targetPageSize) {
     return {
         type: TARGET_SIZE_KNOWN,
         targetPort,
@@ -54,7 +57,7 @@ function targetSizeKnownAction(targetPort, targetSize, targetPageSize) {
     };
 }
 
-function targetContentsKnownAction(
+export function targetContentsKnownAction(
     targetPort,
     targetSize,
     targetPageSize,
@@ -72,15 +75,33 @@ function targetContentsKnownAction(
     };
 }
 
-function writeProgressFinishedAction() {
+export function writeProgressFinishedAction() {
     return {
         type: WRITE_PROGRESS_FINISHED,
     };
 }
 
-function writeProgressStartAction() {
+export function writeProgressStartAction() {
     return {
         type: WRITE_PROGRESS_START,
+    };
+}
+
+export function refreshAllFilesStartAction() {
+    return {
+        type: REFRESH_ALL_FILES_START,
+    };
+}
+
+export function writeStartAction() {
+    return {
+        type: WRITE_START,
+    };
+}
+
+export function recoverStartAction() {
+    return {
+        type: RECOVER_START,
     };
 }
 
