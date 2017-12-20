@@ -148,7 +148,6 @@ function parseOneFile(dispatch, filename) {
 export function openFileDialog() {
     return dispatch => {
         electron.remote.dialog.showOpenDialog(
-            undefined, /* window */
             {
                 title: 'Select a .hex file',
                 filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
