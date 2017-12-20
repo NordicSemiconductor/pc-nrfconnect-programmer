@@ -106,7 +106,7 @@ class MemoryLayout extends React.Component {
             }
         });
 
-        overlaps.forEach(([address, overlap]) => {
+        overlaps.forEach((overlap, address) => {
             // Draw a solid block (with one solid colour or more striped colours)
             let blockSize = 0;
             const blockColours = [];
@@ -155,7 +155,7 @@ class MemoryLayout extends React.Component {
             // Draws a horizontal line at the given address, and some text on top
             // TODO: Allow for text on the bottom
             inlineLabels.push(<div
-                // key={`inline-label-${inlineLabels.length}`}
+                key={`inline-label-${inlineLabels.length}`}
                 style={{
                     position: 'absolute',
                     textAlign: 'center',
@@ -199,7 +199,7 @@ class MemoryLayout extends React.Component {
                     y2={svgTotalHeight - unclutteredHeights[i][0]}
                     stroke="black"
                     strokeWidth="1"
-                    key={`${addr}`}
+                    key={`addr-${i + 1}`}
                 />);
 
                 const label = (<div
@@ -209,7 +209,7 @@ class MemoryLayout extends React.Component {
                         fontFamily: 'monospace',
                         bottom: `${unclutteredHeights[i][0]}px`,
                     }}
-                    key={`${addr}`}
+                    key={`addr-${i + 1}`}
                 >{ hexpad8(addr) }</div>);
 
                 return { line, label };

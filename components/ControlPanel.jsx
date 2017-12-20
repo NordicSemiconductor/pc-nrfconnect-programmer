@@ -47,7 +47,7 @@ const ControlPanel = props => {
 
     let overlapWarning = '';
     const outsideFlashBlocks = [];
-    overlaps.forEach(([startAddress, overlap]) => {
+    overlaps.forEach((overlap, startAddress) => {
         if (overlap.length > 1) {
             overlapWarning = (<div className="alert alert-warning">
                 <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>

@@ -133,7 +133,7 @@ function parseOneFile(dispatch, filename) {
                 return;
             }
 
-            memMap.forEach(([address, block]) => {
+            memMap.forEach((block, address) => {
                 const size = block.length;
                 logger.info(`Data block: ${hexpad8(address)}-${hexpad8(address + size)} (${hexpad8(size)}`, ' bytes long)');
             });
