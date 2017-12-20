@@ -93,7 +93,7 @@ export function loadMruFilesSuccessAction(files) {
 function displayFileError(dispatch, err) {
     const error = `Could not open .hex file: ${err}`;
     logger.error(error);
-    dispatch(errorDialogShowAction);
+    dispatch(errorDialogShowAction(error));
 }
 
 function removeMruFile(filename) {
