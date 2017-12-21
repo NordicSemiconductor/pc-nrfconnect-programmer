@@ -34,77 +34,81 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import './memoryLayout.less';
+@labelHeight: 12px;
+@lineWidth: 16px;
+@labelWidth: 80px;
 
-.core-main-view {
-/*   border: 2px dotted red; */
-  height: 100%;
-}
+.memory-layout {
+    min-width: 250px;
+    max-width: 750px;
+    height: 100%;
+    position: relative;
+    z-index: 0;
+    box-shadow: 0px 0px 4px 0px #777A89;
+    background: white;
+    line-height: @labelHeight;
+    font-size: @labelHeight;
+    padding: calc(@labelHeight / 2);
 
-.core-main-layout > div.core-side-panel {
-/*   border: 2px dotted red; */
-  height: 100%;
-  overflow-y: visible;
-
-  button {
-    display: block;
-    width: 100%;
-    text-align: left;
-
-    span.glyphicon {
-        margin-right: 15px;
-    }
-  }
-
-  .dropdown {
-    display: block;
-    width: 100%;
-    text-align: left;
-
-    span.glyphicon {
-        margin-right: 15px;
+    h1 {
+        margin-top: 0;
+        margin-bottom: calc(@labelHeight / 2);
+        margin-left: calc(@labelHeight / 2);
+        font-size: calc(@labelHeight * 1.5);
+        line-height: calc(@labelHeight * 4);
+        border-bottom: 1px solid #c0c0c0;
     }
 
-    span.caret {
-        font-weight: bolder;
-        margin-left: 5px;
+    .memory-layout-inner {
+        position: absolute;
+        top: calc(@labelHeight * 4.5);
+        bottom: calc(@labelHeight / 2);
+        right: 0;
+        left: 0;
+        margin: calc(@labelHeight * 1.5);
+        display: flex;
+        flexFlow: row nowrap;
+        alignItems: stretch;
     }
-  }
-}
 
-.memlayout-spinner {
-    position: absolute;
-    top: 50%; left: 50%; width: 100px; height: 100px;
-    margin: -50px 0 0 -50px;
-    z-index: 1000;
-    transition: opacity .4s;
-    pointer-events: none;
-    border-radius: 50%;
-    border: 8px solid rgba(0,128,192, 0.2);
-    border-left: 8px solid #0080c0;
-    animation: rotator 2s infinite linear;
+    .block-container {
+        flex: 1 1 auto;
+        position: relative;
+        border: 1px solid black;
 
-    @keyframes rotator {
-        0%   { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        .inline-label {
+            position: absolute;
+            text-align: center;
+            line-height: 10px;
+            font-size: 12px;
+            width: 100%;
+            border-bottom: 1px solid black;
+        }
+
+        .memory-block {
+            position: absolute;
+            width: 100%;
+            min-height: 2px;
+        }
     }
-}
 
-.file-legend {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    .legend-colour {
-        width: 1.5em;
-        height: 1.5em;
-        display: inline-block;
-        float: left;
-        margin-right: 0.2em;
+    .address-lines {
+        flex: 0 1 auto;
+        position: relative;
+        width: @lineWidth;
+        stroke: black;
+        stroke-width: 0.5px;
     }
-    .file-label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        width: 185px;
-        display: block;
+
+    .address-labels {
+        flex: 0 1 auto;
+        position: relative;
+        min-width: @labelWidth;
+
+        .address-label {
+            left: 0;
+            position: absolute;
+            font-family: monospace;
+        }
     }
 }
