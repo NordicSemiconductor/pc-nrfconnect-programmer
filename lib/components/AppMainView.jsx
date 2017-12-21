@@ -36,7 +36,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import MemoryLayout from '../components/MemoryLayout';
 
 const AppMainView = (
@@ -46,11 +45,9 @@ const AppMainView = (
         let targetMap;
         if (!target.serialNumber) {
             targetMap = (
-                <div style={{
-                    position: 'absolute',
-                    top: 'calc(50% - 50px)',
-                }}
-                >Connect to a DevKit to see the contents of its non-volatile memory here.</div>
+                <div className="target-map-disconnected">
+                    Connect to a DevKit to see the contents of its non-volatile memory here.
+                </div>
             );
         } else if (target.serialNumber && target.isReady) {
             const targetDevice = {
@@ -75,30 +72,11 @@ const AppMainView = (
 
 
         return (
-            <div style={{
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-            }}
-            >
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    width: 'calc(50% - 8px)',
-                }}
-                >
-                    {targetMap}
+            <div className="app-main-view">
+                <div className="column">
+                    { targetMap }
                 </div>
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    right: 0,
-                    width: 'calc(50% - 8px)',
-                }}
-                >
+                <div className="column">
                     <MemoryLayout
                         loaded={file.loaded}
                         memMaps={file.memMaps}
@@ -116,10 +94,4 @@ AppMainView.propTypes = {
     target: PropTypes.shape({}).isRequired,
 };
 
-export default connect(
-    (state, props) => ({
-        ...props,
-        file: state.app.file,
-        target: state.app.target,
-    }),
-)(AppMainView);
+export default AppMainView;
