@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { readFile, stat } from 'fs';
+import { readFile, stat, statSync } from 'fs';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import MemoryMap from 'nrf-intel-hex';
@@ -54,7 +54,7 @@ export const MRU_FILES_LOAD_SUCCESS = 'MRU_FILES_LOAD_SUCCESS';
 export function errorDialogShowAction(error) {
     return {
         type: ERROR_DIALOG_SHOW,
-        message: error,
+        message: error.message || error,
     };
 }
 
@@ -104,45 +104,56 @@ function addMruFile(filename) {
     }
 }
 
-function parseOneFile(dispatch, filename) {
-    stat(filename, (statsError, stats) => {
-        if (statsError) {
-            logger.error(`Could not open .hex file: ${statsError}`);
-            dispatch(errorDialogShowAction(statsError));
-            removeMruFile(filename);
-            return;
-        }
-
-        readFile(filename, {}, (readError, data) => {
-            logger.info('Parsing .hex file: ', filename);
-            logger.info('File was last modified at ', stats.mtime.toLocaleString());
-            if (readError) {
-                logger.error(`Could not open .hex file: ${readError}`);
-                dispatch(errorDialogShowAction(readError));
+function parseOneFile(filename) {
+    return async dispatch => {
+        stat(filename, (statsError, stats) => {
+            if (statsError) {
+                logger.error(`Could not open .hex file: ${statsError}`);
+                dispatch(errorDialogShowAction(statsError));
                 removeMruFile(filename);
                 return;
             }
-            addMruFile(filename);
 
-            let memMap;
-            try {
-                memMap = MemoryMap.fromHex(data.toString());
-            } catch (e) {
-                logger.error(`Could not open .hex file: ${e}`);
-                dispatch(errorDialogShowAction(e));
-                return;
-            }
+            readFile(filename, {}, (readError, data) => {
+                logger.info('Parsing .hex file: ', filename);
+                logger.info('File was last modified at ', stats.mtime.toLocaleString());
+                if (readError) {
+                    logger.error(`Could not open .hex file: ${readError}`);
+                    dispatch(errorDialogShowAction(readError));
+                    removeMruFile(filename);
+                    return;
+                }
+                addMruFile(filename);
 
-            memMap.forEach((block, address) => {
-                const size = block.length;
-                logger.info(`Data block: ${hexpad8(address)}-${hexpad8(address + size)} (${hexpad8(size)}`, ' bytes long)');
+                let memMap;
+                try {
+                    memMap = MemoryMap.fromHex(data.toString());
+                } catch (e) {
+                    logger.error(`Could not open .hex file: ${e}`);
+                    dispatch(errorDialogShowAction(e));
+                    return;
+                }
+
+                memMap.forEach((block, address) => {
+                    const size = block.length;
+                    logger.info('Data block: ' +
+                        `${hexpad8(address)}-${hexpad8(address + size)} (${hexpad8(size)}`,
+                        ' bytes long)');
+                });
+
+                const { regions, labels } = memRegions(memMap);
+
+                dispatch(fileParseAction(
+                    filename,
+                    stats.mtime,
+                    new Date(),
+                    memMap,
+                    regions,
+                    labels,
+                ));
             });
-
-            const { regions, labels } = memRegions(memMap);
-
-            dispatch(fileParseAction(filename, stats.mtime, new Date(), memMap, regions, labels));
         });
-    });
+    };
 }
 
 export function openFileDialog() {
@@ -155,7 +166,7 @@ export function openFileDialog() {
             },
             filenames => {
                 filenames.forEach(filename => {
-                    parseOneFile(dispatch, filename);
+                    dispatch(parseOneFile(filename));
                 });
             });
     };
@@ -163,7 +174,7 @@ export function openFileDialog() {
 
 export function openFile(filename) {
     return dispatch => {
-        parseOneFile(dispatch, filename);
+        dispatch(parseOneFile(filename));
     };
 }
 
@@ -176,26 +187,21 @@ export function loadMruFiles() {
 
 export function refreshAllFiles() {
     return (dispatch, getState) => Promise.all(
-        Object.keys(getState().app.file.loaded).map(filePath => new Promise((resolve, reject) => {
+        Object.keys(getState().app.file.loaded).map(async filePath => {
             const entry = getState().app.file.loaded[filePath];
-            stat(filePath, (err, stats) => {
-                if (err) {
-                    logger.error(`Could not open .hex file: ${err}`);
-                    dispatch(errorDialogShowAction(err));
-                    return reject();
-                }
+            try {
+                const stats = statSync(filePath);
                 if (entry.loadTime.getTime() < stats.mtime) {
                     logger.info('Reloading: ', filePath);
-                    return parseOneFile((...args) => {
-                        dispatch(...args);
-                        resolve();
-                    }, filePath);
+                    await dispatch(parseOneFile(filePath));
+                    return;
                 }
                 logger.info('Does not need to be reloaded: ', filePath);
-                return resolve();
-            });
-        })),
-    );
+            } catch (err) {
+                logger.error(`Could not open .hex file: ${err}`);
+                dispatch(errorDialogShowAction(err));
+            }
+        }));
 }
 
 // Checks if the files have changed since they were loaded into the programmer UI.
