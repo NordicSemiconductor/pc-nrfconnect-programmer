@@ -37,11 +37,11 @@
 import React from 'react';
 import { logger } from 'nrfconnect/core';
 
-import ControlPanel from './containers/controlPanel';
-import AppMainView from './containers/appMainView';
-import * as fileActions from './actions/fileActions';
-import * as targetActions from './actions/targetActions';
-import appReducer from './reducers';
+import ControlPanel from './lib/containers/controlPanel';
+import AppMainView from './lib/containers/appMainView';
+import * as fileActions from './lib/actions/fileActions';
+import * as targetActions from './lib/actions/targetActions';
+import appReducer from './lib/reducers';
 
 import './resources/css/index.less';
 
