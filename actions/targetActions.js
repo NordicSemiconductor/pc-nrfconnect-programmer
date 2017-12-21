@@ -227,21 +227,23 @@ export function logDeviceInfo(serialNumber, comName) {
 }
 
 // Sends a .hex string to jprog.program()
-function writeHex(dispatch, serialNumber, hexString) {
-    nrfjprog.program(serialNumber, hexString, {
-        inputFormat: nrfjprog.INPUT_FORMAT_HEX_STRING,
-        chip_erase_mode: nrfjprog.ERASE_PAGES,
+function writeHex(serialNumber, hexString) {
+    return dispatch => {
+        nrfjprog.program(serialNumber, hexString, {
+            inputFormat: nrfjprog.INPUT_FORMAT_HEX_STRING,
+            chip_erase_mode: nrfjprog.ERASE_PAGES,
 
-    }, progress => {
-        logger.info(progress.process);
-    }, err => {
-        if (err) {
-            err.log.split('\n').forEach(line => logger.error(line));
-            return;
-        }
-        logger.info('Write procedure finished');
-        dispatch(writeProgressFinishedAction());
-    });
+        }, progress => {
+            logger.info(progress.process);
+        }, err => {
+            if (err) {
+                err.log.split('\n').forEach(line => logger.error(line));
+                return;
+            }
+            logger.info('Write procedure finished');
+            dispatch(writeProgressFinishedAction());
+        });
+    };
 }
 
 // Whether the current hex files can be written to the current target.
@@ -323,7 +325,7 @@ export function write() {
                 pages = pages.slice(0, uicrAddr);
             }
             dispatch(writeProgressStartAction());
-            writeHex(dispatch, serialNumber, pages.asHexString(64));
+            dispatch(writeHex(serialNumber, pages.asHexString(64)));
         }).catch(() => {});
     };
 }
