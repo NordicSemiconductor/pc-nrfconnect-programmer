@@ -39,34 +39,33 @@ import { logger } from 'nrfconnect/core';
 
 import ControlPanel from './containers/controlPanel';
 import AppMainView from './containers/appMainView';
-import { openFile, refreshAllFiles } from './actions/files';
-import * as jprogActions from './actions/jprog';
+import * as fileActions from './actions/fileActions';
+import * as targetActions from './actions/targetActions';
 import appReducer from './reducers';
 
 import './resources/css/index.less';
 
-/* eslint-disable react/prop-types */
-
 export default {
     onInit: dispatch => {
-        document.ondrop = ev => {
-            ev.preventDefault();
+        document.ondrop = event => {
+            event.preventDefault();
         };
+
         document.ondragover = document.ondrop;
 
         document.body.ondragover = event => {
-            /* eslint-disable no-param-reassign */
-            if (!event.dataTransfer.files.length) {
-                event.dataTransfer.dropEffect = 'none';
-                event.dataTransfer.effectAllowed = 'none';
+            const dragOverEvent = event;
+            if (!dragOverEvent.dataTransfer.files.length) {
+                dragOverEvent.dataTransfer.dropEffect = 'none';
+                dragOverEvent.dataTransfer.effectAllowed = 'none';
             } else {
-                event.dataTransfer.effectAllowed = 'uninitialized';
+                dragOverEvent.dataTransfer.effectAllowed = 'uninitialized';
             }
         };
 
         document.body.ondrop = event => {
             Array.from(event.dataTransfer.files).forEach(i => {
-                dispatch(openFile(i.path));
+                dispatch(fileActions.openFile(i.path));
             });
             event.preventDefault();
         };
@@ -82,18 +81,16 @@ export default {
         </SidePanel>
     ),
     reduceApp: appReducer,
-
     mapSerialPortSelectorState: (state, props) => ({
         portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
         ...props,
     }),
-
-    middleware: store => next => action => { // eslint-disable-line
+    middleware: store => next => action => {
         const state = store.getState();
         const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                dispatch(jprogActions.logDeviceInfo(
+                dispatch(targetActions.logDeviceInfo(
                     action.port.serialNumber,
                     action.port.comName,
                 ));
@@ -103,19 +100,19 @@ export default {
                 logger.info('Target device closed.');
                 break;
             }
-            case 'START_WRITE': {
+            case targetActions.WRITE_START: {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                dispatch(jprogActions.write());
+                dispatch(targetActions.write());
                 break;
             }
-            case 'START_RECOVER': {
-                dispatch(jprogActions.recover());
+            case targetActions.RECOVER_START: {
+                dispatch(targetActions.recover());
                 break;
             }
-            case 'START_REFRESH_ALL_FILES': {
-                dispatch(refreshAllFiles());
+            case targetActions.REFRESH_ALL_FILES_START: {
+                dispatch(fileActions.refreshAllFiles());
                 break;
             }
             default:

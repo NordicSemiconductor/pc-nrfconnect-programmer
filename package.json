@@ -20,21 +20,21 @@
     "LICENSE"
   ],
   "scripts": {
-    "dev": "webpack --watch",
-    "webpack": "webpack",
-    "build": "cross-env NODE_ENV=production webpack",
-    "lint": "eslint components/*.js components/*.jsx reducers/*.js containers/*.js containers/*.jsx index.jsx actions/*.js hexpad.js memRegions.js",
-    "lintfix": "eslint --fix components/*.js components/*.jsx reducers/*.js containers/*.js containers/*.jsx index.jsx actions/*.js hexpad.js memRegions.js",
-    "test": "jest --testResultsProcessor jest-bamboo-formatter",
-    "test-watch": "jest --watch",
-    "clean": "npm install rimraf && npm run clean-dist && npm run clean-modules",
+    "dev": "nrfconnect-scripts build-watch",
+    "webpack": "nrfconnect-scripts build-dev",
+    "build": "nrfconnect-scripts build-prod",
+    "lint": "nrfconnect-scripts lint lib index.jsx",
+    "lintfix": "nrfconnect-scripts lint --fix lib index.jsx",
+    "test": "nrfconnect-scripts test",
+    "test-watch": "nrfconnect-scripts test --watch",
+    "clean": "npm run clean-dist && npm run clean-modules",
     "clean-dist": "rimraf dist",
     "clean-modules": "rimraf \"node_modules/!(rimraf|.bin)\""
   },
   "devDependencies": {
     "babel-loader": "^7.1.2",
     "nrf-intel-hex": "^1.1.0",
-    "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.0.0",
+    "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.1.1",
     "unclutter1d": "^0.2.0"
   },
   "dependencies": {

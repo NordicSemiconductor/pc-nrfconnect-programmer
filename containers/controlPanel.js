@@ -36,8 +36,8 @@
 
 import { connect } from 'react-redux';
 import ControlPanel from '../components/ControlPanel';
-import * as fileActions from '../actions/files';
-import * as jprogActions from '../actions/jprog';
+import * as fileActions from '../actions/fileActions';
+import * as targetActions from '../actions/targetActions';
 
 export default connect(
     (state, props) => ({
@@ -46,7 +46,7 @@ export default connect(
         memMaps: state.app.file.memMaps,
         mruFiles: state.app.file.mruFiles,
         targetIsReady: state.app.target.isReady,
-        targetIsWritable: jprogActions.canWrite(state.app),
+        targetIsWritable: targetActions.canWrite(state.app),
         targetSize: state.app.target.size,
     }),
     (dispatch, props) => ({
@@ -54,10 +54,10 @@ export default connect(
         onToggleFileList: () => dispatch(fileActions.loadMruFiles()),
         openFileDialog: () => dispatch(fileActions.openFileDialog()),
         openFile: filename => dispatch(fileActions.openFile(filename)),
-        refreshAllFiles: () => { dispatch({ type: 'START_REFRESH_ALL_FILES' }); },
-        performWrite: () => { dispatch({ type: 'START_WRITE' }); },
-        performRecover: () => { dispatch({ type: 'START_RECOVER' }); },
-        closeFiles: () => { dispatch({ type: 'EMPTY_FILES' }); },
-        removeFile: filePath => { dispatch({ type: 'REMOVE_FILE', filePath }); },
+        refreshAllFiles: () => { dispatch(targetActions.refreshAllFilesStartAction()); },
+        performWrite: () => { dispatch(targetActions.writeStartAction()); },
+        performRecover: () => { dispatch(targetActions.recoverStartAction()); },
+        closeFiles: () => { dispatch(fileActions.filesEmptyAction()); },
+        removeFile: filePath => { dispatch(fileActions.fileRemoveAction(filePath)); },
     }),
 )(ControlPanel);

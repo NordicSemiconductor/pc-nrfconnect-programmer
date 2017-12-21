@@ -47,7 +47,7 @@ const ControlPanel = props => {
 
     let overlapWarning = '';
     const outsideFlashBlocks = [];
-    for (const [startAddress, overlap] of overlaps) {
+    overlaps.forEach((overlap, startAddress) => {
         if (overlap.length > 1) {
             overlapWarning = (<div className="alert alert-warning">
                 <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
@@ -64,7 +64,7 @@ const ControlPanel = props => {
             (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
             outsideFlashBlocks.push(`${hexpad8(startAddress)}-${hexpad8(endAddress)}`);
         }
-    }
+    });
     let outsideFlashWarning;
     if (outsideFlashBlocks.length) {
         outsideFlashWarning = (<div className="alert alert-warning">
@@ -137,7 +137,6 @@ ControlPanel.propTypes = {
             PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
         ),
     ).isRequired,
-    targetSize: PropTypes.number.isRequired,
     refreshAllFiles: PropTypes.func.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,

@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { readFile, stat } from 'fs';
+import { readFile, stat, statSync } from 'fs';
 import electron from 'electron';
 import { logger } from 'nrfconnect/core';
 import MemoryMap from 'nrf-intel-hex';
@@ -45,14 +45,49 @@ import memRegions from '../memRegions';
 
 const persistentStore = new Store({ name: 'nrf-programmer' });
 
+export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
+export const FILE_PARSE = 'FILE_PARSE';
+export const FILE_REMOVE = 'FILE_REMOVE';
+export const FILES_EMPTY = 'FILES_EMPTY';
+export const MRU_FILES_LOAD_SUCCESS = 'MRU_FILES_LOAD_SUCCESS';
 
-function displayFileError(err, dispatch) {
-    const error = `Could not open .hex file: ${err}`;
-    logger.error(error);
-    dispatch({
-        type: 'ERROR_DIALOG_SHOW',
-        message: error,
-    });
+export function errorDialogShowAction(error) {
+    return {
+        type: ERROR_DIALOG_SHOW,
+        message: error.message || error,
+    };
+}
+
+export function fileParseAction(filePath, modTime, loadTime, memMap, regions, labels) {
+    return {
+        type: FILE_PARSE,
+        filePath,
+        modTime,
+        loadTime,
+        memMap,
+        regions,
+        labels,
+    };
+}
+
+export function fileRemoveAction(filePath) {
+    return {
+        type: FILE_REMOVE,
+        filePath,
+    };
+}
+
+export function filesEmptyAction() {
+    return {
+        type: FILES_EMPTY,
+    };
+}
+
+export function mruFilesLoadSuccessAction(files) {
+    return {
+        type: MRU_FILES_LOAD_SUCCESS,
+        files,
+    };
 }
 
 function removeMruFile(filename) {
@@ -69,110 +104,105 @@ function addMruFile(filename) {
     }
 }
 
-function parseOneFile(filename, dispatch) {
-    stat(filename, (err, stats) => {
-        if (err) {
-            displayFileError(err, dispatch);
-            removeMruFile(filename);
-            return;
-        }
-
-//         const fileModTime = stats.fileModTime;
-
-        readFile(filename, {}, (err2, data) => {
-            logger.info('Parsing .hex file: ', filename);
-            logger.info('File was last modified at ', stats.mtime.toLocaleString());
-            if (err2) {
-                displayFileError(err2, dispatch);
+function parseOneFile(filename) {
+    return async dispatch => {
+        stat(filename, (statsError, stats) => {
+            if (statsError) {
+                logger.error(`Could not open .hex file: ${statsError}`);
+                dispatch(errorDialogShowAction(statsError));
                 removeMruFile(filename);
                 return;
             }
-            addMruFile(filename);
 
-            let memMap;
-            try {
-                memMap = MemoryMap.fromHex(data.toString());
-            } catch (ex) {
-                displayFileError(ex, dispatch);
-                return;
-            }
+            readFile(filename, {}, (readError, data) => {
+                logger.info('Parsing .hex file: ', filename);
+                logger.info('File was last modified at ', stats.mtime.toLocaleString());
+                if (readError) {
+                    logger.error(`Could not open .hex file: ${readError}`);
+                    dispatch(errorDialogShowAction(readError));
+                    removeMruFile(filename);
+                    return;
+                }
+                addMruFile(filename);
 
-            // Display some info in the log.
-            for (const [address, block] of memMap) {
-                const size = block.length;
+                let memMap;
+                try {
+                    memMap = MemoryMap.fromHex(data.toString());
+                } catch (e) {
+                    logger.error(`Could not open .hex file: ${e}`);
+                    dispatch(errorDialogShowAction(e));
+                    return;
+                }
 
-                logger.info(`Data block: ${hexpad8(address)}-${hexpad8(address + size)} (${hexpad8(size)}`, ' bytes long)');
-            }
+                memMap.forEach((block, address) => {
+                    const size = block.length;
+                    logger.info('Data block: ' +
+                        `${hexpad8(address)}-${hexpad8(address + size)} (${hexpad8(size)}`,
+                        ' bytes long)');
+                });
 
-            const { regions, labels } = memRegions(memMap);
+                const { regions, labels } = memRegions(memMap);
 
-            dispatch({
-                type: 'FILE_PARSE',
-                filePath: filename,
-                modTime: stats.mtime,
-                loadTime: new Date(),
-                memMap,
-                regions,
-                labels,
+                dispatch(fileParseAction(
+                    filename,
+                    stats.mtime,
+                    new Date(),
+                    memMap,
+                    regions,
+                    labels,
+                ));
             });
         });
-    });
+    };
 }
 
 export function openFileDialog() {
     return dispatch => {
-        electron.remote.dialog.showOpenDialog(/* window */undefined, {
-            title: 'Select a .hex file',
-            filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
-            properties: ['openFile', 'multiSelections'],
-        }, filenames => {
-            for (const filename of filenames) {
-                parseOneFile(filename, dispatch);
-            }
-        });
+        electron.remote.dialog.showOpenDialog(
+            {
+                title: 'Select a .hex file',
+                filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
+                properties: ['openFile', 'multiSelections'],
+            },
+            filenames => {
+                filenames.forEach(filename => {
+                    dispatch(parseOneFile(filename));
+                });
+            });
     };
 }
 
 export function openFile(filename) {
     return dispatch => {
-        parseOneFile(filename, dispatch);
+        dispatch(parseOneFile(filename));
     };
 }
 
 export function loadMruFiles() {
     return dispatch => {
         const files = persistentStore.get('mruFiles', []);
-        dispatch({
-            type: 'LOAD_MRU_FILES_SUCCESS',
-            files,
-        });
+        dispatch(mruFilesLoadSuccessAction(files));
     };
 }
 
 export function refreshAllFiles() {
     return (dispatch, getState) => Promise.all(
-        Object.keys(getState().app.file.loaded).map(filePath => new Promise((resolve, reject) => {
+        Object.keys(getState().app.file.loaded).map(async filePath => {
             const entry = getState().app.file.loaded[filePath];
-            stat(filePath, (err, stats) => {
-                if (err) {
-                    displayFileError(err, dispatch);
-                    return reject();
-                }
-
+            try {
+                const stats = statSync(filePath);
                 if (entry.loadTime.getTime() < stats.mtime) {
                     logger.info('Reloading: ', filePath);
-                    return parseOneFile(filePath, (...args) => {
-                        dispatch(...args);
-                        resolve();
-                    });
+                    await dispatch(parseOneFile(filePath));
+                    return;
                 }
                 logger.info('Does not need to be reloaded: ', filePath);
-                return resolve();
-            });
-        })),
-    );
+            } catch (err) {
+                logger.error(`Could not open .hex file: ${err}`);
+                dispatch(errorDialogShowAction(err));
+            }
+        }));
 }
-
 
 // Checks if the files have changed since they were loaded into the programmer UI.
 // Will display a message box dialog.
@@ -239,6 +269,7 @@ export function checkUpToDateFiles(dispatch, getState) {
                 } else if (button === 2) { // Cancel
                     return rej();
                 }
+
                 // Should never be reached
                 return rej();
             });
