@@ -192,7 +192,7 @@ class MemoryLayout extends React.Component {
             </div>
         ));
 
-        window.requestAnimationFrame(() => this.relocateLabels());
+        window.requestAnimationFrame(this.boundRelocateLabels);
 
         return (
             <div className="memory-layout">
