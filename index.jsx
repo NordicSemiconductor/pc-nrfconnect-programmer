@@ -75,11 +75,7 @@ export default {
             <AppMainView />
         </MainView>
     ),
-    decorateSidePanel: SidePanel => () => (
-        <SidePanel>
-            <ControlPanel />
-        </SidePanel>
-    ),
+    decorateSidePanel: () => () => <ControlPanel />,
     reduceApp: appReducer,
     mapSerialPortSelectorState: (state, props) => ({
         portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
@@ -90,7 +86,7 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                dispatch(targetActions.logDeviceInfo(
+                dispatch(targetActions.openDevice(
                     action.port.serialNumber,
                     action.port.comName,
                 ));

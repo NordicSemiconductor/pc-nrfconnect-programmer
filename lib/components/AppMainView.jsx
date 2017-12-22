@@ -40,7 +40,7 @@ import MemoryLayout from '../components/MemoryLayout';
 
 const AppMainView = (
     props => {
-        const { file, target } = props;
+        const { file, target, refreshTargetContents } = props;
 
         let targetMap;
         if (!target.serialNumber) {
@@ -64,6 +64,7 @@ const AppMainView = (
                     memMaps={[['targetDevice', target.memMap]]}
                     targetSize={target.size}
                     title="nRF 5x"
+                    refresh={refreshTargetContents}
                 />
             );
         } else {
@@ -92,6 +93,7 @@ const AppMainView = (
 AppMainView.propTypes = {
     file: PropTypes.shape({}).isRequired,
     target: PropTypes.shape({}).isRequired,
+    refreshTargetContents: PropTypes.func.isRequired,
 };
 
 export default AppMainView;
