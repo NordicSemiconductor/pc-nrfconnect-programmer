@@ -42,9 +42,8 @@ import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../hexpad';
 
-const labelHeight = 12; // in CSS pixels
-const lineWidth = 8;    // in CSS pixels. This is the width of the SVG container for the lines.
-const labelWidth = 80; // in CSS pixels. Should be replaced with some flexboxes anyway.
+const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
+const gradientLength = 20;
 
 class MemoryLayout extends React.Component {
 
@@ -81,18 +80,16 @@ class MemoryLayout extends React.Component {
 
     render() {
         const {
-            targetSize,
+            targetSize: max,
             memMaps,
             loaded,
         } = this.props;
 
         const blocks = [];
         const inlineLabels = [];
-        const min = 0x0;
-        const max = targetSize;
         const labelz = {};
 
-        const addressLabels = { left: new Set(), right: new Set() };
+        const addressSet = new Set();
 
         const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
@@ -117,192 +114,102 @@ class MemoryLayout extends React.Component {
                 blockColours.push(loaded[filename].colour);
             });
 
-            if (address + blockSize > min && address < max) {
+            if (address + blockSize > 0x0 && address < max) {
                 if (blockColours.length === 1) {
                     blockBackground = blockColours[0];
                 } else {
-                    const gradientStops = [];
-                    let gradientPx = 0;
-                    blockColours.forEach(colour => {
-                        gradientStops.push(`${colour} ${gradientPx}px`);
-                        gradientPx += 20;
-                        gradientStops.push(`${colour} ${gradientPx}px`);
-                    });
-
+                    const gradientStops = blockColours.map((colour, i) =>
+                        `${colour} ${i * gradientLength}px, ${colour} ${(i + 1) * gradientLength}px`,
+                    );
                     blockBackground = `repeating-linear-gradient(45deg, ${
                         gradientStops.join(',')})`;
                 }
 
-                blocks.push(<div
-                    key={`block-${blocks.length}`}
-                    style={{
-                        position: 'absolute',
-                        height: `${(100 * blockSize) / max}%`,
-                        bottom: `${(100 * address) / max}%`,
-                        width: '100%',
-                        minHeight: '2px',
-                        background: blockBackground,
-                    }}
-                />,
+                blocks.push(
+                    <div
+                        key={`block-${blocks.length}`}
+                        className="memory-block"
+                        style={{
+                            height: `${(100 * blockSize) / max}%`,
+                            bottom: `${(100 * address) / max}%`,
+                            background: blockBackground,
+                        }}
+                    />,
                 );
 
-                addressLabels.right.add(address);
-                addressLabels.right.add(address + blockSize);
+                addressSet.add(address);
+                addressSet.add(address + blockSize);
             }
         });
 
         Object.entries(labelz).forEach(([inlineLabelText, inlineLabelAddress]) => {
             // Draws a horizontal line at the given address, and some text on top
             // TODO: Allow for text on the bottom
-            inlineLabels.push(<div
-                key={`inline-label-${inlineLabels.length}`}
-                style={{
-                    position: 'absolute',
-                    textAlign: 'center',
-                    lineHeight: '10px',
-                    fontSize: '12px',
-                    width: '100%',
-                    borderBottom: '1px solid black',
-                    bottom: `${(100 * inlineLabelAddress) / max}%`,
-                }}
-            >{ inlineLabelText }</div>,
+            inlineLabels.push(
+                <div
+                    className="inline-label"
+                    key={`inline-label-${inlineLabels.length}`}
+                    style={{ bottom: `${(100 * inlineLabelAddress) / max}%` }}
+                >
+                    { inlineLabelText }
+                </div>,
             );
 
-            addressLabels.right.add(inlineLabelAddress);
+            addressSet.add(inlineLabelAddress);
         });
 
-        const labelStep = 0x10000;
-        for (let i = min; i <= max; i += labelStep) {
-            addressLabels.left.add(i);
-        }
+        addressSet.add(max);
+        const addresses = Array.from(addressSet);
 
-        Object.keys(addressLabels).forEach(side => {
-            addressLabels[side] = Array.from(addressLabels[side]);
-            const labelHeights = addressLabels[side].map(addr => [
-                ((this.state.computedHeight * addr) / targetSize) - (labelHeight / 2),
-                labelHeight,
-            ]);
+        const labelHeights = addresses.map(addr => [
+            ((this.state.computedHeight * addr) / max) - (labelHeight / 2),
+            labelHeight,
+        ]);
 
-            const unclutteredHeights = unclutter1d(labelHeights,
-                -(labelHeight / 2),
-                this.state.computedHeight + (labelHeight / 2));
+        const unclutteredHeights = unclutter1d(labelHeights,
+            -(labelHeight / 2),
+            this.state.computedHeight + (labelHeight / 2));
 
-            const lineAttrs = side === 'left' ? { x1: 8, x2: 0 } : { x1: 0, x2: 8 };
-            const labelStyle = side === 'left' ? { right: '0px' } : { left: '0px' };
+        const svgTotalHeight = this.state.computedHeight - ((labelHeight / 2) - 0.5);
 
-            const svgTotalHeight = this.state.computedHeight - ((labelHeight / 2) - 0.5);
+        const addresslines = addresses.map((addr, i) => (
+            <line
+                x1={0}
+                x2="100%"
+                y1={svgTotalHeight - labelHeights[i][0]}
+                y2={svgTotalHeight - unclutteredHeights[i][0]}
+                key={addr}
+            />
+        ));
 
-            addressLabels[side] = addressLabels[side].map((addr, i) => {
-                const line = (<line
-                    {...lineAttrs}
-                    y1={svgTotalHeight - labelHeights[i][0]}
-                    y2={svgTotalHeight - unclutteredHeights[i][0]}
-                    stroke="black"
-                    strokeWidth="1"
-                    key={`addr-${i + 1}`}
-                />);
+        const addressLabels = addresses.map((addr, i) => (
+            <div
+                className="address-label"
+                style={{ bottom: `${unclutteredHeights[i][0]}px` }}
+                key={addr}
+            >
+                { hexpad8(addr) }
+            </div>
+        ));
 
-                const label = (<div
-                    style={{
-                        ...labelStyle,
-                        position: 'absolute',
-                        fontFamily: 'monospace',
-                        bottom: `${unclutteredHeights[i][0]}px`,
-                    }}
-                    key={`addr-${i + 1}`}
-                >{ hexpad8(addr) }</div>);
-
-                return { line, label };
-            });
-        });
-
-        this.leftSvgContainer = (<svg style={{
-            flex: '0 1 auto',
-            position: 'relative',
-            width: `${lineWidth}px`,
-        }}
-        >
-            { addressLabels.left.map(i => i.line) }
-        </svg>);
-
-        this.rightSvgContainer = (<svg style={{
-            flex: '0 1 auto',
-            position: 'relative',
-            width: `${lineWidth}px`,
-        }}
-        >
-            { addressLabels.right.map(i => i.line) }
-        </svg>);
-
-
-        window.requestAnimationFrame(() => this.relocateLabels());
+        window.requestAnimationFrame(this.boundRelocateLabels);
 
         return (
-            <div
-                style={{
-                    minWidth: '250px',
-                    maxWidth: '750px',
-                    height: '100%',
-                    position: 'relative',
-                    zIndex: '0',
-                    lineHeight: `${labelHeight}px`,
-                    fontSize: `${labelHeight}px`,
-                    boxShadow: '0px 0px 4px 0px #777A89',
-                    padding: `${labelHeight / 2}px`,
-                    background: 'white',
-
-                }}
-            >
-                <h1 style={{
-                    marginTop: 0,
-                    marginBottom: `${labelHeight / 2}px`,
-                    marginLeft: `${labelHeight / 2}px`,
-                    fontSize: `${labelHeight * 1.5}px`,
-                    lineHeight: `${labelHeight * 4}px`,
-                    borderBottom: '1px solid #c0c0c0',
-                }}
-                >{this.props.title}</h1>
+            <div className="memory-layout">
+                <h1>{ this.props.title }</h1>
                 <div
-                    style={{ position: 'absolute',
-                        top: `${labelHeight * 4.5}px`,
-                        bottom: `${labelHeight / 2}px`,
-                        right: 0,
-                        left: 0,
-                        margin: `${labelHeight * 1.5}px`,
-                        display: 'flex',
-                        flexFlow: 'row nowrap',
-                        alignItems: 'stretch',
-                    }}
+                    className="memory-layout-inner"
                     ref={node => { this.node = node; }}
                 >
-                    <div
-                        style={{
-                            flex: '0 1 auto',
-                            position: 'relative',
-                            minWidth: `${labelWidth}px`,
-                        }}
-                    >
-                        { addressLabels.left.map(i => i.label) }
-                    </div>
-                    { this.leftSvgContainer }
-                    <div style={{
-                        flex: '1 1 auto',
-                        position: 'relative',
-                        border: '1px solid black',
-                    }}
-                    >
+                    <div className="block-container">
                         { blocks }
                         { inlineLabels }
                     </div>
-                    { this.rightSvgContainer }
-                    <div
-                        style={{
-                            flex: '0 1 auto',
-                            position: 'relative',
-                            minWidth: `${labelWidth}px`,
-                        }}
-                    >
-                        { addressLabels.right.map(i => i.label) }
+                    <svg className="address-lines">
+                        { addresslines }
+                    </svg>
+                    <div className="address-labels">
+                        { addressLabels }
                     </div>
                 </div>
             </div>
