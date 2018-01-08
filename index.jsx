@@ -86,7 +86,7 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                dispatch(targetActions.openDevice(
+                dispatch(targetActions.loadDeviceInfo(
                     action.port.serialNumber,
                     action.port.comName,
                 ));
