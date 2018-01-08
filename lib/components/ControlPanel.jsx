@@ -102,8 +102,8 @@ const ControlPanel = props => {
     let mruMenuItems;
 
     if (mruFiles.length) {
-        mruMenuItems = mruFiles.map((filename, i) => (
-            <MenuItem key={`${i + 1}`} onSelect={() => openFile(filename)}>{filename}</MenuItem>
+        mruMenuItems = mruFiles.map(filePath => (
+            <MenuItem key={filePath} onSelect={() => openFile(filePath)}>{filePath}</MenuItem>
         ));
     } else {
         mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
