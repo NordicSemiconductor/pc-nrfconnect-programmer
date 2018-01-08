@@ -36,11 +36,11 @@
 
 @import './memoryLayout.less';
 
-.core-main-view {
-    height: 100%;
+.main-view, .side-panel {
+    padding: 10px 15px;
 }
 
-.core-side-panel {
+.control-panel {
     height: 100%;
     flex: 0 0 260px;
     > * {
@@ -55,7 +55,7 @@
     overflow-y: visible;
 }
 
-.core-side-panel > div:nth-child(1) {
+.control-panel > div:nth-child(1) {
     height: 100%;
 
     button {

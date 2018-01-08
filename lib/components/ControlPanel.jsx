@@ -110,7 +110,7 @@ const ControlPanel = props => {
     }
 
     return (
-        <div className="core-side-panel">
+        <div className="control-panel">
             <div>
                 <Dropdown pullRight id="files-dropdown">
                     <Dropdown.Toggle onClick={onToggleFileList}>

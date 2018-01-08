@@ -71,11 +71,15 @@ export default {
         };
     },
     decorateMainView: MainView => () => (
-        <MainView>
+        <MainView cssClass="main-view">
             <AppMainView />
         </MainView>
     ),
-    decorateSidePanel: () => () => <ControlPanel />,
+    decorateSidePanel: SidePanel => () => (
+        <SidePanel cssClass="side-panel">
+            <ControlPanel />
+        </SidePanel>
+    ),
     reduceApp: appReducer,
     mapSerialPortSelectorState: (state, props) => ({
         portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
