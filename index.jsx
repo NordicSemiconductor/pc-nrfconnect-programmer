@@ -92,7 +92,6 @@ export default {
             case 'SERIAL_PORT_SELECTED': {
                 dispatch(targetActions.loadDeviceInfo(
                     action.port.serialNumber,
-                    action.port.comName,
                 ));
                 break;
             }
