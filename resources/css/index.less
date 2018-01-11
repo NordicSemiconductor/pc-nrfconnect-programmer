@@ -36,40 +36,52 @@
 
 @import './memoryLayout.less';
 
-.core-main-view {
-/*   border: 2px dotted red; */
-  height: 100%;
+.main-view, .side-panel {
+    padding: 10px 15px;
 }
 
-.core-main-layout > div.core-side-panel {
-/*   border: 2px dotted red; */
-  height: 100%;
-  overflow-y: visible;
-
-  button {
-    display: block;
-    width: 100%;
-    text-align: left;
-
-    span.glyphicon {
-        margin-right: 15px;
+.control-panel {
+    height: 100%;
+    flex: 0 0 260px;
+    > * {
+        margin-bottom: 20px;
     }
-  }
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+}
 
-  .dropdown {
-    display: block;
-    width: 100%;
-    text-align: left;
+.core-main-layout > div:nth-child(2) {
+    overflow-y: visible;
+}
 
-    span.glyphicon {
-        margin-right: 15px;
+.control-panel > div:nth-child(1) {
+    height: 100%;
+
+    button {
+        display: block;
+        width: 100%;
+        text-align: left;
+
+        span.glyphicon {
+            margin-right: 15px;
+        }
     }
 
-    span.caret {
-        font-weight: bolder;
-        margin-left: 5px;
+    .dropdown {
+        display: block;
+        width: 100%;
+        text-align: left;
+
+        span.glyphicon {
+            margin-right: 15px;
+        }
+
+        span.caret {
+            font-weight: bolder;
+            margin-left: 5px;
+        }
     }
-  }
 }
 
 .memlayout-spinner {

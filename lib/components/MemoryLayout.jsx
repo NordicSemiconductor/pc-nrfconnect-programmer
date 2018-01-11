@@ -36,6 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Button } from 'react-bootstrap';
 
 import MemoryMap from 'nrf-intel-hex';
 import unclutter1d from 'unclutter1d';
@@ -83,6 +84,7 @@ class MemoryLayout extends React.Component {
             targetSize: max,
             memMaps,
             loaded,
+            refresh,
         } = this.props;
 
         const blocks = [];
@@ -196,7 +198,10 @@ class MemoryLayout extends React.Component {
 
         return (
             <div className="memory-layout">
-                <h1>{ this.props.title }</h1>
+                <h1>
+                    { this.props.title }
+                    { refresh && <Button onClick={refresh}>Refresh</Button> }
+                </h1>
                 <div
                     className="memory-layout-inner"
                     ref={node => { this.node = node; }}
@@ -223,6 +228,7 @@ MemoryLayout.defaultProps = {
     memMaps: [],
     loaded: {},
     title: '',
+    refresh: null,
 };
 
 
@@ -235,6 +241,7 @@ MemoryLayout.propTypes = {
     ).isRequired,
     loaded: PropTypes.shape({}),
     title: PropTypes.string,
+    refresh: PropTypes.func,
 };
 
 

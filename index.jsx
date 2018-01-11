@@ -71,12 +71,12 @@ export default {
         };
     },
     decorateMainView: MainView => () => (
-        <MainView>
+        <MainView cssClass="main-view">
             <AppMainView />
         </MainView>
     ),
     decorateSidePanel: SidePanel => () => (
-        <SidePanel>
+        <SidePanel cssClass="side-panel">
             <ControlPanel />
         </SidePanel>
     ),
@@ -90,7 +90,7 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                dispatch(targetActions.logDeviceInfo(
+                dispatch(targetActions.loadDeviceInfo(
                     action.port.serialNumber,
                     action.port.comName,
                 ));

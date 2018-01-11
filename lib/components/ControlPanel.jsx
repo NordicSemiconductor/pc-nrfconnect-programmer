@@ -35,7 +35,7 @@
  */
 
 import React from 'react';
-import { Button, Dropdown, MenuItem, Glyphicon } from 'react-bootstrap';
+import { Accordion, Button, Checkbox, Dropdown, Glyphicon, MenuItem, Panel } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import MemoryMap from 'nrf-intel-hex';
 
@@ -43,91 +43,130 @@ import FileLegend from './FileLegend';
 import { hexpad8 } from '../hexpad';
 
 const ControlPanel = props => {
-    const overlaps = MemoryMap.overlapMemoryMaps(props.memMaps);
+    const {
+        targetSize,
+        closeFiles,
+        onToggleFileList,
+        openFileDialog,
+        openFile,
+        performWrite,
+        performRecover,
+        mruFiles,
+        loaded,
+        memMaps,
+        refreshAllFiles,
+        targetIsReady,
+        targetIsWritable,
+        removeFile,
+        autoRead,
+        toggleAutoRead,
+    } = props;
+
+    const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
     let overlapWarning = '';
     const outsideFlashBlocks = [];
     overlaps.forEach((overlap, startAddress) => {
         if (overlap.length > 1) {
-            overlapWarning = (<div className="alert alert-warning">
-                <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
-                <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
-                <p>In regions with overlapping data, data from the file which
-                    was <strong>last</strong> added will be used.</p>
-            </div>);
+            overlapWarning = (
+                <div className="alert alert-warning">
+                    <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
+                    <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
+                    <p>In regions with overlapping data, data from the file which
+                        was <strong>last</strong> added will be used.</p>
+                </div>
+            );
         }
 
         const endAddress = startAddress + overlap[0][1].length;
 
         // This assumes UICR at 0x10001000, size 4KiB
-        if ((startAddress < 0x10001000 && endAddress > props.targetSize) ||
+        if ((startAddress < 0x10001000 && endAddress > targetSize) ||
             (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
             outsideFlashBlocks.push(`${hexpad8(startAddress)}-${hexpad8(endAddress)}`);
         }
     });
     let outsideFlashWarning;
     if (outsideFlashBlocks.length) {
-        outsideFlashWarning = (<div className="alert alert-warning">
-            <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
-            <p><strong>Caution!</strong> There is data outside the
-                user-writable areas ({ outsideFlashBlocks.join(', ') }).</p>
-            <p> Check that the .hex files are appropiate for the current device.</p>
-        </div>);
+        outsideFlashWarning = (
+            <div className="alert alert-warning">
+                <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
+                <p><strong>Caution!</strong> There is data outside the
+                    user-writable areas ({ outsideFlashBlocks.join(', ') }).</p>
+                <p> Check that the .hex files are appropiate for the current device.</p>
+            </div>
+        );
     }
 
 
     let mruMenuItems;
 
-    if (props.mruFiles.length) {
-        mruMenuItems = props.mruFiles.map((filename, i) => (
-            <MenuItem key={`${i + 1}`} onSelect={() => props.openFile(filename)}>{filename}</MenuItem>
+    if (mruFiles.length) {
+        mruMenuItems = mruFiles.map(filePath => (
+            <MenuItem key={filePath} onSelect={() => openFile(filePath)}>{filePath}</MenuItem>
         ));
     } else {
         mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
     }
 
     return (
-        <div>
-            <Dropdown pullRight id="files-dropdown">
-                <Dropdown.Toggle onClick={props.onToggleFileList}>
-                    <Glyphicon glyph="folder-open" />Add a .hex file
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    { mruMenuItems }
-                    <MenuItem divider />
-                    <MenuItem onSelect={props.openFileDialog}>Browse...</MenuItem>
-                </Dropdown.Menu>
-            </Dropdown>
-            <Button onClick={props.refreshAllFiles}>
-                <Glyphicon glyph="refresh" />Reload .hex files
-            </Button>
-            <Button onClick={props.closeFiles}>
-                <Glyphicon glyph="minus-sign" />Clear files
-            </Button>
+        <div className="control-panel">
+            <div>
+                <Dropdown pullRight id="files-dropdown">
+                    <Dropdown.Toggle onClick={onToggleFileList}>
+                        <Glyphicon glyph="folder-open" />Add a .hex file
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        { mruMenuItems }
+                        <MenuItem divider />
+                        <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
+                    </Dropdown.Menu>
+                </Dropdown>
+                <Button onClick={refreshAllFiles}>
+                    <Glyphicon glyph="refresh" />Reload .hex files
+                </Button>
+                <Button onClick={closeFiles}>
+                    <Glyphicon glyph="minus-sign" />Clear files
+                </Button>
 
-            <Button
-                onClick={props.performWrite}
-                disabled={!props.targetIsReady || !props.targetIsWritable}
-            >
-                <Glyphicon glyph="save" />Write all to devkit
-            </Button>
+                <Button
+                    onClick={performWrite}
+                    disabled={!targetIsReady || !targetIsWritable}
+                >
+                    <Glyphicon glyph="save" />Write all to devkit
+                </Button>
 
-            <Button onClick={props.performRecover} disabled={!props.targetIsReady}>
-                <Glyphicon glyph="remove-sign" />Recover (full erase)
-            </Button>
+                <Button onClick={performRecover} disabled={!targetIsReady}>
+                    <Glyphicon glyph="remove-sign" />Recover (full erase)
+                </Button>
 
-            <FileLegend files={props.loaded} remove={props.removeFile} />
+                <FileLegend files={loaded} remove={removeFile} />
 
-            { overlapWarning }
-            { outsideFlashWarning }
+                { overlapWarning }
+                { outsideFlashWarning }
+            </div>
+
+            <Accordion defaultActiveKey="1">
+                <Panel header="Settings" eventKey="1">
+                    <Checkbox
+                        onChange={e => toggleAutoRead(e.target.checked)}
+                        checked={autoRead}
+                        title="Automatically read memory regions of the target device when opening"
+                    >
+                        Auto read device
+                    </Checkbox>
+                </Panel>
+            </Accordion>
         </div>
     );
 };
 
 ControlPanel.propTypes = {
+    targetSize: PropTypes.number.isRequired,
     closeFiles: PropTypes.func.isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
+    openFile: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -141,6 +180,8 @@ ControlPanel.propTypes = {
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
     removeFile: PropTypes.func.isRequired,
+    autoRead: PropTypes.bool.isRequired,
+    toggleAutoRead: PropTypes.func.isRequired,
 };
 
 export default ControlPanel;
