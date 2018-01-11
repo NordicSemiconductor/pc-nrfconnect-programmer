@@ -90,9 +90,10 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                next(action);
-                dispatch(targetActions.loadDeviceInfo());
-                return;
+                dispatch(targetActions.loadDeviceInfo(
+                    action.port.serialNumber,
+                ));
+                break;
             }
             case 'SERIAL_PORT_DESELECTED': {
                 logger.info('Target device closed.');
