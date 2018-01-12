@@ -1,8 +1,9 @@
 {
-  "presets": [ "react", "stage-3" ],
+  "presets": [ "react" ],
   "plugins": [
     "add-module-exports",
     "transform-es2015-modules-commonjs",
-    "transform-object-rest-spread"
+    "transform-object-rest-spread",
+    "babel-plugin-transform-async-to-generator"
   ]
 }
