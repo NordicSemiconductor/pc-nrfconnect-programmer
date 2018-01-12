@@ -34,10 +34,11 @@
   },
   "devDependencies": {
     "babel-loader": "^7.1.2",
+    "babel-preset-stage-3": "^6.24.1",
     "nrf-intel-hex": "^1.1.0",
     "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.1.2",
-    "unclutter1d": "^0.2.0",
-    "protobufjs": "^6.8.3"
+    "protobufjs": "^6.8.3",
+    "unclutter1d": "^0.2.0"
   },
   "dependencies": {
     "electron-store": "^1.2.0"
