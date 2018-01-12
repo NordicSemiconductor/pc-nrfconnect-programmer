@@ -1,4 +1,6 @@
-node_modules
-.idea
-dist
+node_modules/
+.idea/
+dist/
 jest.json
+.vscode/
+package-lock.json
