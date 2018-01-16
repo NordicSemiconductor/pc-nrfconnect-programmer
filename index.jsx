@@ -46,6 +46,9 @@ import appReducer from './lib/reducers';
 import './resources/css/index.less';
 
 export default {
+    config: {
+        selectorType: 'device',
+    },
     onInit: dispatch => {
         document.ondrop = event => {
             event.preventDefault();
@@ -88,8 +91,10 @@ export default {
     middleware: store => next => action => {
         const state = store.getState();
         const { dispatch } = store;
+        console.log(action);
         switch (action.type) {
-            case 'SERIAL_PORT_SELECTED': {
+            case 'SERIAL_PORT_SELECTED':
+            case 'DEVICE_SELECTED': {
                 dispatch(targetActions.loadDeviceInfo(
                     action.port.serialNumber,
                 ));
