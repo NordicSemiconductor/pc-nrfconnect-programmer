@@ -35,7 +35,6 @@
   "devDependencies": {
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "immutable": "^3.8.2",
     "nrf-intel-hex": "^1.1.0",
     "pc-nrfconnect-devdep": "https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.1.2",
     "protobufjs": "^6.8.4",

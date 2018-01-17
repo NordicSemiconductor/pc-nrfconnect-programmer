@@ -91,10 +91,14 @@ export default {
     middleware: store => next => action => {
         const state = store.getState();
         const { dispatch } = store;
-        console.log(action);
         switch (action.type) {
-            case 'SERIAL_PORT_SELECTED':
             case 'DEVICE_SELECTED': {
+                dispatch(targetActions.loadDeviceInfo(
+                    parseInt(action.device.serialNumber, 10),
+                ));
+                break;
+            }
+            case 'SERIAL_PORT_SELECTED': {
                 dispatch(targetActions.loadDeviceInfo(
                     action.port.serialNumber,
                 ));
