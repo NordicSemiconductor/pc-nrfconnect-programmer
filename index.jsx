@@ -40,10 +40,13 @@ import { logger } from 'nrfconnect/core';
 import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
-import * as targetActions from './lib/actions/targetActions';
+import * as portTargetActions from './lib/actions/portTargetActions';
+import USBTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
 
 import './resources/css/index.less';
+
+const usbTargetActions = new USBTargetActions();
 
 export default {
     config: {
@@ -93,13 +96,21 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
-                dispatch(targetActions.loadDeviceInfo(
-                    parseInt(action.device.serialNumber, 10),
-                ));
+                // console.log(usbTargetActions.RECOVER_START);
+                console.log(action.device);
+                if (action.device.type === 'serialport') {
+                    dispatch(portTargetActions.loadDeviceInfo(
+                        parseInt(action.device.serialNumber, 10),
+                    ));
+                } else if (action.device.type === 'usb') {
+                    dispatch(usbTargetActions.loadDeviceInfo(
+                        action.device,
+                    ));
+                }
                 break;
             }
             case 'SERIAL_PORT_SELECTED': {
-                dispatch(targetActions.loadDeviceInfo(
+                dispatch(portTargetActions.loadDeviceInfo(
                     action.port.serialNumber,
                 ));
                 break;
@@ -108,18 +119,18 @@ export default {
                 logger.info('Target device closed.');
                 break;
             }
-            case targetActions.WRITE_START: {
+            case portTargetActions.WRITE_START: {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                dispatch(targetActions.write());
+                dispatch(portTargetActions.write());
                 break;
             }
-            case targetActions.RECOVER_START: {
-                dispatch(targetActions.recover());
+            case portTargetActions.RECOVER_START: {
+                dispatch(portTargetActions.recover());
                 break;
             }
-            case targetActions.REFRESH_ALL_FILES_START: {
+            case portTargetActions.REFRESH_ALL_FILES_START: {
                 dispatch(fileActions.refreshAllFiles());
                 break;
             }
