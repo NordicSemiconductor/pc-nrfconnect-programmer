@@ -87,6 +87,7 @@ class MemoryLayout extends React.Component {
             refresh,
         } = this.props;
 
+        console.log(max);
         const blocks = [];
         const inlineLabels = [];
         const labelz = {};
