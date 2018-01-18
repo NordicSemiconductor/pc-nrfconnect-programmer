@@ -97,7 +97,6 @@ export default {
         switch (action.type) {
             case 'DEVICE_SELECTED': {
                 // console.log(usbTargetActions.RECOVER_START);
-                console.log(action.device);
                 if (action.device.type === 'serialport') {
                     dispatch(portTargetActions.loadDeviceInfo(
                         parseInt(action.device.serialNumber, 10),
