@@ -96,14 +96,13 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
-                console.log(action.device);
                 if (action.device.product === 'J-Link') {
                     dispatch(portTargetActions.loadDeviceInfo(
                         parseInt(action.device.serialNumber, 10),
                     ));
-                } else if (action.device.product.includes('usb')) {
+                } else if (action.device.product.includes('USB SDFU')) {
                     dispatch(usbTargetActions.loadDeviceInfo(
-                        action.device,
+                        action.device.comName,
                     ));
                 }
                 break;
