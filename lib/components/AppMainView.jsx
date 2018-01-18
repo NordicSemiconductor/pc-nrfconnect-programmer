@@ -62,7 +62,7 @@ const AppMainView = (
                 <MemoryLayout
                     loaded={{ targetDevice }}
                     memMaps={[['targetDevice', target.memMap]]}
-                    targetSize={target.get('romSize')}
+                    targetSize={target.romSize}
                     title="nRF 5x"
                     refresh={refreshTargetContents}
                 />
@@ -81,7 +81,7 @@ const AppMainView = (
                     <MemoryLayout
                         loaded={file.loaded}
                         memMaps={file.memMaps}
-                        targetSize={target.get('romSize')}
+                        targetSize={target.romSize}
                         title="Files"
                     />
                 </div>
