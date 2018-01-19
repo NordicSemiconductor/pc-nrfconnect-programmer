@@ -40,12 +40,13 @@ import { logger } from 'nrfconnect/core';
 import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
-import * as portTargetActions from './lib/actions/portTargetActions';
+import PortTargetActions from './lib/actions/portTargetActions';
 import USBTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
 
 import './resources/css/index.less';
 
+const portTargetActions = new PortTargetActions();
 const usbTargetActions = new USBTargetActions();
 
 export default {
