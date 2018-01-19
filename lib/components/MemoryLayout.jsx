@@ -41,7 +41,7 @@ import { Button } from 'react-bootstrap';
 import MemoryMap from 'nrf-intel-hex';
 import unclutter1d from 'unclutter1d';
 
-import { hexpad8 } from '../hexpad';
+import { hexpad8 } from '../util/hexpad';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
 const gradientLength = 20;
@@ -104,6 +104,7 @@ class MemoryLayout extends React.Component {
                 });
             }
         });
+        console.log(overlaps);
 
         overlaps.forEach((overlap, address) => {
             // Draw a solid block (with one solid colour or more striped colours)
