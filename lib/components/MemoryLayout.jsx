@@ -186,8 +186,7 @@ class MemoryLayout extends React.Component {
                         style={{
                             height: `${(100 * blockSize) / max}%`,
                             bottom: `${(100 * blockAddress) / max}%`,
-                            // background: blockBackground,
-                            background: 'pink',
+                            background: blockBackground,
 
                         }}
                     />,
@@ -204,7 +203,7 @@ class MemoryLayout extends React.Component {
                         key={`inline-label-${inlineLabels.length}`}
                         style={{ bottom: `${(100 * blockAddress) / max}%` }}
                     >
-                        { 'inlineLabelText' }
+                        { region.name }
                     </div>,
                 );
             }
