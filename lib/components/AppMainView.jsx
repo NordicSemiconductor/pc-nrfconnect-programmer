@@ -62,6 +62,7 @@ const AppMainView = (
                 <MemoryLayout
                     loaded={{ targetDevice }}
                     memMaps={[['targetDevice', target.memMap]]}
+                    regions={target.regions}
                     targetSize={target.romSize}
                     title="nRF 5x"
                     refresh={refreshTargetContents}
