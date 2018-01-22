@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -166,7 +167,7 @@ class MemoryLayout extends React.Component {
             // Draw a solid block (with one solid colour or more striped colours)
             const blockAddress = region.startAddress;
             const blockSize = region.regionSize;
-            const blockColours = [];
+            const blockColours = region.colours;
             let blockBackground = '';
             if (blockAddress + blockSize > 0x0 && blockAddress < max) {
                 if (blockColours.length === 1) {
@@ -297,3 +298,4 @@ MemoryLayout.propTypes = {
 
 
 export default MemoryLayout;
+
