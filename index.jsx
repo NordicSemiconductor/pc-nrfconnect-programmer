@@ -108,13 +108,7 @@ export default {
                 }
                 break;
             }
-            case 'SERIAL_PORT_SELECTED': {
-                dispatch(portTargetActions.loadDeviceInfo(
-                    action.port.serialNumber,
-                ));
-                break;
-            }
-            case 'SERIAL_PORT_DESELECTED': {
+            case 'DEVICE_DESELECTED': {
                 logger.info('Target device closed.');
                 break;
             }
