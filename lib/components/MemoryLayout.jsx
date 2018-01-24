@@ -202,7 +202,10 @@ class MemoryLayout extends React.Component {
                     <div
                         className="inline-label"
                         key={`inline-label-${inlineLabels.length}`}
-                        style={{ bottom: `${(100 * blockAddress) / max}%` }}
+                        style={{
+                            bottom: `${(100 * blockAddress) / max}%`,
+                            paddingBottom: `${(blockSize * 100) / 2 / max}%`,
+                        }}
                     >
                         { region.name }
                     </div>,
