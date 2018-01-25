@@ -40,7 +40,7 @@ import PropTypes from 'prop-types';
 import MemoryMap from 'nrf-intel-hex';
 
 import FileLegend from './FileLegend';
-import { hexpad8 } from '../hexpad';
+import { hexpad8 } from '../util/hexpad';
 
 const ControlPanel = props => {
     const {

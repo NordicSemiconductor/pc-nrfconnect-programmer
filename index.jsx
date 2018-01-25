@@ -41,11 +41,16 @@ import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
 import * as targetActions from './lib/actions/targetActions';
+import * as portTargetActions from './lib/actions/portTargetActions';
+import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
 
 import './resources/css/index.less';
 
 export default {
+    config: {
+        selectorType: 'device',
+    },
     onInit: dispatch => {
         document.ondrop = event => {
             event.preventDefault();
@@ -89,13 +94,19 @@ export default {
         const state = store.getState();
         const { dispatch } = store;
         switch (action.type) {
-            case 'SERIAL_PORT_SELECTED': {
-                dispatch(targetActions.loadDeviceInfo(
-                    action.port.serialNumber,
-                ));
+            case 'DEVICE_SELECTED': {
+                if (action.device.product === 'J-Link') {
+                    dispatch(portTargetActions.loadDeviceInfo(
+                        parseInt(action.device.serialNumber, 10),
+                    ));
+                } else if (action.device.product.includes('USB SDFU')) {
+                    dispatch(usbTargetActions.loadDeviceInfo(
+                        action.device.comName,
+                    ));
+                }
                 break;
             }
-            case 'SERIAL_PORT_DESELECTED': {
+            case 'DEVICE_DESELECTED': {
                 logger.info('Target device closed.');
                 break;
             }
@@ -103,11 +114,11 @@ export default {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                dispatch(targetActions.write());
+                dispatch(portTargetActions.write());
                 break;
             }
             case targetActions.RECOVER_START: {
-                dispatch(targetActions.recover());
+                dispatch(portTargetActions.recover());
                 break;
             }
             case targetActions.REFRESH_ALL_FILES_START: {
