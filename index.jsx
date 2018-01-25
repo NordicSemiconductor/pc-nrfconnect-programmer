@@ -40,14 +40,12 @@ import { logger } from 'nrfconnect/core';
 import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
-import PortTargetActions from './lib/actions/portTargetActions';
-import USBTargetActions from './lib/actions/usbTargetActions';
+import * as targetActions from './lib/actions/targetActions';
+import * as portTargetActions from './lib/actions/portTargetActions';
+import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
 
 import './resources/css/index.less';
-
-const portTargetActions = new PortTargetActions();
-const usbTargetActions = new USBTargetActions();
 
 export default {
     config: {
@@ -112,18 +110,18 @@ export default {
                 logger.info('Target device closed.');
                 break;
             }
-            case portTargetActions.WRITE_START: {
+            case targetActions.WRITE_START: {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
                 dispatch(portTargetActions.write());
                 break;
             }
-            case portTargetActions.RECOVER_START: {
+            case targetActions.RECOVER_START: {
                 dispatch(portTargetActions.recover());
                 break;
             }
-            case portTargetActions.REFRESH_ALL_FILES_START: {
+            case targetActions.REFRESH_ALL_FILES_START: {
                 dispatch(fileActions.refreshAllFiles());
                 break;
             }
