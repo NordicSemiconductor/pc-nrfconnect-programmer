@@ -44,6 +44,7 @@ import * as targetActions from './lib/actions/targetActions';
 import * as portTargetActions from './lib/actions/portTargetActions';
 import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
+import { VendorId } from './lib/util/deviceDefinitions';
 
 import './resources/css/index.less';
 
@@ -95,16 +96,12 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
-                if (action.device.product === 'J-Link') {
-                    dispatch(targetActions.targetTypeKnownAction(targetActions.TargetType.PORT));
-                    dispatch(portTargetActions.loadDeviceInfo(
-                        parseInt(action.device.serialNumber, 10),
-                    ));
-                } else if (action.device.product.includes('USB SDFU')) {
-                    dispatch(targetActions.targetTypeKnownAction(targetActions.TargetType.USB));
-                    dispatch(usbTargetActions.loadDeviceInfo(
-                        action.device.comName,
-                    ));
+                if (action.device.vendorId === VendorId.SEGGER) {
+                    dispatch(portTargetActions.loadDeviceInfo(action.device));
+                } else if (action.device.vendorId === VendorId.NORDIC_SEMICONDUCTOR) {
+                    dispatch(usbTargetActions.loadDeviceInfo(action.device));
+                } else {
+                    logger.error('Vender ID is unknown.');
                 }
                 break;
             }
