@@ -92,21 +92,8 @@ class MemoryLayout extends React.Component {
 
         const blocks = [];
         const inlineLabels = [];
-        const labelz = {};
-
         const addressSet = new Set();
-
         const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
-
-        Object.entries(loaded).forEach(([, { labels }]) => {
-            if (labels) {
-                Object.entries(labels).forEach(([label, address]) => {
-                    if (address !== undefined) {
-                        labelz[label] = address;
-                    }
-                });
-            }
-        });
 
         overlaps.forEach((overlap, address) => {
             // Draw a solid block (with one solid colour or more striped colours)
@@ -145,22 +132,6 @@ class MemoryLayout extends React.Component {
                 addressSet.add(address);
                 addressSet.add(address + blockSize);
             }
-        });
-
-        Object.entries(labelz).forEach(([inlineLabelText, inlineLabelAddress]) => {
-            // Draws a horizontal line at the given address, and some text on top
-            // TODO: Allow for text on the bottom
-            inlineLabels.push(
-                <div
-                    className="inline-label"
-                    key={`inline-label-${inlineLabels.length}`}
-                    style={{ bottom: `${(100 * inlineLabelAddress) / max}%` }}
-                >
-                    { inlineLabelText }
-                </div>,
-            );
-
-            addressSet.add(inlineLabelAddress);
         });
 
         regions.forEach(region => {

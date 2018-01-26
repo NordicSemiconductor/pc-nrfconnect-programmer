@@ -96,10 +96,12 @@ export default {
         switch (action.type) {
             case 'DEVICE_SELECTED': {
                 if (action.device.product === 'J-Link') {
+                    dispatch(targetActions.targetTypeKnownAction(targetActions.TargetType.PORT));
                     dispatch(portTargetActions.loadDeviceInfo(
                         parseInt(action.device.serialNumber, 10),
                     ));
                 } else if (action.device.product.includes('USB SDFU')) {
+                    dispatch(targetActions.targetTypeKnownAction(targetActions.TargetType.USB));
                     dispatch(usbTargetActions.loadDeviceInfo(
                         action.device.comName,
                     ));
