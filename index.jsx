@@ -44,7 +44,7 @@ import * as targetActions from './lib/actions/targetActions';
 import * as portTargetActions from './lib/actions/portTargetActions';
 import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
-import { VendorId } from './lib/util/deviceDefinitions';
+import { VendorId } from './lib/util/devices';
 
 import './resources/css/index.less';
 
@@ -101,7 +101,7 @@ export default {
                 } else if (action.device.vendorId === VendorId.NORDIC_SEMICONDUCTOR) {
                     dispatch(usbTargetActions.loadDeviceInfo(action.device));
                 } else {
-                    logger.error('Vender ID is unknown.');
+                    logger.error('Device vender ID is unknown.');
                 }
                 break;
             }
