@@ -97,9 +97,9 @@ export default {
         switch (action.type) {
             case 'DEVICE_SELECTED': {
                 if (action.device.vendorId === VendorId.SEGGER) {
-                    dispatch(portTargetActions.loadDeviceInfo(action.device));
+                    dispatch(portTargetActions.loadDeviceInfo(action.device.serialNumber));
                 } else if (action.device.vendorId === VendorId.NORDIC_SEMICONDUCTOR) {
-                    dispatch(usbTargetActions.loadDeviceInfo(action.device));
+                    dispatch(usbTargetActions.loadDeviceInfo(action.device.comName));
                 } else {
                     logger.error('Device vender ID is unknown.');
                 }
