@@ -39,8 +39,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import { List } from 'immutable';
-
-import MemoryMap from 'nrf-intel-hex';
 import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../util/hexpad';
@@ -84,8 +82,6 @@ class MemoryLayout extends React.Component {
     render() {
         const {
             targetSize: max,
-            memMaps,
-            loaded,
             regions,
             refresh,
         } = this.props;
@@ -93,46 +89,6 @@ class MemoryLayout extends React.Component {
         const blocks = [];
         const inlineLabels = [];
         const addressSet = new Set();
-        const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
-
-        overlaps.forEach((overlap, address) => {
-            // Draw a solid block (with one solid colour or more striped colours)
-            let blockSize = 0;
-            const blockColours = [];
-            let blockBackground = '';
-
-            overlap.forEach(([filename, bytes]) => {
-                blockSize = bytes.length;
-                blockColours.push(loaded[filename].colour);
-            });
-
-            if (address + blockSize > 0x0 && address < max) {
-                if (blockColours.length === 1) {
-                    blockBackground = blockColours[0];
-                } else {
-                    const gradientStops = blockColours.map((colour, i) =>
-                        `${colour} ${i * gradientLength}px, ${colour} ${(i + 1) * gradientLength}px`,
-                    );
-                    blockBackground = `repeating-linear-gradient(45deg, ${
-                        gradientStops.join(',')})`;
-                }
-
-                blocks.push(
-                    <div
-                        key={`block-${blocks.length}`}
-                        className="memory-block"
-                        style={{
-                            height: `${(100 * blockSize) / max}%`,
-                            bottom: `${(100 * address) / max}%`,
-                            background: blockBackground,
-                        }}
-                    />,
-                );
-
-                addressSet.add(address);
-                addressSet.add(address + blockSize);
-            }
-        });
 
         regions.forEach(region => {
             // Draw a solid block (with one solid colour or more striped colours)
@@ -260,12 +216,6 @@ MemoryLayout.defaultProps = {
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
     regions: PropTypes.instanceOf(List),
-    memMaps: PropTypes.arrayOf(
-        PropTypes.arrayOf(
-            PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        ),
-    ).isRequired,
-    loaded: PropTypes.shape({}),
     title: PropTypes.string,
     refresh: PropTypes.func,
 };

@@ -70,8 +70,7 @@ const AppMainView = (
                 </div>
                 <div className="column">
                     <MemoryLayout
-                        loaded={file.loaded}
-                        memMaps={file.memMaps}
+                        regions={file.regions}
                         targetSize={target.romSize}
                         title="Files"
                     />
