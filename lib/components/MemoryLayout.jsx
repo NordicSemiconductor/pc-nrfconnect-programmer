@@ -92,18 +92,18 @@ class MemoryLayout extends React.Component {
 
         regions.forEach(region => {
             // Draw a solid block (with one solid colour or more striped colours)
-            const blockAddress = region.startAddress;
-            const blockSize = region.regionSize;
-            const blockColours = region.colours;
-            let blockBackground = '';
-            if (blockAddress + blockSize > 0x0 && blockAddress < max) {
-                if (blockColours.length === 1) {
-                    blockBackground = blockColours[0];
+            const startAddress = region.startAddress;
+            const regionSize = region.regionSize;
+            const colours = region.colours;
+            let background = '';
+            if (startAddress + regionSize > 0x0 && startAddress < max) {
+                if (colours.length === 1) {
+                    background = colours[0];
                 } else {
-                    const gradientStops = blockColours.map((colour, i) =>
+                    const gradientStops = colours.map((colour, i) =>
                         `${colour} ${i * gradientLength}px, ${colour} ${(i + 1) * gradientLength}px`,
                     );
-                    blockBackground = `repeating-linear-gradient(45deg, ${
+                    background = `repeating-linear-gradient(45deg, ${
                         gradientStops.join(',')})`;
                 }
 
@@ -112,16 +112,16 @@ class MemoryLayout extends React.Component {
                         key={`block-${blocks.length}`}
                         className="memory-block"
                         style={{
-                            height: `${(100 * blockSize) / max}%`,
-                            bottom: `${(100 * blockAddress) / max}%`,
-                            background: blockBackground,
+                            height: `${(100 * regionSize) / max}%`,
+                            bottom: `${(100 * startAddress) / max}%`,
+                            background,
 
                         }}
                     />,
                 );
 
-                addressSet.add(blockAddress);
-                addressSet.add(blockAddress + blockSize);
+                addressSet.add(startAddress);
+                addressSet.add(startAddress + regionSize);
 
                 // Draws a horizontal line at the given address, and some text on top
                 // TODO: Allow for text on the bottom
@@ -130,8 +130,8 @@ class MemoryLayout extends React.Component {
                         className="inline-label"
                         key={`inline-label-${inlineLabels.length}`}
                         style={{
-                            bottom: `${(100 * blockAddress) / max}%`,
-                            paddingBottom: `${(blockSize * 100) / 2 / max}%`,
+                            bottom: `${(100 * startAddress) / max}%`,
+                            paddingBottom: `${(regionSize * 100) / 2 / max}%`,
                         }}
                     >
                         { region.name }
