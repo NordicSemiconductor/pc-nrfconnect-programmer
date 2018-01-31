@@ -96,15 +96,15 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
-                const { vendorId, productId } = action.device;
+                const { vendorId, productId, serialNumber, comName } = action.device;
                 if (
                     vendorId === VendorId.SEGGER && productId === ProductId.SEGGER
                 ) {
-                    dispatch(portTargetActions.loadDeviceInfo(action.device.serialNumber));
+                    dispatch(portTargetActions.loadDeviceInfo(serialNumber));
                 } else if (
                     vendorId === VendorId.NORDIC_SEMICONDUCTOR && USBProductIds.includes(productId)
                 ) {
-                    dispatch(usbTargetActions.loadDeviceInfo(action.device.comName));
+                    dispatch(usbTargetActions.loadDeviceInfo(comName));
                 } else {
                     const vhex = vendorId.toString(16).padStart(4, '0');
                     const phex = productId.toString(16).padStart(4, '0');
