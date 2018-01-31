@@ -121,7 +121,11 @@ export default {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                dispatch(portTargetActions.write());
+                if (state.app.target.targetType === CommunicationType.PORT) {
+                    dispatch(portTargetActions.write());
+                } else if (state.app.target.targetType === CommunicationType.USB) {
+                    dispatch(usbTargetActions.write());
+                }
                 break;
             }
             case targetActions.RECOVER_START: {
