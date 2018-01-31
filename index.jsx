@@ -44,7 +44,7 @@ import * as targetActions from './lib/actions/targetActions';
 import * as portTargetActions from './lib/actions/portTargetActions';
 import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
-import { VendorId } from './lib/util/devices';
+import { VendorId, ProductId, USBProductIds } from './lib/util/devices';
 
 import './resources/css/index.less';
 
@@ -96,12 +96,18 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
-                if (action.device.vendorId === VendorId.SEGGER) {
+                if (
+                    action.device.vendorId === VendorId.SEGGER &&
+                    action.device.productId === ProductId.SEGGER
+                ) {
                     dispatch(portTargetActions.loadDeviceInfo(action.device.serialNumber));
-                } else if (action.device.vendorId === VendorId.NORDIC_SEMICONDUCTOR) {
+                } else if (
+                    action.device.vendorId === VendorId.NORDIC_SEMICONDUCTOR &&
+                    USBProductIds.includes(action.device.productId)
+                ) {
                     dispatch(usbTargetActions.loadDeviceInfo(action.device.comName));
                 } else {
-                    logger.error('Device vender ID is unknown.');
+                    logger.error('Device vendor ID is unknown.');
                 }
                 break;
             }
