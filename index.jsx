@@ -96,18 +96,19 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
+                const { vendorId, productId } = action.device;
                 if (
-                    action.device.vendorId === VendorId.SEGGER &&
-                    action.device.productId === ProductId.SEGGER
+                    vendorId === VendorId.SEGGER && productId === ProductId.SEGGER
                 ) {
                     dispatch(portTargetActions.loadDeviceInfo(action.device.serialNumber));
                 } else if (
-                    action.device.vendorId === VendorId.NORDIC_SEMICONDUCTOR &&
-                    USBProductIds.includes(action.device.productId)
+                    vendorId === VendorId.NORDIC_SEMICONDUCTOR && USBProductIds.includes(productId)
                 ) {
                     dispatch(usbTargetActions.loadDeviceInfo(action.device.comName));
                 } else {
-                    logger.error('Device vendor ID is unknown.');
+                    const vhex = vendorId.toString(16).padStart(4, '0');
+                    const phex = productId.toString(16).padStart(4, '0');
+                    logger.error(`Unsupported device (vendorId: 0x${vhex}, productId: 0x${phex})`);
                 }
                 break;
             }
