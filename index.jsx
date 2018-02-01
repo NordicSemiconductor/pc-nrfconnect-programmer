@@ -95,6 +95,10 @@ export default {
         const state = store.getState();
         const { dispatch } = store;
         switch (action.type) {
+            case 'SERIAL_PORT_SELECTED': {
+                dispatch(portTargetActions.loadDeviceInfo(action.port.serialNumber));
+                break;
+            }
             case 'DEVICE_SELECTED': {
                 const { vendorId, productId, serialNumber, comName } = action.device;
                 if (
@@ -112,6 +116,7 @@ export default {
                 }
                 break;
             }
+            case 'SERIAL_PORT_DESELECTED':
             case 'DEVICE_DESELECTED': {
                 logger.info('Target device closed.');
                 break;
