@@ -44,6 +44,7 @@
     "usb": "^1.4.0"
   },
   "dependencies": {
+    "debug": "^3.1.0",
     "electron-store": "^1.2.0"
   },
   "bundledDependencies": [
