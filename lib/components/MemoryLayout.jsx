@@ -37,14 +37,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
+import { Button, ProgressBar } from 'react-bootstrap';
 import { List } from 'immutable';
 import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../util/hexpad';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
-const gradientLength = 20;
+// const gradientLength = 20;
 
 class MemoryLayout extends React.Component {
 
@@ -90,32 +90,47 @@ class MemoryLayout extends React.Component {
         const inlineLabels = [];
         const addressSet = new Set();
 
-        regions.forEach(region => {
+        let lastAddress = max;
+        regions.sortBy(region => region.startAddress).reverse().forEach(region => {
+            console.log('###################');
+            console.log(region.startAddress.toString(16));
             // Draw a solid block (with one solid colour or more striped colours)
             const startAddress = region.startAddress;
             const regionSize = region.regionSize;
             const colours = region.colours;
+
             let background = '';
+            let overlapped = false;
             if (startAddress + regionSize > 0x0 && startAddress < max) {
                 if (colours.length === 1) {
                     background = colours[0];
                 } else {
-                    const gradientStops = colours.map((colour, i) =>
-                        `${colour} ${i * gradientLength}px, ${colour} ${(i + 1) * gradientLength}px`,
-                    );
-                    background = `repeating-linear-gradient(45deg, ${
-                        gradientStops.join(',')})`;
+                    background = 'black';
+                    overlapped = true;
+                }
+                if (lastAddress > startAddress + regionSize) {
+                    console.log(`block-${startAddress + regionSize + 1}`);
+                    blocks.push(
+                        <ProgressBar
+                            className="progress-bar"
+                            key={`block-${startAddress + regionSize + 1}`}
+                            style={{
+                                height: `${(100 * (lastAddress - (startAddress + regionSize))) / max}%`,
+                                backgroundColor: 'transparent',
+                            }}
+                        />,
+                        );
                 }
 
                 blocks.push(
-                    <div
-                        key={`block-${blocks.length}`}
-                        className="memory-block"
+                    <ProgressBar
+                        className="progress-bar"
+                        key={`block-${startAddress}`}
+                        striped={!overlapped}
+                        active={!overlapped}
                         style={{
                             height: `${(100 * regionSize) / max}%`,
-                            bottom: `${(100 * startAddress) / max}%`,
-                            background,
-
+                            backgroundColor: background,
                         }}
                     />,
                 );
@@ -137,8 +152,22 @@ class MemoryLayout extends React.Component {
                         { region.name }
                     </div>,
                 );
+                lastAddress = startAddress;
             }
         });
+
+        if (lastAddress > 0) {
+            blocks.push(
+                <ProgressBar
+                    className="progress-bar"
+                    key={`block-${0}`}
+                    style={{
+                        height: `${(100 * (lastAddress - 1)) / max}%`,
+                        backgroundColor: 'transparent',
+                    }}
+                />,
+                );
+        }
 
         addressSet.add(max);
         const addresses = Array.from(addressSet);
@@ -161,6 +190,7 @@ class MemoryLayout extends React.Component {
                 y1={svgTotalHeight - labelHeights[i][0]}
                 y2={svgTotalHeight - unclutteredHeights[i][0]}
                 key={addr}
+                stroke="red"
             />
         ));
 
@@ -186,10 +216,13 @@ class MemoryLayout extends React.Component {
                     className="memory-layout-inner"
                     ref={node => { this.node = node; }}
                 >
-                    <div className="block-container">
+                    {/* <div className="block-container">
                         { blocks }
                         { inlineLabels }
-                    </div>
+                    </div> */}
+                    <ProgressBar className="progress-bar-vertical">
+                        { blocks }
+                    </ProgressBar>
                     <svg className="address-lines">
                         { addresslines }
                     </svg>
