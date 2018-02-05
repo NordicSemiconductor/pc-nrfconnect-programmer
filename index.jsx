@@ -45,6 +45,7 @@ import * as portTargetActions from './lib/actions/portTargetActions';
 import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
 import { VendorId, ProductId, USBProductIds } from './lib/util/devices';
+import { hexpad4 } from './lib/util/hexpad';
 
 import './resources/css/index.less';
 
@@ -110,9 +111,7 @@ export default {
                 ) {
                     dispatch(usbTargetActions.loadDeviceInfo(comName));
                 } else {
-                    const vhex = vendorId.toString(16).padStart(4, '0');
-                    const phex = productId.toString(16).padStart(4, '0');
-                    logger.error(`Unsupported device (vendorId: 0x${vhex}, productId: 0x${phex})`);
+                    logger.error(`Unsupported device (vendorId: ${hexpad4(vendorId)}, productId: ${hexpad4(productId)})`);
                 }
                 break;
             }
