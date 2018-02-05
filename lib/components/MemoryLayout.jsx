@@ -103,7 +103,7 @@ class MemoryLayout extends React.Component {
                 if (colours.length === 1) {
                     background = colours[0];
                 } else {
-                    background = 'black';
+                    background = 'transparent';
                     overlapped = true;
                 }
                 if (lastAddress > startAddress + regionSize + 1) {
@@ -124,7 +124,7 @@ class MemoryLayout extends React.Component {
                         className="progress-bar"
                         key={`block-${startAddress}`}
                         striped={!overlapped}
-                        active={!overlapped}
+                        // active={!overlapped}
                         style={{
                             height: `${(100 * regionSize) / max}%`,
                             backgroundColor: background,
