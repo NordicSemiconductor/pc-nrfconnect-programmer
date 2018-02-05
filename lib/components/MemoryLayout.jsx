@@ -92,8 +92,6 @@ class MemoryLayout extends React.Component {
 
         let lastAddress = max;
         regions.sortBy(region => region.startAddress).reverse().forEach(region => {
-            console.log('###################');
-            console.log(region.startAddress.toString(16));
             // Draw a solid block (with one solid colour or more striped colours)
             const startAddress = region.startAddress;
             const regionSize = region.regionSize;
@@ -101,21 +99,20 @@ class MemoryLayout extends React.Component {
 
             let background = '';
             let overlapped = false;
-            if (startAddress + regionSize > 0x0 && startAddress < max) {
+            if (regionSize && startAddress + regionSize > 0x0 && startAddress < max) {
                 if (colours.length === 1) {
                     background = colours[0];
                 } else {
                     background = 'black';
                     overlapped = true;
                 }
-                if (lastAddress > startAddress + regionSize) {
-                    console.log(`block-${startAddress + regionSize + 1}`);
+                if (lastAddress > startAddress + regionSize + 1) {
                     blocks.push(
                         <ProgressBar
                             className="progress-bar"
                             key={`block-${startAddress + regionSize + 1}`}
                             style={{
-                                height: `${(100 * (lastAddress - (startAddress + regionSize))) / max}%`,
+                                height: `${(100 * (lastAddress - (startAddress + regionSize + 1))) / max}%`,
                                 backgroundColor: 'transparent',
                             }}
                         />,
