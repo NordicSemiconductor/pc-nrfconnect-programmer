@@ -44,7 +44,7 @@ import unclutter1d from 'unclutter1d';
 import { hexpad8 } from '../util/hexpad';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
-// const gradientLength = 20;
+const gradientLength = 20;
 
 class MemoryLayout extends React.Component {
 
@@ -96,6 +96,7 @@ class MemoryLayout extends React.Component {
             const startAddress = region.startAddress;
             const regionSize = region.regionSize;
             const colours = region.colours;
+            const regionName = region.name;
 
             let background = '';
             let overlapped = false;
@@ -103,7 +104,11 @@ class MemoryLayout extends React.Component {
                 if (colours.length === 1) {
                     background = colours[0];
                 } else {
-                    background = 'transparent';
+                    const gradientStops = colours.map((colour, i) =>
+                        `${colour} ${i * gradientLength}px, ${colour} ${(i + 1) * gradientLength}px`,
+                    );
+                    background = `repeating-linear-gradient(45deg, ${
+                        gradientStops.join(',')})`;
                     overlapped = true;
                 }
                 if (lastAddress > startAddress + regionSize + 1) {
@@ -123,11 +128,14 @@ class MemoryLayout extends React.Component {
                     <ProgressBar
                         className="progress-bar"
                         key={`block-${startAddress}`}
-                        striped={!overlapped}
-                        // active={!overlapped}
+                        striped={overlapped}
+                        active={overlapped}
+                        label={regionName}
                         style={{
                             height: `${(100 * regionSize) / max}%`,
                             backgroundColor: background,
+                            lineHeight: `${(25 * regionSize) / max}`,
+                            color: 'blueviolet',
                         }}
                     />,
                 );
