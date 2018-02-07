@@ -86,8 +86,8 @@ const FileWarnings = (memMaps, targetSize) => {
 };
 
 const TargetWarnings = targetWarningStrings => (
-    targetWarningStrings.map(s => (
-        <div className="alert alert-warning" key="outside-flash-warning">
+    targetWarningStrings.map((s, index) => (
+        <div className="alert alert-warning" key={`outside-flash-warning-${index + 1}`}>
             <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
             <center><p><strong>Caution!</strong></p></center>
             <p>{s}</p>
