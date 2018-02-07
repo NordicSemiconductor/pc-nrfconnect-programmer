@@ -91,7 +91,7 @@ class MemoryLayout extends React.Component {
         const addressSet = new Set();
 
         let lastAddress = max;
-        regions.sortBy(region => region.startAddress).reverse().forEach(region => {
+        regions.sortBy(r => r.startAddress).reverse().forEach(region => {
             // Draw a solid block (with one solid colour or more striped colours)
             const startAddress = region.startAddress;
             const regionSize = region.regionSize;
