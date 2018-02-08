@@ -36,7 +36,7 @@
     "babel-loader": "^7.1.2",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "immutable": "^3.8.2",
-    "nrf-intel-hex": "git+https://github.com/NordicSemiconductor/nrf-intel-hex",
+    "nrf-intel-hex": "^1.2.0",
     "pc-nrf-dfu-js": "^0.1.0",
     "pc-nrfconnect-devdep": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#v1.1.2",
     "protobufjs": "^6.8.4",
