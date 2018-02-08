@@ -50,19 +50,10 @@ const AppMainView = (
                 </div>
             );
         } else if (target.serialNumber && target.isReady) {
-            const targetDevice = {
-                filename: 'targetDevice',
-                fileError: file.fileError,
-                colour: '#C0C0C0',
-                writtenAddress: 0,
-                labels: target.labels,
-                regions: target.regions,
-            };
             targetMap = (
                 <MemoryLayout
-                    loaded={{ targetDevice }}
-                    memMaps={[['targetDevice', target.memMap]]}
-                    targetSize={target.size}
+                    regions={target.regions}
+                    targetSize={target.romSize}
                     title="nRF 5x"
                     refresh={refreshTargetContents}
                 />
@@ -79,9 +70,8 @@ const AppMainView = (
                 </div>
                 <div className="column">
                     <MemoryLayout
-                        loaded={file.loaded}
-                        memMaps={file.memMaps}
-                        targetSize={target.size}
+                        regions={file.regions}
+                        targetSize={target.romSize}
                         title="Files"
                     />
                 </div>

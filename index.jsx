@@ -41,11 +41,18 @@ import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
 import * as targetActions from './lib/actions/targetActions';
+import * as portTargetActions from './lib/actions/portTargetActions';
+import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
+import { VendorId, ProductId, USBProductIds } from './lib/util/devices';
+import { hexpad4 } from './lib/util/hexpad';
 
 import './resources/css/index.less';
 
 export default {
+    config: {
+        selectorType: 'device',
+    },
     onInit: dispatch => {
         document.ondrop = event => {
             event.preventDefault();
@@ -90,12 +97,26 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'SERIAL_PORT_SELECTED': {
-                dispatch(targetActions.loadDeviceInfo(
-                    action.port.serialNumber,
-                ));
+                dispatch(portTargetActions.loadDeviceInfo(action.port.serialNumber));
                 break;
             }
-            case 'SERIAL_PORT_DESELECTED': {
+            case 'DEVICE_SELECTED': {
+                const { vendorId, productId, serialNumber, comName } = action.device;
+                if (
+                    vendorId === VendorId.SEGGER && productId === ProductId.SEGGER
+                ) {
+                    dispatch(portTargetActions.loadDeviceInfo(serialNumber));
+                } else if (
+                    vendorId === VendorId.NORDIC_SEMICONDUCTOR && USBProductIds.includes(productId)
+                ) {
+                    dispatch(usbTargetActions.loadDeviceInfo(comName));
+                } else {
+                    logger.error(`Unsupported device (vendorId: ${hexpad4(vendorId)}, productId: ${hexpad4(productId)})`);
+                }
+                break;
+            }
+            case 'SERIAL_PORT_DESELECTED':
+            case 'DEVICE_DESELECTED': {
                 logger.info('Target device closed.');
                 break;
             }
@@ -103,11 +124,11 @@ export default {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                dispatch(targetActions.write());
+                dispatch(portTargetActions.write());
                 break;
             }
             case targetActions.RECOVER_START: {
-                dispatch(targetActions.recover());
+                dispatch(portTargetActions.recover());
                 break;
             }
             case targetActions.REFRESH_ALL_FILES_START: {

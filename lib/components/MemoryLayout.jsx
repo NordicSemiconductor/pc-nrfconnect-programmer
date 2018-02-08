@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -37,11 +38,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
-
-import MemoryMap from 'nrf-intel-hex';
+import { List } from 'immutable';
 import unclutter1d from 'unclutter1d';
 
-import { hexpad8 } from '../hexpad';
+import { hexpad8 } from '../util/hexpad';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
 const gradientLength = 20;
@@ -82,48 +82,28 @@ class MemoryLayout extends React.Component {
     render() {
         const {
             targetSize: max,
-            memMaps,
-            loaded,
+            regions,
             refresh,
         } = this.props;
 
         const blocks = [];
         const inlineLabels = [];
-        const labelz = {};
-
         const addressSet = new Set();
 
-        const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
-
-        Object.entries(loaded).forEach(([, { labels }]) => {
-            if (labels) {
-                Object.entries(labels).forEach(([label, address]) => {
-                    if (address !== undefined) {
-                        labelz[label] = address;
-                    }
-                });
-            }
-        });
-
-        overlaps.forEach((overlap, address) => {
+        regions.forEach(region => {
             // Draw a solid block (with one solid colour or more striped colours)
-            let blockSize = 0;
-            const blockColours = [];
-            let blockBackground = '';
-
-            overlap.forEach(([filename, bytes]) => {
-                blockSize = bytes.length;
-                blockColours.push(loaded[filename].colour);
-            });
-
-            if (address + blockSize > 0x0 && address < max) {
-                if (blockColours.length === 1) {
-                    blockBackground = blockColours[0];
+            const startAddress = region.startAddress;
+            const regionSize = region.regionSize;
+            const colours = region.colours;
+            let background = '';
+            if (startAddress + regionSize > 0x0 && startAddress < max) {
+                if (colours.length === 1) {
+                    background = colours[0];
                 } else {
-                    const gradientStops = blockColours.map((colour, i) =>
+                    const gradientStops = colours.map((colour, i) =>
                         `${colour} ${i * gradientLength}px, ${colour} ${(i + 1) * gradientLength}px`,
                     );
-                    blockBackground = `repeating-linear-gradient(45deg, ${
+                    background = `repeating-linear-gradient(45deg, ${
                         gradientStops.join(',')})`;
                 }
 
@@ -132,32 +112,32 @@ class MemoryLayout extends React.Component {
                         key={`block-${blocks.length}`}
                         className="memory-block"
                         style={{
-                            height: `${(100 * blockSize) / max}%`,
-                            bottom: `${(100 * address) / max}%`,
-                            background: blockBackground,
+                            height: `${(100 * regionSize) / max}%`,
+                            bottom: `${(100 * startAddress) / max}%`,
+                            background,
+
                         }}
                     />,
                 );
 
-                addressSet.add(address);
-                addressSet.add(address + blockSize);
+                addressSet.add(startAddress);
+                addressSet.add(startAddress + regionSize);
+
+                // Draws a horizontal line at the given address, and some text on top
+                // TODO: Allow for text on the bottom
+                inlineLabels.push(
+                    <div
+                        className="inline-label"
+                        key={`inline-label-${inlineLabels.length}`}
+                        style={{
+                            bottom: `${(100 * startAddress) / max}%`,
+                            paddingBottom: `${(regionSize * 100) / 2 / max}%`,
+                        }}
+                    >
+                        { region.name }
+                    </div>,
+                );
             }
-        });
-
-        Object.entries(labelz).forEach(([inlineLabelText, inlineLabelAddress]) => {
-            // Draws a horizontal line at the given address, and some text on top
-            // TODO: Allow for text on the bottom
-            inlineLabels.push(
-                <div
-                    className="inline-label"
-                    key={`inline-label-${inlineLabels.length}`}
-                    style={{ bottom: `${(100 * inlineLabelAddress) / max}%` }}
-                >
-                    { inlineLabelText }
-                </div>,
-            );
-
-            addressSet.add(inlineLabelAddress);
         });
 
         addressSet.add(max);
@@ -225,6 +205,7 @@ class MemoryLayout extends React.Component {
 
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
+    regions: new List(),
     memMaps: [],
     loaded: {},
     title: '',
@@ -234,15 +215,11 @@ MemoryLayout.defaultProps = {
 
 MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
-    memMaps: PropTypes.arrayOf(
-        PropTypes.arrayOf(
-            PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        ),
-    ).isRequired,
-    loaded: PropTypes.shape({}),
+    regions: PropTypes.instanceOf(List),
     title: PropTypes.string,
     refresh: PropTypes.func,
 };
 
 
 export default MemoryLayout;
+
