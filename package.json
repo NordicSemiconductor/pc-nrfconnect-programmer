@@ -44,8 +44,7 @@
     "usb": "^1.4.0"
   },
   "dependencies": {
-    "electron-store": "^1.2.0",
-    "serialport": "^6.0.5"
+    "electron-store": "^1.2.0"
   },
   "bundledDependencies": [
     "electron-store"
