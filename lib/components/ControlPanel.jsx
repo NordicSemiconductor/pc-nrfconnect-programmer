@@ -121,6 +121,7 @@ const ControlPanel = props => {
         refreshAllFiles,
         targetIsReady,
         targetIsWritable,
+        targetIsRecoverable,
         targetWarningStrings,
         removeFile,
         autoRead,
@@ -151,6 +152,8 @@ const ControlPanel = props => {
                     <Glyphicon glyph="minus-sign" />Clear files
                 </Button>
 
+                <hr style={{ borderColor: 'transparent' }} />
+
                 <Button
                     onClick={performWrite}
                     disabled={!targetIsReady || !targetIsWritable}
@@ -158,7 +161,7 @@ const ControlPanel = props => {
                     <Glyphicon glyph="save" />Write all to devkit
                 </Button>
 
-                <Button onClick={performRecover} disabled={!targetIsReady}>
+                <Button onClick={performRecover} disabled={!targetIsReady} style={{ display: targetIsRecoverable ? 'block' : 'none' }}>
                     <Glyphicon glyph="remove-sign" />Recover (full erase)
                 </Button>
 
@@ -201,6 +204,7 @@ ControlPanel.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
+    targetIsRecoverable: PropTypes.bool.isRequired,
     targetWarningStrings: PropTypes.objectOf(List).isRequired,
     removeFile: PropTypes.func.isRequired,
     autoRead: PropTypes.bool.isRequired,
