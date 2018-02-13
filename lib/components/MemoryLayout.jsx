@@ -222,10 +222,6 @@ class MemoryLayout extends React.Component {
                     className="memory-layout-inner"
                     ref={node => { this.node = node; }}
                 >
-                    {/* <div className="block-container">
-                        { blocks }
-                        { inlineLabels }
-                    </div> */}
                     <ProgressBar className="progress-bar-vertical">
                         { blocks }
                     </ProgressBar>
