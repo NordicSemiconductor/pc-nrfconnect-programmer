@@ -112,7 +112,7 @@ class MemoryLayout extends React.Component {
                         gradientStops.join(',')})`;
                     overlapped = true;
                 }
-                if (lastAddress > startAddress + regionSize + 1) {
+                if (lastAddress > startAddress + regionSize) {
                     blocks.push(
                         <ProgressBar
                             className="progress-bar"
@@ -158,6 +158,7 @@ class MemoryLayout extends React.Component {
                         { region.name }
                     </div>,
                 );
+
                 lastAddress = startAddress;
             }
         });
