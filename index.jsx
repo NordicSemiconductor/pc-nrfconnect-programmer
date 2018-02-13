@@ -44,7 +44,7 @@ import * as targetActions from './lib/actions/targetActions';
 import * as portTargetActions from './lib/actions/portTargetActions';
 import * as usbTargetActions from './lib/actions/usbTargetActions';
 import appReducer from './lib/reducers';
-import { VendorId, ProductId, USBProductIds } from './lib/util/devices';
+import { VendorId, USBProductIds, JlinkProductIds } from './lib/util/devices';
 import { hexpad4 } from './lib/util/hexpad';
 
 import './resources/css/index.less';
@@ -102,13 +102,10 @@ export default {
             }
             case 'DEVICE_SELECTED': {
                 const { vendorId, productId, serialNumber, comName } = action.device;
-                if (
-                    vendorId === VendorId.SEGGER && productId === ProductId.SEGGER
-                ) {
+                if (vendorId === VendorId.SEGGER && JlinkProductIds.includes(productId)) {
                     dispatch(portTargetActions.loadDeviceInfo(serialNumber));
-                } else if (
-                    vendorId === VendorId.NORDIC_SEMICONDUCTOR && USBProductIds.includes(productId)
-                ) {
+                } else if (vendorId === VendorId.NORDIC_SEMICONDUCTOR &&
+                           USBProductIds.includes(productId)) {
                     dispatch(usbTargetActions.loadDeviceInfo(comName));
                 } else {
                     logger.error(`Unsupported device (vendorId: ${hexpad4(vendorId)}, productId: ${hexpad4(productId)})`);
