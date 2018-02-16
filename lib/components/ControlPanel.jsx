@@ -51,7 +51,7 @@ const FileWarnings = (memMaps, targetSize) => {
     overlaps.forEach((overlap, startAddress) => {
         if (overlap.length > 1) {
             overlapWarning = (
-                <div className="alert alert-warning" key={`overlap=warning-${startAddress + 1}`}>
+                <div className="alert alert-warning" key={`overlap-warning-${startAddress + 1}`}>
                     <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
                     <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
                     <p>In regions with overlapping data, data from the file which
@@ -161,7 +161,10 @@ const ControlPanel = props => {
                     <Glyphicon glyph="save" />Write all to devkit
                 </Button>
 
-                <Button onClick={performRecover} disabled={!targetIsReady} style={{ display: targetIsRecoverable ? 'block' : 'none' }}>
+                <Button
+                    onClick={performRecover}
+                    disabled={!targetIsReady || !targetIsRecoverable}
+                >
                     <Glyphicon glyph="remove-sign" />Recover (full erase)
                 </Button>
 
