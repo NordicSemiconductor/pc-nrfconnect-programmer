@@ -37,7 +37,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
+import { Button, ProgressBar } from 'react-bootstrap';
 import { List } from 'immutable';
 import unclutter1d from 'unclutter1d';
 
@@ -90,13 +90,18 @@ class MemoryLayout extends React.Component {
         const inlineLabels = [];
         const addressSet = new Set();
 
-        regions.forEach(region => {
+        let lastAddress = max;
+        // Regions have to be sorted desc
+        regions.sortBy(r => r.startAddress).reverse().forEach(region => {
             // Draw a solid block (with one solid colour or more striped colours)
             const startAddress = region.startAddress;
             const regionSize = region.regionSize;
             const colours = region.colours;
+            const regionName = region.name;
+
             let background = '';
-            if (startAddress + regionSize > 0x0 && startAddress < max) {
+            let overlapped = false;
+            if (regionSize && startAddress + regionSize > 0x0 && startAddress < max) {
                 if (colours.length === 1) {
                     background = colours[0];
                 } else {
@@ -105,17 +110,33 @@ class MemoryLayout extends React.Component {
                     );
                     background = `repeating-linear-gradient(45deg, ${
                         gradientStops.join(',')})`;
+                    overlapped = true;
+                }
+                if (lastAddress > startAddress + regionSize) {
+                    blocks.push(
+                        <ProgressBar
+                            className="progress-bar"
+                            key={`block-${startAddress + regionSize + 1}`}
+                            style={{
+                                height: `${(100 * (lastAddress - (startAddress + regionSize + 1))) / max}%`,
+                                backgroundColor: 'transparent',
+                            }}
+                        />,
+                        );
                 }
 
                 blocks.push(
-                    <div
-                        key={`block-${blocks.length}`}
-                        className="memory-block"
+                    <ProgressBar
+                        className="progress-bar"
+                        key={`block-${startAddress}`}
+                        striped={overlapped}
+                        active={overlapped}
+                        label={regionName}
                         style={{
                             height: `${(100 * regionSize) / max}%`,
-                            bottom: `${(100 * startAddress) / max}%`,
-                            background,
-
+                            backgroundColor: background,
+                            lineHeight: `${(25 * regionSize) / max}`,
+                            color: 'blueviolet',
                         }}
                     />,
                 );
@@ -137,8 +158,23 @@ class MemoryLayout extends React.Component {
                         { region.name }
                     </div>,
                 );
+
+                lastAddress = startAddress;
             }
         });
+
+        if (lastAddress > 0) {
+            blocks.push(
+                <ProgressBar
+                    className="progress-bar"
+                    key={`block-${0}`}
+                    style={{
+                        height: `${(100 * (lastAddress - 1)) / max}%`,
+                        backgroundColor: 'transparent',
+                    }}
+                />,
+                );
+        }
 
         addressSet.add(max);
         const addresses = Array.from(addressSet);
@@ -161,6 +197,7 @@ class MemoryLayout extends React.Component {
                 y1={svgTotalHeight - labelHeights[i][0]}
                 y2={svgTotalHeight - unclutteredHeights[i][0]}
                 key={addr}
+                stroke="red"
             />
         ));
 
@@ -186,10 +223,9 @@ class MemoryLayout extends React.Component {
                     className="memory-layout-inner"
                     ref={node => { this.node = node; }}
                 >
-                    <div className="block-container">
+                    <ProgressBar className="progress-bar-vertical">
                         { blocks }
-                        { inlineLabels }
-                    </div>
+                    </ProgressBar>
                     <svg className="address-lines">
                         { addresslines }
                     </svg>

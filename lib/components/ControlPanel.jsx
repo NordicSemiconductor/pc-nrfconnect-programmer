@@ -37,31 +37,13 @@
 import React from 'react';
 import { Accordion, Button, Checkbox, Dropdown, Glyphicon, MenuItem, Panel } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { List } from 'immutable';
 import MemoryMap from 'nrf-intel-hex';
 
 import FileLegend from './FileLegend';
 import { hexpad8 } from '../util/hexpad';
 
-const ControlPanel = props => {
-    const {
-        targetSize,
-        closeFiles,
-        onToggleFileList,
-        openFileDialog,
-        openFile,
-        performWrite,
-        performRecover,
-        mruFiles,
-        loaded,
-        memMaps,
-        refreshAllFiles,
-        targetIsReady,
-        targetIsWritable,
-        removeFile,
-        autoRead,
-        toggleAutoRead,
-    } = props;
-
+const FileWarnings = (memMaps, targetSize) => {
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
     let overlapWarning = '';
@@ -69,7 +51,7 @@ const ControlPanel = props => {
     overlaps.forEach((overlap, startAddress) => {
         if (overlap.length > 1) {
             overlapWarning = (
-                <div className="alert alert-warning">
+                <div className="alert alert-warning" key={`overlap-warning-${startAddress + 1}`}>
                     <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
                     <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
                     <p>In regions with overlapping data, data from the file which
@@ -89,7 +71,7 @@ const ControlPanel = props => {
     let outsideFlashWarning;
     if (outsideFlashBlocks.length) {
         outsideFlashWarning = (
-            <div className="alert alert-warning">
+            <div className="alert alert-warning" key="outside-flash-warning">
                 <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
                 <p><strong>Caution!</strong> There is data outside the
                     user-writable areas ({ outsideFlashBlocks.join(', ') }).</p>
@@ -97,10 +79,23 @@ const ControlPanel = props => {
             </div>
         );
     }
+    return [
+        overlapWarning,
+        outsideFlashWarning,
+    ];
+};
 
+const TargetWarnings = targetWarningStrings => (
+    targetWarningStrings.map((s, index) => (
+        <div className="alert alert-warning" key={`outside-flash-warning-${index + 1}`}>
+            <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
+            <center><p><strong>Caution!</strong></p></center>
+            <p>{s}</p>
+        </div>
+    )));
 
+const MruMenuItems = (mruFiles, openFile) => {
     let mruMenuItems;
-
     if (mruFiles.length) {
         mruMenuItems = mruFiles.map(filePath => (
             <MenuItem key={filePath} onSelect={() => openFile(filePath)}>{filePath}</MenuItem>
@@ -108,6 +103,34 @@ const ControlPanel = props => {
     } else {
         mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
     }
+    return mruMenuItems;
+};
+
+const ControlPanel = props => {
+    const {
+        targetSize,
+        closeFiles,
+        onToggleFileList,
+        openFileDialog,
+        openFile,
+        performWrite,
+        performRecover,
+        mruFiles,
+        loaded,
+        memMaps,
+        refreshAllFiles,
+        targetIsReady,
+        targetIsWritable,
+        targetIsRecoverable,
+        targetWarningStrings,
+        removeFile,
+        autoRead,
+        toggleAutoRead,
+    } = props;
+
+    const fileWarnings = FileWarnings(memMaps, targetSize);
+    const targetWarnings = TargetWarnings(targetWarningStrings);
+    const mruMenuItems = MruMenuItems(mruFiles, openFile);
 
     return (
         <div className="control-panel">
@@ -129,6 +152,8 @@ const ControlPanel = props => {
                     <Glyphicon glyph="minus-sign" />Clear files
                 </Button>
 
+                <hr style={{ borderColor: 'transparent' }} />
+
                 <Button
                     onClick={performWrite}
                     disabled={!targetIsReady || !targetIsWritable}
@@ -136,14 +161,17 @@ const ControlPanel = props => {
                     <Glyphicon glyph="save" />Write all to devkit
                 </Button>
 
-                <Button onClick={performRecover} disabled={!targetIsReady}>
+                <Button
+                    onClick={performRecover}
+                    disabled={!targetIsReady || !targetIsRecoverable}
+                >
                     <Glyphicon glyph="remove-sign" />Recover (full erase)
                 </Button>
 
                 <FileLegend files={loaded} remove={removeFile} />
 
-                { overlapWarning }
-                { outsideFlashWarning }
+                { fileWarnings }
+                { targetWarnings }
             </div>
 
             <Accordion defaultActiveKey="1">
@@ -179,6 +207,8 @@ ControlPanel.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
+    targetIsRecoverable: PropTypes.bool.isRequired,
+    targetWarningStrings: PropTypes.objectOf(List).isRequired,
     removeFile: PropTypes.func.isRequired,
     autoRead: PropTypes.bool.isRequired,
     toggleAutoRead: PropTypes.func.isRequired,

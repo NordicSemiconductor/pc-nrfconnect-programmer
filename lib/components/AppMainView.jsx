@@ -53,7 +53,7 @@ const AppMainView = (
             targetMap = (
                 <MemoryLayout
                     regions={target.regions}
-                    targetSize={target.romSize}
+                    targetSize={target.deviceInfo.romSize}
                     title="nRF 5x"
                     refresh={refreshTargetContents}
                 />
@@ -71,7 +71,7 @@ const AppMainView = (
                 <div className="column">
                     <MemoryLayout
                         regions={file.regions}
-                        targetSize={target.romSize}
+                        targetSize={target.deviceInfo.romSize}
                         title="Files"
                     />
                 </div>

@@ -1,7 +1,7 @@
 node_modules/
-.idea/
 dist/
 jest.json
-.vscode/
 package-lock.json
+.idea/
+.vscode/
 .DS_Store
