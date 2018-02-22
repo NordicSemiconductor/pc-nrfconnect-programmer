@@ -1,55 +1,33 @@
-# nRF Connect boilerplate app
+# nRF Connect Programmer
 
-This project provides a starting point for developing apps that can be launched by [nRF Connect](https://github.com/NordicSemiconductor/pc-nrfconnect-core). See the [app creation documentation](https://github.com/NordicSemiconductor/pc-nrfconnect-core#creating-apps) for more information about apps and the available API.
+App for [nRF Connect](https://github.com/NordicSemiconductor/pc-nrfconnect-core) that provides a simple GUI for programming of Nordic Semiconductor devkits/dongles.
 
-This boilerplate provides:
+## Building from source
 
-- an empty implementation of all functions in the API (index.jsx)
-- build tools (babel/webpack/eslint)
-- basic styling (less)
-- unit testing (jest)
+### Dependencies
 
-## Quick start
+To build the app you will need to install the following tools:
 
-1. Create the `.nrfconnect-apps/local` directory if it does not already exist:
+* Node.js (>=6.9)
+* npm (>=5.6.0) / yarn (>=1.4.0)
 
-    * Linux/macOS: `mkdir -p $HOME/.nrfconnect-apps/local`
-    * Windows: `md "%USERPROFILE%\.nrfconnect-apps\local"`
+### Clone the repository
 
-2. Clone this project under the `local` directory. In a terminal on Linux/macOS or Git bash on Windows:
+Open a terminal, go to the following directory, and clone the repository:
 
-        cd $HOME/.nrfconnect-apps/local
-        git clone https://github.com/NordicSemiconductor/pc-nrfconnect-boilerplate.git pc-nrfconnect-myapp
-        cd pc-nrfconnect-myapp
-        rm -rf .git
+- Linux/macOS: `cd $HOME/.nrfconnect-apps/local`
+- Windows: `cd %USERPROFILE%/.nrfconnect-apps/local`
 
-    Alternatively, if you do not want to use Git, you could download the the current master branch as a [zip file](https://github.com/NordicSemiconductor/pc-nrfconnect-boilerplate/archive/master.zip) and extract it under `.nrfconnect-apps/local/pc-nrfconnect-myapp`.
+Alternatively, clone the repository in a different directory and symlink it into `.nrfconnect-apps/local`.
 
-3. Modify relevant properties in `package.json`. At least consider changing:
+### Building
 
-    * name
-    * displayName
-    * version
-    * author
-    * license
-    * repository.url
+After cloning the repository, install the required dependencies:
 
-4. Install dependencies:
+    npm install
 
-        npm install
+Then build the app:
 
-5. Build the project in development mode:
+    npm run dev
 
-        npm run dev
-
-    This will keep running and watch for changes (Ctrl+C to stop). Alternatively, to build just once in production mode, run `npm run build`.
-
-6. Run unit tests:
-
-        npm run test-watch
-
-    This will keep running and watch for changes (Ctrl+C to stop). Alternatively, to run tests just once, run `npm test`.
-
-7. Start nRF Connect and verify that your app appears in the *Launch app* screen. If the build was successful, you should be able to launch it. Chrome Developer Tools can be opened by pressing Ctrl+Alt+I (Windows/Linux) or Cmd+Option+I (macOS). 
-
-8. Add your own implementation in `index.jsx` to adjust the behavior of the app.
+If everything was successful, you should now be able to launch the app in nRF Connect.
