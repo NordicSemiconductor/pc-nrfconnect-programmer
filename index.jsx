@@ -51,7 +51,7 @@ import './resources/css/index.less';
 
 export default {
     config: {
-        selectorType: 'device',
+        selectorType: 'serialport',
     },
     onInit: dispatch => {
         document.ondrop = event => {
