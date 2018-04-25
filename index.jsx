@@ -51,7 +51,14 @@ import './resources/css/index.less';
 
 export default {
     config: {
-        selectorType: 'serialport',
+        selectorTraits: {
+            nordicUsb: true,
+            serialport: true,
+            jlink: true,
+        },
+        deviceSetup: {
+            needSerialport: true,
+        },
     },
     onInit: dispatch => {
         document.ondrop = event => {
@@ -96,23 +103,21 @@ export default {
         const state = store.getState();
         const { dispatch } = store;
         switch (action.type) {
-            case 'SERIAL_PORT_SELECTED': {
-                dispatch(portTargetActions.loadDeviceInfo(action.port.serialNumber));
-                break;
-            }
             case 'DEVICE_SELECTED': {
-                const { vendorId, productId, serialNumber, comName } = action.device;
-                if (vendorId === VendorId.SEGGER && JlinkProductIds.includes(productId)) {
+                const { serialNumber } = action.device;
+                const { vendorId, productId, comName } = action.device.serialport;
+                const vid = parseInt(vendorId.toString(16), 16);
+                const pid = parseInt(productId.toString(16), 16);
+                if (vid === VendorId.SEGGER && JlinkProductIds.includes(pid)) {
                     dispatch(portTargetActions.loadDeviceInfo(serialNumber));
-                } else if (vendorId === VendorId.NORDIC_SEMICONDUCTOR &&
-                           USBProductIds.includes(productId)) {
+                } else if (vid === VendorId.NORDIC_SEMICONDUCTOR &&
+                           USBProductIds.includes(pid)) {
                     dispatch(usbTargetActions.loadDeviceInfo(comName));
                 } else {
-                    logger.error(`Unsupported device (vendorId: ${hexpad4(vendorId)}, productId: ${hexpad4(productId)})`);
+                    logger.error(`Unsupported device (vendorId: ${hexpad4(vid)}, productId: ${hexpad4(pid)})`);
                 }
                 break;
             }
-            case 'SERIAL_PORT_DESELECTED':
             case 'DEVICE_DESELECTED': {
                 logger.info('Target device closed.');
                 break;
