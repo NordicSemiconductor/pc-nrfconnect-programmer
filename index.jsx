@@ -105,20 +105,24 @@ export default {
         switch (action.type) {
             case 'DEVICE_SELECTED': {
                 const { serialNumber } = action.device;
-                const { vendorId, productId, comName } = action.device.serialport;
+                const { vendorId, productId } = action.device.serialport;
                 const vid = parseInt(vendorId.toString(16), 16);
                 const pid = parseInt(productId.toString(16), 16);
                 if (vid === VendorId.SEGGER && JlinkProductIds.includes(pid)) {
                     dispatch(portTargetActions.loadDeviceInfo(serialNumber));
                 } else if (vid === VendorId.NORDIC_SEMICONDUCTOR &&
                            USBProductIds.includes(pid)) {
-                    dispatch(usbTargetActions.loadDeviceInfo(comName));
+                    dispatch(usbTargetActions.openDevice(action.device));
                 } else {
                     logger.error(`Unsupported device (vendorId: ${hexpad4(vid)}, productId: ${hexpad4(pid)})`);
                 }
                 break;
             }
             case 'DEVICE_DESELECTED': {
+                if (state.app.deviceChange.predictedSerialNumber) {
+                    logger.info(`Waiting for device ${state.app.deviceChange.predictedSerialNumber} to reattach`);
+                    return;
+                }
                 logger.info('Target device closed.');
                 break;
             }
