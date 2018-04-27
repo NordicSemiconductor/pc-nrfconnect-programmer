@@ -119,8 +119,8 @@ export default {
                 break;
             }
             case 'DEVICE_DESELECTED': {
-                if (state.app.deviceChange.predictedSerialNumber) {
-                    logger.info(`Waiting for device ${state.app.deviceChange.predictedSerialNumber} to reattach`);
+                if (state.app.deviceChange.expectedSerialNumber) {
+                    logger.info(`Waiting for device ${state.app.deviceChange.expectedSerialNumber} to reattach`);
                     return;
                 }
                 logger.info('Target device closed.');
