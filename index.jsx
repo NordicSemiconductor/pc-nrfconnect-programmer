@@ -41,8 +41,8 @@ import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
 import * as targetActions from './lib/actions/targetActions';
-import * as portTargetActions from './lib/actions/portTargetActions';
-import * as usbTargetActions from './lib/actions/usbTargetActions';
+import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
+import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
 import { VendorId, USBProductIds, JlinkProductIds, CommunicationType } from './lib/util/devices';
 import { hexpad4 } from './lib/util/hexpad';
@@ -109,10 +109,10 @@ export default {
                 const vid = parseInt(vendorId.toString(16), 16);
                 const pid = parseInt(productId.toString(16), 16);
                 if (vid === VendorId.SEGGER && JlinkProductIds.includes(pid)) {
-                    dispatch(portTargetActions.loadDeviceInfo(serialNumber));
+                    dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
                 } else if (vid === VendorId.NORDIC_SEMICONDUCTOR &&
                            USBProductIds.includes(pid)) {
-                    dispatch(usbTargetActions.openDevice(action.device));
+                    dispatch(usbsdfuTargetActions.openDevice(action.device));
                 } else {
                     logger.error(`Unsupported device (vendorId: ${hexpad4(vid)}, productId: ${hexpad4(pid)})`);
                 }
@@ -130,15 +130,15 @@ export default {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                if (state.app.target.targetType === CommunicationType.PORT) {
-                    dispatch(portTargetActions.write());
-                } else if (state.app.target.targetType === CommunicationType.USB) {
-                    dispatch(usbTargetActions.write());
+                if (state.app.target.targetType === CommunicationType.JLINK) {
+                    dispatch(jlinkTargetActions.write());
+                } else if (state.app.target.targetType === CommunicationType.USBSDFU) {
+                    dispatch(usbsdfuTargetActions.write());
                 }
                 break;
             }
             case targetActions.RECOVER_START: {
-                dispatch(portTargetActions.recover());
+                dispatch(jlinkTargetActions.recover());
                 break;
             }
             case targetActions.REFRESH_ALL_FILES_START: {
