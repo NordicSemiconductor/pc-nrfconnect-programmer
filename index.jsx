@@ -41,8 +41,8 @@ import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
 import * as targetActions from './lib/actions/targetActions';
-import * as portTargetActions from './lib/actions/portTargetActions';
-import * as usbTargetActions from './lib/actions/usbTargetActions';
+import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
+import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
 import { VendorId, USBProductIds, JlinkProductIds, CommunicationType } from './lib/util/devices';
 import { hexpad4 } from './lib/util/hexpad';
@@ -51,7 +51,14 @@ import './resources/css/index.less';
 
 export default {
     config: {
-        selectorType: 'serialport',
+        selectorTraits: {
+            nordicUsb: true,
+            serialport: true,
+            jlink: true,
+        },
+        deviceSetup: {
+            needSerialport: true,
+        },
     },
     onInit: dispatch => {
         document.ondrop = event => {
@@ -96,24 +103,26 @@ export default {
         const state = store.getState();
         const { dispatch } = store;
         switch (action.type) {
-            case 'SERIAL_PORT_SELECTED': {
-                dispatch(portTargetActions.loadDeviceInfo(action.port.serialNumber));
-                break;
-            }
             case 'DEVICE_SELECTED': {
-                const { vendorId, productId, serialNumber, comName } = action.device;
-                if (vendorId === VendorId.SEGGER && JlinkProductIds.includes(productId)) {
-                    dispatch(portTargetActions.loadDeviceInfo(serialNumber));
-                } else if (vendorId === VendorId.NORDIC_SEMICONDUCTOR &&
-                           USBProductIds.includes(productId)) {
-                    dispatch(usbTargetActions.loadDeviceInfo(comName));
+                const { serialNumber } = action.device;
+                const { vendorId, productId } = action.device.serialport;
+                const vid = parseInt(vendorId.toString(16), 16);
+                const pid = parseInt(productId.toString(16), 16);
+                if (vid === VendorId.SEGGER && JlinkProductIds.includes(pid)) {
+                    dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
+                } else if (vid === VendorId.NORDIC_SEMICONDUCTOR &&
+                           USBProductIds.includes(pid)) {
+                    dispatch(usbsdfuTargetActions.openDevice(action.device));
                 } else {
-                    logger.error(`Unsupported device (vendorId: ${hexpad4(vendorId)}, productId: ${hexpad4(productId)})`);
+                    logger.error(`Unsupported device (vendorId: ${hexpad4(vid)}, productId: ${hexpad4(pid)})`);
                 }
                 break;
             }
-            case 'SERIAL_PORT_DESELECTED':
             case 'DEVICE_DESELECTED': {
+                if (state.app.deviceChange.expectedSerialNumber) {
+                    logger.info(`Waiting for device ${state.app.deviceChange.expectedSerialNumber} to reattach`);
+                    return;
+                }
                 logger.info('Target device closed.');
                 break;
             }
@@ -121,15 +130,15 @@ export default {
                 if (state.app.file.memMaps.length === 0) {
                     return;
                 }
-                if (state.app.target.targetType === CommunicationType.PORT) {
-                    dispatch(portTargetActions.write());
-                } else if (state.app.target.targetType === CommunicationType.USB) {
-                    dispatch(usbTargetActions.write());
+                if (state.app.target.targetType === CommunicationType.JLINK) {
+                    dispatch(jlinkTargetActions.write());
+                } else if (state.app.target.targetType === CommunicationType.USBSDFU) {
+                    dispatch(usbsdfuTargetActions.write());
                 }
                 break;
             }
             case targetActions.RECOVER_START: {
-                dispatch(portTargetActions.recover());
+                dispatch(jlinkTargetActions.recover());
                 break;
             }
             case targetActions.REFRESH_ALL_FILES_START: {
