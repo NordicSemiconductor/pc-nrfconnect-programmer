@@ -1,8 +1,8 @@
 {
   "name": "pc-nrfconnect-programmer",
-  "version": "1.0.0-experimental.2",
+  "version": "1.0.0-experimental.3",
   "description": "Program a Nordic SoC with a .hex file from nRF Connect",
-  "displayName": "nRF Programmer",
+  "displayName": "Programmer (experimental)",
   "repository": {
     "type": "git",
     "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer.git"
