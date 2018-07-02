@@ -37,12 +37,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ProgressBar, Jumbotron, Tooltip } from 'react-bootstrap';
+import { Button, ProgressBar, Jumbotron } from 'react-bootstrap';
 import { List } from 'immutable';
 import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../util/hexpad';
-import { getCommunicationType } from '../util/devices';
+import { getCommunicationType, CommunicationType } from '../util/devices';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
 const gradientLength = 20;
@@ -241,7 +241,7 @@ class MemoryLayout extends React.Component {
                                 <p>{port}</p>
                             </div>
                         }
-                        {targetType &&
+                        {targetType !== CommunicationType.UNKNOWN &&
                             <div>
                                 <h5>Communication Type</h5>
                                 <p>{getCommunicationType(targetType)}</p>
@@ -288,6 +288,10 @@ MemoryLayout.defaultProps = {
     memMaps: [],
     loaded: {},
     title: '',
+    serialNumber: '',
+    port: '',
+    targetType: CommunicationType.UNKNOWN,
+    deviceInfo: {},
     refresh: null,
 };
 
@@ -296,6 +300,10 @@ MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
     regions: PropTypes.instanceOf(List),
     title: PropTypes.string,
+    serialNumber: PropTypes.string,
+    port: PropTypes.string,
+    targetType: PropTypes.number,
+    deviceInfo: PropTypes.instanceOf(Object),
     refresh: PropTypes.func,
 };
 
