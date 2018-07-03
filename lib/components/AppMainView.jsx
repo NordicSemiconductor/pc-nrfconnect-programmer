@@ -60,6 +60,7 @@ const AppMainView = (
                     port={target.port}
                     deviceInfo={target.deviceInfo}
                     targetType={target.targetType}
+                    isMemLoaded={target.isMemLoaded}
                     refresh={refresh}
                 />
             );

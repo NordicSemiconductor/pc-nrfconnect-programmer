@@ -88,6 +88,7 @@ class MemoryLayout extends React.Component {
             port,
             deviceInfo,
             targetType,
+            isMemLoaded,
             refresh,
         } = this.props;
 
@@ -265,6 +266,12 @@ class MemoryLayout extends React.Component {
                                 <p>{hexpad8(deviceInfo.pageSize)}</p>
                             </div>
                         }
+                        {targetType === CommunicationType.JLINK &&
+                            <div>
+                                <h5>Device memory is loaded?</h5>
+                                <p>{isMemLoaded ? 'Yes' : 'No'}</p>
+                            </div>
+                        }
                     </Jumbotron>
                     <ProgressBar className="memory-bar-vertical">
                         { blocks }
@@ -291,6 +298,7 @@ MemoryLayout.defaultProps = {
     serialNumber: '',
     port: '',
     targetType: CommunicationType.UNKNOWN,
+    isMemLoaded: false,
     deviceInfo: {},
     refresh: null,
 };
@@ -304,6 +312,7 @@ MemoryLayout.propTypes = {
     port: PropTypes.string,
     targetType: PropTypes.number,
     deviceInfo: PropTypes.instanceOf(Object),
+    isMemLoaded: PropTypes.bool,
     refresh: PropTypes.func,
 };
 
