@@ -115,6 +115,7 @@ const ControlPanel = props => {
         openFile,
         performWrite,
         performRecover,
+        performRecoverAndWrite,
         mruFiles,
         loaded,
         memMaps,
@@ -155,18 +156,24 @@ const ControlPanel = props => {
                 <hr style={{ borderColor: 'transparent' }} />
 
                 <Button
-                    onClick={performWrite}
-                    disabled={!targetIsReady || !targetIsWritable}
-                >
-                    <Glyphicon glyph="save" />Write all to devkit
-                </Button>
-
-                <Button
                     onClick={performRecover}
                     disabled={!targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="remove-sign" />Recover (full erase)
+                    <Glyphicon glyph="remove-sign" />Erase all
                 </Button>
+                <Button
+                    onClick={performWrite}
+                    disabled={!targetIsReady || !targetIsWritable}
+                >
+                    <Glyphicon glyph="save" />Write
+                </Button>
+                <Button
+                    onClick={performRecoverAndWrite}
+                    disabled={!targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="save" />Erase all & write
+                </Button>
+
 
                 <FileLegend files={loaded} remove={removeFile} />
 
@@ -197,6 +204,7 @@ ControlPanel.propTypes = {
     openFile: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
+    performRecoverAndWrite: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     loaded: PropTypes.shape({}).isRequired,
     memMaps: PropTypes.arrayOf(

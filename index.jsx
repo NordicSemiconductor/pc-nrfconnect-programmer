@@ -141,6 +141,10 @@ export default {
                 dispatch(jlinkTargetActions.recover());
                 break;
             }
+            case targetActions.RECOVER_AND_WRITE_START: {
+                dispatch(jlinkTargetActions.recoverAndWrite());
+                break;
+            }
             case targetActions.REFRESH_ALL_FILES_START: {
                 dispatch(fileActions.refreshAllFiles());
                 break;
