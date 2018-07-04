@@ -35,20 +35,57 @@
  */
 
 import React from 'react';
-import FileLegendView from './FileLegendView';
-import ButtonGroupView from './ButtonGroupView';
-import WarningView from './WarningView';
-import SettingView from './SettingView';
+import PropTypes from 'prop-types';
+import { Glyphicon } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import * as fileActions from '../actions/fileActions';
 
-const ControlPanel = () => (
-    <div className="control-panel">
-        <div>
-            <ButtonGroupView />
-            <FileLegendView />
-            <WarningView />
-        </div>
-        <SettingView />
-    </div>
-);
+const FileLegendView = props => {
+    const { loaded, remove } = props;
+    return (
+        <table className="file-legend">
+            <tbody>
+                {Object.keys(loaded).map((filePath, i) => (
+                    <tr key={`file-${i + 1}`}>
+                        <td>
+                            <div
+                                className="legend-colour"
+                                style={{ backgroundColor: loaded[filePath].colour }}
+                            />
+                        </td>
+                        <td title={loaded[filePath].filename} className="file-label">
+                            { loaded[filePath].filename }
+                        </td>
+                        <td>
+                            <Glyphicon
+                                glyph="remove-sign"
+                                onClick={() => { remove(filePath); }}
+                                title="Remove this file"
+                            />
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
 
-export default ControlPanel;
+FileLegendView.propTypes = {
+    loaded: PropTypes.shape({}),
+    remove: PropTypes.func.isRequired,
+};
+
+FileLegendView.defaultProps = {
+    loaded: {},
+};
+
+export default connect(
+    (state, props) => ({
+        ...props,
+        loaded: state.app.file.loaded,
+    }),
+    (dispatch, props) => ({
+        ...props,
+        remove: filePath => { dispatch(fileActions.removeFile(filePath)); },
+    }),
+)(FileLegendView);
