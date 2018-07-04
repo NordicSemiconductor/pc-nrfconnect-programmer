@@ -165,7 +165,7 @@ const ControlPanel = props => {
                     onClick={performWrite}
                     disabled={!targetIsReady || !targetIsWritable}
                 >
-                    <Glyphicon glyph="save" />Write
+                    <Glyphicon glyph="download-alt" />Write
                 </Button>
                 <Button
                     onClick={performRecoverAndWrite}
