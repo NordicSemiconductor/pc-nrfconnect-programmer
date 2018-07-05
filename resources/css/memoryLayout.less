@@ -118,17 +118,41 @@
         }
     }
 
-    .progress-bar-vertical {
-        width: 80%;
+    .memory-bar-vertical {
+        width: 35%;
         min-height: 100%;
         float: left;
+        margin-left: 8%;
+        box-shadow: 0px 0px 4px 0px #777A89;
       }
 
-    .progress-bar-vertical .progress-bar {
+    .memory-bar-vertical .progress-bar {
         width: 100%;
         -webkit-transition: height 1s ease;
         -o-transition: height 1s ease;
         transition: height 1s ease;
     }
 
+    .memory-info {
+        width: 35%;
+        box-shadow: 0px 0px 4px 0px #777A89;
+    }
+
+    .memory-info.jumbotron {
+        margin: 0;
+        padding: 0 0 0 2%;
+        height: auto;
+        min-height: 0;
+    }
+
+    .memory-info.jumbotron h5 {
+        font-size: calc(@labelHeight * 1.0);
+        line-height: calc(@labelHeight * 1);
+        color: darkgrey;
+    }
+    .memory-info.jumbotron p {
+        font-size: calc(@labelHeight * 1.2);
+        line-height: calc(@labelHeight * 1);
+        color: #777A89;
+    }
 }

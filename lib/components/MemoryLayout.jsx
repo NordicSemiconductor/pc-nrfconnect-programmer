@@ -37,11 +37,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ProgressBar } from 'react-bootstrap';
+import { Button, ProgressBar, Jumbotron } from 'react-bootstrap';
 import { List } from 'immutable';
 import unclutter1d from 'unclutter1d';
 
 import { hexpad8 } from '../util/hexpad';
+import { getCommunicationType, CommunicationType } from '../util/devices';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
 const gradientLength = 20;
@@ -83,6 +84,10 @@ class MemoryLayout extends React.Component {
         const {
             targetSize: max,
             regions,
+            serialNumber,
+            port,
+            deviceInfo,
+            targetType,
             refresh,
         } = this.props;
 
@@ -223,7 +228,45 @@ class MemoryLayout extends React.Component {
                     className="memory-layout-inner"
                     ref={node => { this.node = node; }}
                 >
-                    <ProgressBar className="progress-bar-vertical">
+                    <Jumbotron className="memory-info">
+                        {serialNumber &&
+                            <div>
+                                <h5>SerialNumber</h5>
+                                <p>{serialNumber}</p>
+                            </div>
+                        }
+                        {port &&
+                            <div>
+                                <h5>Port</h5>
+                                <p>{port}</p>
+                            </div>
+                        }
+                        {targetType !== CommunicationType.UNKNOWN &&
+                            <div>
+                                <h5>Communication Type</h5>
+                                <p>{getCommunicationType(targetType)}</p>
+                            </div>
+                        }
+                        {deviceInfo && deviceInfo.romSize &&
+                            <div>
+                                <h5>ROM Size</h5>
+                                <p>{hexpad8(deviceInfo.romSize)}</p>
+                            </div>
+                        }
+                        {deviceInfo && deviceInfo.ramSize &&
+                            <div>
+                                <h5>RAM Size</h5>
+                                <p>{hexpad8(deviceInfo.ramSize)}</p>
+                            </div>
+                        }
+                        {deviceInfo && deviceInfo.pageSize &&
+                            <div>
+                                <h5>Page Size</h5>
+                                <p>{hexpad8(deviceInfo.pageSize)}</p>
+                            </div>
+                        }
+                    </Jumbotron>
+                    <ProgressBar className="memory-bar-vertical">
                         { blocks }
                     </ProgressBar>
                     <svg className="address-lines">
@@ -245,6 +288,10 @@ MemoryLayout.defaultProps = {
     memMaps: [],
     loaded: {},
     title: '',
+    serialNumber: '',
+    port: '',
+    targetType: CommunicationType.UNKNOWN,
+    deviceInfo: {},
     refresh: null,
 };
 
@@ -253,6 +300,10 @@ MemoryLayout.propTypes = {
     targetSize: PropTypes.number,
     regions: PropTypes.instanceOf(List),
     title: PropTypes.string,
+    serialNumber: PropTypes.string,
+    port: PropTypes.string,
+    targetType: PropTypes.number,
+    deviceInfo: PropTypes.instanceOf(Object),
     refresh: PropTypes.func,
 };
 

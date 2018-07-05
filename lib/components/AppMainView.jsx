@@ -55,14 +55,17 @@ const AppMainView = (
                 <MemoryLayout
                     regions={target.regions}
                     targetSize={target.deviceInfo.romSize}
-                    title="nRF 5x"
+                    title={target.deviceInfo.type || 'nRF 5x'}
+                    serialNumber={target.serialNumber}
+                    port={target.port}
+                    deviceInfo={target.deviceInfo}
+                    targetType={target.targetType}
                     refresh={refresh}
                 />
             );
         } else {
             targetMap = <div className="memlayout-spinner" />;
         }
-
 
         return (
             <div className="app-main-view">
