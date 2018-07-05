@@ -40,9 +40,7 @@ import PropTypes from 'prop-types';
 import { Button, ProgressBar } from 'react-bootstrap';
 import { List } from 'immutable';
 import unclutter1d from 'unclutter1d';
-
 import { hexpad8 } from '../util/hexpad';
-import { CommunicationType } from '../util/devices';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
 const gradientLength = 20;
