@@ -35,11 +35,11 @@
  */
 
 import React from 'react';
-import FileLegendView from './FileLegendView';
-import ButtonGroupView from './ButtonGroupView';
-import WarningView from './WarningView';
-import DeviceInfoView from './DeviceInfoView';
-import SettingView from './SettingView';
+import FileLegendView from '../containers/fileLegendView';
+import ButtonGroupView from '../containers/buttonGroupView';
+import WarningView from '../containers/warningView';
+import DeviceInfoView from '../containers/deviceInfoView';
+import SettingView from '../containers/settingView';
 
 const ControlPanel = () => (
     <div className="control-panel">

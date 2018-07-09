@@ -39,12 +39,12 @@ import PropTypes from 'prop-types';
 import { Glyphicon } from 'react-bootstrap';
 import { List } from 'immutable';
 import MemoryMap from 'nrf-intel-hex';
-import { connect } from 'react-redux';
 import { hexpad8 } from '../util/hexpad';
 
 const FileWarnings = (memMaps, targetSize) => {
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
+    // This warning is to warn about overlap in the hex files.
     let overlapWarning = '';
     const outsideFlashBlocks = [];
     overlaps.forEach((overlap, startAddress) => {
@@ -67,6 +67,9 @@ const FileWarnings = (memMaps, targetSize) => {
             outsideFlashBlocks.push(`${hexpad8(startAddress)}-${hexpad8(endAddress)}`);
         }
     });
+
+    // This warning is to warn about there exists some contents
+    // outside of maximum size of target device.
     let outsideFlashWarning;
     if (outsideFlashBlocks.length) {
         outsideFlashWarning = (
@@ -78,6 +81,7 @@ const FileWarnings = (memMaps, targetSize) => {
             </div>
         );
     }
+
     return [
         overlapWarning,
         outsideFlashWarning,
@@ -93,22 +97,16 @@ const TargetWarnings = targetWarningStrings => (
         </div>
     )));
 
-const WarningView = props => {
-    const {
-        memMaps,
-        targetSize,
-        targetWarningStrings,
-    } = props;
-    const fileWarnings = FileWarnings(memMaps, targetSize);
-    const targetWarnings = TargetWarnings(targetWarningStrings);
-
-    return (
-        <div>
-            { fileWarnings }
-            { targetWarnings }
-        </div>
-    );
-};
+const WarningView = ({
+    memMaps,
+    targetSize,
+    targetWarningStrings,
+}) => (
+    <div>
+        { FileWarnings(memMaps, targetSize) }
+        { TargetWarnings(targetWarningStrings) }
+    </div>
+);
 
 WarningView.propTypes = {
     memMaps: PropTypes.arrayOf(
@@ -120,12 +118,4 @@ WarningView.propTypes = {
     targetWarningStrings: PropTypes.objectOf(List).isRequired,
 };
 
-export default connect(
-    (state, props) => ({
-        ...props,
-        memMaps: state.app.file.memMaps,
-        targetWarningStrings: state.app.target.warnings,
-        targetSize: state.app.target.deviceInfo.romSize,
-    }),
-)(WarningView);
-
+export default WarningView;

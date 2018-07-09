@@ -37,67 +37,63 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Accordion, Panel } from 'react-bootstrap';
-import { connect } from 'react-redux';
-import { hexpad8 } from '../util/hexpad';
+import { hexToKiB } from '../util/hexpad';
 import { getCommunicationType, CommunicationType } from '../util/devices';
 
-const DeviceInfoView = props => {
-    const {
-        serialNumber,
-        port,
-        deviceInfo,
-        targetType,
-        isMemLoaded,
-    } = props;
-
-    return (
-        <Accordion defaultActiveKey="1" className="device-info">
-            <Panel header="Device Info" eventKey="1">
-                {serialNumber &&
-                    <div>
-                        <h5>SerialNumber</h5>
-                        <p>{serialNumber}</p>
-                    </div>
-                }
-                {port &&
-                    <div>
-                        <h5>Port</h5>
-                        <p>{port}</p>
-                    </div>
-                }
-                {targetType !== CommunicationType.UNKNOWN &&
-                    <div>
-                        <h5>Communication Type</h5>
-                        <p>{getCommunicationType(targetType)}</p>
-                    </div>
-                }
-                {deviceInfo && deviceInfo.romSize &&
-                    <div>
-                        <h5>ROM Size</h5>
-                        <p>{hexpad8(deviceInfo.romSize)}</p>
-                    </div>
-                }
-                {deviceInfo && deviceInfo.ramSize &&
-                    <div>
-                        <h5>RAM Size</h5>
-                        <p>{hexpad8(deviceInfo.ramSize)}</p>
-                    </div>
-                }
-                {deviceInfo && deviceInfo.pageSize &&
-                    <div>
-                        <h5>Page Size</h5>
-                        <p>{hexpad8(deviceInfo.pageSize)}</p>
-                    </div>
-                }
-                {targetType === CommunicationType.JLINK &&
-                    <div>
-                        <h5>Device memory is loaded?</h5>
-                        <p>{isMemLoaded ? 'Yes' : 'No'}</p>
-                    </div>
-                }
-            </Panel>
-        </Accordion>);
-};
+const DeviceInfoView = ({
+    serialNumber,
+    port,
+    deviceInfo,
+    targetType,
+    isMemLoaded,
+}) => (!targetType ? null : (
+    <Accordion defaultActiveKey="1" className="device-info">
+        <Panel header="Device Info" eventKey="1">
+            {serialNumber &&
+                <div>
+                    <h5>SerialNumber</h5>
+                    <p>{serialNumber}</p>
+                </div>
+            }
+            {port &&
+                <div>
+                    <h5>Port</h5>
+                    <p>{port}</p>
+                </div>
+            }
+            {targetType !== CommunicationType.UNKNOWN &&
+                <div>
+                    <h5>Communication Type</h5>
+                    <p>{getCommunicationType(targetType)}</p>
+                </div>
+            }
+            {deviceInfo && deviceInfo.romSize &&
+                <div>
+                    <h5>ROM Size</h5>
+                    <p>{hexToKiB(deviceInfo.romSize)}</p>
+                </div>
+            }
+            {deviceInfo && deviceInfo.ramSize &&
+                <div>
+                    <h5>RAM Size</h5>
+                    <p>{hexToKiB(deviceInfo.ramSize)}</p>
+                </div>
+            }
+            {deviceInfo && deviceInfo.pageSize &&
+                <div>
+                    <h5>Page Size</h5>
+                    <p>{hexToKiB(deviceInfo.pageSize)}</p>
+                </div>
+            }
+            {targetType === CommunicationType.JLINK &&
+                <div>
+                    <h5>Device memory is loaded?</h5>
+                    <p>{isMemLoaded ? 'Yes' : 'No'}</p>
+                </div>
+            }
+        </Panel>
+    </Accordion>
+));
 
 DeviceInfoView.propTypes = {
     serialNumber: PropTypes.string,
@@ -115,16 +111,4 @@ DeviceInfoView.defaultProps = {
     isMemLoaded: false,
 };
 
-export default connect(
-    (state, props) => ({
-        ...props,
-        serialNumber: state.app.target.serialNumber,
-        port: state.app.target.port,
-        targetType: state.app.target.targetType,
-        deviceInfo: state.app.target.deviceInfo,
-        isMemLoaded: state.app.target.isMemLoaded,
-    }),
-    (dispatch, props) => ({
-        ...props,
-    }),
-)(DeviceInfoView);
+export default DeviceInfoView;

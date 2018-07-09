@@ -37,9 +37,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Glyphicon, Button, Dropdown, MenuItem } from 'react-bootstrap';
-import { connect } from 'react-redux';
-import * as fileActions from '../actions/fileActions';
-import * as targetActions from '../actions/targetActions';
+import { CommunicationType } from '../util/devices';
 
 const MruMenuItems = (mruFiles, openFile) => {
     let mruMenuItems;
@@ -53,65 +51,87 @@ const MruMenuItems = (mruFiles, openFile) => {
     return mruMenuItems;
 };
 
-const ButtonGroupView = props => {
-    const {
-        openFile,
-        closeFiles,
-        refreshAllFiles,
-        openFileDialog,
-        onToggleFileList,
-        performWrite,
-        performRecover,
-        performRecoverAndWrite,
-        mruFiles,
-        targetIsReady,
-        targetIsWritable,
-        targetIsRecoverable,
-    } = props;
-    const mruMenuItems = MruMenuItems(mruFiles, openFile);
+const WriteButton = (
+    targetType,
+    performJLinkWrite,
+    performUSBSDFUWrite,
+    targetIsReady,
+    targetIsWritable,
+) => {
+    let performWrite;
+    if (targetType === CommunicationType.JLINK) {
+        performWrite = performJLinkWrite;
+    } else if (targetType === CommunicationType.USBSDFU) {
+        performWrite = performUSBSDFUWrite;
+    }
 
     return (
-        <div>
-            <Dropdown pullRight id="files-dropdown">
-                <Dropdown.Toggle onClick={onToggleFileList}>
-                    <Glyphicon glyph="folder-open" />Add a .hex file
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    { mruMenuItems }
-                    <MenuItem divider />
-                    <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
-                </Dropdown.Menu>
-            </Dropdown>
-            <Button onClick={refreshAllFiles}>
-                <Glyphicon glyph="refresh" />Reload .hex files
-            </Button>
-            <Button onClick={closeFiles}>
-                <Glyphicon glyph="minus-sign" />Clear files
-            </Button>
-
-            <hr style={{ borderColor: 'transparent', margin: '5px 0px' }} />
-
-            <Button
-                onClick={performRecover}
-                disabled={!targetIsReady || !targetIsRecoverable}
-            >
-                <Glyphicon glyph="remove-sign" />Erase all
-            </Button>
-            <Button
-                onClick={performWrite}
-                disabled={!targetIsReady || !targetIsWritable}
-            >
-                <Glyphicon glyph="download-alt" />Write
-            </Button>
-            <Button
-                onClick={performRecoverAndWrite}
-                disabled={!targetIsReady || !targetIsRecoverable}
-            >
-                <Glyphicon glyph="save" />Erase all & write
-            </Button>
-        </div>
+        <Button
+            onClick={performWrite}
+            disabled={!targetIsReady || !targetIsWritable}
+        >
+            <Glyphicon glyph="download-alt" />Write
+        </Button>
     );
 };
+
+const ButtonGroupView = ({
+    openFile,
+    closeFiles,
+    refreshAllFiles,
+    openFileDialog,
+    onToggleFileList,
+    performJLinkWrite,
+    performUSBSDFUWrite,
+    performRecover,
+    performRecoverAndWrite,
+    mruFiles,
+    targetType,
+    targetIsReady,
+    targetIsWritable,
+    targetIsRecoverable,
+}) => (
+    <div>
+        <Dropdown pullRight id="files-dropdown">
+            <Dropdown.Toggle onClick={onToggleFileList}>
+                <Glyphicon glyph="folder-open" />Add a .hex file
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+                {MruMenuItems(mruFiles, openFile)}
+                <MenuItem divider />
+                <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
+            </Dropdown.Menu>
+        </Dropdown>
+        <Button onClick={refreshAllFiles}>
+            <Glyphicon glyph="refresh" />Reload .hex files
+        </Button>
+        <Button onClick={closeFiles}>
+            <Glyphicon glyph="minus-sign" />Clear files
+        </Button>
+
+        <hr style={{ borderColor: 'transparent', margin: '5px 0px' }} />
+
+        <Button
+            onClick={performRecover}
+            disabled={!targetIsReady || !targetIsRecoverable}
+        >
+            <Glyphicon glyph="remove-sign" />Erase all
+        </Button>
+        {WriteButton(
+            targetType,
+            performJLinkWrite,
+            performUSBSDFUWrite,
+            targetIsReady,
+            targetIsWritable,
+        )}
+        <Button
+            onClick={performRecoverAndWrite}
+            disabled={!targetIsReady || !targetIsRecoverable}
+        >
+            <Glyphicon glyph="save" />Erase all & write
+        </Button>
+    </div>
+);
 
 ButtonGroupView.propTypes = {
     openFile: PropTypes.func.isRequired,
@@ -119,34 +139,15 @@ ButtonGroupView.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
-    performWrite: PropTypes.func.isRequired,
+    performJLinkWrite: PropTypes.func.isRequired,
+    performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    targetType: PropTypes.number.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
     targetIsRecoverable: PropTypes.bool.isRequired,
 };
 
-export default connect(
-    (state, props) => ({
-        ...props,
-        mruFiles: state.app.file.mruFiles,
-        targetIsReady: state.app.target.isReady,
-        targetIsWritable: state.app.target.isWritable,
-        targetIsRecoverable: state.app.target.isRecoverable,
-    }),
-    (dispatch, props) => ({
-        ...props,
-        openFile: filename => dispatch(fileActions.openFile(filename)),
-        closeFiles: () => { dispatch(fileActions.filesEmptyAction()); },
-        removeFile: filePath => { dispatch(fileActions.removeFile(filePath)); },
-        refreshAllFiles: () => { dispatch(targetActions.refreshAllFilesStartAction()); },
-        onToggleFileList: () => dispatch(fileActions.loadMruFiles()),
-        openFileDialog: () => dispatch(fileActions.openFileDialog()),
-        performWrite: () => { dispatch(targetActions.writeStartAction()); },
-        performRecover: () => { dispatch(targetActions.recoverStartAction()); },
-        performRecoverAndWrite: () => { dispatch(targetActions.recoverAndWriteStartAction()); },
-    }),
-)(ButtonGroupView);
-
+export default ButtonGroupView;
