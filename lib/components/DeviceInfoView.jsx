@@ -46,7 +46,7 @@ const DeviceInfoView = ({
     deviceInfo,
     targetType,
     isMemLoaded,
-}) => (!targetType ? null : (
+}) => (targetType === CommunicationType.UNKNOWN ? null : (
     <Accordion defaultActiveKey="1" className="device-info">
         <Panel header="Device Info" eventKey="1">
             {serialNumber &&
@@ -61,12 +61,10 @@ const DeviceInfoView = ({
                     <p>{port}</p>
                 </div>
             }
-            {targetType !== CommunicationType.UNKNOWN &&
-                <div>
-                    <h5>Communication Type</h5>
-                    <p>{getCommunicationType(targetType)}</p>
-                </div>
-            }
+            <div>
+                <h5>Communication Type</h5>
+                <p>{getCommunicationType(targetType)}</p>
+            </div>
             {deviceInfo && deviceInfo.romSize &&
                 <div>
                     <h5>ROM Size</h5>

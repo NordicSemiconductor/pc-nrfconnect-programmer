@@ -51,28 +51,17 @@ const MruMenuItems = (mruFiles, openFile) => {
     return mruMenuItems;
 };
 
-const WriteButton = (
+const getWriteAction = (
     targetType,
     performJLinkWrite,
     performUSBSDFUWrite,
-    targetIsReady,
-    targetIsWritable,
 ) => {
-    let performWrite;
     if (targetType === CommunicationType.JLINK) {
-        performWrite = performJLinkWrite;
+        return performJLinkWrite;
     } else if (targetType === CommunicationType.USBSDFU) {
-        performWrite = performUSBSDFUWrite;
+        return performUSBSDFUWrite;
     }
-
-    return (
-        <Button
-            onClick={performWrite}
-            disabled={!targetIsReady || !targetIsWritable}
-        >
-            <Glyphicon glyph="download-alt" />Write
-        </Button>
-    );
+    return undefined;
 };
 
 const ButtonGroupView = ({
@@ -117,13 +106,12 @@ const ButtonGroupView = ({
         >
             <Glyphicon glyph="remove-sign" />Erase all
         </Button>
-        {WriteButton(
-            targetType,
-            performJLinkWrite,
-            performUSBSDFUWrite,
-            targetIsReady,
-            targetIsWritable,
-        )}
+        <Button
+            onClick={getWriteAction(targetType, performJLinkWrite, performUSBSDFUWrite)}
+            disabled={!targetIsReady || !targetIsWritable}
+        >
+            <Glyphicon glyph="download-alt" />Write
+        </Button>
         <Button
             onClick={performRecoverAndWrite}
             disabled={!targetIsReady || !targetIsRecoverable}
