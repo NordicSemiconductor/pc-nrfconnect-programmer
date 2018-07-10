@@ -43,8 +43,7 @@ import * as fileActions from './lib/actions/fileActions';
 import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
 import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
-import { VendorId, USBProductIds, JlinkProductIds } from './lib/util/devices';
-import { hexpad4 } from './lib/util/hexpad';
+import { CommunicationType } from './lib/util/devices';
 
 import './resources/css/index.less';
 
@@ -95,8 +94,8 @@ export default {
     ),
     reduceApp: appReducer,
     mapSerialPortSelectorState: (state, props) => ({
-        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
         ...props,
+        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
     }),
     middleware: store => next => action => {
         const state = store.getState();
@@ -104,16 +103,12 @@ export default {
         switch (action.type) {
             case 'DEVICE_SELECTED': {
                 const { serialNumber } = action.device;
-                const { vendorId, productId } = action.device.serialport;
-                const vid = parseInt(vendorId.toString(16), 16);
-                const pid = parseInt(productId.toString(16), 16);
-                if (vid === VendorId.SEGGER && JlinkProductIds.includes(pid)) {
+                if (action.device.traits.includes('jlink')) {
                     dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
-                } else if (vid === VendorId.NORDIC_SEMICONDUCTOR &&
-                           USBProductIds.includes(pid)) {
+                } else if (action.device.traits.includes('nordicUsb')) {
                     dispatch(usbsdfuTargetActions.openDevice(action.device));
                 } else {
-                    logger.error(`Unsupported device (vendorId: ${hexpad4(vid)}, productId: ${hexpad4(pid)})`);
+                    logger.error('Unsupported device. The detected device is neither JLink device nor Nordic USB device.');
                 }
                 break;
             }
