@@ -41,8 +41,9 @@ import { hexToKiB } from '../util/hexpad';
 import { getCommunicationType, CommunicationType } from '../util/devices';
 
 const displayUserInputs = (userInputFields, updateUserInput) => {
-    userInputFields = ['appSdReq'];
-    console.log(userInputFields);
+    if (!userInputFields) {
+        return null;
+    }
     const inputs = [];
     userInputFields.forEach(field => (
         inputs.push(<div key={field}>
