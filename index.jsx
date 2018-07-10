@@ -36,17 +36,14 @@
 
 import React from 'react';
 import { logger } from 'nrfconnect/core';
-
-import ControlPanel from './lib/containers/controlPanel';
+import ControlPanel from './lib/components/ControlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
-import * as targetActions from './lib/actions/targetActions';
 import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
 import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
-import { CommunicationType } from './lib/util/devices';
-
 import './resources/css/index.less';
+import { VendorId, USBProductIds } from './lib/util/devices';
 
 export default {
     config: {
@@ -103,14 +100,26 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
-                const { serialNumber } = action.device;
+                const device = action.device;
+                const serialNumber = device.serialNumber;
                 if (action.device.traits.includes('jlink')) {
                     dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
-                } else if (action.device.traits.includes('nordicUsb')) {
-                    dispatch(usbsdfuTargetActions.openDevice(action.device));
-                } else {
-                    logger.error('Unsupported device. The detected device is neither JLink device nor Nordic USB device.');
+                    break;
                 }
+                if (action.device.traits.includes('nordicUsb')) {
+                    dispatch(usbsdfuTargetActions.openDevice(action.device));
+                    break;
+                }
+                if (action.device.traits.includes('serialport')) {
+                    const { vendorId, productId } = device.serialport;
+                    const vid = parseInt(vendorId.toString(16), 16);
+                    const pid = parseInt(productId.toString(16), 16);
+                    if (vid === VendorId.NORDIC_SEMICONDUCTOR && USBProductIds.includes(pid)) {
+                        dispatch(usbsdfuTargetActions.openDevice(action.device));
+                        break;
+                    }
+                }
+                logger.error('Unsupported device. The detected device is neither JLink device nor Nordic USB device.');
                 break;
             }
             case 'DEVICE_DESELECTED': {
@@ -119,25 +128,6 @@ export default {
                     return;
                 }
                 logger.info('Target device closed.');
-                break;
-            }
-            case targetActions.WRITE_START: {
-                if (state.app.file.memMaps.length === 0) {
-                    return;
-                }
-                if (state.app.target.targetType === CommunicationType.JLINK) {
-                    dispatch(jlinkTargetActions.write());
-                } else if (state.app.target.targetType === CommunicationType.USBSDFU) {
-                    dispatch(usbsdfuTargetActions.write());
-                }
-                break;
-            }
-            case targetActions.RECOVER_START: {
-                dispatch(jlinkTargetActions.recover());
-                break;
-            }
-            case targetActions.REFRESH_ALL_FILES_START: {
-                dispatch(fileActions.refreshAllFiles());
                 break;
             }
             default:

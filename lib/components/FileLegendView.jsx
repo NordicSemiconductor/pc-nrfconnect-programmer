@@ -36,55 +36,41 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import MemoryLayout from '../components/MemoryLayout';
+import { Glyphicon } from 'react-bootstrap';
 
-const AppMainView = (
-    props => {
-        const { file, target, refreshEnabled, refreshTargetContents } = props;
-        const refresh = refreshEnabled ? refreshTargetContents : null;
-
-        let targetMap;
-        if (!target.serialNumber) {
-            targetMap = (
-                <div className="target-map-disconnected">
-                    Connect to a DevKit to see the contents of its non-volatile memory here.
-                </div>
-            );
-        } else if (target.serialNumber && target.isReady) {
-            targetMap = (
-                <MemoryLayout
-                    regions={target.regions}
-                    targetSize={target.deviceInfo.romSize}
-                    title={target.deviceInfo.type || 'nRF 5x'}
-                    refresh={refresh}
-                />
-            );
-        } else {
-            targetMap = <div className="memlayout-spinner" />;
-        }
-
-        return (
-            <div className="app-main-view">
-                <div className="column">
-                    { targetMap }
-                </div>
-                <div className="column">
-                    <MemoryLayout
-                        regions={file.regions}
-                        targetSize={target.deviceInfo.romSize}
-                        title="Files"
-                    />
-                </div>
-            </div>
-        );
-    }
+const FileLegendView = ({ loaded, remove }) => (
+    <table className="file-legend">
+        <tbody>
+            {Object.keys(loaded).map((filePath, i) => (
+                <tr key={`file-${i + 1}`}>
+                    <td>
+                        <div
+                            className="legend-colour"
+                            style={{ backgroundColor: loaded[filePath].colour }}
+                        />
+                    </td>
+                    <td title={loaded[filePath].filename} className="file-label">
+                        { loaded[filePath].filename }
+                    </td>
+                    <td>
+                        <Glyphicon
+                            glyph="remove-sign"
+                            onClick={() => { remove(filePath); }}
+                            title="Remove this file"
+                        />
+                    </td>
+                </tr>))}
+        </tbody>
+    </table>
 );
 
-AppMainView.propTypes = {
-    file: PropTypes.shape({}).isRequired,
-    target: PropTypes.shape({}).isRequired,
-    refreshEnabled: PropTypes.bool.isRequired,
-    refreshTargetContents: PropTypes.func.isRequired,
+FileLegendView.propTypes = {
+    loaded: PropTypes.shape({}),
+    remove: PropTypes.func.isRequired,
 };
 
-export default AppMainView;
+FileLegendView.defaultProps = {
+    loaded: {},
+};
+
+export default FileLegendView;
