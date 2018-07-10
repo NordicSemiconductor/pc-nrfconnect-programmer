@@ -37,14 +37,13 @@
 import React from 'react';
 import { logger } from 'nrfconnect/core';
 
-import ControlPanel from './lib/containers/controlPanel';
+import ControlPanel from './lib/components/ControlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
-import * as targetActions from './lib/actions/targetActions';
 import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
 import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
-import { VendorId, USBProductIds, JlinkProductIds, CommunicationType } from './lib/util/devices';
+import { VendorId, USBProductIds, JlinkProductIds } from './lib/util/devices';
 import { hexpad4 } from './lib/util/hexpad';
 
 import './resources/css/index.less';
@@ -124,25 +123,6 @@ export default {
                     return;
                 }
                 logger.info('Target device closed.');
-                break;
-            }
-            case targetActions.WRITE_START: {
-                if (state.app.file.memMaps.length === 0) {
-                    return;
-                }
-                if (state.app.target.targetType === CommunicationType.JLINK) {
-                    dispatch(jlinkTargetActions.write());
-                } else if (state.app.target.targetType === CommunicationType.USBSDFU) {
-                    dispatch(usbsdfuTargetActions.write());
-                }
-                break;
-            }
-            case targetActions.RECOVER_START: {
-                dispatch(jlinkTargetActions.recover());
-                break;
-            }
-            case targetActions.REFRESH_ALL_FILES_START: {
-                dispatch(fileActions.refreshAllFiles());
                 break;
             }
             default:

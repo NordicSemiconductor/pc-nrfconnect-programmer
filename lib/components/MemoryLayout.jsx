@@ -40,7 +40,6 @@ import PropTypes from 'prop-types';
 import { Button, ProgressBar } from 'react-bootstrap';
 import { List } from 'immutable';
 import unclutter1d from 'unclutter1d';
-
 import { hexpad8 } from '../util/hexpad';
 
 const labelHeight = 12; // in CSS pixels, also defined in memoryLayout.less
@@ -217,13 +216,13 @@ class MemoryLayout extends React.Component {
             <div className="memory-layout">
                 <h1>
                     { this.props.title }
-                    { refresh && <Button onClick={refresh}>Refresh</Button> }
+                    { refresh && <Button onClick={refresh}>Read Memory</Button> }
                 </h1>
                 <div
                     className="memory-layout-inner"
                     ref={node => { this.node = node; }}
                 >
-                    <ProgressBar className="progress-bar-vertical">
+                    <ProgressBar className="memory-bar-vertical">
                         { blocks }
                     </ProgressBar>
                     <svg className="address-lines">
@@ -238,6 +237,12 @@ class MemoryLayout extends React.Component {
     }
 }
 
+MemoryLayout.propTypes = {
+    targetSize: PropTypes.number,
+    regions: PropTypes.instanceOf(List),
+    title: PropTypes.string,
+    refresh: PropTypes.func,
+};
 
 MemoryLayout.defaultProps = {
     targetSize: 0x100000,  // 1MiB
@@ -247,15 +252,6 @@ MemoryLayout.defaultProps = {
     title: '',
     refresh: null,
 };
-
-
-MemoryLayout.propTypes = {
-    targetSize: PropTypes.number,
-    regions: PropTypes.instanceOf(List),
-    title: PropTypes.string,
-    refresh: PropTypes.func,
-};
-
 
 export default MemoryLayout;
 

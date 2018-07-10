@@ -36,47 +36,32 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon } from 'react-bootstrap';
+import { Accordion, Checkbox, Panel } from 'react-bootstrap';
 
-const FileLegend = props => {
-    const { files, remove } = props;
-    return (
-        <table className="file-legend">
-            <tbody>
-                {
-                    Object.keys(files).map((filePath, i) => (
-                        <tr key={`file-${i + 1}`}>
-                            <td>
-                                <div
-                                    className="legend-colour"
-                                    style={{ backgroundColor: files[filePath].colour }}
-                                />
-                            </td>
-                            <td title={files[filePath].filename} className="file-label">
-                                { files[filePath].filename }
-                            </td>
-                            <td>
-                                <Glyphicon
-                                    glyph="remove-sign"
-                                    onClick={() => { remove(filePath); }}
-                                    title="Remove this file"
-                                />
-                            </td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table>
-    );
+const SettingView = ({
+    autoRead,
+    toggleAutoRead,
+}) => (
+    <Accordion defaultActiveKey="1">
+        <Panel header="Settings" eventKey="1">
+            <Checkbox
+                onChange={e => toggleAutoRead(e.target.checked)}
+                checked={autoRead}
+                title="Automatically read memory regions of the target device when opening"
+            >
+                Auto read device
+            </Checkbox>
+        </Panel>
+    </Accordion>
+);
+
+SettingView.propTypes = {
+    autoRead: PropTypes.bool.isRequired,
+    toggleAutoRead: PropTypes.func.isRequired,
 };
 
-FileLegend.propTypes = {
-    files: PropTypes.shape({}),
-    remove: PropTypes.func.isRequired,
+SettingView.defaultProps = {
+    loaded: {},
 };
 
-FileLegend.defaultProps = {
-    files: {},
-};
-
-export default FileLegend;
+export default SettingView;
