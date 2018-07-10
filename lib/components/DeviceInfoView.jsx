@@ -36,9 +36,29 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Accordion, Panel } from 'react-bootstrap';
+import { Accordion, Panel, FormControl } from 'react-bootstrap';
 import { hexToKiB } from '../util/hexpad';
 import { getCommunicationType, CommunicationType } from '../util/devices';
+
+const displayUserInputs = (userInputFields, updateUserInput) => {
+    userInputFields = ['appSdReq'];
+    console.log(userInputFields);
+    const inputs = [];
+    userInputFields.forEach(field => (
+        inputs.push(<div key={field}>
+            <h5>field</h5>
+            <FormControl
+                id={field}
+                type="text"
+                label={field}
+                placeholder={field}
+                onChange={event => updateUserInput(field, event.target.value)}
+            />
+        </div>)
+    ));
+
+    return inputs;
+};
 
 const DeviceInfoView = ({
     serialNumber,
@@ -46,6 +66,8 @@ const DeviceInfoView = ({
     deviceInfo,
     targetType,
     isMemLoaded,
+    userInputFields,
+    updateUserInput,
 }) => (targetType === CommunicationType.UNKNOWN ? null : (
     <Accordion defaultActiveKey="1" className="device-info">
         <Panel header="Device Info" eventKey="1">
@@ -89,6 +111,7 @@ const DeviceInfoView = ({
                     <p>{isMemLoaded ? 'Yes' : 'No'}</p>
                 </div>
             }
+            { displayUserInputs(userInputFields, updateUserInput) }
         </Panel>
     </Accordion>
 ));
@@ -99,6 +122,8 @@ DeviceInfoView.propTypes = {
     targetType: PropTypes.number,
     deviceInfo: PropTypes.instanceOf(Object),
     isMemLoaded: PropTypes.bool,
+    userInputFields: PropTypes.arrayOf(PropTypes.string),
+    updateUserInput: PropTypes.func.isRequired,
 };
 
 DeviceInfoView.defaultProps = {
@@ -107,6 +132,7 @@ DeviceInfoView.defaultProps = {
     targetType: CommunicationType.UNKNOWN,
     deviceInfo: {},
     isMemLoaded: false,
+    userInputFields: ['appSdReq'],
 };
 
 export default DeviceInfoView;
