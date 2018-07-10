@@ -43,6 +43,7 @@ import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
 import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
 import './resources/css/index.less';
+import { VendorId, USBProductIds } from './lib/util/devices';
 
 export default {
     config: {
@@ -99,14 +100,26 @@ export default {
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
-                const { serialNumber } = action.device;
+                const device = action.device;
+                const serialNumber = device.serialNumber;
                 if (action.device.traits.includes('jlink')) {
                     dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
-                } else if (action.device.traits.includes('nordicUsb')) {
-                    dispatch(usbsdfuTargetActions.openDevice(action.device));
-                } else {
-                    logger.error('Unsupported device. The detected device is neither JLink device nor Nordic USB device.');
+                    break;
                 }
+                if (action.device.traits.includes('nordicUsb')) {
+                    dispatch(usbsdfuTargetActions.openDevice(action.device));
+                    break;
+                }
+                if (action.device.traits.includes('serialport')) {
+                    const { vendorId, productId } = device.serialport;
+                    const vid = parseInt(vendorId.toString(16), 16);
+                    const pid = parseInt(productId.toString(16), 16);
+                    if (vid === VendorId.NORDIC_SEMICONDUCTOR && USBProductIds.includes(pid)) {
+                        dispatch(usbsdfuTargetActions.openDevice(action.device));
+                        break;
+                    }
+                }
+                logger.error('Unsupported device. The detected device is neither JLink device nor Nordic USB device.');
                 break;
             }
             case 'DEVICE_DESELECTED': {
