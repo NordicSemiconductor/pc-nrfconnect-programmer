@@ -132,7 +132,7 @@ DeviceInfoView.defaultProps = {
     targetType: CommunicationType.UNKNOWN,
     deviceInfo: {},
     isMemLoaded: false,
-    userInputFields: ['appSdReq'],
+    userInputFields: [],
 };
 
 export default DeviceInfoView;
