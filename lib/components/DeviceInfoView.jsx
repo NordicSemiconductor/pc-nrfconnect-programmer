@@ -47,12 +47,11 @@ const displayUserInputs = (userInputFields, updateUserInput) => {
     const inputs = [];
     userInputFields.forEach(field => (
         inputs.push(<div key={field}>
-            <h5>field</h5>
+            <h5>{field}</h5>
             <FormControl
                 id={field}
                 type="text"
                 label={field}
-                placeholder={field}
                 onChange={event => updateUserInput(field, event.target.value)}
             />
         </div>)
