@@ -51,10 +51,12 @@ const FileWarnings = (memMaps, targetSize) => {
         if (overlap.length > 1) {
             overlapWarning = (
                 <div className="alert alert-warning" key={`overlap-warning-${startAddress + 1}`}>
-                    <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
-                    <p><strong>Caution!</strong> Some of the .hex files have overlapping data.</p>
-                    <p>In regions with overlapping data, data from the file which
+                    <center>
+                        <Glyphicon glyph="warning-sign" className="warning-sign" />
+                        <p>Some of the .hex files have overlapping data.</p>
+                        <p>In regions with overlapping data, data from the file which
                         was <strong>last</strong> added will be used.</p>
+                    </center>
                 </div>
             );
         }
@@ -74,10 +76,11 @@ const FileWarnings = (memMaps, targetSize) => {
     if (outsideFlashBlocks.length) {
         outsideFlashWarning = (
             <div className="alert alert-warning" key="outside-flash-warning">
-                <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
-                <p><strong>Caution!</strong> There is data outside the
-                    user-writable areas ({ outsideFlashBlocks.join(', ') }).</p>
-                <p> Check that the .hex files are appropiate for the current device.</p>
+                <center>
+                    <Glyphicon glyph="warning-sign" className="warning-sign" />
+                    <p>There is data outside the user-writable areas ({ outsideFlashBlocks.join(', ') }). </p>
+                    <p>Check that the .hex files are appropiate for the current device.</p>
+                </center>
             </div>
         );
     }
@@ -91,9 +94,10 @@ const FileWarnings = (memMaps, targetSize) => {
 const TargetWarnings = targetWarningStrings => (
     targetWarningStrings.map((s, index) => (
         <div className="alert alert-warning" key={`outside-flash-warning-${index + 1}`}>
-            <center><Glyphicon glyph="warning-sign" style={{ fontSize: '3em' }} /></center>
-            <center><p><strong>Caution!</strong></p></center>
-            <p>{s}</p>
+            <center>
+                <Glyphicon glyph="warning-sign" className="warning-sign" />
+                <p>{s}</p>
+            </center>
         </div>
     )));
 
@@ -102,7 +106,7 @@ const WarningView = ({
     targetSize,
     targetWarningStrings,
 }) => (
-    <div>
+    <div className="warning-view">
         { FileWarnings(memMaps, targetSize) }
         { TargetWarnings(targetWarningStrings) }
     </div>

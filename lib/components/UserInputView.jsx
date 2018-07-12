@@ -36,77 +36,59 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Accordion, Panel } from 'react-bootstrap';
-import { hexToKiB } from '../util/hexpad';
-import { getCommunicationType, CommunicationType } from '../util/devices';
+import { Accordion, Panel, FormControl } from 'react-bootstrap';
 
-const DeviceInfoView = ({
-    serialNumber,
-    port,
-    deviceInfo,
-    targetType,
-    isMemLoaded,
-}) => (targetType === CommunicationType.UNKNOWN ? null : (
+const getFieldLabel = field => {
+    switch (field) {
+        case 'appSdReq':
+            return 'SdReq for Application';
+        case 'blSdReq':
+            return 'SdReq for Bootloader';
+        default:
+            throw new Error('User input field is unknown');
+    }
+};
+
+const getFieldPlaceHolder = field => {
+    switch (field) {
+        case 'appSdReq':
+            return '0x00';
+        case 'blSdReq':
+            return '0x00';
+        default:
+            throw new Error('User input field is unknown');
+    }
+};
+
+const UserInputView = ({
+    userInputFields,
+    updateUserInput,
+}) => (!userInputFields.length ? null : (
     <Accordion defaultActiveKey="1" className="device-info">
-        <Panel header="Device Info" eventKey="1">
-            {serialNumber &&
-                <div>
-                    <h5>SerialNumber</h5>
-                    <p>{serialNumber}</p>
+        <Panel header="User Input" eventKey="1">
+            {userInputFields.map(field => (
+                <div key={field}>
+                    <h5>{getFieldLabel(field)}</h5>
+                    <FormControl
+                        id={field}
+                        type="text"
+                        label={field}
+                        placeholder={getFieldPlaceHolder(field)}
+                        onChange={event => updateUserInput(field, event.target.value)}
+                    />
                 </div>
-            }
-            {port &&
-                <div>
-                    <h5>Port</h5>
-                    <p>{port}</p>
-                </div>
-            }
-            <div>
-                <h5>Communication Type</h5>
-                <p>{getCommunicationType(targetType)}</p>
-            </div>
-            {deviceInfo && deviceInfo.romSize &&
-                <div>
-                    <h5>ROM Size</h5>
-                    <p>{hexToKiB(deviceInfo.romSize)}</p>
-                </div>
-            }
-            {deviceInfo && deviceInfo.ramSize &&
-                <div>
-                    <h5>RAM Size</h5>
-                    <p>{hexToKiB(deviceInfo.ramSize)}</p>
-                </div>
-            }
-            {deviceInfo && deviceInfo.pageSize &&
-                <div>
-                    <h5>Page Size</h5>
-                    <p>{hexToKiB(deviceInfo.pageSize)}</p>
-                </div>
-            }
-            {targetType === CommunicationType.JLINK &&
-                <div>
-                    <h5>Device memory is loaded?</h5>
-                    <p>{isMemLoaded ? 'Yes' : 'No'}</p>
-                </div>
-            }
+            ))}
         </Panel>
     </Accordion>
 ));
 
-DeviceInfoView.propTypes = {
-    serialNumber: PropTypes.string,
-    port: PropTypes.string,
-    targetType: PropTypes.number,
-    deviceInfo: PropTypes.instanceOf(Object),
-    isMemLoaded: PropTypes.bool,
+UserInputView.propTypes = {
+    userInputFields: PropTypes.arrayOf(PropTypes.string),
+    updateUserInput: PropTypes.func.isRequired,
 };
 
-DeviceInfoView.defaultProps = {
-    serialNumber: '',
-    port: '',
-    targetType: CommunicationType.UNKNOWN,
-    deviceInfo: {},
-    isMemLoaded: false,
+UserInputView.defaultProps = {
+    userInputFields: [],
 };
 
-export default DeviceInfoView;
+export default UserInputView;
