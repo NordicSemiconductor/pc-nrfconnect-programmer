@@ -96,7 +96,6 @@ export default {
         portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
     }),
     middleware: store => next => action => {
-        const state = store.getState();
         const { dispatch } = store;
         switch (action.type) {
             case 'DEVICE_SELECTED': {
@@ -123,10 +122,6 @@ export default {
                 break;
             }
             case 'DEVICE_DESELECTED': {
-                if (state.app.deviceChange.expectedSerialNumber) {
-                    logger.info(`Waiting for device ${state.app.deviceChange.expectedSerialNumber} to reattach`);
-                    return;
-                }
                 logger.info('Target device closed.');
                 break;
             }
