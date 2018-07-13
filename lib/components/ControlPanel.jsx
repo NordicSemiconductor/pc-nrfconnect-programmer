@@ -38,7 +38,6 @@ import React from 'react';
 import FileLegendView from '../containers/fileLegendView';
 import ButtonGroupView from '../containers/buttonGroupView';
 import WarningView from '../containers/warningView';
-import UserInputView from '../containers/userInputView';
 import DeviceInfoView from '../containers/deviceInfoView';
 import SettingView from '../containers/settingView';
 
@@ -47,7 +46,6 @@ const ControlPanel = () => (
         <div>
             <ButtonGroupView />
             <FileLegendView />
-            <UserInputView />
             <WarningView />
         </div>
         <DeviceInfoView />
