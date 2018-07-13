@@ -36,7 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup, FormControl, Radio } from 'react-bootstrap';
+import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup, Radio } from 'react-bootstrap';
 import { hexpad2 } from '../util/hexpad';
 
 export default class UserInputDialogView extends React.Component {
@@ -61,6 +61,7 @@ export default class UserInputDialogView extends React.Component {
             message,
             choices,
             onOk,
+            onCancel,
         } = this.props;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
@@ -92,7 +93,7 @@ export default class UserInputDialogView extends React.Component {
                     {
                         <Button
                             className="core-btn"
-                            onClick={this.onCancel}
+                            onClick={() => onCancel()}
                         >
                             Cancel
                         </Button>
@@ -108,6 +109,7 @@ UserInputDialogView.propTypes = {
     message: PropTypes.string.isRequired,
     choices: PropTypes.arrayOf(PropTypes.string),
     onOk: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
 };
 
 UserInputDialogView.defaultProps = {
