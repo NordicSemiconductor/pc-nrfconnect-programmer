@@ -71,13 +71,13 @@ export default class UserInputDialogView extends React.Component {
                 <ModalBody>
                     {message}
                     <FormGroup>
-                        {choices.map(choice => (
+                        {Object.keys(choices).map(choice => (
                             <Radio
                                 key={choice}
                                 name="radioGroup"
                                 onClick={() => this.onSelectChoice(choice)}
                             >
-                                {hexpad2(choice)}
+                                {hexpad2(parseInt(choice, 10))} ({choices[choice]})
                             </Radio>
                         ))}
                     </FormGroup>
