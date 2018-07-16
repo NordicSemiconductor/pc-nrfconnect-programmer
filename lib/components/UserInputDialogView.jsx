@@ -106,7 +106,7 @@ export default class UserInputDialogView extends React.Component {
 
 UserInputDialogView.propTypes = {
     isVisible: PropTypes.bool,
-    message: PropTypes.string.isRequired,
+    message: PropTypes.string,
     choices: PropTypes.arrayOf(PropTypes.string),
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
@@ -114,5 +114,6 @@ UserInputDialogView.propTypes = {
 
 UserInputDialogView.defaultProps = {
     isVisible: false,
+    message: '',
     choices: [],
 };
