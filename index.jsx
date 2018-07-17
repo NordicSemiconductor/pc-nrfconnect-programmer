@@ -36,6 +36,7 @@
 
 import React from 'react';
 import { logger } from 'nrfconnect/core';
+import nrfjprog from 'pc-nrfjprog-js';
 import ControlPanel from './lib/components/ControlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
@@ -79,6 +80,17 @@ export default {
             });
             event.preventDefault();
         };
+    },
+    onReady: () => {
+        const logVersion = (err, { major, minor, revision }) => {
+            if (err) return;
+            logger.info(`Using nrfjprog library ${major}.${minor}.${revision}`);
+        };
+        if (nrfjprog.getLibraryVersion) {
+            nrfjprog.getLibraryVersion(logVersion);
+        } else {
+            nrfjprog.getDllVersion(logVersion);
+        }
     },
     decorateMainView: MainView => () => (
         <MainView cssClass="main-view">
