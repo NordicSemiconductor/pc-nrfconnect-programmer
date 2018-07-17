@@ -36,7 +36,6 @@
 
 import React from 'react';
 import { logger } from 'nrfconnect/core';
-import nrfjprog from 'pc-nrfjprog-js';
 import ControlPanel from './lib/components/ControlPanel';
 import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
@@ -45,6 +44,7 @@ import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
 import './resources/css/index.less';
 import { VendorId, USBProductIds } from './lib/util/devices';
+import logJprogVersion from './lib/util/logJprogVersion';
 
 export default {
     config: {
@@ -80,17 +80,8 @@ export default {
             });
             event.preventDefault();
         };
-    },
-    onReady: () => {
-        const logVersion = (err, { major, minor, revision }) => {
-            if (err) return;
-            logger.info(`Using nrfjprog library ${major}.${minor}.${revision}`);
-        };
-        if (nrfjprog.getLibraryVersion) {
-            nrfjprog.getLibraryVersion(logVersion);
-        } else {
-            nrfjprog.getDllVersion(logVersion);
-        }
+
+        logJprogVersion();
     },
     decorateMainView: MainView => () => (
         <MainView cssClass="main-view">
