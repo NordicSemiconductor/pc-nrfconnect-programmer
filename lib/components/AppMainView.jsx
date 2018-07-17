@@ -37,6 +37,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MemoryLayout from '../components/MemoryLayout';
+import UserInputDialogView from '../containers/userInputDialogView';
 
 const AppMainView = (
     props => {
@@ -75,6 +76,8 @@ const AppMainView = (
                         title="Files"
                     />
                 </div>
+
+                <UserInputDialogView />
             </div>
         );
     }
