@@ -44,6 +44,7 @@ import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
 import appReducer from './lib/reducers';
 import './resources/css/index.less';
 import { VendorId, USBProductIds } from './lib/util/devices';
+import logJprogVersion from './lib/util/logJprogVersion';
 
 export default {
     config: {
@@ -79,6 +80,8 @@ export default {
             });
             event.preventDefault();
         };
+
+        logJprogVersion();
     },
     decorateMainView: MainView => () => (
         <MainView cssClass="main-view">
