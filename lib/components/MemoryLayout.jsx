@@ -83,6 +83,7 @@ class MemoryLayout extends React.Component {
             targetSize: max,
             regions,
             refresh,
+            reset,
         } = this.props;
 
         const blocks = [];
@@ -217,6 +218,7 @@ class MemoryLayout extends React.Component {
                 <h1>
                     { this.props.title }
                     { refresh && <Button onClick={refresh}>Read Memory</Button> }
+                    { reset && <Button onClick={reset}>Reset Device</Button> }
                 </h1>
                 <div
                     className="memory-layout-inner"
@@ -242,6 +244,7 @@ MemoryLayout.propTypes = {
     regions: PropTypes.instanceOf(List),
     title: PropTypes.string,
     refresh: PropTypes.func,
+    reset: PropTypes.func,
 };
 
 MemoryLayout.defaultProps = {
@@ -251,6 +254,7 @@ MemoryLayout.defaultProps = {
     loaded: {},
     title: '',
     refresh: null,
+    reset: null,
 };
 
 export default MemoryLayout;

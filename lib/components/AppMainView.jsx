@@ -41,8 +41,16 @@ import UserInputDialogView from '../containers/userInputDialogView';
 
 const AppMainView = (
     props => {
-        const { file, target, refreshEnabled, refreshTargetContents } = props;
+        const {
+            file,
+            target,
+            refreshEnabled,
+            refreshTargetContents,
+            resetEnabled,
+            resetTarget,
+        } = props;
         const refresh = refreshEnabled ? refreshTargetContents : null;
+        const reset = resetEnabled ? resetTarget : null;
 
         let targetMap;
         if (!target.serialNumber) {
@@ -58,6 +66,7 @@ const AppMainView = (
                     targetSize={target.deviceInfo.romSize}
                     title={target.deviceInfo.type || 'nRF 5x'}
                     refresh={refresh}
+                    reset={reset}
                 />
             );
         } else {
@@ -88,6 +97,8 @@ AppMainView.propTypes = {
     target: PropTypes.shape({}).isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
     refreshTargetContents: PropTypes.func.isRequired,
+    resetEnabled: PropTypes.bool.isRequired,
+    resetTarget: PropTypes.func.isRequired,
 };
 
 export default AppMainView;
