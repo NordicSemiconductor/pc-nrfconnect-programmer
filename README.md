@@ -1,17 +1,48 @@
 # nRF Connect Programmer
 
-App for [nRF Connect](https://github.com/NordicSemiconductor/pc-nrfconnect-core) that provides a simple GUI for programming of Nordic Semiconductor devkits/dongles.
+[![Build Status](https://travis-ci.org/NordicSemiconductor/pc-nrfconnect-programmer.svg?branch=master)](https://travis-ci.org/NordicSemiconductor/pc-nrfconnect-programmer)
+[![License](https://img.shields.io/badge/license-Modified%20BSD%20License-blue.svg)](LICENSE)
 
-## Building from source
+*nRF Connect Programmer* is a cross-platform tool that enables programming firmwares to device. Memory layout for both *JLink* and *Nordic USB* devices can be displayed. Content for the *HEX* files can be displayed, too. Moreover, content of *HEX* files can be written to the devices.
 
-### Dependencies
+*nRF Connect Programmer* is implemented as an app for [nRF Connect](https://github.com/NordicSemiconductor/pc-nrfconnect-core#creating-apps).
 
-To build the app you will need to install the following tools:
+![screenshot](resources/programmer-screenshot.png)
 
-* Node.js (>=6.9)
-* npm (>=5.6.0) / yarn (>=1.4.0)
+The app supports the following devices:
+* PCA10028 nRF51 Development Kit
+* PCA10031 nRF51 Dongle
+* PCA10040 nRF52 Development Kit
+* PCA10056 nRF52 Development Kit
+* PCA10059 nRF52 Dongle
 
-### Clone the repository
+
+# Installation
+
+To install the application you can download binaries from the [nRF Connect product page](https://www.nordicsemi.com/eng/Products/Bluetooth-low-energy/nRF-Connect-for-desktop) on Nordic Semiconductor web pages.
+
+nRF Connect currently supports the following operating systems:
+
+* Windows
+* Ubuntu Linux 64-bit
+* macOS
+
+After *nRF Connect* is installed, you can find *Programmer* in the app list by selecting *Add/remove apps*.
+
+
+# Usage documentation
+
+A [User guide](http://infocenter.nordicsemi.com/topic/com.nordic.infocenter.tools/dita/tools/nRF_Connect/nRF_Connect_intro.html?cp=4_2) is available on the *nRF Connect Programmer* product pages.
+
+(To be done)
+
+# Contributing
+
+Feel free to file code related issues on [GitHub Issues](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/issues) and/or submit a pull request. In order to accept your pull request, we need you to sign our Contributor License Agreement (CLA). You will see instructions for doing this after having submitted your first pull request. You only need to sign the CLA once, so if you have already done it for another project in the NordicSemiconductor organization, you are good to go.
+
+# Building from source
+
+## Clone the repository
 
 Open a terminal, go to the following directory, and clone the repository:
 
@@ -20,7 +51,14 @@ Open a terminal, go to the following directory, and clone the repository:
 
 Alternatively, clone the repository in a different directory and symlink it into `.nrfconnect-apps/local`.
 
-### Building
+## Dependencies
+
+To build the app you will need to install the following tools:
+
+* Node.js (>=6.9)
+* npm (>=5.6.0) / yarn (>=1.4.0)
+
+## Building
 
 After cloning the repository, install the required dependencies:
 
@@ -31,3 +69,18 @@ Then build the app:
     npm run dev
 
 If everything was successful, you should now be able to launch the app in nRF Connect.
+
+## Testing
+
+Unit testing can be performed by running:
+
+    npm test
+
+# License
+
+See the [license file](LICENSE) for details.
+
+# Feedback
+
+* Ask questions on [DevZone Questions](https://devzone.nordicsemi.com)
+* File code related issues on [GitHub Issues](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/issues)
