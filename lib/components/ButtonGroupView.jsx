@@ -99,24 +99,27 @@ const ButtonGroupView = ({
         </Button>
 
         <hr style={{ borderColor: 'transparent', margin: '5px 0px' }} />
-
-        <Button
-            onClick={performRecover}
-            disabled={!targetIsReady || !targetIsRecoverable}
-        >
-            <Glyphicon glyph="remove-sign" />Erase all
-        </Button>
+        {targetType === CommunicationType.JLINK &&
+            <div>
+                <Button
+                    onClick={performRecover}
+                    disabled={!targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="remove-sign" />Erase all
+                </Button>
+                <Button
+                    onClick={performRecoverAndWrite}
+                    disabled={!targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="save" />Erase all & write
+                </Button>
+            </div>
+        }
         <Button
             onClick={getWriteAction(targetType, performJLinkWrite, performUSBSDFUWrite)}
             disabled={!targetIsReady || !targetIsWritable}
         >
             <Glyphicon glyph="download-alt" />Write
-        </Button>
-        <Button
-            onClick={performRecoverAndWrite}
-            disabled={!targetIsReady || !targetIsRecoverable}
-        >
-            <Glyphicon glyph="save" />Erase all & write
         </Button>
     </div>
 );

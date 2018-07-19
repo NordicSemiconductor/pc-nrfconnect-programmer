@@ -38,7 +38,7 @@
     "immutable": "^3.8.2",
     "nrf-device-setup": "^0.2.9",
     "nrf-intel-hex": "^1.2.0",
-    "pc-nrf-dfu-js": "^0.2.5",
+    "pc-nrf-dfu-js": "^0.2.6",
     "pc-nrfconnect-devdep": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#semver:^1.2.2",
     "protobufjs": "^6.8.4",
     "unclutter1d": "^0.2.0",
