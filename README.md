@@ -30,12 +30,6 @@ nRF Connect currently supports the following operating systems:
 After *nRF Connect* is installed, you can find *Programmer* in the app list by selecting *Add/remove apps*.
 
 
-# Usage documentation
-
-A [User guide](http://infocenter.nordicsemi.com/topic/com.nordic.infocenter.tools/dita/tools/nRF_Connect/nRF_Connect_intro.html?cp=4_2) is available on the *nRF Connect Programmer* product pages.
-
-(To be done)
-
 # Contributing
 
 Feel free to file code related issues on [GitHub Issues](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/issues) and/or submit a pull request. In order to accept your pull request, we need you to sign our Contributor License Agreement (CLA). You will see instructions for doing this after having submitted your first pull request. You only need to sign the CLA once, so if you have already done it for another project in the NordicSemiconductor organization, you are good to go.
