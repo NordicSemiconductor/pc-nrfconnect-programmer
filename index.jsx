@@ -101,7 +101,7 @@ export default {
     middleware: store => next => action => {
         const { dispatch } = store;
         switch (action.type) {
-            case 'DEVICE_SELECTED': {
+            case 'DEVICE_SETUP_COMPLETE': {
                 const device = action.device;
                 const serialNumber = device.serialNumber;
                 if (action.device.traits.includes('jlink')) {
