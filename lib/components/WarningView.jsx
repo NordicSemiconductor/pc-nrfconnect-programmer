@@ -91,8 +91,8 @@ const FileWarnings = (memMaps, targetSize) => {
     ];
 };
 
-const TargetWarnings = targetWarningStrings => (
-    targetWarningStrings.map((s, index) => (
+const Warnings = (targetWarningStrings, userWarningStrings) => (
+    targetWarningStrings.concat(userWarningStrings).map((s, index) => (
         <div className="alert alert-warning" key={`outside-flash-warning-${index + 1}`}>
             <center>
                 <Glyphicon glyph="warning-sign" className="warning-sign" />
@@ -105,10 +105,11 @@ const WarningView = ({
     memMaps,
     targetSize,
     targetWarningStrings,
+    userWarningStrings,
 }) => (
     <div className="warning-view">
         { FileWarnings(memMaps, targetSize) }
-        { TargetWarnings(targetWarningStrings) }
+        { Warnings(targetWarningStrings, userWarningStrings) }
     </div>
 );
 
@@ -120,6 +121,7 @@ WarningView.propTypes = {
     ).isRequired,
     targetSize: PropTypes.number.isRequired,
     targetWarningStrings: PropTypes.objectOf(List).isRequired,
+    userWarningStrings: PropTypes.objectOf(List).isRequired,
 };
 
 export default WarningView;
