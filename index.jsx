@@ -58,20 +58,10 @@ export default {
         },
     },
     onInit: dispatch => {
-        document.ondrop = event => {
-            event.preventDefault();
-        };
-
-        document.ondragover = document.ondrop;
-
         document.body.ondragover = event => {
-            const dragOverEvent = event;
-            if (!dragOverEvent.dataTransfer.files.length) {
-                dragOverEvent.dataTransfer.dropEffect = 'none';
-                dragOverEvent.dataTransfer.effectAllowed = 'none';
-            } else {
-                dragOverEvent.dataTransfer.effectAllowed = 'uninitialized';
-            }
+            const ev = event;
+            ev.dataTransfer.dropEffect = 'copy';
+            ev.preventDefault();
         };
 
         document.body.ondrop = event => {
