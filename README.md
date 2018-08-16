@@ -51,6 +51,8 @@ To build the app you will need to install the following tools:
 
 * Node.js (>=6.9)
 * npm (>=5.6.0) / yarn (>=1.4.0)
+* libudev-dev (Linux)
+* [nrf-udev](https://github.com/NordicSemiconductor/nrf-udev) (Linux)
 
 ## Building
 
