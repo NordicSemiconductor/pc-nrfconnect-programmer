@@ -51,7 +51,7 @@ const DeviceInfoView = ({
         <Panel header="Device Info" eventKey="1">
             {serialNumber &&
                 <div>
-                    <h5>SerialNumber</h5>
+                    <h5>Serial Number</h5>
                     <p>{serialNumber}</p>
                 </div>
             }

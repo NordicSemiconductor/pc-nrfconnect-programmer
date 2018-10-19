@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -35,17 +36,49 @@
  */
 
 import React from 'react';
-import FileLegendView from '../containers/fileLegendView';
-import ButtonGroupView from '../containers/buttonGroupView';
-import WarningView from '../containers/warningView';
-import DeviceInfoView from '../containers/deviceInfoView';
-import SettingView from '../containers/settingView';
+import PropTypes from 'prop-types';
+import { Glyphicon, Button, ProgressBar, Dropdown, MenuItem, ButtonGroup, Accordion, Panel, Checkbox, Alert } from 'react-bootstrap';
 
-const ControlPanel = () => (
-    <div className="control-panel">
-        <ButtonGroupView />
-        <DeviceInfoView />
-    </div>
-);
+class FantasyView extends React.Component {
 
-export default ControlPanel;
+
+    render() {
+        return (
+            <div className="juhuu">
+                <Alert bsStyle="danger" className="myWarning">
+                    <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
+                </Alert>
+                <div className="container">
+                    <div className="fantasy-view-layout item">
+                        <Panel header="Device">
+                            <div className="centering-container">
+                             </div>
+                        </Panel>
+                    </div>
+                    <div className="spacer"></div>
+                    <div className="fantasy-view-layout item">
+                        <Panel header="File">
+                            <div className="centering-container">
+                                <Alert bsStyle="info" className="deviceHelperInfo">
+                                    <Glyphicon glyph="folder-open" />
+                                    <p>Drag & Drop one or more .hex files here.</p>
+                                </Alert>
+                            </div>
+                        </Panel>
+                    </div>  
+                </div> 
+            </div>         
+        );
+    }
+}
+
+FantasyView.propTypes = {
+   
+};
+
+FantasyView.defaultProps = {
+   
+};
+
+export default FantasyView;
+

@@ -54,7 +54,7 @@ const FileLegendView = ({ loaded, remove }) => (
                     </td>
                     <td>
                         <Glyphicon
-                            glyph="remove-sign"
+                            glyph="minus-sign"
                             onClick={() => { remove(filePath); }}
                             title="Remove this file"
                         />

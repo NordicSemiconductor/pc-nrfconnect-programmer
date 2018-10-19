@@ -38,6 +38,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MemoryLayout from '../components/MemoryLayout';
 import UserInputDialogView from '../containers/userInputDialogView';
+import { Alert } from 'react-bootstrap';
 
 const AppMainView = (
     props => {
@@ -55,9 +56,11 @@ const AppMainView = (
         let targetMap;
         if (!target.serialNumber) {
             targetMap = (
-                <div className="target-map-disconnected">
-                    Connect to a DevKit to see the contents of its non-volatile memory here.
-                </div>
+                <MemoryLayout
+                    regions={file.regions}
+                    targetSize={target.deviceInfo.romSize}
+                    title="Device"
+                />
             );
         } else if (target.serialNumber && target.isReady) {
             const title = target.deviceInfo.type !== 'Unknown' ?
@@ -81,6 +84,9 @@ const AppMainView = (
                     { targetMap }
                 </div>
                 <div className="column">
+                    <Alert bsStyle="warning">
+                        <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
+                    </Alert>;                
                     <MemoryLayout
                         regions={file.regions}
                         targetSize={target.deviceInfo.romSize}
