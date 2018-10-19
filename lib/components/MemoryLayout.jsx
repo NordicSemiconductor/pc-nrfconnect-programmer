@@ -215,11 +215,11 @@ class MemoryLayout extends React.Component {
 
         return (
             <div className="memory-layout">
-                <h1>
+                <h2>
                     { this.props.title }
                     { refresh && <Button onClick={refresh}>Read Memory</Button> }
                     { reset && <Button onClick={reset}>Reset Device</Button> }
-                </h1>
+                </h2>
                 <div
                     className="memory-layout-inner"
                     ref={node => { this.node = node; }}

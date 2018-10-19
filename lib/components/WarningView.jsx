@@ -41,6 +41,8 @@ import { List } from 'immutable';
 import MemoryMap from 'nrf-intel-hex';
 import { hexpad8 } from '../util/hexpad';
 
+const WarningIcon = <Glyphicon glyph="exclamation-sign" className="warning-sign" />;
+
 const FileWarnings = (memMaps, targetSize) => {
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
 
@@ -52,7 +54,7 @@ const FileWarnings = (memMaps, targetSize) => {
             overlapWarning = (
                 <div className="alert alert-warning" key={`overlap-warning-${startAddress + 1}`}>
                     <center>
-                        <Glyphicon glyph="warning-sign" className="warning-sign" />
+                        { WarningIcon }
                         <p>Some of the .hex files have overlapping data.</p>
                         <p>In regions with overlapping data, data from the file which
                         was <strong>last</strong> added will be used.</p>
@@ -77,7 +79,7 @@ const FileWarnings = (memMaps, targetSize) => {
         outsideFlashWarning = (
             <div className="alert alert-warning" key="outside-flash-warning">
                 <center>
-                    <Glyphicon glyph="warning-sign" className="warning-sign" />
+                    { WarningIcon }
                     <p>There is data outside the user-writable areas ({ outsideFlashBlocks.join(', ') }). </p>
                     <p>Check that the .hex files are appropiate for the current device.</p>
                 </center>
@@ -95,7 +97,7 @@ const Warnings = (targetWarningStrings, userWarningStrings) => (
     targetWarningStrings.concat(userWarningStrings).map((s, index) => (
         <div className="alert alert-warning" key={`outside-flash-warning-${index + 1}`}>
             <center>
-                <Glyphicon glyph="warning-sign" className="warning-sign" />
+                { WarningIcon }
                 <p>{s}</p>
             </center>
         </div>

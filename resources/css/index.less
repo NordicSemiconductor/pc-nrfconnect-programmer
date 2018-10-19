@@ -36,21 +36,13 @@
 
 @import './memoryLayout.less';
 @import './controPanel.less';
+@import './fantasyView.less';
 
 .main-view, .side-panel {
     padding: 10px 15px;
 }
 
-.control-panel {
-    height: 100%;
-    flex: 0 0 260px;
-    > * {
-        margin-bottom: 20px;
-    }
-    justify-content: space-between;
-    display: flex;
-    flex-direction: column;
-}
+
 
 .core-main-layout > div:nth-child(2) {
     overflow-y: visible;
@@ -142,4 +134,18 @@
             justify-content: center;
         }
     }
+}
+
+.button-group-view {
+    .btn-group-vertical {
+        width: 100%;
+    }
+    .glyphicon {
+        color: #0080c0;
+    }
+}
+
+.panel-body {
+    padding: 15px;
+    background-color: #f5f5f5;
 }
