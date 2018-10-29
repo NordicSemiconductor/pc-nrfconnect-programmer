@@ -75,7 +75,7 @@ export default {
     },
     decorateMainView: MainView => () => (
         <MainView cssClass="main-view">
-            <AppMainView />
+            <FantasyView />
         </MainView>
     ),
     decorateSidePanel: SidePanel => () => (

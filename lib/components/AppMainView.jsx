@@ -37,8 +37,14 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import { Glyphicon, Button, ProgressBar, Panel, Alert } from 'react-bootstrap';
 
+=======
+import MemoryLayout from '../components/MemoryLayout';
+import UserInputDialogView from '../containers/userInputDialogView';
+import { Alert } from 'react-bootstrap';
+>>>>>>> abc51f3993ed06f0b925ea906d1f048b91c25e12
 
 const AppMainView = (
     props => {
@@ -53,6 +59,7 @@ const AppMainView = (
         const refresh = refreshEnabled ? refreshTargetContents : null;
         const reset = resetEnabled ? resetTarget : null;
 
+<<<<<<< HEAD
         const warningsView = (
             <Alert bsStyle="danger" className="myWarning">
                 <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
