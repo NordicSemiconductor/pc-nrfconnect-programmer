@@ -38,97 +38,97 @@
 @lineWidth: 16px;
 @labelWidth: 80px;
 
-.memory-layout {
-    min-width: 250px;
-    max-width: 750px;
-    height: 100%;
-    position: relative;
-    z-index: 0;
-    box-shadow: 0px 0px 4px 0px #777A89;
-    background: white;
-    line-height: @labelHeight;
-    font-size: @labelHeight;
-    padding: calc(@labelHeight / 2);
+// .memory-layout {
+//     min-width: 250px;
+//     max-width: 750px;
+//     height: 100%;
+//     position: relative;
+//     z-index: 0;
+//     box-shadow: 0px 0px 4px 0px #777A89;
+//     background: white;
+//     line-height: @labelHeight;
+//     font-size: @labelHeight;
+//     padding: calc(@labelHeight / 2);
 
-    h1 {
-        margin-top: 0;
-        margin-bottom: calc(@labelHeight / 2);
-        margin-left: calc(@labelHeight / 2);
-        font-size: calc(@labelHeight * 1.5);
-        line-height: calc(@labelHeight * 4);
-        border-bottom: 1px solid #c0c0c0;
+//     h1 {
+//         margin-top: 0;
+//         margin-bottom: calc(@labelHeight / 2);
+//         margin-left: calc(@labelHeight / 2);
+//         font-size: calc(@labelHeight * 1.5);
+//         line-height: calc(@labelHeight * 4);
+//         border-bottom: 1px solid #c0c0c0;
 
-        button {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-        }
-    }
+//         button {
+//             position: absolute;
+//             right: 10px;
+//             top: 10px;
+//         }
+//     }
 
-    .memory-layout-inner {
-        position: absolute;
-        top: calc(@labelHeight * 4.5);
-        bottom: calc(@labelHeight / 2);
-        right: 0;
-        left: 0;
-        margin: calc(@labelHeight * 1.5);
-        display: flex;
-        flexFlow: row nowrap;
-        alignItems: stretch;
-    }
+//     .memory-layout-inner {
+//         position: absolute;
+//         top: calc(@labelHeight * 4.5);
+//         bottom: calc(@labelHeight / 2);
+//         right: 0;
+//         left: 0;
+//         margin: calc(@labelHeight * 1.5);
+//         display: flex;
+//         flexFlow: row nowrap;
+//         alignItems: stretch;
+//     }
 
-    .block-container {
-        flex: 1 1 auto;
-        position: relative;
-        border: 1px solid black;
+//     .block-container {
+//         flex: 1 1 auto;
+//         position: relative;
+//         border: 1px solid black;
 
-        .inline-label {
-            position: absolute;
-            text-align: center;
-            line-height: 10px;
-            font-size: 12px;
-            width: 100%;
-            border-bottom: 1px solid black;
-        }
+//         .inline-label {
+//             position: absolute;
+//             text-align: center;
+//             line-height: 10px;
+//             font-size: 12px;
+//             width: 100%;
+//             border-bottom: 1px solid black;
+//         }
 
-        .memory-block {
-            position: absolute;
-            width: 100%;
-            min-height: 2px;
-        }
-    }
+//         .memory-block {
+//             position: absolute;
+//             width: 100%;
+//             min-height: 2px;
+//         }
+//     }
 
-    .address-lines {
-        flex: 0 1 auto;
-        position: relative;
-        width: @lineWidth;
-        stroke: black;
-        stroke-width: 0.5px;
-    }
+//     .address-lines {
+//         flex: 0 1 auto;
+//         position: relative;
+//         width: @lineWidth;
+//         stroke: black;
+//         stroke-width: 0.5px;
+//     }
 
-    .address-labels {
-        flex: 0 1 auto;
-        position: relative;
-        min-width: @labelWidth;
+//     .address-labels {
+//         flex: 0 1 auto;
+//         position: relative;
+//         min-width: @labelWidth;
 
-        .address-label {
-            left: 0;
-            position: absolute;
-            font-family: monospace;
-        }
-    }
+//         .address-label {
+//             left: 0;
+//             position: absolute;
+//             font-family: monospace;
+//         }
+//     }
 
-    .memory-bar-vertical {
-        width: 100%;
-        min-height: 100%;
-        float: left;
-        box-shadow: 0px 0px 4px 0px #777A89;
-      }
+//     .memory-bar-vertical {
+//         width: 100%;
+//         min-height: 100%;
+//         float: left;
+//         box-shadow: 0px 0px 4px 0px #777A89;
+//       }
 
-    .memory-bar-vertical .progress-bar {
-        width: 40%;
-        -webkit-transition: height 1s ease;
-        -o-transition: height 1s ease;
-        transition: height 1s ease;
-    }
-}
+//     .memory-bar-vertical .progress-bar {
+//         width: 40%;
+//         -webkit-transition: height 1s ease;
+//         -o-transition: height 1s ease;
+//         transition: height 1s ease;
+//     }
+// }

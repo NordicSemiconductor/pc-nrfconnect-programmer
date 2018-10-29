@@ -42,10 +42,55 @@
     padding: 10px 15px;
 }
 
-
-
 .core-main-layout > div:nth-child(2) {
     overflow-y: visible;
+}
+
+.app-main-view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        width: 100%;
+        height: 100%;
+        padding: 0px;
+        margin-bottom: 2%;
+    }
+
+    .memory-layout {
+        height: 100%;
+        width: 100%;
+        flex-grow: 1;
+
+        .panel {
+            height: 100%;
+        }
+        .panel-heading {
+            background-color: #fff;
+        }
+        .panel-body {
+            padding: 15px;
+            background-color: #fff;
+            height: 92%;
+            display: flex;
+        }
+    }
+
+    .memory-layout-container {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+    }
+
 }
 
 .control-panel > div:nth-child(1) {
@@ -114,27 +159,6 @@
     }
 }
 
-
-.app-main-view {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    .column {
-        flex: 0 0 ~'calc(50% - 8px)';
-        display: flex;
-        justify-content: space-around;
-        flex-direction: column;
-
-        .target-map-disconnected {
-            display: flex;
-            justify-content: center;
-        }
-    }
-}
 
 .button-group-view {
     .btn-group-vertical {

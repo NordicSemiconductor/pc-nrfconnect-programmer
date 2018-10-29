@@ -37,14 +37,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-<<<<<<< HEAD
-import { Glyphicon, Button, ProgressBar, Panel, Alert } from 'react-bootstrap';
-
-=======
 import MemoryLayout from '../components/MemoryLayout';
 import UserInputDialogView from '../containers/userInputDialogView';
-import { Alert } from 'react-bootstrap';
->>>>>>> abc51f3993ed06f0b925ea906d1f048b91c25e12
+import { Alert, Glyphicon, Panel } from 'react-bootstrap';
 
 const AppMainView = (
     props => {
@@ -59,22 +54,19 @@ const AppMainView = (
         const refresh = refreshEnabled ? refreshTargetContents : null;
         const reset = resetEnabled ? resetTarget : null;
 
-<<<<<<< HEAD
         const warningsView = (
             <Alert bsStyle="danger" className="myWarning">
                 <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
             </Alert>
         );
         const deviceView = (
-            <div className="centering-container"></div>
+            <div></div>
         );
         const fileView = (
-            <div className="centering-container">
-                <Alert bsStyle="info" className="deviceHelperInfo">
-                    <Glyphicon glyph="folder-open" />
-                    <p>Drag & Drop one or more .hex files here.</p>
-                </Alert>
-            </div>
+            <Alert bsStyle="info" className="deviceHelperInfo">
+                <Glyphicon glyph="folder-open" />
+                <p>Drag & Drop one or more .hex files here.</p>
+            </Alert>
         );
         // let targetMap;
         // if (!target.serialNumber) {
@@ -102,21 +94,27 @@ const AppMainView = (
         // }
 
         return (
-            <div className="juhuu">
+            <div className="app-main-view">
                 { warningsView }
                 <div className="container">
-                    <div className="fantasy-view-layout item">
+                    <div className="memory-layout">
                         <Panel header="Device">
-                            { deviceView }
-                        </Panel>
-                    </div>
-                    <div className="spacer"></div>
-                    <div className="fantasy-view-layout item">
-                        <Panel header="File">
-                            { fileView }
+                            <div className="memory-layout-container">
+                                { deviceView }
+                            </div>
                         </Panel>
                     </div>
                 </div>
+                <div className="container">
+                    <div className="memory-layout">
+                        <Panel header="File">
+                            <div className="memory-layout-container">
+                                { fileView }
+                            </div>
+                        </Panel>
+                    </div>
+                </div>
+                <UserInputDialogView />
             </div>
         );
         // return (
