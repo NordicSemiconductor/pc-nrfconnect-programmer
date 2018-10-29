@@ -38,64 +38,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Glyphicon, Button, ProgressBar, Popover, Panel, Alert, OverlayTrigger } from 'react-bootstrap';
-import RegionBarView from './RegionBarView';
-
-console.log(RegionBarView);
-
-const popover = (
-  <Popover id="popover-top" title="Popover right">
-    And here's some <strong>amazing</strong> content. It's very engaging. right?
-  </Popover>
-);
+import RegionView from './RegionView';
 
 
-
-class FantasyView extends React.Component {
-    // componentDidMount() {
-    //     const pop = document.getElementById('[data-toggle="popover"]');
-    //     pop.popover();
-    // }
+class RegionBarView extends React.Component {
     render() {       
         return (
-            <div className="juhuu">
-                <Alert bsStyle="danger hide" className="myWarning">
-                    <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
-                </Alert>
-                <div className="container">
-                <div className="fantasy-view-layout item">
-                        <div className="panel panel-default">
-                            <div className="panel-heading">
-                                <h3 className="panel-title">File</h3>
-                            </div>
-                            <div className="panel-body">
-                                <RegionBarView />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="spacer"></div>
-                    <div className="fantasy-view-layout item">
-                        <div className="panel panel-default">
-                            <div className="panel-heading">
-                                <h3 className="panel-title">File</h3>
-                            </div>
-                            <div className="panel-body">
-                                <RegionBarView />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="regionContainer">
+                <RegionView  width={1} color={"#aaa"} striped active />
+                <RegionView  width={1} color={"#ccc"}  />
+                <RegionView  width={1} color={"#0080B7"} striped />
+                <RegionView  width={50} color={"#ccc"} />
             </div>
         );
     }
 }
 
-FantasyView.propTypes = {
-
-};
-
-FantasyView.defaultProps = {
-
-};
-
-export default FantasyView;
+export default RegionBarView;
 

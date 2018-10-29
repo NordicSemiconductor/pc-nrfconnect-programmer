@@ -38,64 +38,71 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Glyphicon, Button, ProgressBar, Popover, Panel, Alert, OverlayTrigger } from 'react-bootstrap';
-import RegionBarView from './RegionBarView';
 
-console.log(RegionBarView);
+const RegionView = ({
+    width,
+    active,
+    striped,
+    color,
+}) => {
 
-const popover = (
-  <Popover id="popover-top" title="Popover right">
-    And here's some <strong>amazing</strong> content. It's very engaging. right?
-  </Popover>
-);
+    const popover = (
+        <Popover id="popover-top">
+            <p>
+                START <strong>0x000001212</strong>
+            </p>
+            <p>
+                STOP 0x000001212
+            </p>
+            <p>
+                SIZE 1024 Bytes
+            </p> 
+            <p>
+                TYPE SoftDevice
+            </p>
+            <p>
+                SoftDevice version SD310v6.5
+            </p>            
+            <p>
+                Filename: ksjdhfkdsfbsdf_cljuh feduhwefw-weuifhu.hex
+            </p>         
+        </Popover>
+    );
 
-
-
-class FantasyView extends React.Component {
-    // componentDidMount() {
-    //     const pop = document.getElementById('[data-toggle="popover"]');
-    //     pop.popover();
-    // }
-    render() {       
-        return (
-            <div className="juhuu">
-                <Alert bsStyle="danger hide" className="myWarning">
-                    <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
-                </Alert>
-                <div className="container">
-                <div className="fantasy-view-layout item">
-                        <div className="panel panel-default">
-                            <div className="panel-heading">
-                                <h3 className="panel-title">File</h3>
-                            </div>
-                            <div className="panel-body">
-                                <RegionBarView />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="spacer"></div>
-                    <div className="fantasy-view-layout item">
-                        <div className="panel panel-default">
-                            <div className="panel-heading">
-                                <h3 className="panel-title">File</h3>
-                            </div>
-                            <div className="panel-body">
-                                <RegionBarView />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+    let className = 'region';
+    if (striped) {
+        className = className + ' striped';
     }
-}
-
-FantasyView.propTypes = {
-
+    if (active) {
+        className = className + ' active';
+    }
+    console.log(className);
+    return (
+        <OverlayTrigger overlay={popover} trigger={ ['click', 'hover'] } placement="right" positionLeft={-100}>
+            <div 
+                className={ className } 
+                style= {{ 
+                    flexGrow: width,
+                    backgroundColor: color,
+                }}>
+            </div>
+        </OverlayTrigger>
+    )
 };
 
-FantasyView.defaultProps = {
 
+RegionView.propTypes = {
+    width: PropTypes.number.isRequired,
+    active: PropTypes.bool.isRequired,
+    striped: PropTypes.bool.isRequired,
+    color: PropTypes.string.isRequired,
 };
 
-export default FantasyView;
+RegionView.defaultProps = {
+    width: 10,
+    active: false,
+    striped: false,
+};
+
+export default RegionView;
 
