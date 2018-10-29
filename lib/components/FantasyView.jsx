@@ -37,7 +37,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon, Button, ProgressBar, Dropdown, MenuItem, ButtonGroup, Accordion, Panel, Checkbox, Alert } from 'react-bootstrap';
+import { Glyphicon, Button, ProgressBar, Panel, Alert } from 'react-bootstrap';
+
 
 class FantasyView extends React.Component {
 
@@ -45,39 +46,65 @@ class FantasyView extends React.Component {
     render() {
         return (
             <div className="juhuu">
-                <Alert bsStyle="danger" className="myWarning">
+                <Alert bsStyle="danger hide" className="myWarning">
                     <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
                 </Alert>
                 <div className="container">
                     <div className="fantasy-view-layout item">
-                        <Panel header="Device">
-                            <div className="centering-container">
-                             </div>
-                        </Panel>
+                        <div className="panel panel-default">
+                            <div className="panel-heading">
+                                <h3 className="panel-title">Device</h3>
+                            </div>
+                            <div className="panel-body">
+                                <ProgressBar>
+                                    <ProgressBar active bsStyle="primary" now={2} key={1} />
+                                    <ProgressBar active bsStyle="danger" now={0.2} key={2} />
+                                    <ProgressBar active bsStyle="primary" now={2} key={3} />
+                                    <ProgressBar active bsStyle="danger" now={0.2} key={4} />     
+                                    <ProgressBar active bsStyle="primary" now={2} key={5} />
+                                    <ProgressBar active bsStyle="danger" now={0.2} key={6} /> 
+                                    <ProgressBar active bsStyle="primary" now={2} key={7} />
+                                    <ProgressBar active bsStyle="danger" now={0.2} key={8} /> 
+                                    <ProgressBar bsStyle="warning" now={20} key={9} />                               
+                                    <ProgressBar active bsStyle="primary" now={20} key={10} />
+                                </ProgressBar>
+                            </div>
+                        </div>
                     </div>
                     <div className="spacer"></div>
                     <div className="fantasy-view-layout item">
-                        <Panel header="File">
-                            <div className="centering-container">
-                                <Alert bsStyle="info" className="deviceHelperInfo">
-                                    <Glyphicon glyph="folder-open" />
-                                    <p>Drag & Drop one or more .hex files here.</p>
-                                </Alert>
+                    <div className="panel panel-default">
+                            <div className="panel-heading">
+                                <h3 className="panel-title">File</h3>
                             </div>
-                        </Panel>
-                    </div>  
-                </div> 
-            </div>         
+                            <div className="panel-body">
+                                <ProgressBar>
+                                    <ProgressBar bsStyle="primary" now={2} key={1} />
+                                    <ProgressBar bsStyle="danger" now={0.2} key={2} />
+                                    <ProgressBar bsStyle="primary" now={2} key={3} />
+                                    <ProgressBar bsStyle="danger" now={0.2} key={4} />     
+                                    <ProgressBar bsStyle="primary" now={2} key={5} />
+                                    <ProgressBar bsStyle="danger" now={0.2} key={6} /> 
+                                    <ProgressBar bsStyle="primary" now={2} key={7} />
+                                    <ProgressBar bsStyle="danger" now={0.2} key={8} /> 
+                                    <ProgressBar bsStyle="warning" now={20} key={9} />                               
+                                    <ProgressBar bsStyle="primary" now={20} key={10} />
+                                </ProgressBar>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         );
     }
 }
 
 FantasyView.propTypes = {
-   
+
 };
 
 FantasyView.defaultProps = {
-   
+
 };
 
 export default FantasyView;
