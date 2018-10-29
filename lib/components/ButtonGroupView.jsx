@@ -74,11 +74,13 @@ const ButtonGroupView = ({
     performUSBSDFUWrite,
     performRecover,
     performRecoverAndWrite,
+    performSaveAsFile,
     mruFiles,
     targetType,
     targetIsReady,
     targetIsWritable,
     targetIsRecoverable,
+    targetIsMemLoaded,
 }) => (
     <div>
         <Dropdown pullRight id="files-dropdown">
@@ -113,6 +115,12 @@ const ButtonGroupView = ({
                 >
                     <Glyphicon glyph="save" />Erase all & write
                 </Button>
+                <Button
+                    onClick={performSaveAsFile}
+                    disabled={!targetIsMemLoaded}
+                >
+                    <Glyphicon glyph="save" />Save memory as file
+                </Button>
             </div>
         }
         <Button
@@ -134,11 +142,13 @@ ButtonGroupView.propTypes = {
     performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
+    performSaveAsFile: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     targetType: PropTypes.number.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
     targetIsRecoverable: PropTypes.bool.isRequired,
+    targetIsMemLoaded: PropTypes.bool.isRequired,
 };
 
 export default ButtonGroupView;
