@@ -183,7 +183,6 @@ const ButtonGroupView = ({
                 <Checkbox>Auto read memory</Checkbox>
             </Panel>
         </Accordion>
->>>>>>> changed stuff ;)
     </div>
 );
 

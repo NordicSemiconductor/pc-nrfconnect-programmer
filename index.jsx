@@ -37,7 +37,7 @@
 import React from 'react';
 import { logger } from 'nrfconnect/core';
 import ControlPanel from './lib/components/ControlPanel';
-import FantasyView from './lib/components/FantasyView';
+import AppMainView from './lib/components/AppMainView';
 import * as fileActions from './lib/actions/fileActions';
 import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
 import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
@@ -75,7 +75,7 @@ export default {
     },
     decorateMainView: MainView => () => (
         <MainView cssClass="main-view">
-            <FantasyView />
+            <AppMainView />
         </MainView>
     ),
     decorateSidePanel: SidePanel => () => (

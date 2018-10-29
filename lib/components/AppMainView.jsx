@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -36,9 +37,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import MemoryLayout from '../components/MemoryLayout';
-import UserInputDialogView from '../containers/userInputDialogView';
-import { Alert } from 'react-bootstrap';
+import { Glyphicon, Button, ProgressBar, Panel, Alert } from 'react-bootstrap';
+
 
 const AppMainView = (
     props => {
@@ -53,50 +53,84 @@ const AppMainView = (
         const refresh = refreshEnabled ? refreshTargetContents : null;
         const reset = resetEnabled ? resetTarget : null;
 
-        let targetMap;
-        if (!target.serialNumber) {
-            targetMap = (
-                <MemoryLayout
-                    regions={file.regions}
-                    targetSize={target.deviceInfo.romSize}
-                    title="Device"
-                />
-            );
-        } else if (target.serialNumber && target.isReady) {
-            const title = target.deviceInfo.type !== 'Unknown' ?
-                target.deviceInfo.type : target.deviceInfo.family;
-            targetMap = (
-                <MemoryLayout
-                    regions={target.regions}
-                    targetSize={target.deviceInfo.romSize}
-                    title={title}
-                    refresh={refresh}
-                    reset={reset}
-                />
-            );
-        } else {
-            targetMap = <div className="memlayout-spinner" />;
-        }
-
-        return (
-            <div className="app-main-view">
-                <div className="column">
-                    { targetMap }
-                </div>
-                <div className="column">
-                    <Alert bsStyle="warning">
-                        <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
-                    </Alert>;                
-                    <MemoryLayout
-                        regions={file.regions}
-                        targetSize={target.deviceInfo.romSize}
-                        title="Files"
-                    />
-                </div>
-
-                <UserInputDialogView />
+        const warningsView = (
+            <Alert bsStyle="danger" className="myWarning">
+                <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
+            </Alert>
+        );
+        const deviceView = (
+            <div className="centering-container"></div>
+        );
+        const fileView = (
+            <div className="centering-container">
+                <Alert bsStyle="info" className="deviceHelperInfo">
+                    <Glyphicon glyph="folder-open" />
+                    <p>Drag & Drop one or more .hex files here.</p>
+                </Alert>
             </div>
         );
+        // let targetMap;
+        // if (!target.serialNumber) {
+        //     targetMap = (
+        //         <MemoryLayout
+        //             regions={file.regions}
+        //             targetSize={target.deviceInfo.romSize}
+        //             title="Device"
+        //         />
+        //     );
+        // } else if (target.serialNumber && target.isReady) {
+        //     const title = target.deviceInfo.type !== 'Unknown' ?
+        //         target.deviceInfo.type : target.deviceInfo.family;
+        //     targetMap = (
+        //         <MemoryLayout
+        //             regions={target.regions}
+        //             targetSize={target.deviceInfo.romSize}
+        //             title={title}
+        //             refresh={refresh}
+        //             reset={reset}
+        //         />
+        //     );
+        // } else {
+        //     targetMap = <div className="memlayout-spinner" />;
+        // }
+
+        return (
+            <div className="juhuu">
+                { warningsView }
+                <div className="container">
+                    <div className="fantasy-view-layout item">
+                        <Panel header="Device">
+                            { deviceView }
+                        </Panel>
+                    </div>
+                    <div className="spacer"></div>
+                    <div className="fantasy-view-layout item">
+                        <Panel header="File">
+                            { fileView }
+                        </Panel>
+                    </div>
+                </div>
+            </div>
+        );
+        // return (
+        //     <div className="app-main-view">
+        //         <div className="column">
+        //             { targetMap }
+        //         </div>
+        //         <div className="column">
+        //             <Alert bsStyle="warning">
+        //                 <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
+        //             </Alert>;
+        //             <MemoryLayout
+        //                 regions={file.regions}
+        //                 targetSize={target.deviceInfo.romSize}
+        //                 title="Files"
+        //             />
+        //         </div>
+
+        //         <UserInputDialogView />
+        //     </div>
+        // );
     }
 );
 
