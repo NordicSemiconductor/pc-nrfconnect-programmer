@@ -60,11 +60,13 @@ const AppMainView = (
                 </div>
             );
         } else if (target.serialNumber && target.isReady) {
+            const title = target.deviceInfo.type !== 'Unknown' ?
+                target.deviceInfo.type : target.deviceInfo.family;
             targetMap = (
                 <MemoryLayout
                     regions={target.regions}
                     targetSize={target.deviceInfo.romSize}
-                    title={target.deviceInfo.type || 'nRF 5x'}
+                    title={title}
                     refresh={refresh}
                     reset={reset}
                 />
