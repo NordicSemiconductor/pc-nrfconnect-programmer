@@ -37,7 +37,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import MemoryLayout from '../components/MemoryLayout';
+import MemoryView from '../containers/memoryView';
 import UserInputDialogView from '../containers/userInputDialogView';
 import { Alert, Glyphicon, Panel } from 'react-bootstrap';
 
@@ -59,16 +59,16 @@ const AppMainView = (
                 <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
             </Alert>
         );
-        const deviceView = (
+        let deviceView = (
             <div></div>
         );
-        const fileView = (
+        let fileView = (
             <Alert bsStyle="info" className="deviceHelperInfo">
                 <Glyphicon glyph="folder-open" />
                 <p>Drag & Drop one or more .hex files here.</p>
             </Alert>
         );
-        console.log(target);
+
         let targetMap;
         if (!target.serialNumber) {
         //     targetMap = (
@@ -81,6 +81,9 @@ const AppMainView = (
         } else if (target.serialNumber && target.isReady) {
             const title = target.deviceInfo.type !== 'Unknown' ?
                 target.deviceInfo.type : target.deviceInfo.family;
+                deviceView = (
+                    <MemoryView />
+                );
         //     targetMap = (
         //         <MemoryLayout
         //             regions={target.regions}
@@ -94,6 +97,7 @@ const AppMainView = (
         //     targetMap = <div className="memlayout-spinner" />;
         }
 
+        console.log(file);
         return (
             <div className="app-main-view">
                 { warningsView }
