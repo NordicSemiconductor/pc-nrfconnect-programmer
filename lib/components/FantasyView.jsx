@@ -58,21 +58,20 @@ class FantasyView extends React.Component {
     render() {       
         return (
             <div className="juhuu">
-                <Alert bsStyle="danger hide" className="myWarning">
+                <Alert bsStyle="warning" className="myWarning hide">
                     <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
-                </Alert>
+                </Alert>                                                           
                 <div className="container">
                 <div className="fantasy-view-layout item">
                         <div className="panel panel-default">
                             <div className="panel-heading">
-                                <h3 className="panel-title">File</h3>
+                                <h3 className="panel-title">Device</h3>
                             </div>
                             <div className="panel-body">
                                 <RegionBarView />
                             </div>
                         </div>
                     </div>
-                    <div className="spacer"></div>
                     <div className="fantasy-view-layout item">
                         <div className="panel panel-default">
                             <div className="panel-heading">
@@ -82,7 +81,7 @@ class FantasyView extends React.Component {
                                 <RegionBarView />
                             </div>
                         </div>
-                    </div>
+                    </div>                                     
                 </div>
             </div>
         );
