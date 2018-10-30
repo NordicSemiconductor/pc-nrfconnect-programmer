@@ -68,8 +68,9 @@ const AppMainView = (
                 <p>Drag & Drop one or more .hex files here.</p>
             </Alert>
         );
-        // let targetMap;
-        // if (!target.serialNumber) {
+        console.log(target);
+        let targetMap;
+        if (!target.serialNumber) {
         //     targetMap = (
         //         <MemoryLayout
         //             regions={file.regions}
@@ -77,9 +78,9 @@ const AppMainView = (
         //             title="Device"
         //         />
         //     );
-        // } else if (target.serialNumber && target.isReady) {
-        //     const title = target.deviceInfo.type !== 'Unknown' ?
-        //         target.deviceInfo.type : target.deviceInfo.family;
+        } else if (target.serialNumber && target.isReady) {
+            const title = target.deviceInfo.type !== 'Unknown' ?
+                target.deviceInfo.type : target.deviceInfo.family;
         //     targetMap = (
         //         <MemoryLayout
         //             regions={target.regions}
@@ -89,9 +90,9 @@ const AppMainView = (
         //             reset={reset}
         //         />
         //     );
-        // } else {
+        } else {
         //     targetMap = <div className="memlayout-spinner" />;
-        // }
+        }
 
         return (
             <div className="app-main-view">

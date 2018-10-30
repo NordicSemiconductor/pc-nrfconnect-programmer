@@ -37,7 +37,7 @@
 import React from 'react';
 import { logger } from 'nrfconnect/core';
 import ControlPanel from './lib/components/ControlPanel';
-import AppMainView from './lib/components/AppMainView';
+import AppMainView from './lib/containers/appMainView';
 import * as fileActions from './lib/actions/fileActions';
 import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
 import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
