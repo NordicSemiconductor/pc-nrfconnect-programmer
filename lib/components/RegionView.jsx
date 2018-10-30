@@ -47,25 +47,36 @@ const RegionView = ({
 }) => {
 
     const popover = (
-        <Popover id="popover-top">
-            <p>
-                START <strong>0x000001212</strong>
-            </p>
-            <p>
-                STOP 0x000001212
-            </p>
-            <p>
-                SIZE 1024 Bytes
-            </p> 
-            <p>
-                TYPE SoftDevice
-            </p>
-            <p>
-                SoftDevice version SD310v6.5
-            </p>            
-            <p>
-                Filename: ksjdhfkdsfbsdf_cljuh feduhwefw-weuifhu.hex
-            </p>         
+        <Popover id="popover-top" className="memory-details">
+            <div>
+                <h5>Start address</h5>
+                <p>0x000020</p>
+            </div>
+            <hr></hr>
+            <div>
+                <h5>End address</h5>
+                <p>0x001230</p>
+            </div>
+            <hr></hr>
+            <div>
+                <h5>Size</h5>
+                <p>1024 Bytes</p>
+            </div>
+            <hr></hr>
+            <div>
+                <h5>Type</h5>
+                <p>SoftDevice</p>
+            </div>
+            <hr></hr>
+            <div>
+                <h5>SoftDevice version</h5>
+                <p>S310v2.1</p>
+            </div>   
+            <hr></hr>
+            <div>
+                <h5>Filename</h5>
+                <p>nrf91_my_fantastic_firmware.hex</p>
+            </div>                                                                  
         </Popover>
     );
 

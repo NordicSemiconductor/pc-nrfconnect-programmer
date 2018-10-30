@@ -1,3 +1,53 @@
+
+.fantasy-view-layout {
+    .panel-body {
+        padding: 15px;
+        background-color: #fff;
+        height: 92%;
+        display: flex;
+        padding-bottom: 1px;
+    }
+    .panel-heading {
+        background-color: #fff;
+    }
+    .panel {
+        height: 100%;
+    }
+    .panel-title {
+        color: gray;
+        .glyphicon {
+            color: #ddd;
+        }
+    }
+    height: 100%;
+    flex-grow: 1;
+    padding: 3%;
+    max-width: 500px;
+}
+
+.container {
+    display: flex; /* or inline-flex */
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+  }
+
+  .spacer {
+      height: 20px;
+  }
+
+
+  .juhuu {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      flex-direction: column;
+  }
+
 .alert {
     margin-bottom: 10px;
 }
@@ -36,10 +86,8 @@
  .regionContainer {
     background-color: #ccc;
     display: flex;
-    margin-left: 15px;
-    margin-right: 15px;
-    /* margin-top: 8%; */
-    height: 40%;
+    flex-direction: column-reverse;
+    height: 100%;
     width: 100%;
     align-self: center;
 }
@@ -49,7 +97,7 @@
  }
 
  .striped:hover {
-    background-color: rgba(0, 128, 183, 0.75) !important;
+    background-color: #005c84 !important;
  }
 
  .striped {
@@ -60,4 +108,31 @@
 
 .active {
     animation: progress-bar-stripes 1s linear infinite;
+}
+
+#popover-top {
+    border-radius: 0px;
+    margin-left: -20px;
+}
+
+.popover-content {
+    color: #005c84;
+}
+
+.popover-content h5 {
+    font-size: 12px;
+    line-height: 6px;
+    color: darkgrey;
+}
+
+.popover-content p {
+    font-size: 15x;
+    line-height: 12px;
+}
+
+.popover-content hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 0;
+    border-top: 1px solid #eeeeee
 }
