@@ -65,7 +65,7 @@ class FantasyView extends React.Component {
                 <div className="fantasy-view-layout item">
                         <div className="panel panel-default">
                             <div className="panel-heading">
-                                <h3 className="panel-title">Device</h3>
+                                <h3 className="panel-title">Device Memory Layout</h3>
                             </div>
                             <div className="panel-body">
                                 <RegionBarView />
@@ -75,7 +75,7 @@ class FantasyView extends React.Component {
                     <div className="fantasy-view-layout item">
                         <div className="panel panel-default">
                             <div className="panel-heading">
-                                <h3 className="panel-title">File</h3>
+                                <h3 className="panel-title">File Memory Layout</h3>
                             </div>
                             <div className="panel-body">
                                 <RegionBarView />
