@@ -46,12 +46,12 @@ class RegionBarView extends React.Component {
         return (
             <div className="regionContainer">
                 <RegionView  width={5} color={"#0080B7"} striped />
-                <RegionView  width={1} color={"#ccc"}  />
-                <RegionView  width={3} color={"#0080B7"} striped />
-                <RegionView  width={25} color={"#ccc"} />
-                <RegionView  width={20} color={"#0080B7"} striped/>
-                <RegionView  width={25} color={"#ccc"} />
-                <RegionView  width={20} color={"#0080B7"} striped/>             
+                <RegionView  width={1} color={"#bbb"} />
+                <RegionView  width={5} color={"#0080B7"} striped />
+                <RegionView  width={25} color={"#bbb"} />
+                <RegionView  width={20} color={"#0080B7"} striped />
+                <RegionView  width={25} color={"#bbb"} />
+                <RegionView  width={20} color={"#0080B7"} striped />             
             </div>
         );
     }
