@@ -70,6 +70,9 @@ const AppMainView = (
         );
 
         let targetMap;
+                deviceView = (
+                    <MemoryView />
+                );
         if (!target.serialNumber) {
         //     targetMap = (
         //         <MemoryLayout
@@ -100,62 +103,38 @@ const AppMainView = (
         console.log(file);
         return (
             <div className="app-main-view">
-                { warningsView }
+                {/* { warningsView } */}
                 <div className="container">
                     <div className="memory-layout">
-                        <Panel header="Device">
-                            <div className="memory-layout-container">
+                        <div className="panel panel-default">
+                            <div className="panel-heading">
+                                <h3 className="panel-title">Device Memory Layout <span className="pull-right glyphicon glyphicon-flash"></span></h3>
+                            </div>
+                            <div className="panel-body">
+                                <div className="memory-layout-container">
                                 { deviceView }
+                                    {/* <h1><span className="glyphicon glyphicon-flash"></span></h1>
+                                    <p>Connect a device to display memory contents</p> */}
+                                </div>
                             </div>
-                        </Panel>
+                        </div>
                     </div>
-                </div>
-                <div className="container">
-                    {/* <div className="memory-layout">
-                        <Panel header="File">
-                            <div className="memory-layout-container">
-                                { fileView }
+                    <div className="memory-layout">
+                        <div className="panel panel-default">
+                            <div className="panel-heading">
+                                <h3 className="panel-title">File Memory Layout <span className="pull-right glyphicon glyphicon-folder-open"></span></h3>
                             </div>
-                        </Panel>
-                    </div> */}
+                            <div className="panel-body">
+                                <div className="memory-layout-container">
+                                <h1><span className="glyphicon glyphicon-folder-open"></span></h1>
+                                    <p>Drag & Drop one or more .hex files here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <UserInputDialogView />
             </div>
-            // <div className="juhuu">
-            //     <Alert bsStyle="warning" className="myWarning hide">
-            //         <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
-            //     </Alert>
-            //     <div className="container">
-            //     <div className="fantasy-view-layout item">
-            //             <div className="panel panel-default">
-            //                 <div className="panel-heading">
-            //                     <h3 className="panel-title">Device Memory Layout <span className="pull-right glyphicon glyphicon-flash"></span></h3>
-            //                 </div>
-            //                 <div className="panel-body">
-            //                     {/* <RegionBarView /> */}
-            //                     <div className="centering-container">
-            //                         <h1><span className="glyphicon glyphicon-flash"></span></h1>
-            //                         <p>Connect a device to display memory contents</p>
-            //                     </div>
-            //                 </div>
-            //             </div>
-            //         </div>
-            //         <div className="fantasy-view-layout item">
-            //             <div className="panel panel-default">
-            //                 <div className="panel-heading">
-            //                     <h3 className="panel-title">File Memory Layout <span className="pull-right glyphicon glyphicon-folder-open"></span></h3>
-            //                 </div>
-            //                 <div className="panel-body">
-            //                     {/* <RegionBarView /> */}
-            //                     <div className="centering-container">
-            //                     <h1><span className="glyphicon glyphicon-folder-open"></span></h1>
-            //                         <p>Drag & Drop one or more .hex files here</p>
-            //                     </div>
-            //                 </div>
-            //             </div>
-            //         </div>
-            //     </div>
-            // </div>
         );
         // return (
         //     <div className="app-main-view">

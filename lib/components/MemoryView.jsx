@@ -67,14 +67,13 @@ const MemoryView = ({
         // }
         regionViews.push(<RegionView width={region.regionSize} color={region.colours[0]} key={region.startAddress} />);
     });
-    console.log(regions);
     return (
         <div className="regionContainer">
-            { regionViews }
-            {/* <RegionView  width={1} color={"#aaa"} striped active />
+            {/* { regionViews } */}
+            <RegionView  width={1} color={"#aaa"} striped active />
             <RegionView  width={1} color={"#ccc"}  />
             <RegionView  width={1} color={"#0080B7"} striped />
-            <RegionView  width={50} color={"#ccc"} /> */}
+            <RegionView  width={50} color={"#ccc"} />
         </div>
     );
 }
