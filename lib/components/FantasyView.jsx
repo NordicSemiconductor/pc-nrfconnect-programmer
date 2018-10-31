@@ -68,7 +68,11 @@ class FantasyView extends React.Component {
                                 <h3 className="panel-title">Device Memory Layout <span className="pull-right glyphicon glyphicon-flash"></span></h3> 
                             </div>
                             <div className="panel-body">
-                                <RegionBarView />
+                                {/* <RegionBarView /> */}
+                                <div className="centering-container">
+                                    <h1><span className="glyphicon glyphicon-flash"></span></h1>
+                                    <p>Connect a device to display memory contents</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -78,7 +82,11 @@ class FantasyView extends React.Component {
                                 <h3 className="panel-title">File Memory Layout <span className="pull-right glyphicon glyphicon-folder-open"></span></h3>
                             </div>
                             <div className="panel-body">
-                                <RegionBarView />
+                                {/* <RegionBarView /> */}
+                                <div className="centering-container">
+                                <h1><span className="glyphicon glyphicon-folder-open"></span></h1>
+                                    <p>Drag & Drop one or more .hex files here</p>
+                                </div>
                             </div>
                         </div>
                     </div>                                     
