@@ -37,7 +37,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon, Button, ProgressBar, Popover, Panel, Alert, OverlayTrigger } from 'react-bootstrap';
+import { Popover, OverlayTrigger } from 'react-bootstrap';
 
 const RegionView = ({
     width,
@@ -45,7 +45,6 @@ const RegionView = ({
     striped,
     color,
 }) => {
-
     const popover = (
         <Popover id="popover-top" className="memory-details">
             <div>
@@ -71,12 +70,12 @@ const RegionView = ({
             <div>
                 <h5>SoftDevice version</h5>
                 <p>S310v2.1</p>
-            </div>   
+            </div>
             <hr></hr>
             <div>
                 <h5>Filename</h5>
                 <p>nrf91_my_fantastic_firmware.hex</p>
-            </div>                                                                  
+            </div>
         </Popover>
     );
 
