@@ -125,10 +125,11 @@ const AppMainView = (
                                 <h3 className="panel-title">File Memory Layout <span className="pull-right glyphicon glyphicon-folder-open"></span></h3>
                             </div>
                             <div className="panel-body">
-                                <div className="memory-layout-container">
+                                { deviceView }
+                                {/* <div className="memory-layout-container">
                                 <h1><span className="glyphicon glyphicon-folder-open"></span></h1>
                                     <p>Drag & Drop one or more .hex files here</p>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>

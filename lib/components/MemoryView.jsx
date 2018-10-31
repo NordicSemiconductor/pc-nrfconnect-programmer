@@ -65,15 +65,23 @@ const MemoryView = ({
 
         //     }
         // }
-        regionViews.push(<RegionView width={region.regionSize} color={region.colours[0]} key={region.startAddress} />);
+        regionViews.push(
+            <RegionView
+                width={
+                    region.regionSize / max > 0.02 ? region.regionSize : max * 0.02
+                }
+                color={region.colours[0]} key={region.startAddress} />);
     });
     return (
         <div className="regionContainer">
-            {/* { regionViews } */}
-            <RegionView  width={1} color={"#aaa"} striped active />
-            <RegionView  width={1} color={"#ccc"}  />
-            <RegionView  width={1} color={"#0080B7"} striped />
-            <RegionView  width={50} color={"#ccc"} />
+            { regionViews }
+            {/* <RegionView  width={5} color={"#0080B7"} striped />
+            <RegionView  width={1} color={"#ddd"} />
+            <RegionView  width={5} color={"#0080B7"} striped />
+            <RegionView  width={25} color={"#ddd"} />
+            <RegionView  width={20} color={"#0080B7"} striped />
+            <RegionView  width={25} color={"#ddd"} />
+            <RegionView  width={20} color={"#0080B7"} striped /> */}
         </div>
     );
 }
