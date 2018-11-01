@@ -37,7 +37,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import MemoryView from '../containers/memoryView';
+import MemoryBoxView from '../containers/memoryBoxView';
 import UserInputDialogView from '../containers/userInputDialogView';
 import { Alert, Glyphicon, Panel } from 'react-bootstrap';
 
@@ -54,25 +54,43 @@ const AppMainView = (
         const refresh = refreshEnabled ? refreshTargetContents : null;
         const reset = resetEnabled ? resetTarget : null;
 
-        const warningsView = (
-            <Alert bsStyle="danger" className="myWarning">
-                <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
-            </Alert>
-        );
-        let deviceView = (
-            <div></div>
-        );
-        let fileView = (
-            <Alert bsStyle="info" className="deviceHelperInfo">
-                <Glyphicon glyph="folder-open" />
-                <p>Drag & Drop one or more .hex files here.</p>
-            </Alert>
-        );
+        // const warningsView = (
+        //     <Alert bsStyle="danger" className="myWarning">
+        //         <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
+        //     </Alert>
+        // );
+        let targetView;
+        let fileView;
+
+        if (file.loaded) {
+            targetView = (<MemoryBoxView
+                title="Device"
+                description="Connect a device to display memory contents"
+                iconName="flash"
+            />);
+        } else {
+            targetView = (<MemoryBoxView
+                title="Device"
+                description="Connect a device to display memory contents"
+                iconName="flash"
+            />);
+        }
+
+        if (file.loaded) {
+            fileView = (<MemoryBoxView
+                title="Device"
+                description="Connect a device to display memory contents"
+                iconName="flash"
+            />);
+        } else {
+            fileView = (<MemoryBoxView
+                title="Device"
+                description="Connect a device to display memory contents"
+                iconName="flash"
+            />);
+        }
 
         let targetMap;
-                deviceView = (
-                    <MemoryView />
-                );
         if (!target.serialNumber) {
         //     targetMap = (
         //         <MemoryLayout
@@ -100,39 +118,12 @@ const AppMainView = (
         //     targetMap = <div className="memlayout-spinner" />;
         }
 
-        console.log(file);
         return (
             <div className="app-main-view">
                 {/* { warningsView } */}
                 <div className="container">
-                    <div className="memory-layout">
-                        <div className="panel panel-default">
-                            <div className="panel-heading">
-                                <h3 className="panel-title">Device Memory Layout <span className="pull-right glyphicon glyphicon-flash"></span></h3>
-                            </div>
-                            <div className="panel-body">
-                                <div className="memory-layout-container">
-                                { deviceView }
-                                    {/* <h1><span className="glyphicon glyphicon-flash"></span></h1>
-                                    <p>Connect a device to display memory contents</p> */}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="memory-layout">
-                        <div className="panel panel-default">
-                            <div className="panel-heading">
-                                <h3 className="panel-title">File Memory Layout <span className="pull-right glyphicon glyphicon-folder-open"></span></h3>
-                            </div>
-                            <div className="panel-body">
-                                { deviceView }
-                                {/* <div className="memory-layout-container">
-                                <h1><span className="glyphicon glyphicon-folder-open"></span></h1>
-                                    <p>Drag & Drop one or more .hex files here</p>
-                                </div> */}
-                            </div>
-                        </div>
-                    </div>
+                    { targetView }
+                    { fileView }
                 </div>
                 <UserInputDialogView />
             </div>
