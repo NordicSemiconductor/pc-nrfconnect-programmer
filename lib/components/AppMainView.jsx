@@ -62,9 +62,9 @@ const AppMainView = (
         let targetView;
         let fileView;
 
-        if (file.loaded) {
+        if (!file.loaded) {
             targetView = (<MemoryBoxView
-                title="Device"
+                title="Device Memory Layout"
                 description="Connect a device to display memory contents"
                 iconName="flash"
             />);
@@ -76,17 +76,16 @@ const AppMainView = (
             />);
         }
 
-        if (file.loaded) {
+        if (!file.loaded) {
             fileView = (<MemoryBoxView
-                title="Device"
-                description="Connect a device to display memory contents"
-                iconName="flash"
+                title="File Memory Layout"
+                description="Drag & Drop one or more .hex files here"
+                iconName="folder-open"
             />);
         } else {
             fileView = (<MemoryBoxView
-                title="Device"
-                description="Connect a device to display memory contents"
-                iconName="flash"
+                title="File Memory Layout"
+                regions={file.regions}
             />);
         }
 
@@ -121,32 +120,13 @@ const AppMainView = (
         return (
             <div className="app-main-view">
                 {/* { warningsView } */}
-                <div className="container">
+                <div className="memory-container">
                     { targetView }
                     { fileView }
                 </div>
                 <UserInputDialogView />
             </div>
         );
-        // return (
-        //     <div className="app-main-view">
-        //         <div className="column">
-        //             { targetMap }
-        //         </div>
-        //         <div className="column">
-        //             <Alert bsStyle="warning">
-        //                 <strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
-        //             </Alert>;
-        //             <MemoryLayout
-        //                 regions={file.regions}
-        //                 targetSize={target.deviceInfo.romSize}
-        //                 title="Files"
-        //             />
-        //         </div>
-
-        //         <UserInputDialogView />
-        //     </div>
-        // );
     }
 );
 
