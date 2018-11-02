@@ -68,6 +68,7 @@ const AppMainView = (
                 iconName="flash"
             />);
         } else {
+            console.log(target);
             const title = target.deviceInfo.type !== 'Unknown' ?
                 target.deviceInfo.type : target.deviceInfo.family;
             targetView = (<MemoryBoxView

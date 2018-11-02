@@ -50,7 +50,6 @@ const convertRegionsToViews = (regions, targetSize) => {
         const colors = region.colours;
         const minPropotion = 0.02;
 
-        console.log(lastAddress.toString(16));
         if (lastAddress === 0) {
             if (startAddress > 0) {
                 regionViews.push(<RegionView
