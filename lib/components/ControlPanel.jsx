@@ -44,6 +44,7 @@ import SettingView from '../containers/settingView';
 const ControlPanel = () => (
     <div className="control-panel">
         <ButtonGroupView />
+        <FileLegendView />
         <DeviceInfoView />
     </div>
 );
