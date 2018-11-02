@@ -39,7 +39,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import { Glyphicon, Button, ProgressBar, Popover, Panel, Alert, OverlayTrigger } from 'react-bootstrap';
-import RegionView from './RegionView';
+import MemoryView from './MemoryView';
 
 
 const MemoryBoxView = ({
@@ -49,7 +49,6 @@ const MemoryBoxView = ({
     regions,
 }) => {
     let memoryHolder;
-    console.log(description, iconName);
     if (description && iconName) {
         memoryHolder = (
             <div className="memory-layout-container">
@@ -61,6 +60,10 @@ const MemoryBoxView = ({
                 </p>
             </div>
         );
+    } else {
+        memoryHolder = (<MemoryView
+            regions={regions}
+        />);
     }
     return (
         <div className="memory-layout">

@@ -86,12 +86,11 @@ const RegionView = ({
     if (active) {
         className = className + ' active';
     }
-    console.log(className);
     return (
         <OverlayTrigger overlay={popover} trigger={ ['click', 'hover'] } placement="right" positionLeft={-100}>
-            <div 
-                className={ className } 
-                style= {{ 
+            <div
+                className={ className }
+                style= {{
                     flexGrow: width,
                     backgroundColor: color,
                 }}>

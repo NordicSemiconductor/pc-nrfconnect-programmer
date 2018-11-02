@@ -76,7 +76,7 @@ const AppMainView = (
             />);
         }
 
-        if (!file.loaded) {
+        if (Object.keys(file.loaded).length === 0) {
             fileView = (<MemoryBoxView
                 title="File Memory Layout"
                 description="Drag & Drop one or more .hex files here"

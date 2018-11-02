@@ -38,43 +38,66 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
-import { Glyphicon, Button, ProgressBar, Popover, Panel, Alert, OverlayTrigger } from 'react-bootstrap';
 import RegionView from './RegionView';
 
 
-const MemoryView = ({
-    targetSize: max,
-    regions,
-    refresh,
-    reset,
-}) => {
-    let regionViews = [];
-    regions.sortBy(r => r.startAddress).reverse().forEach(region => {
+const convertRegionsToViews = (regions, targetSize) => {
+    const regionViews = [];
+    const spaceColor = '#DDD';
+    let lastAddress = 0;
+    regions.sortBy(r => r.startAddress).forEach(region => {
         const startAddress = region.startAddress;
         const regionSize = region.regionSize;
-        const colours = region.colours;
-        const regionName = region.name;
+        const colors = region.colours;
+        const minPropotion = 0.02;
 
-        // if (regionSize && startAddress + regionSize > 0x0 && startAddress < max) {
-        //     if (colours.length === 1) {
-        //         background = colours[0];
-        //     } else {
-        //         overlapped = true;
-        //     }
-        //     if (lastAddress > startAddress + regionSize) {
-
-        //     }
-        // }
-        regionViews.push(
-            <RegionView
-                width={
-                    region.regionSize / max > 0.02 ? region.regionSize : max * 0.02
-                }
-                color={region.colours[0]} key={region.startAddress} />);
+        console.log(lastAddress.toString(16));
+        if (lastAddress === 0) {
+            if (startAddress > 0) {
+                regionViews.push(<RegionView
+                    width={startAddress}
+                    color={spaceColor}
+                    key={lastAddress}
+                />);
+            }
+            regionViews.push(<RegionView
+                width={regionSize / targetSize > minPropotion ?
+                    regionSize : targetSize * minPropotion}
+                color={colors[0]}
+                key={startAddress}
+                striped
+            />);
+            lastAddress = startAddress + regionSize;
+        } else if (lastAddress + startAddress <= targetSize) {
+            regionViews.push(<RegionView
+                width={startAddress - lastAddress}
+                color={spaceColor}
+                key={lastAddress}
+            />);
+            regionViews.push(<RegionView
+                width={regionSize / targetSize > minPropotion ?
+                    regionSize : targetSize * minPropotion}
+                color={colors[0]}
+                key={startAddress}
+                striped
+            />);
+            lastAddress = startAddress + regionSize;
+        }
     });
+    regionViews.push(<RegionView
+        width={targetSize - lastAddress}
+        color={spaceColor}
+        key={lastAddress}
+    />);
+    return regionViews;
+};
+const MemoryView = ({
+    targetSize,
+    regions,
+}) => {
     return (
         <div className="regionContainer">
-            { regionViews }
+            { convertRegionsToViews(regions, targetSize) }
             {/* <RegionView  width={5} color={"#0080B7"} striped />
             <RegionView  width={1} color={"#ddd"} />
             <RegionView  width={5} color={"#0080B7"} striped />
@@ -84,7 +107,8 @@ const MemoryView = ({
             <RegionView  width={20} color={"#0080B7"} striped /> */}
         </div>
     );
-}
+};
+
 
 MemoryView.propTypes = {
     targetSize: PropTypes.number,
