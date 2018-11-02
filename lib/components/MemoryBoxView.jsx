@@ -38,7 +38,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
-import { Glyphicon, Button, ProgressBar, Popover, Panel, Alert, OverlayTrigger } from 'react-bootstrap';
 import MemoryView from './MemoryView';
 
 
@@ -85,12 +84,13 @@ MemoryBoxView.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     iconName: PropTypes.string,
-    regions: PropTypes.instanceOf(List).isRequired,
+    regions: PropTypes.instanceOf(List),
 };
 
 MemoryBoxView.defaultProps = {
     description: null,
     iconName: null,
+    regions: null,
 };
 export default MemoryBoxView;
 

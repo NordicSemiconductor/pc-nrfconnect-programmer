@@ -40,7 +40,6 @@ import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import RegionView from './RegionView';
 
-
 const convertRegionsToViews = (regions, targetSize) => {
     const regionViews = [];
     const spaceColor = '#DDD';
@@ -55,42 +54,45 @@ const convertRegionsToViews = (regions, targetSize) => {
         if (lastAddress === 0) {
             if (startAddress > 0) {
                 regionViews.push(<RegionView
-                    width={startAddress}
-                    color={spaceColor}
                     key={lastAddress}
+                    color={spaceColor}
+                    width={startAddress}
                 />);
             }
             regionViews.push(<RegionView
+                key={startAddress}
+                color={colors[0]}
+                region={region}
+                striped
                 width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
-                color={colors[0]}
-                key={startAddress}
-                striped
             />);
             lastAddress = startAddress + regionSize;
         } else if (lastAddress + startAddress <= targetSize) {
             regionViews.push(<RegionView
+                key={lastAddress}
                 width={startAddress - lastAddress}
                 color={spaceColor}
-                key={lastAddress}
             />);
             regionViews.push(<RegionView
+                key={startAddress}
+                color={colors[0]}
+                region={region}
+                striped
                 width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
-                color={colors[0]}
-                key={startAddress}
-                striped
             />);
             lastAddress = startAddress + regionSize;
         }
     });
     regionViews.push(<RegionView
-        width={targetSize - lastAddress}
-        color={spaceColor}
         key={lastAddress}
+        color={spaceColor}
+        width={targetSize - lastAddress}
     />);
     return regionViews;
 };
+
 const MemoryView = ({
     targetSize,
     regions,
@@ -98,13 +100,6 @@ const MemoryView = ({
     return (
         <div className="regionContainer">
             { convertRegionsToViews(regions, targetSize) }
-            {/* <RegionView  width={5} color={"#0080B7"} striped />
-            <RegionView  width={1} color={"#ddd"} />
-            <RegionView  width={5} color={"#0080B7"} striped />
-            <RegionView  width={25} color={"#ddd"} />
-            <RegionView  width={20} color={"#0080B7"} striped />
-            <RegionView  width={25} color={"#ddd"} />
-            <RegionView  width={20} color={"#0080B7"} striped /> */}
         </div>
     );
 };
@@ -113,18 +108,10 @@ const MemoryView = ({
 MemoryView.propTypes = {
     targetSize: PropTypes.number,
     regions: PropTypes.instanceOf(List).isRequired,
-    title: PropTypes.string,
-    refresh: PropTypes.func,
-    reset: PropTypes.func,
 };
 
 MemoryView.defaultProps = {
     targetSize: 0x100000,  // 1MiB
-    memMaps: [],
-    loaded: {},
-    title: '',
-    refresh: null,
-    reset: null,
 };
 export default MemoryView;
 

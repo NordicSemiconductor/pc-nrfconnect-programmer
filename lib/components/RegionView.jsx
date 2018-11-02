@@ -39,79 +39,81 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 
+import { hexpad2 } from '../util/hexpad';
+
+const popover = region => (
+    <Popover id="popover-top" className="memory-details">
+        <div>
+            <h5>Region name</h5>
+            <p>{ region.name }</p>
+        </div>
+        <hr />
+        <div>
+            <h5>Start address</h5>
+            <p>{ hexpad2(region.startAddress) }</p>
+        </div>
+        <hr />
+        <div>
+            <h5>End address</h5>
+            <p>{ hexpad2(region.startAddress + region.regionSize) }</p>
+        </div>
+        <hr />
+        <div>
+            <h5>Size</h5>
+            <p>{ hexpad2(region.regionSize) }</p>
+        </div>
+        <hr />
+    </Popover>
+);
+
 const RegionView = ({
     width,
     active,
     striped,
     color,
+    region,
 }) => {
-    const popover = (
-        <Popover id="popover-top" className="memory-details">
-            <div>
-                <h5>Start address</h5>
-                <p>0x000020</p>
-            </div>
-            <hr></hr>
-            <div>
-                <h5>End address</h5>
-                <p>0x001230</p>
-            </div>
-            <hr></hr>
-            <div>
-                <h5>Size</h5>
-                <p>1024 Bytes</p>
-            </div>
-            <hr></hr>
-            <div>
-                <h5>Type</h5>
-                <p>SoftDevice</p>
-            </div>
-            <hr></hr>
-            <div>
-                <h5>SoftDevice version</h5>
-                <p>S310v2.1</p>
-            </div>
-            <hr></hr>
-            <div>
-                <h5>Filename</h5>
-                <p>nrf91_my_fantastic_firmware.hex</p>
-            </div>
-        </Popover>
+    let className = 'region';
+    className = striped ? `${className} striped` : className;
+    className = active ? `${className} active` : className;
+
+    const singleRegionView = (
+        <div
+            className={className}
+            style={{
+                flexGrow: width,
+                backgroundColor: color,
+            }}
+        />
     );
 
-    let className = 'region';
-    if (striped) {
-        className = className + ' striped';
-    }
-    if (active) {
-        className = className + ' active';
-    }
-    return (
-        <OverlayTrigger overlay={popover} trigger={ ['click', 'hover'] } placement="right" positionLeft={-100}>
-            <div
-                className={ className }
-                style= {{
-                    flexGrow: width,
-                    backgroundColor: color,
-                }}>
-            </div>
+    const overlayRegionView = !region ? null : (
+        <OverlayTrigger
+            overlay={popover(region)}
+            trigger={['click', 'hover']}
+            placement="right"
+            positionLeft={-100}
+        >
+            { singleRegionView }
         </OverlayTrigger>
-    )
+    );
+
+    return region ? overlayRegionView : singleRegionView;
 };
 
 
 RegionView.propTypes = {
     width: PropTypes.number.isRequired,
-    active: PropTypes.bool.isRequired,
-    striped: PropTypes.bool.isRequired,
     color: PropTypes.string.isRequired,
+    active: PropTypes.bool,
+    striped: PropTypes.bool,
+    region: PropTypes.instanceOf(Object),
 };
 
 RegionView.defaultProps = {
-    width: 10,
     active: false,
     striped: false,
+    region: null,
 };
 
 export default RegionView;
-
