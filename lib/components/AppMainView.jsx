@@ -39,7 +39,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MemoryBoxView from '../containers/memoryBoxView';
 import UserInputDialogView from '../containers/userInputDialogView';
-import { Alert, Glyphicon, Panel } from 'react-bootstrap';
 
 const AppMainView = (
     props => {
@@ -62,17 +61,18 @@ const AppMainView = (
         let targetView;
         let fileView;
 
-        if (!file.loaded) {
+        if (!target.serialNumber || !target.isReady) {
             targetView = (<MemoryBoxView
                 title="Device Memory Layout"
                 description="Connect a device to display memory contents"
                 iconName="flash"
             />);
         } else {
+            const title = target.deviceInfo.type !== 'Unknown' ?
+                target.deviceInfo.type : target.deviceInfo.family;
             targetView = (<MemoryBoxView
-                title="Device"
-                description="Connect a device to display memory contents"
-                iconName="flash"
+                title={title}
+                regions={target.regions}
             />);
         }
 
@@ -87,34 +87,6 @@ const AppMainView = (
                 title="File Memory Layout"
                 regions={file.regions}
             />);
-        }
-
-        let targetMap;
-        if (!target.serialNumber) {
-        //     targetMap = (
-        //         <MemoryLayout
-        //             regions={file.regions}
-        //             targetSize={target.deviceInfo.romSize}
-        //             title="Device"
-        //         />
-        //     );
-        } else if (target.serialNumber && target.isReady) {
-            const title = target.deviceInfo.type !== 'Unknown' ?
-                target.deviceInfo.type : target.deviceInfo.family;
-                deviceView = (
-                    <MemoryView />
-                );
-        //     targetMap = (
-        //         <MemoryLayout
-        //             regions={target.regions}
-        //             targetSize={target.deviceInfo.romSize}
-        //             title={title}
-        //             refresh={refresh}
-        //             reset={reset}
-        //         />
-        //     );
-        } else {
-        //     targetMap = <div className="memlayout-spinner" />;
         }
 
         return (
