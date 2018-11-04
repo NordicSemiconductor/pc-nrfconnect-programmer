@@ -57,6 +57,7 @@ const ButtonGroupView = ({
     refreshAllFiles,
     openFileDialog,
     onToggleFileList,
+    performJLinkRead,
     performJLinkWrite,
     performUSBSDFUWrite,
     performRecover,
@@ -92,6 +93,13 @@ const ButtonGroupView = ({
                     disabled={!targetIsMemLoaded}
                 >
                     <Glyphicon glyph="save" />Save as file
+                </Button>
+                <Button
+                    key="performJLinkRead"
+                    onClick={performJLinkRead}
+                    disabled={!targetIsReady}
+                >
+                    <Glyphicon glyph="download-alt" />Read
                 </Button>
                 <Button
                     key="performJLinkWrite"
@@ -160,6 +168,7 @@ ButtonGroupView.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
+    performJLinkRead: PropTypes.func.isRequired,
     performJLinkWrite: PropTypes.func.isRequired,
     performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,

@@ -98,5 +98,5 @@ MemoryBoxView.defaultProps = {
     isTarget: false,
     isFile: false,
 };
-export default MemoryBoxView;
 
+export default MemoryBoxView;
