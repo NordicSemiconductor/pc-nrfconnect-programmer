@@ -87,6 +87,13 @@ const ButtonGroupView = ({
                     <Glyphicon glyph="save" />Erase all & write
                 </Button>
                 <Button
+                    key="performSaveAsFile"
+                    onClick={performSaveAsFile}
+                    disabled={!targetIsMemLoaded}
+                >
+                    <Glyphicon glyph="save" />Save as file
+                </Button>
+                <Button
                     key="performJLinkWrite"
                     onClick={performJLinkWrite}
                     disabled={!targetIsReady || !targetIsWritable}

@@ -37,19 +37,20 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'immutable';
-import MemoryView from './MemoryView';
+import MemoryView from '../containers/memoryView';
 
 
 const MemoryBoxView = ({
     title,
     description,
     iconName,
-    regions,
+    isHolder,
+    isTarget,
+    isFile,
 }) => {
-    let memoryHolder;
-    if (description && iconName) {
-        memoryHolder = (
+    let placeHolder;
+    if (isHolder) {
+        placeHolder = (
             <div className="memory-layout-container">
                 <h1>
                     <span className={`glyphicon glyphicon-${iconName}`} />
@@ -60,8 +61,9 @@ const MemoryBoxView = ({
             </div>
         );
     } else {
-        memoryHolder = (<MemoryView
-            regions={regions}
+        placeHolder = (<MemoryView
+            isTarget={isTarget}
+            isFile={isFile}
         />);
     }
     return (
@@ -73,7 +75,7 @@ const MemoryBoxView = ({
                     </h3>
                 </div>
                 <div className="panel-body">
-                    { memoryHolder }
+                    { placeHolder }
                 </div>
             </div>
         </div>
@@ -84,13 +86,17 @@ MemoryBoxView.propTypes = {
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     iconName: PropTypes.string,
-    regions: PropTypes.instanceOf(List),
+    isHolder: PropTypes.bool,
+    isTarget: PropTypes.bool,
+    isFile: PropTypes.bool,
 };
 
 MemoryBoxView.defaultProps = {
     description: null,
     iconName: null,
-    regions: null,
+    isHolder: false,
+    isTarget: false,
+    isFile: false,
 };
 export default MemoryBoxView;
 

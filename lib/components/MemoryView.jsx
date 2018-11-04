@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -40,9 +39,10 @@ import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import RegionView from './RegionView';
 
-const convertRegionsToViews = (regions, targetSize) => {
+const spaceColor = '#DDD';
+
+const convertRegionsToViews = (regions, targetSize, active) => {
     const regionViews = [];
-    const spaceColor = '#DDD';
     let lastAddress = 0;
     regions.sortBy(r => r.startAddress).forEach(region => {
         const startAddress = region.startAddress;
@@ -63,11 +63,12 @@ const convertRegionsToViews = (regions, targetSize) => {
                 color={colors[0]}
                 region={region}
                 striped
+                active={active}
                 width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
             />);
             lastAddress = startAddress + regionSize;
-        } else if (lastAddress + startAddress <= targetSize) {
+        } else if (startAddress <= targetSize) {
             regionViews.push(<RegionView
                 key={lastAddress}
                 width={startAddress - lastAddress}
@@ -78,6 +79,7 @@ const convertRegionsToViews = (regions, targetSize) => {
                 color={colors[0]}
                 region={region}
                 striped
+                active={active}
                 width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
             />);
@@ -89,16 +91,44 @@ const convertRegionsToViews = (regions, targetSize) => {
         color={spaceColor}
         width={targetSize - lastAddress}
     />);
+
     return regionViews;
 };
 
+const erasingView = (<RegionView
+    key="erasing-view"
+    width={1}
+    striped
+    active
+    color={spaceColor}
+/>);
+
 const MemoryView = ({
     targetSize,
-    regions,
+    targetRegions,
+    fileRegions,
+    isTarget,
+    isFile,
+    isWriting,
+    isErasing,
+    isLoading,
 }) => {
+    let placeHolder;
+    // When it is target and during loading, show something.
+    placeHolder = isTarget && isLoading ?
+        erasingView : placeHolder;
+    // When it is target and during writing, show file regions active.
+    placeHolder = isTarget && isWriting ?
+        convertRegionsToViews(fileRegions, targetSize, true) : placeHolder;
+    placeHolder = isTarget && isErasing ?
+        erasingView : placeHolder;
+    // When it is file, show file regions not active.
+    placeHolder = isFile ?
+        convertRegionsToViews(fileRegions, targetSize, false) : placeHolder;
+    console.log(isTarget && isLoading);
     return (
         <div className="regionContainer">
-            { convertRegionsToViews(regions, targetSize) }
+            { placeHolder }
         </div>
     );
 };
@@ -106,11 +136,24 @@ const MemoryView = ({
 
 MemoryView.propTypes = {
     targetSize: PropTypes.number,
-    regions: PropTypes.instanceOf(List).isRequired,
+    targetRegions: PropTypes.instanceOf(List),
+    fileRegions: PropTypes.instanceOf(List),
+    isTarget: PropTypes.bool,
+    isFile: PropTypes.bool,
+    isWriting: PropTypes.bool,
+    isErasing: PropTypes.bool,
+    isLoading: PropTypes.bool,
 };
 
 MemoryView.defaultProps = {
     targetSize: 0x100000,  // 1MiB
+    targetRegions: null,
+    fileRegions: null,
+    isTarget: false,
+    isFile: false,
+    isWriting: false,
+    isErasing: false,
+    isLoading: false,
 };
-export default MemoryView;
 
+export default MemoryView;

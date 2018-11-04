@@ -45,13 +45,7 @@ const AppMainView = (
         const {
             file,
             target,
-            refreshEnabled,
-            refreshTargetContents,
-            resetEnabled,
-            resetTarget,
         } = props;
-        const refresh = refreshEnabled ? refreshTargetContents : null;
-        const reset = resetEnabled ? resetTarget : null;
 
         // const warningsView = (
         //     <Alert bsStyle="danger" className="myWarning">
@@ -60,20 +54,23 @@ const AppMainView = (
         // );
         let targetView;
         let fileView;
+        let targetTitle = 'Device Memory Layout';
 
-        if (!target.serialNumber || !target.isReady) {
+        if (!target.serialNumber) {
             targetView = (<MemoryBoxView
-                title="Device Memory Layout"
+                title={targetTitle}
                 description="Connect a device to display memory contents"
                 iconName="flash"
+                isHolder
             />);
         } else {
-            console.log(target);
-            const title = target.deviceInfo.type !== 'Unknown' ?
-                target.deviceInfo.type : target.deviceInfo.family;
+            targetTitle = (target.deviceInfo.type !== 'Unknown' ?
+                target.deviceInfo.type : target.deviceInfo.family) ||
+                targetTitle;
             targetView = (<MemoryBoxView
-                title={title}
+                title={targetTitle}
                 regions={target.regions}
+                isTarget
             />);
         }
 
@@ -82,11 +79,12 @@ const AppMainView = (
                 title="File Memory Layout"
                 description="Drag & Drop one or more .hex files here"
                 iconName="folder-open"
+                isHolder
             />);
         } else {
             fileView = (<MemoryBoxView
                 title="File Memory Layout"
-                regions={file.regions}
+                isFile
             />);
         }
 
@@ -106,10 +104,6 @@ const AppMainView = (
 AppMainView.propTypes = {
     file: PropTypes.shape({}).isRequired,
     target: PropTypes.shape({}).isRequired,
-    refreshEnabled: PropTypes.bool.isRequired,
-    refreshTargetContents: PropTypes.func.isRequired,
-    resetEnabled: PropTypes.bool.isRequired,
-    resetTarget: PropTypes.func.isRequired,
 };
 
 export default AppMainView;
