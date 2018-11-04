@@ -67,7 +67,7 @@ const convertRegionsToViews = (regions, targetSize, active) => {
                 width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
             />);
-            lastAddress = startAddress + regionSize;
+            lastAddress = (startAddress + regionSize) - 1;
         } else if (startAddress <= targetSize) {
             regionViews.push(<RegionView
                 key={lastAddress}
@@ -83,7 +83,7 @@ const convertRegionsToViews = (regions, targetSize, active) => {
                 width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
             />);
-            lastAddress = startAddress + regionSize;
+            lastAddress = (startAddress + regionSize) - 1;
         }
     });
     regionViews.push(<RegionView
@@ -120,19 +120,21 @@ const MemoryView = ({
     // When it is target and during writing, show file regions active.
     placeHolder = isTarget && isWriting ?
         convertRegionsToViews(fileRegions, targetSize, true) : placeHolder;
+    // When it is target and during erasing, show entire memory active with gray color.
     placeHolder = isTarget && isErasing ?
         erasingView : placeHolder;
-    // When it is file, show file regions not active.
+    // When it is target and regions are known, show target regions without animation.
+    placeHolder = isTarget && !isLoading && !isWriting && !isErasing ?
+        convertRegionsToViews(targetRegions, targetSize, false) : placeHolder;
+    // When it is file, show file regions without animation.
     placeHolder = isFile ?
         convertRegionsToViews(fileRegions, targetSize, false) : placeHolder;
-    console.log(isTarget && isLoading);
     return (
         <div className="regionContainer">
             { placeHolder }
         </div>
     );
 };
-
 
 MemoryView.propTypes = {
     targetSize: PropTypes.number,
