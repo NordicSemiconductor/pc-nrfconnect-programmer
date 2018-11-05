@@ -36,7 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Accordion, Panel, Checkbox } from 'react-bootstrap';
+import { Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox } from 'react-bootstrap';
 import { CommunicationType } from '../util/devices';
 
 const MruMenuItems = (mruFiles, openFile) => {
@@ -129,36 +129,32 @@ const ButtonGroupView = ({
 
 
     return (<div className="button-group-view">
-        <Accordion>
-            <Panel header="File actions">
-                <ButtonGroup vertical>
-                    <Dropdown pullRight id="files-dropdown">
-                        <Dropdown.Toggle onClick={onToggleFileList}>
-                            <Glyphicon glyph="folder-open" />Add a .hex file
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu>
-                            {MruMenuItems(mruFiles, openFile)}
-                            <MenuItem divider />
-                            <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    <Button onClick={refreshAllFiles}>
-                        <Glyphicon glyph="refresh" />Reload .hex files
-                    </Button>
-                    <Button onClick={closeFiles}>
-                        <Glyphicon glyph="minus-sign" />Clear files
-                    </Button>
-                </ButtonGroup>
-            </Panel>
-        </Accordion>
-        <Accordion>
-            {targetType === CommunicationType.JLINK &&
+        <Panel header="File actions">
+            <ButtonGroup vertical>
+                <Dropdown pullRight id="files-dropdown">
+                    <Dropdown.Toggle onClick={onToggleFileList}>
+                        <Glyphicon glyph="folder-open" />Add a .hex file
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {MruMenuItems(mruFiles, openFile)}
+                        <MenuItem divider />
+                        <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
+                    </Dropdown.Menu>
+                </Dropdown>
+                <Button onClick={refreshAllFiles}>
+                    <Glyphicon glyph="refresh" />Reload .hex files
+                </Button>
+                <Button onClick={closeFiles}>
+                    <Glyphicon glyph="minus-sign" />Clear files
+                </Button>
+            </ButtonGroup>
+        </Panel>
+        {targetType === CommunicationType.JLINK &&
                 usbJLinkButtons
-            }
-            {targetType === CommunicationType.USBSDFU &&
+        }
+        {targetType === CommunicationType.USBSDFU &&
                 usbCdcAcmButtons
-            }
-        </Accordion>
+        }
     </div>);
 };
 
