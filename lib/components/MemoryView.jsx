@@ -130,7 +130,7 @@ const MemoryView = ({
     placeHolder = isFile ?
         convertRegionsToViews(fileRegions, targetSize, false) : placeHolder;
     return (
-        <div className="regionContainer">
+        <div className="region-container">
             { placeHolder }
         </div>
     );
