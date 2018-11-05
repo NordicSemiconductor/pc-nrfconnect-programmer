@@ -40,65 +40,36 @@ import PropTypes from 'prop-types';
 import MemoryBoxView from '../containers/memoryBoxView';
 import UserInputDialogView from '../containers/userInputDialogView';
 
-const AppMainView = (
-    props => {
-        const {
-            file,
-            target,
-        } = props;
-
-        // const warningsView = (
-        //     <Alert bsStyle="danger" className="myWarning">
-        //         <strong>Holy guacamole!</strong> Your memory is overlapping. Ordering lobotomy.
-        //     </Alert>
-        // );
-        let targetView;
-        let fileView;
-        let targetTitle = 'Device Memory Layout';
-
-        if (!target.serialNumber) {
-            targetView = (<MemoryBoxView
-                title={targetTitle}
-                description="Connect a device to display memory contents"
-                iconName="flash"
-                isHolder
-            />);
-        } else {
-            targetTitle = (target.deviceInfo.type !== 'Unknown' ?
-                target.deviceInfo.type : target.deviceInfo.family) ||
-                targetTitle;
-            targetView = (<MemoryBoxView
-                title={targetTitle}
-                regions={target.regions}
-                isTarget
-            />);
-        }
-
-        if (Object.keys(file.loaded).length === 0) {
-            fileView = (<MemoryBoxView
-                title="File Memory Layout"
-                description="Drag & Drop one or more .hex files here"
-                iconName="folder-open"
-                isHolder
-            />);
-        } else {
-            fileView = (<MemoryBoxView
-                title="File Memory Layout"
-                isFile
-            />);
-        }
-
-        return (
-            <div className="app-main-view">
-                {/* { warningsView } */}
-                <div className="memory-container">
-                    { targetView }
-                    { fileView }
-                </div>
-                <UserInputDialogView />
-            </div>
-        );
+function getTargetTitle(serialNumber, deviceInfo) {
+    if (serialNumber) {
+        return (deviceInfo.type !== 'Unknown' ? deviceInfo.type : deviceInfo.family);
     }
+    return undefined;
+}
+
+function hasFileContent(file) {
+    return Object.keys(file.loaded).length > 0;
+}
+
+const AppMainView = ({ file, target }) => (
+    <div className="app-main-view">
+        <MemoryBoxView
+            title={getTargetTitle(target.serialNumber, target.deviceInfo) || 'Device Memory Layout'}
+            description="Connect a device to display memory contents"
+            iconName="flash"
+            regions={target.regions}
+            isHolder={!target.serialNumber}
+            isTarget={!!target.serialNumber}
+        />
+        <MemoryBoxView
+            title="File Memory Layout"
+            description="Drag & Drop one or more .hex files here"
+            iconName="folder-open"
+            isHolder={!hasFileContent(file)}
+            isFile={hasFileContent(file)}
+        />
+        <UserInputDialogView />
+    </div>
 );
 
 AppMainView.propTypes = {
