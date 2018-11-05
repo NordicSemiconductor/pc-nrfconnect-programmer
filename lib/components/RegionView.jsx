@@ -41,8 +41,15 @@ import { Popover, OverlayTrigger } from 'react-bootstrap';
 
 import { hexpad2 } from '../util/hexpad';
 
+let triggerRef;
+
 const popover = region => (
-    <Popover id="popover-top" className="memory-details">
+    <Popover
+        id="popover-top"
+        className="memory-details"
+        onMouseOver={() => { triggerRef.setState({ show: true }); }}
+        onMouseOut={() => { triggerRef.setState({ show: false }); }}
+    >
         <div>
             <h5>Region name</h5>
             <p>{ region.name }</p>
@@ -92,7 +99,7 @@ const RegionView = ({
             overlay={popover(region)}
             trigger={['click', 'hover']}
             placement="right"
-            positionLeft={-100}
+            ref={r => { triggerRef = r; }}
         >
             { singleRegionView }
         </OverlayTrigger>
