@@ -1,5 +1,20 @@
+.memory-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+}
 
-.fantasy-view-layout {
+.memory-layout {
+    height: 100%;
+    flex-grow: 1;
+    padding: 3%;
+    max-width: 500px;
+
     .panel-body {
         padding: 15px;
         background-color: #fff;
@@ -19,53 +34,9 @@
             color: #ddd;
         }
     }
-    height: 100%;
-    flex-grow: 1;
-    padding: 3%;
-    max-width: 500px;
 }
 
-.container {
-    display: flex; /* or inline-flex */
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: 0px;
-  }
-
-  .spacer {
-      height: 20px;
-  }
-
-
-  .juhuu {
-      display: flex;
-      height: 100%;
-      width: 100%;
-      flex-direction: column;
-  }
-
-.alert {
-    margin-bottom: 10px;
-}
-
-.deviceHelperInfo {
-    max-width: 300px;
-    min-height: 150px;
-    text-align: center;
-    padding: 20px;
-    .glyphicon {
-        font-size: 50px;
-        color: rgba(45, 128, 169, 0.15);
-        margin-bottom: 20px;
-        margin-top: 20px;
-    }
-}
-
-.centering-container {
+.memory-layout-container {
     display: flex;
     height: 100%;
     width: 100%;
@@ -74,7 +45,7 @@
     flex-direction: column;
     .glyphicon {
         font-size: 4em;
-        color: rgba(0, 0, 0, 0.075);
+        color: rgba(0, 0, 0, 0.175);
     }
     p {
         color: #9d9d9d;
@@ -82,25 +53,7 @@
     }
 }
 
-.progress{
-    height: 10vh;
-    background-color: #ccc;
-    margin-top: 5%;
-  }
-
-.hide {
-    display: none;
- }
-
- .progress-bar-warning {
-     background-color: #ccc;
- }
-
- .progress-bar-danger {
-     background-color: #ccc;
- }
-
- .regionContainer {
+.region-container {
     background-color: #ccc;
     display: flex;
     flex-direction: column-reverse;
@@ -118,7 +71,6 @@
  }
 
  .striped {
-    // linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-image:  linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-size: 40px 40px;
 }
