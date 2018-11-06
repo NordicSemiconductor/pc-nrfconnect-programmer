@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -37,6 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import WarningView from '../containers/warningView';
 import MemoryBoxView from '../containers/memoryBoxView';
 import UserInputDialogView from '../containers/userInputDialogView';
 
@@ -53,21 +53,24 @@ function hasFileContent(file) {
 
 const AppMainView = ({ file, target }) => (
     <div className="app-main-view">
-        <MemoryBoxView
-            title={getTargetTitle(target.serialNumber, target.deviceInfo) || 'Device Memory Layout'}
-            description="Connect a device to display memory contents"
-            iconName="flash"
-            regions={target.regions}
-            isHolder={!target.serialNumber}
-            isTarget={!!target.serialNumber}
-        />
-        <MemoryBoxView
-            title="File Memory Layout"
-            description="Drag & Drop one or more .hex files here"
-            iconName="folder-open"
-            isHolder={!hasFileContent(file)}
-            isFile={hasFileContent(file)}
-        />
+        <WarningView />
+        <div className="memory-box-container">
+            <MemoryBoxView
+                title={getTargetTitle(target.serialNumber, target.deviceInfo) || 'Device Memory Layout'}
+                description="Connect a device to display memory contents"
+                iconName="flash"
+                regions={target.regions}
+                isHolder={!target.serialNumber}
+                isTarget={!!target.serialNumber}
+            />
+            <MemoryBoxView
+                title="File Memory Layout"
+                description="Drag & Drop one or more .hex files here"
+                iconName="folder-open"
+                isHolder={!hasFileContent(file)}
+                isFile={hasFileContent(file)}
+            />
+        </div>
         <UserInputDialogView />
     </div>
 );

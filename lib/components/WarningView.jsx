@@ -36,19 +36,16 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon } from 'react-bootstrap';
+import { Alert, Glyphicon } from 'react-bootstrap';
 import { List } from 'immutable';
 
-const WarningIcon = <Glyphicon glyph="exclamation-sign" className="warning-sign" />;
+const warningIcon = <Glyphicon glyph="exclamation-sign" className="warning-sign" />;
 
-const Warnings = (targetWarningStrings, fileWarningStrings, userWarningStrings) => (
+const combineWarnings = (targetWarningStrings, fileWarningStrings, userWarningStrings) => (
     targetWarningStrings.concat(fileWarningStrings).concat(userWarningStrings).map((s, index) => (
-        <div className="alert alert-warning" key={`warning-${index + 1}`}>
-            <center>
-                { WarningIcon }
-                <p>{s}</p>
-            </center>
-        </div>
+        <Alert bsStyle="warning" key={`warning-${index + 1}`}>
+            <span>{warningIcon}</span> <strong>{s}</strong>
+        </Alert>
     )));
 
 const WarningView = ({
@@ -57,7 +54,7 @@ const WarningView = ({
     userWarningStrings,
 }) => (
     <div className="warning-view">
-        { Warnings(targetWarningStrings, fileWarningStrings, userWarningStrings) }
+        { combineWarnings(targetWarningStrings, fileWarningStrings, userWarningStrings) }
     </div>
 );
 
