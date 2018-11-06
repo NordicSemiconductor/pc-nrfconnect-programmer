@@ -131,7 +131,6 @@ class RegionView extends React.Component {
     }
 }
 
-
 RegionView.propTypes = {
     width: PropTypes.number.isRequired,
     active: PropTypes.bool,
