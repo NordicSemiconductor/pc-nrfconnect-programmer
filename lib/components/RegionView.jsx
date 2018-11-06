@@ -99,12 +99,13 @@ class RegionView extends React.Component {
             region,
         } = this.props;
         const colors = region ? region.colors : ['#d9e1e2'];
+        const fileNames = region ? region.fileNames : ['#d9e1e2'];
 
         let className = 'region';
         className = striped ? `${className} striped` : className;
         className = active ? `${className} active striped` : className;
         className = hoverable ? `${className} hoverable` : className;
-        className = (colors.length > 1) ? `${className} crosses` : className;
+        className = (fileNames && fileNames.length > 1) ? `${className} crosses` : className;
 
         const singleRegionView = (
             <div
