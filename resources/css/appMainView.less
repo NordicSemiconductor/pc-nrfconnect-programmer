@@ -13,7 +13,9 @@
     flex-direction: row;
     height: 100%;
     width: 100%;
-
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
 }
 
 .memory-layout {
@@ -86,7 +88,9 @@
     }
 }
 
-
+.hoverable {
+    min-height: 2%;
+}
 
 .hoverable:hover::after {
     content: '';
