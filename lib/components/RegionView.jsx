@@ -41,22 +41,25 @@ import { Popover, OverlayTrigger } from 'react-bootstrap';
 import { hexpad8 } from '../util/hexpad';
 
 
-const popover = ({ name, startAddress, regionSize, colors }, parent) => (
+const popover = ({ name, startAddress, regionSize, colors, fileNames }, parent) => (
     <Popover
         id="popover-top"
         className="memory-details"
         onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
         onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
     >
-        { colors.length > 1 &&
+        { fileNames.length > 1 &&
             <div className="overlap-colors">
                 <h5>Overlapping region!</h5>
                 {
-                    colors.map((color, index) => (
-                        <span
-                            key={`${color}-${index + 1}`}
-                            style={{ backgroundColor: color }}
-                        />
+                    fileNames.map((fileName, index) => (
+                        <div>
+                            <span
+                                key={`${fileName}-${index + 1}`}
+                                style={{ backgroundColor: colors[0] }}
+                            />
+                            { fileName }
+                        </div>
                     ))
                 }
                 <hr />
@@ -86,6 +89,7 @@ popover.propTypes = {
     startAddress: PropTypes.number.isRequired,
     regionSize: PropTypes.number.isRequired,
     colors: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 popover.defaultProps = { name: null };
 
