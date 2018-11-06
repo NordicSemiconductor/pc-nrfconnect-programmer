@@ -102,7 +102,7 @@ class RegionView extends React.Component {
 
         let className = 'region';
         className = striped ? `${className} striped` : className;
-        className = active ? `${className} active` : className;
+        className = active ? `${className} active striped` : className;
         className = hoverable ? `${className} hoverable` : className;
         className = (colors.length > 1) ? `${className} crosses` : className;
 
