@@ -44,7 +44,6 @@ const convertRegionsToViews = (regions, targetSize, active) => {
     let lastAddress = 0;
     regions.sortBy(r => r.startAddress).forEach(region => {
         const { startAddress, regionSize } = region;
-        const minPropotion = 0.02;
 
         if (lastAddress === 0) {
             if (startAddress > 0) {
@@ -61,8 +60,7 @@ const convertRegionsToViews = (regions, targetSize, active) => {
                     region={region}
                     hoverable
                     active={active}
-                    width={regionSize / targetSize > minPropotion ?
-                    regionSize : targetSize * minPropotion}
+                    width={regionSize}
                 />,
             );
             lastAddress = (startAddress + regionSize) - 1;
@@ -79,8 +77,7 @@ const convertRegionsToViews = (regions, targetSize, active) => {
                     region={region}
                     hoverable
                     active={active}
-                    width={regionSize / targetSize > minPropotion ?
-                    regionSize : targetSize * minPropotion}
+                    width={regionSize}
                 />,
             );
             lastAddress = (startAddress + regionSize) - 1;
