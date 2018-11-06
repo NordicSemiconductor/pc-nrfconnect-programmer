@@ -38,17 +38,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
-
 import { hexpad8 } from '../util/hexpad';
 
-let triggerRef;
 
-const popover = ({ name, startAddress, regionSize, colors }) => (
+const popover = ({ name, startAddress, regionSize, colors }, parent) => (
     <Popover
         id="popover-top"
         className="memory-details"
-        onMouseOver={() => { triggerRef.setState({ show: true }); }}
-        onMouseOut={() => { triggerRef.setState({ show: false }); }}
+        onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
+        onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
     >
         { colors.length > 1 &&
             <div className="overlap-colors">
@@ -91,48 +89,51 @@ popover.propTypes = {
 };
 popover.defaultProps = { name: null };
 
-const RegionView = ({
-    width,
-    active,
-    striped,
-    hoverable,
-    colors,
-    region,
-}) => {
-    let className = 'region';
-    className = striped ? `${className} striped` : className;
-    className = active ? `${className} active` : className;
-    className = hoverable ? `${className} hoverable` : className;
-    className = (colors.length > 1) ? `${className} crosses` : className;
+class RegionView extends React.Component {
+    render() {
+        const {
+            width,
+            active,
+            striped,
+            hoverable,
+            region,
+        } = this.props;
+        const colors = region ? region.colors : ['#d9e1e2'];
 
-    const singleRegionView = (
-        <div
-            className={className}
-            style={{
-                flexGrow: width,
-                backgroundColor: colors[0],
-            }}
-        />
-    );
+        let className = 'region';
+        className = striped ? `${className} striped` : className;
+        className = active ? `${className} active` : className;
+        className = hoverable ? `${className} hoverable` : className;
+        className = (colors.length > 1) ? `${className} crosses` : className;
 
-    const overlayRegionView = !region ? null : (
-        <OverlayTrigger
-            overlay={popover(region)}
-            trigger={['click', 'hover']}
-            placement="right"
-            ref={r => { triggerRef = r; }}
-        >
-            { singleRegionView }
-        </OverlayTrigger>
-    );
+        const singleRegionView = (
+            <div
+                className={className}
+                style={{
+                    flexGrow: width,
+                    backgroundColor: colors[0],
+                }}
+            />
+        );
 
-    return region ? overlayRegionView : singleRegionView;
-};
+        const overlayRegionView = !region ? null : (
+            <OverlayTrigger
+                overlay={popover(region, this)}
+                trigger={['focus', 'hover']}
+                placement="right"
+                ref={r => { this.triggerRef = r; }}
+            >
+                { singleRegionView }
+            </OverlayTrigger>
+        );
+
+        return region ? overlayRegionView : singleRegionView;
+    }
+}
 
 
 RegionView.propTypes = {
     width: PropTypes.number.isRequired,
-    colors: PropTypes.arrayOf(PropTypes.string),
     active: PropTypes.bool,
     striped: PropTypes.bool,
     hoverable: PropTypes.bool,
@@ -144,7 +145,6 @@ RegionView.defaultProps = {
     striped: false,
     hoverable: false,
     region: null,
-    colors: ['#d9e1e2'],
 };
 
 export default RegionView;
