@@ -39,69 +39,73 @@ import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import RegionView from './RegionView';
 
-const spaceColor = '#DDD';
-
 const convertRegionsToViews = (regions, targetSize, active) => {
     const regionViews = [];
     let lastAddress = 0;
     regions.sortBy(r => r.startAddress).forEach(region => {
-        const startAddress = region.startAddress;
-        const regionSize = region.regionSize;
-        const colors = region.colours;
+        const { startAddress, regionSize, colors } = region;
         const minPropotion = 0.02;
 
         if (lastAddress === 0) {
             if (startAddress > 0) {
-                regionViews.push(<RegionView
-                    key={lastAddress}
-                    color={spaceColor}
-                    width={startAddress}
-                />);
+                regionViews.push(
+                    <RegionView
+                        key={lastAddress}
+                        width={startAddress}
+                    />,
+                );
             }
-            regionViews.push(<RegionView
-                key={startAddress}
-                color={colors[0]}
-                region={region}
-                striped
-                active={active}
-                width={regionSize / targetSize > minPropotion ?
+            regionViews.push(
+                <RegionView
+                    key={startAddress}
+                    colors={colors}
+                    region={region}
+                    hoverable
+                    active={active}
+                    width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
-            />);
+                />,
+            );
             lastAddress = (startAddress + regionSize) - 1;
         } else if (startAddress <= targetSize) {
-            regionViews.push(<RegionView
-                key={lastAddress}
-                width={startAddress - lastAddress}
-                color={spaceColor}
-            />);
-            regionViews.push(<RegionView
-                key={startAddress}
-                color={colors[0]}
-                region={region}
-                striped
-                active={active}
-                width={regionSize / targetSize > minPropotion ?
+            regionViews.push(
+                <RegionView
+                    key={lastAddress}
+                    width={startAddress - lastAddress}
+                />,
+            );
+            regionViews.push(
+                <RegionView
+                    key={startAddress}
+                    colors={colors}
+                    region={region}
+                    hoverable
+                    active={active}
+                    width={regionSize / targetSize > minPropotion ?
                     regionSize : targetSize * minPropotion}
-            />);
+                />,
+            );
             lastAddress = (startAddress + regionSize) - 1;
         }
     });
-    regionViews.push(<RegionView
-        key={lastAddress}
-        color={spaceColor}
-        width={targetSize - lastAddress}
-    />);
+    regionViews.push(
+        <RegionView
+            key={lastAddress}
+            width={targetSize - lastAddress}
+        />,
+    );
 
     return regionViews;
 };
 
-const erasingView = (<RegionView
-    key="erasing-view"
-    width={1}
-    striped
-    active
-    color={spaceColor}
-/>);
+const erasingView = (
+    <RegionView
+        key="erasing-view"
+        width={1}
+        striped
+        active
+    />
+);
 
 const MemoryView = ({
     targetSize,

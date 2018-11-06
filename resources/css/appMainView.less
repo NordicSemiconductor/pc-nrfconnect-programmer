@@ -4,24 +4,27 @@
     padding: 3%;
     max-width: 500px;
     width: 50%;
+    display: flex;
 
-    .panel-body {
-        padding: 15px;
-        background-color: #fff;
-        height: 92%;
-        display: flex;
-        padding-bottom: 1px;
-    }
-    .panel-heading {
-        background-color: #fff;
-    }
     .panel {
-        height: 100%;
-    }
-    .panel-title {
-        color: gray;
-        .glyphicon {
-            color: #ddd;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        margin-bottom: 0;
+        .panel-heading {
+            background-color: #fff;
+            .panel-title {
+                color: gray;
+                .glyphicon {
+                    color: #ddd;
+                }
+            }
+        }
+        .panel-body {
+            padding: 15px;
+            background-color: #fff;
+            display: flex;
+            flex: 1;
         }
     }
 }
@@ -40,27 +43,42 @@
     p {
         color: #9d9d9d;
         padding-top: 20px;
+        text-align: center;
     }
 }
 
 .region-container {
-    background-color: #ccc;
     display: flex;
     flex-direction: column-reverse;
     height: 100%;
     width: 100%;
     align-self: center;
+
+    .region {
+        position: relative;
+        width: 100%;
+    }
+    .crosses::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(45deg, #f00 25%, #fff 25%, #fff 50%, #f00 50%, #f00 75%, #fff 75%, #fff);
+        background-size: 8px 8px;
+    }
 }
 
- .region {
-    background-color: #0080B7;
- }
 
- .striped:hover {
-    background-color: #005c84 !important;
- }
 
- .striped {
+.hoverable:hover::after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.striped {
     background-image:  linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-size: 40px 40px;
 }
@@ -94,4 +112,13 @@
     margin-bottom: 10px;
     border: 0;
     border-top: 1px solid #eeeeee
+}
+
+.memory-details {
+    .overlap-colors span {
+        display: inline-block;
+        width: 2em;
+        height: 2em;
+        margin-right: 2px;
+    }
 }

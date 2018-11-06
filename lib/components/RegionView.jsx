@@ -39,50 +39,78 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 
-import { hexpad2 } from '../util/hexpad';
+import { hexpad8 } from '../util/hexpad';
 
-const popover = region => (
-    <Popover id="popover-top" className="memory-details">
+let triggerRef;
+
+const popover = ({ name, startAddress, regionSize, colors }) => (
+    <Popover
+        id="popover-top"
+        className="memory-details"
+        onMouseOver={() => { triggerRef.setState({ show: true }); }}
+        onMouseOut={() => { triggerRef.setState({ show: false }); }}
+    >
+        { colors.length > 1 &&
+            <div className="overlap-colors">
+                <h5>Overlapping region!</h5>
+                {
+                    colors.map((color, index) => (
+                        <span
+                            key={`${color}-${index + 1}`}
+                            style={{ backgroundColor: color }}
+                        />
+                    ))
+                }
+                <hr />
+            </div>
+        }
+        { name &&
+            <div>
+                <h5>Region name</h5>
+                <p>{ name }</p>
+                <hr />
+            </div>
+        }
         <div>
-            <h5>Region name</h5>
-            <p>{ region.name }</p>
+            <h5>Address range</h5>
+            <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize) }</p>
+            <hr />
         </div>
-        <hr />
-        <div>
-            <h5>Start address</h5>
-            <p>{ hexpad2(region.startAddress) }</p>
-        </div>
-        <hr />
-        <div>
-            <h5>End address</h5>
-            <p>{ hexpad2(region.startAddress + region.regionSize) }</p>
-        </div>
-        <hr />
         <div>
             <h5>Size</h5>
-            <p>{ hexpad2(region.regionSize) }</p>
+            <p>{ regionSize } bytes</p>
         </div>
-        <hr />
     </Popover>
 );
+
+popover.propTypes = {
+    name: PropTypes.string,
+    startAddress: PropTypes.number.isRequired,
+    regionSize: PropTypes.number.isRequired,
+    colors: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+popover.defaultProps = { name: null };
 
 const RegionView = ({
     width,
     active,
     striped,
-    color,
+    hoverable,
+    colors,
     region,
 }) => {
     let className = 'region';
     className = striped ? `${className} striped` : className;
     className = active ? `${className} active` : className;
+    className = hoverable ? `${className} hoverable` : className;
+    className = (colors.length > 1) ? `${className} crosses` : className;
 
     const singleRegionView = (
         <div
             className={className}
             style={{
                 flexGrow: width,
-                backgroundColor: color,
+                backgroundColor: colors[0],
             }}
         />
     );
@@ -92,7 +120,7 @@ const RegionView = ({
             overlay={popover(region)}
             trigger={['click', 'hover']}
             placement="right"
-            positionLeft={-100}
+            ref={r => { triggerRef = r; }}
         >
             { singleRegionView }
         </OverlayTrigger>
@@ -104,16 +132,19 @@ const RegionView = ({
 
 RegionView.propTypes = {
     width: PropTypes.number.isRequired,
-    color: PropTypes.string.isRequired,
+    colors: PropTypes.arrayOf(PropTypes.string),
     active: PropTypes.bool,
     striped: PropTypes.bool,
+    hoverable: PropTypes.bool,
     region: PropTypes.instanceOf(Object),
 };
 
 RegionView.defaultProps = {
     active: false,
     striped: false,
+    hoverable: false,
     region: null,
+    colors: ['#d9e1e2'],
 };
 
 export default RegionView;
