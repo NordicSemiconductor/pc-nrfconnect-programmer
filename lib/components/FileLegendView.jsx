@@ -45,8 +45,8 @@ const FileLegendView = ({ loaded, remove }) => (
                 <tr key={`file-${i + 1}`}>
                     <td>
                         <div
-                            className="legend-colour"
-                            style={{ backgroundColor: loaded[filePath].colour }}
+                            className="legend-color"
+                            style={{ backgroundColor: loaded[filePath].color }}
                         />
                     </td>
                     <td title={loaded[filePath].filename} className="file-label">
