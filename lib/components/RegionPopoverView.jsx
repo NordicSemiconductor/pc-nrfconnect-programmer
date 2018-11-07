@@ -34,38 +34,64 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { connect } from 'react-redux';
-import ButtonGroupView from '../components/ButtonGroupView';
-import * as fileActions from '../actions/fileActions';
-import * as jlinkTargetActions from '../actions/jlinkTargetActions';
-import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Popover } from 'react-bootstrap';
+import { basename } from 'path';
+import { hexpad8 } from '../util/hexpad';
 
-export default connect(
-    (state, props) => ({
-        ...props,
-        mruFiles: state.app.file.mruFiles,
-        targetType: state.app.target.targetType,
-        targetIsWritable: state.app.target.isWritable,
-        targetIsRecoverable: state.app.target.isRecoverable,
-        targetIsMemLoaded: state.app.target.isMemLoaded,
-        targetIsReady: !state.app.target.isLoading &&
-            !state.app.target.isLoading &&
-            !state.app.target.isLoading,
-    }),
-    (dispatch, props) => ({
-        ...props,
-        openFile: filename => dispatch(fileActions.openFile(filename)),
-        closeFiles: () => { dispatch(fileActions.closeFiles()); },
-        removeFile: filePath => { dispatch(fileActions.removeFile(filePath)); },
-        refreshAllFiles: () => { dispatch(fileActions.refreshAllFiles()); },
-        onToggleFileList: () => dispatch(fileActions.loadMruFiles()),
-        openFileDialog: () => dispatch(fileActions.openFileDialog()),
-        performRecover: () => { dispatch(jlinkTargetActions.recover()); },
-        performRecoverAndWrite: () => { dispatch(jlinkTargetActions.recoverAndWrite()); },
-        performSaveAsFile: () => { dispatch(jlinkTargetActions.saveAsFile()); },
-        performJLinkRead: () => { dispatch(jlinkTargetActions.read()); },
-        performJLinkWrite: () => { dispatch(jlinkTargetActions.write()); },
-        performUSBSDFUWrite: () => { dispatch(usbsdfuTargetActions.write()); },
-        performReset: () => { dispatch(usbsdfuTargetActions.resetDevice()); },
-    }),
-)(ButtonGroupView);
+const RegionPopoverView = ({ name, startAddress, regionSize, fileNames }, parent) => (
+    <Popover
+        id="popover-top"
+        className="memory-details"
+        onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
+        onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
+    >
+        { name &&
+            <div>
+                <h5>Region name</h5>
+                <p>{ name }</p>
+                <hr />
+            </div>
+        }
+        { fileNames.length > 0 &&
+            <div className="files">
+                <h5>
+                    {
+                        (fileNames.length > 1) ? 'Overlapping files!' : 'File name'
+                    }
+                </h5>
+                {
+                    fileNames.map((fileName, index) => (
+                        <span key={`${index + 1}`}>
+                            { basename(fileName) }
+                        </span>
+                    ))
+                }
+                <hr />
+            </div>
+        }
+        <div>
+            <h5>Address range</h5>
+            <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize) }</p>
+            <hr />
+        </div>
+        <div>
+            <h5>Size</h5>
+            <p>{ regionSize } bytes</p>
+        </div>
+    </Popover>
+);
+
+RegionPopoverView.propTypes = {
+    name: PropTypes.string,
+    startAddress: PropTypes.number.isRequired,
+    regionSize: PropTypes.number.isRequired,
+    fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
+RegionPopoverView.defaultProps = {
+    name: null,
+};
+
+export default RegionPopoverView;
