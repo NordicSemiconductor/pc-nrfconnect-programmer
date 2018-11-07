@@ -65,7 +65,7 @@ const AppMainView = ({ file, target }) => (
             />
             <MemoryBoxView
                 title="File Memory Layout"
-                description="Drag & Drop one or more .hex files here"
+                description="Drag & Drop one or more HEX files here"
                 iconName="folder-open"
                 isHolder={!hasFileContent(file)}
                 isFile={hasFileContent(file)}

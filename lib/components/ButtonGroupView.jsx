@@ -111,7 +111,11 @@ const ButtonGroupView = ({
                 <Button
                     key="performRecoverAndWrite"
                     onClick={performRecoverAndWrite}
-                    disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
+                    disabled={
+                        !isJLink ||
+                        !targetIsReady ||
+                        !(targetIsRecoverable && mruFiles.length)
+                    }
                 >
                     <Glyphicon glyph="save" />Erase & write
                 </Button>
