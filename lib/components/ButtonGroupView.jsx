@@ -63,6 +63,7 @@ const ButtonGroupView = ({
     performRecover,
     performRecoverAndWrite,
     performSaveAsFile,
+    performReset,
     mruFiles,
     targetType,
     targetIsReady,
@@ -70,63 +71,12 @@ const ButtonGroupView = ({
     targetIsRecoverable,
     targetIsMemLoaded,
 }) => {
-    const usbJLinkButtons = (
-        <Panel header="USB JLink device actions">
-            <ButtonGroup vertical>
-                <Button
-                    key="performRecover"
-                    onClick={performRecover}
-                    disabled={!targetIsReady || !targetIsRecoverable}
-                >
-                    <Glyphicon glyph="remove-sign" />Erase all
-                </Button>
-                <Button
-                    key="performRecoverAndWrite"
-                    onClick={performRecoverAndWrite}
-                    disabled={!targetIsReady || !targetIsRecoverable}
-                >
-                    <Glyphicon glyph="save" />Erase all & write
-                </Button>
-                <Button
-                    key="performSaveAsFile"
-                    onClick={performSaveAsFile}
-                    disabled={!targetIsMemLoaded}
-                >
-                    <Glyphicon glyph="save" />Save as file
-                </Button>
-                <Button
-                    key="performJLinkRead"
-                    onClick={performJLinkRead}
-                    disabled={!targetIsReady}
-                >
-                    <Glyphicon glyph="download-alt" />Read
-                </Button>
-                <Button
-                    key="performJLinkWrite"
-                    onClick={performJLinkWrite}
-                    disabled={!targetIsReady || !targetIsWritable}
-                >
-                    <Glyphicon glyph="download-alt" />Write
-                </Button>
-            </ButtonGroup>
-            <Checkbox>Auto read memory</Checkbox>
-        </Panel>
-    );
-
-    const usbCdcAcmButtons = (
-        <Panel header="USB CDC ACM device actions">
-            <ButtonGroup vertical>
-                <Button
-                    key="performJLinkWrite"
-                    onClick={performUSBSDFUWrite}
-                    disabled={!targetIsReady || !targetIsWritable}
-                >
-                    <Glyphicon glyph="download-alt" />Write
-                </Button>
-            </ButtonGroup>
-        </Panel>
-    );
-
+    const isJLink = targetType === CommunicationType.JLINK;
+    const isUsbSerial = targetType === CommunicationType.USBSDFU;
+    const performWrite = {
+        [CommunicationType.JLINK]: performJLinkWrite,
+        [CommunicationType.USBSDFU]: performUSBSDFUWrite,
+    }[targetType];
 
     return (<div className="button-group-view">
         <Panel header="File actions">
@@ -149,12 +99,57 @@ const ButtonGroupView = ({
                 </Button>
             </ButtonGroup>
         </Panel>
-        {targetType === CommunicationType.JLINK &&
-                usbJLinkButtons
-        }
-        {targetType === CommunicationType.USBSDFU &&
-                usbCdcAcmButtons
-        }
+        <Panel header="USB JLink device actions">
+            <ButtonGroup vertical>
+                <Button
+                    key="performRecover"
+                    onClick={performRecover}
+                    disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="remove-sign" />Erase all
+                </Button>
+                <Button
+                    key="performRecoverAndWrite"
+                    onClick={performRecoverAndWrite}
+                    disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="save" />Erase all & write
+                </Button>
+                <Button
+                    key="performSaveAsFile"
+                    onClick={performSaveAsFile}
+                    disabled={!isJLink || !targetIsMemLoaded}
+                >
+                    <Glyphicon glyph="save" />Save as file
+                </Button>
+                <Button
+                    key="performJLinkRead"
+                    onClick={performJLinkRead}
+                    disabled={!isJLink || !targetIsReady}
+                >
+                    <Glyphicon glyph="download-alt" />Read
+                </Button>
+                <Button
+                    key="performReset"
+                    onClick={performReset}
+                    disabled={!isUsbSerial || !targetIsReady}
+                >
+                    <Glyphicon glyph="refresh" />Reset
+                </Button>
+                <Button
+                    key="performJLinkWrite"
+                    onClick={performWrite}
+                    disabled={!targetIsReady || !targetIsWritable}
+                >
+                    <Glyphicon glyph="download-alt" />Write
+                </Button>
+            </ButtonGroup>
+            <Checkbox
+                disabled={!isJLink}
+            >
+                Auto read memory
+            </Checkbox>
+        </Panel>
     </div>);
 };
 
@@ -170,6 +165,7 @@ ButtonGroupView.propTypes = {
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
     performSaveAsFile: PropTypes.func.isRequired,
+    performReset: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     targetType: PropTypes.number.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
