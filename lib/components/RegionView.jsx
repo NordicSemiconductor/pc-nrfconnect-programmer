@@ -38,37 +38,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
+import { basename } from 'path';
 import { hexpad8 } from '../util/hexpad';
 
-
-const popover = ({ name, startAddress, regionSize, colors, fileNames }, parent) => (
+const popover = ({ name, startAddress, regionSize, fileNames }, parent) => (
     <Popover
         id="popover-top"
         className="memory-details"
         onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
         onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
     >
-        { fileNames.length > 1 &&
-            <div className="overlap-colors">
-                <h5>Overlapping region!</h5>
-                {
-                    fileNames.map((fileName, index) => (
-                        <div>
-                            <span
-                                key={`${fileName}-${index + 1}`}
-                                style={{ backgroundColor: colors[0] }}
-                            />
-                            { fileName }
-                        </div>
-                    ))
-                }
-                <hr />
-            </div>
-        }
         { name &&
             <div>
                 <h5>Region name</h5>
                 <p>{ name }</p>
+                <hr />
+            </div>
+        }
+        { fileNames.length > 0 &&
+            <div className="files">
+                <h5>
+                    {
+                        (fileNames.length > 1) ? 'Overlapping files!' : 'File name'
+                    }
+                </h5>
+                {
+                    fileNames.map((fileName, index) => (
+                        <span key={`${index + 1}`}>
+                            { basename(fileName) }
+                        </span>
+                    ))
+                }
                 <hr />
             </div>
         }
@@ -88,7 +88,6 @@ popover.propTypes = {
     name: PropTypes.string,
     startAddress: PropTypes.number.isRequired,
     regionSize: PropTypes.number.isRequired,
-    colors: PropTypes.arrayOf(PropTypes.string).isRequired,
     fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 popover.defaultProps = { name: null };
@@ -102,21 +101,21 @@ class RegionView extends React.Component {
             hoverable,
             region,
         } = this.props;
-        const colors = region ? region.colors : ['#d9e1e2'];
-        const fileNames = region ? region.fileNames : ['#d9e1e2'];
+        const color = region ? region.color : '#d9e1e2';
+        const fileNames = region ? region.fileNames : [];
 
         let className = 'region';
         className = striped ? `${className} striped` : className;
         className = active ? `${className} active striped` : className;
         className = hoverable ? `${className} hoverable` : className;
-        className = (fileNames && fileNames.length > 1) ? `${className} crosses` : className;
+        className = (fileNames.length > 1) ? `${className} crosses` : className;
 
         const singleRegionView = (
             <div
                 className={className}
                 style={{
                     flexGrow: width,
-                    backgroundColor: colors[0],
+                    backgroundColor: color,
                 }}
             />
         );
