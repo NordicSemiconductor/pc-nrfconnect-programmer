@@ -95,15 +95,6 @@ const convertRegionsToViews = (regions, targetSize, active) => {
     return regionViews;
 };
 
-const erasingView = (
-    <RegionView
-        key="erasing-view"
-        width={1}
-        striped
-        active
-    />
-);
-
 const MemoryView = ({
     targetSize,
     targetRegions,
@@ -115,24 +106,27 @@ const MemoryView = ({
     isLoading,
 }) => {
     let placeHolder;
-    // When it is target and during loading, show something.
-    placeHolder = isTarget && isLoading ?
-        erasingView : placeHolder;
-    // When it is target and during writing, show file regions active.
-    placeHolder = isTarget && isWriting ?
-        convertRegionsToViews(fileRegions, targetSize, true) : placeHolder;
-    // When it is target and during erasing, show entire memory active with gray color.
-    placeHolder = isTarget && isErasing ?
-        erasingView : placeHolder;
-    // When it is target and regions are known, show target regions without animation.
-    placeHolder = isTarget && !isLoading && !isWriting && !isErasing ?
-        convertRegionsToViews(targetRegions, targetSize, false) : placeHolder;
-    // When it is file, show file regions without animation.
-    placeHolder = isFile ?
-        convertRegionsToViews(fileRegions, targetSize, false) : placeHolder;
+    if (isTarget) {
+        if (isLoading) {
+            // When it is target and during loading, show something.
+            placeHolder = <RegionView width={1} striped active />;
+        } else if (isWriting) {
+            // When it is target and during writing, show file regions active.
+            placeHolder = convertRegionsToViews(fileRegions, targetSize, true);
+        } else {
+            // When it is target and regions are known, show target regions without animation.
+            placeHolder = convertRegionsToViews(targetRegions, targetSize);
+        }
+    } else if (isFile) {
+        // When it is file, show file regions without animation.
+        placeHolder = convertRegionsToViews(fileRegions, targetSize);
+    }
     return (
         <div className="region-container">
             { placeHolder }
+            { isTarget && isErasing &&
+                <div className="erase-indicator striped active" />
+            }
         </div>
     );
 };

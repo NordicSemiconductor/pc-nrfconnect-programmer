@@ -67,7 +67,7 @@ class RegionView extends React.Component {
                     backgroundColor: color,
                 }}
             >
-                { region && region.fileNames.length > 0 &&
+                { region && region.fileNames.length > 0 && !active &&
                     <Button
                         onClick={() => removeFile(region.fileNames.pop())}
                         bsSize="xsmall"
