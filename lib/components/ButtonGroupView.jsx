@@ -79,11 +79,11 @@ const ButtonGroupView = ({
     }[targetType];
 
     return (<div className="button-group-view">
-        <Panel header="File actions">
+        <Panel header="File">
             <ButtonGroup vertical>
                 <Dropdown pullRight id="files-dropdown">
                     <Dropdown.Toggle onClick={onToggleFileList}>
-                        <Glyphicon glyph="folder-open" />Add a .hex file
+                        <Glyphicon glyph="folder-open" />Add a HEX file
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         {MruMenuItems(mruFiles, openFile)}
@@ -92,28 +92,28 @@ const ButtonGroupView = ({
                     </Dropdown.Menu>
                 </Dropdown>
                 <Button onClick={refreshAllFiles}>
-                    <Glyphicon glyph="refresh" />Reload .hex files
+                    <Glyphicon glyph="refresh" />Reload HEX files
                 </Button>
                 <Button onClick={closeFiles}>
                     <Glyphicon glyph="minus-sign" />Clear files
                 </Button>
             </ButtonGroup>
         </Panel>
-        <Panel header="USB JLink device actions">
+        <Panel header="Device">
             <ButtonGroup vertical>
                 <Button
                     key="performRecover"
                     onClick={performRecover}
                     disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="remove-sign" />Erase all
+                    <Glyphicon glyph="remove-sign" />Erase
                 </Button>
                 <Button
                     key="performRecoverAndWrite"
                     onClick={performRecoverAndWrite}
                     disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="save" />Erase all & write
+                    <Glyphicon glyph="save" />Erase & write
                 </Button>
                 <Button
                     key="performSaveAsFile"
