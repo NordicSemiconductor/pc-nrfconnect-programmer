@@ -45,42 +45,44 @@ const convertRegionsToViews = (regions, targetSize, active) => {
     regions.sortBy(r => r.startAddress).forEach(region => {
         const { startAddress, regionSize } = region;
 
-        if (lastAddress === 0) {
-            if (startAddress > 0) {
+        if (startAddress < targetSize) {
+            if (lastAddress === 0) {
+                if (startAddress > 0) {
+                    regionViews.push(
+                        <RegionView
+                            key={lastAddress}
+                            width={startAddress}
+                        />,
+                    );
+                }
+                regionViews.push(
+                    <RegionView
+                        key={startAddress}
+                        region={region}
+                        hoverable
+                        active={active}
+                        width={regionSize}
+                    />,
+                );
+                lastAddress = (startAddress + regionSize) - 1;
+            } else {
                 regionViews.push(
                     <RegionView
                         key={lastAddress}
-                        width={startAddress}
+                        width={startAddress - lastAddress}
                     />,
                 );
+                regionViews.push(
+                    <RegionView
+                        key={startAddress}
+                        region={region}
+                        hoverable
+                        active={active}
+                        width={regionSize}
+                    />,
+                );
+                lastAddress = (startAddress + regionSize) - 1;
             }
-            regionViews.push(
-                <RegionView
-                    key={startAddress}
-                    region={region}
-                    hoverable
-                    active={active}
-                    width={regionSize}
-                />,
-            );
-            lastAddress = (startAddress + regionSize) - 1;
-        } else if (startAddress <= targetSize) {
-            regionViews.push(
-                <RegionView
-                    key={lastAddress}
-                    width={startAddress - lastAddress}
-                />,
-            );
-            regionViews.push(
-                <RegionView
-                    key={startAddress}
-                    region={region}
-                    hoverable
-                    active={active}
-                    width={regionSize}
-                />,
-            );
-            lastAddress = (startAddress + regionSize) - 1;
         }
     });
     regionViews.push(
