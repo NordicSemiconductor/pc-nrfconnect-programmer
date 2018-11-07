@@ -37,7 +37,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover, OverlayTrigger } from 'react-bootstrap';
+import { Button, Glyphicon, Popover, OverlayTrigger } from 'react-bootstrap';
 import { basename } from 'path';
 import { hexpad8 } from '../util/hexpad';
 
@@ -100,6 +100,7 @@ class RegionView extends React.Component {
             striped,
             hoverable,
             region,
+            removeFile,
         } = this.props;
         const color = region ? region.color : '#d9e1e2';
         const fileNames = region ? region.fileNames : [];
@@ -117,7 +118,16 @@ class RegionView extends React.Component {
                     flexGrow: width,
                     backgroundColor: color,
                 }}
-            />
+            >
+                { region && region.fileNames.length > 0 &&
+                    <Button
+                        onClick={() => removeFile(region.fileNames.pop())}
+                        bsSize="xsmall"
+                    >
+                        <Glyphicon glyph="erase" />
+                    </Button>
+                }
+            </div>
         );
 
         const overlayRegionView = !region ? null : (
@@ -136,6 +146,7 @@ class RegionView extends React.Component {
 }
 
 RegionView.propTypes = {
+    removeFile: PropTypes.func.isRequired,
     width: PropTypes.number.isRequired,
     active: PropTypes.bool,
     striped: PropTypes.bool,

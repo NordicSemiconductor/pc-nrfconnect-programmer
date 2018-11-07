@@ -37,7 +37,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
-import RegionView from './RegionView';
+import RegionView from '../containers/regionView';
 
 const convertRegionsToViews = (regions, targetSize, active) => {
     const regionViews = [];
@@ -45,7 +45,6 @@ const convertRegionsToViews = (regions, targetSize, active) => {
     regions.sortBy(r => r.startAddress).forEach(region => {
         const { startAddress, regionSize } = region;
 
-        console.log(region.startAddress);
         if (startAddress < targetSize) {
             if (lastAddress === 0) {
                 if (startAddress > 0) {
