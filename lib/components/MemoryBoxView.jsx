@@ -36,8 +36,16 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import MemoryView from '../containers/memoryView';
+import DeviceInfoView from './DeviceInfoView';
 
+const popover = (
+    // <DeviceInfoView />
+    <Popover id="popover-gg">
+        aa
+    </Popover>
+);
 
 const MemoryBoxView = ({
     title,
@@ -68,11 +76,17 @@ const MemoryBoxView = ({
     return (
         <div className="memory-layout">
             <div className="panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="panel-title">
-                        { title }<span className={`pull-right glyphicon ${iconName}`} />
-                    </h3>
-                </div>
+                <OverlayTrigger
+                    overlay={popover}
+                    trigger={['click']}
+                    placement="bottom"
+                >
+                    <div className="panel-heading" id="popover-gg">
+                        <h3 className="panel-title">
+                            <a>{ title }<span className={`pull-right glyphicon ${iconName}`} /></a>
+                        </h3>
+                    </div>
+                </OverlayTrigger>
                 <div className="panel-body">
                     { placeHolder }
                 </div>
