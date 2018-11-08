@@ -69,10 +69,10 @@ class RegionView extends React.Component {
             >
                 { region && region.fileNames.length > 0 && !active &&
                     <Button
+                        className="transparent"
                         onClick={() => removeFile(region.fileNames.pop())}
-                        bsSize="xsmall"
                     >
-                        <Glyphicon glyph="erase" />
+                        <Glyphicon glyph="minus-sign" />
                     </Button>
                 }
             </div>
