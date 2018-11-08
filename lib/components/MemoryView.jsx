@@ -105,8 +105,7 @@ const MemoryView = ({
     isWriting,
     isErasing,
     isLoading,
-    isMemLoaded,
-    targetIsReady,
+    refreshEnabled,
     performJLinkRead,
 }) => {
     let placeHolder;
@@ -131,7 +130,7 @@ const MemoryView = ({
             { isTarget && isErasing &&
                 <div className="erase-indicator striped active" />
             }
-            { isTarget && !isMemLoaded && targetIsReady &&
+            { isTarget && refreshEnabled &&
                 <div className="centering-container">
                     <Button
                         key="performJLinkRead"
@@ -146,28 +145,16 @@ const MemoryView = ({
 };
 
 MemoryView.propTypes = {
-    targetSize: PropTypes.number,
-    targetRegions: PropTypes.instanceOf(List),
-    fileRegions: PropTypes.instanceOf(List),
-    isTarget: PropTypes.bool,
-    isFile: PropTypes.bool,
-    isWriting: PropTypes.bool,
-    isErasing: PropTypes.bool,
-    isLoading: PropTypes.bool,
-    isMemLoaded: PropTypes.bool.isRequired,
-    targetIsReady: PropTypes.bool.isRequired,
+    targetSize: PropTypes.number.isRequired,
+    targetRegions: PropTypes.instanceOf(List).isRequired,
+    fileRegions: PropTypes.instanceOf(List).isRequired,
+    isTarget: PropTypes.bool.isRequired,
+    isFile: PropTypes.bool.isRequired,
+    isWriting: PropTypes.bool.isRequired,
+    isErasing: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    refreshEnabled: PropTypes.bool.isRequired,
     performJLinkRead: PropTypes.func.isRequired,
-};
-
-MemoryView.defaultProps = {
-    targetSize: 0x100000,  // 1MiB
-    targetRegions: null,
-    fileRegions: null,
-    isTarget: false,
-    isFile: false,
-    isWriting: false,
-    isErasing: false,
-    isLoading: false,
 };
 
 export default MemoryView;
