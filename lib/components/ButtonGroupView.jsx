@@ -57,7 +57,6 @@ const ButtonGroupView = ({
     refreshAllFiles,
     openFileDialog,
     onToggleFileList,
-    performJLinkRead,
     performJLinkWrite,
     performUSBSDFUWrite,
     performRecover,
@@ -106,7 +105,7 @@ const ButtonGroupView = ({
                     onClick={performRecover}
                     disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="remove-sign" />Erase
+                    <Glyphicon glyph="erase" />Erase
                 </Button>
                 <Button
                     key="performRecoverAndWrite"
@@ -117,35 +116,28 @@ const ButtonGroupView = ({
                         !(targetIsRecoverable && mruFiles.length)
                     }
                 >
-                    <Glyphicon glyph="save" />Erase & write
+                    <Glyphicon bsStyle="warning" glyph="pencil" />Erase & write
                 </Button>
                 <Button
                     key="performSaveAsFile"
                     onClick={performSaveAsFile}
                     disabled={!isJLink || !targetIsMemLoaded}
                 >
-                    <Glyphicon glyph="save" />Save as file
-                </Button>
-                <Button
-                    key="performJLinkRead"
-                    onClick={performJLinkRead}
-                    disabled={!isJLink || !targetIsReady}
-                >
-                    <Glyphicon glyph="download-alt" />Read
+                    <Glyphicon glyph="floppy-disk" />Save as file
                 </Button>
                 <Button
                     key="performReset"
                     onClick={performReset}
                     disabled={!isUsbSerial || !targetIsReady}
                 >
-                    <Glyphicon glyph="refresh" />Reset
+                    <Glyphicon glyph="record" />Reset
                 </Button>
                 <Button
                     key="performJLinkWrite"
                     onClick={performWrite}
                     disabled={!targetIsReady || !targetIsWritable}
                 >
-                    <Glyphicon glyph="download-alt" />Write
+                    <Glyphicon glyph="pencil" />Write
                 </Button>
             </ButtonGroup>
             <Checkbox
@@ -163,7 +155,6 @@ ButtonGroupView.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
-    performJLinkRead: PropTypes.func.isRequired,
     performJLinkWrite: PropTypes.func.isRequired,
     performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,

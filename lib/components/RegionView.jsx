@@ -53,7 +53,7 @@ class RegionView extends React.Component {
         const color = region ? region.color : '#d9e1e2';
         const fileNames = region ? region.fileNames : [];
 
-        let className = 'region';
+        let className = 'region centering-container';
         className = striped ? `${className} striped` : className;
         className = active ? `${className} active striped` : className;
         className = hoverable ? `${className} hoverable` : className;

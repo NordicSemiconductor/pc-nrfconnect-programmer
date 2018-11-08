@@ -66,68 +66,19 @@
             margin-right: 15px;
         }
     }
-
-    .dropdown {
-        display: block;
-        width: 100%;
-        text-align: left;
-
-        span.glyphicon {
-            margin-right: 15px;
-        }
-
-        span.caret {
-            font-weight: bolder;
-            margin-left: 5px;
-        }
-    }
 }
-
-.memlayout-spinner {
-    width: 100px;
-    height: 100px;
-    margin: auto;
-    z-index: 1000;
-    transition: opacity .4s;
-    pointer-events: none;
-    border-radius: 50%;
-    border: 8px solid rgba(0,128,192, 0.2);
-    border-left: 8px solid #0080c0;
-    animation: rotator 2s infinite linear;
-
-    @keyframes rotator {
-        0%   { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-}
-
-.file-legend {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    .legend-color {
-        width: 1.5em;
-        height: 1.5em;
-        display: inline-block;
-        float: left;
-        margin-right: 0.2em;
-    }
-    .file-label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        width: 185px;
-        display: block;
-    }
-}
-
 
 .button-group-view {
     .btn-group-vertical {
         width: 100%;
     }
-    .glyphicon {
-        color: #0080c0;
-    }
+}
+
+.btn:not(.btn-primary) .glyphicon {
+    color: #0080c0;
+}
+.btn:not(.core-btn):not(.btn-xs) .glyphicon {
+    margin-right: 15px;
 }
 
 .panel-body {
