@@ -45,6 +45,10 @@
             background-color: #fff;
             display: flex;
             flex: 1;
+
+            :last-child {
+                margin-bottom: 0;
+            }
         }
     }
 }
@@ -87,13 +91,19 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background-image: linear-gradient(45deg, #f00 25%, #fff 25%, #fff 50%, #f00 50%, #f00 75%, #fff 75%, #fff);
+        background-image: linear-gradient(45deg, #f00 25%, #f77 25%, #f77 50%, #f00 50%, #f00 75%, #f77 75%, #f77);
         background-size: 8px 8px;
     }
     .region button {
         display: none;
         z-index: 1000;
-        box-shadow: 0px 0px 3px 3px white;
+        box-shadow: 0px 0px 7px black;
+        border-radius: 10px;
+        padding: 0;
+        margin: 0;
+        font-size: 16x;
+        position: absolute;
+        line-height: 0;
     }
     .region:hover button {
         display: block;
@@ -103,8 +113,27 @@
         width: 100%;
         height: 100%;
     }
+    button.transparent {
+        .glyphicon {
+            color: white;
+            margin-right: 0;
+        }
+        font-size: 16px;
+        background: none;
+        border: none;
+    }
 }
 
+.centering-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 .hoverable {
     min-height: 2%;

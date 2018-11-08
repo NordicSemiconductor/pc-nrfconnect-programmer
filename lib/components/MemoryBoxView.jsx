@@ -52,7 +52,7 @@ const MemoryBoxView = ({
         placeHolder = (
             <div className="memory-layout-container">
                 <h1>
-                    <span className={`glyphicon glyphicon-${iconName}`} />
+                    <span className={`glyphicon ${iconName}`} />
                 </h1>
                 <p>
                     { description }
@@ -70,7 +70,7 @@ const MemoryBoxView = ({
             <div className="panel panel-default">
                 <div className="panel-heading">
                     <h3 className="panel-title">
-                        { title }<span className={`pull-right glyphicon glyphicon-${iconName}`} />
+                        { title }<span className={`pull-right glyphicon ${iconName}`} />
                     </h3>
                 </div>
                 <div className="panel-body">

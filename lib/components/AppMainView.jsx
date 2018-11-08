@@ -58,7 +58,7 @@ const AppMainView = ({ file, target }) => (
             <MemoryBoxView
                 title={getTargetTitle(target.serialNumber, target.deviceInfo) || 'Device Memory Layout'}
                 description="Connect a device to display memory contents"
-                iconName="flash"
+                iconName="appicon-chip"
                 regions={target.regions}
                 isHolder={!target.serialNumber}
                 isTarget={!!target.serialNumber}
@@ -66,7 +66,7 @@ const AppMainView = ({ file, target }) => (
             <MemoryBoxView
                 title="File Memory Layout"
                 description="Drag & Drop one or more HEX files here"
-                iconName="folder-open"
+                iconName="glyphicon-folder-open"
                 isHolder={!hasFileContent(file)}
                 isFile={hasFileContent(file)}
             />
