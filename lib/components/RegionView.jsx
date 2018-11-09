@@ -46,6 +46,7 @@ class RegionView extends React.Component {
             width,
             active,
             striped,
+            reverse,
             hoverable,
             region,
             removeFile,
@@ -56,6 +57,7 @@ class RegionView extends React.Component {
         let className = 'region centering-container';
         className = striped ? `${className} striped` : className;
         className = active ? `${className} active striped` : className;
+        className = reverse ? `${className} reverse` : className;
         className = hoverable ? `${className} hoverable` : className;
         className = (fileNames.length > 1) ? `${className} crosses` : className;
 
@@ -98,6 +100,7 @@ RegionView.propTypes = {
     width: PropTypes.number.isRequired,
     active: PropTypes.bool,
     striped: PropTypes.bool,
+    reverse: PropTypes.bool,
     hoverable: PropTypes.bool,
     region: PropTypes.instanceOf(Object),
 };
@@ -105,6 +108,7 @@ RegionView.propTypes = {
 RegionView.defaultProps = {
     active: false,
     striped: false,
+    reverse: false,
     hoverable: false,
     region: null,
 };
