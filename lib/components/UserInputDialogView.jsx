@@ -36,24 +36,41 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup, Radio } from 'react-bootstrap';
+import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormControl, FormGroup, Radio } from 'react-bootstrap';
 import { hexpad2 } from '../util/hexpad';
 
 export default class UserInputDialogView extends React.Component {
     constructor(props) {
         super(props);
         this.onSelectChoice = this.onSelectChoice.bind(this);
+        this.onInputChanged = this.onInputChanged.bind(this);
     }
 
     componentDidMount() {
         this.state = {
             selectedChoice: null,
+            selectedValue: null,
+            customChecked: false,
         };
     }
 
     onSelectChoice(choice) {
-        this.setState({ selectedChoice: choice });
+        if (choice === 'Custom') {
+            this.setState({
+                customChecked: true,
+            });
+        } else {
+            this.setState({
+                selectedValue: choice,
+                customChecked: false,
+            });
+        }
     }
+
+    onInputChanged(event) {
+        this.setState({ selectedValue: event.target.value });
+    }
+
 
     render() {
         const {
@@ -63,6 +80,7 @@ export default class UserInputDialogView extends React.Component {
             onOk,
             onCancel,
         } = this.props;
+        const customChecked = this.state ? this.state.customChecked : false;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
                 <ModalHeader>
@@ -77,16 +95,31 @@ export default class UserInputDialogView extends React.Component {
                                 name="radioGroup"
                                 onClick={() => this.onSelectChoice(choice)}
                             >
-                                {hexpad2(parseInt(choice, 10))} ({choices[choice]})
+                                {hexpad2(parseInt(choice, 16))} ({choices[choice]})
                             </Radio>
                         ))}
+                        <Radio
+                            key={'Custom'}
+                            name="radioGroup"
+                            onClick={() => this.onSelectChoice('Custom')}
+                            checked={customChecked}
+                        >
+                            { choices.length }
+                            <FormControl
+                                id="sdControlsText"
+                                type="text"
+                                onFocus={() => this.onSelectChoice('Custom')}
+                                onChange={this.onInputChanged}
+                                placeholder="Custom SoftDevice ID"
+                            />
+                        </Radio>
                     </FormGroup>
                 </ModalBody>
                 <ModalFooter>
                     <Button
                         bsStyle="primary"
                         className="core-btn"
-                        onClick={() => onOk(this.state.selectedChoice)}
+                        onClick={() => onOk(this.state.selectedValue)}
                     >
                         OK
                     </Button>
