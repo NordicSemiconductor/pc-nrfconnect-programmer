@@ -43,8 +43,8 @@ const warningIcon = <Glyphicon glyph="exclamation-sign" className="warning-sign"
 
 const combineWarnings = (targetWarningStrings, fileWarningStrings, userWarningStrings) => (
     targetWarningStrings.concat(fileWarningStrings).concat(userWarningStrings).map((s, index) => (
-        <Alert bsStyle="warning" key={`warning-${index + 1}`}>
-            <span>{warningIcon}</span> <strong>{s}</strong>
+        <Alert bsStyle="danger" key={`warning-${index + 1}`}>
+            <span>{warningIcon}</span>{s}
         </Alert>
     )));
 
