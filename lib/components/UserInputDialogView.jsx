@@ -52,6 +52,7 @@ export default class UserInputDialogView extends React.Component {
             selectedValue: null,
             customChecked: false,
             customValue: '',
+            isValidInput: false,
         };
     }
 
@@ -64,6 +65,7 @@ export default class UserInputDialogView extends React.Component {
             this.setState({
                 selectedValue: choice,
                 customChecked: false,
+                isValidInput: true,
             });
         }
     }
@@ -77,7 +79,14 @@ export default class UserInputDialogView extends React.Component {
         this.setState({
             selectedValue: value,
             customValue: value,
+            isValidInput: false,
         });
+
+        if (!isNaN(parseInt(value, 16))) {
+            this.setState({
+                isValidInput: true,
+            });
+        }
     }
 
 
@@ -89,6 +98,7 @@ export default class UserInputDialogView extends React.Component {
             onOk,
             onCancel,
         } = this.props;
+        const isValidInput = this.state ? this.state.isValidInput : false;
         const customChecked = this.state ? this.state.customChecked : false;
         const customValue = this.state ? this.state.customValue : '';
         return (
@@ -129,6 +139,7 @@ export default class UserInputDialogView extends React.Component {
                     <Button
                         bsStyle="primary"
                         className="core-btn"
+                        disabled={!isValidInput}
                         onClick={() => onOk(this.state.selectedValue)}
                     >
                         OK
