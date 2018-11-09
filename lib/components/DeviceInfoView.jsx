@@ -36,83 +36,66 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'react-bootstrap';
 import { hexToKiB } from '../util/hexpad';
 import { getCommunicationType, CommunicationType } from '../util/devices';
 
-// const DeviceInfoView = ({
-//     serialNumber,
-//     port,
-//     targetType,
-//     deviceInfo,
-//     isMemLoaded,
-// }) => (
-//     <Popover
-//         id="popover-gg"
-//         // className="memory-details"
-//     >
-//         {serialNumber &&
-//             <div>
-//                 <h5>Serial Number</h5>
-//                 <p>{serialNumber}</p>
-//                 <hr />
-//             </div>
-//         }
-//         {port &&
-//             <div>
-//                 <h5>Port</h5>
-//                 <p>{port}</p>
-//                 <hr />
-//             </div>
-//         }
-//         <div>
-//             <h5>Communication Type</h5>
-//             <p>{getCommunicationType(targetType)}</p>
-//             <hr />
-//         </div>
-//         {deviceInfo && deviceInfo.romSize &&
-//             <div>
-//                 <h5>ROM Size</h5>
-//                 <p>{hexToKiB(deviceInfo.romSize)}</p>
-//                 <hr />
-//             </div>
-//         }
-//         {deviceInfo && deviceInfo.ramSize &&
-//             <div>
-//                 <h5>RAM Size</h5>
-//                 <p>{hexToKiB(deviceInfo.ramSize)}</p>
-//                 <hr />
-//             </div>
-//         }
-//         {deviceInfo && deviceInfo.pageSize &&
-//             <div>
-//                 <h5>Page Size</h5>
-//                 <p>{hexToKiB(deviceInfo.pageSize)}</p>
-//                 <hr />
-//             </div>
-//         }
-//         {targetType === CommunicationType.JLINK &&
-//             <div>
-//                 <h5>Device memory is loaded?</h5>
-//                 <p>{isMemLoaded ? 'Yes' : 'No'}</p>
-//                 <hr />
-//             </div>
-//         }
-//     </Popover>
-// );
-
-// DeviceInfoView.propTypes = {
-//     serialNumber: PropTypes.string.isRequired,
-//     port: PropTypes.string.isRequired,
-//     targetType: PropTypes.number.isRequired,
-//     isMemLoaded: PropTypes.bool.isRequired,
-//     deviceInfo: PropTypes.instanceOf(Object).isRequired,
-// };
-
-const DeviceInfoView = () => (
-    <Popover id="popover-gg">
-        aa
-    </Popover>
+const DeviceInfoView = ({
+    serialNumber,
+    port,
+    targetType,
+    deviceInfo,
+    isMemLoaded,
+}) => (
+    <div className="memory-details">
+        {serialNumber &&
+            <div>
+                <h5>Serial Number</h5>
+                <p>{serialNumber}</p>
+            </div>
+        }
+        {port &&
+            <div>
+                <h5>Port</h5>
+                <p>{port}</p>
+            </div>
+        }
+        <div>
+            <h5>Communication Type</h5>
+            <p>{getCommunicationType(targetType)}</p>
+        </div>
+        {deviceInfo && deviceInfo.romSize &&
+            <div>
+                <h5>ROM Size</h5>
+                <p>{hexToKiB(deviceInfo.romSize)}</p>
+            </div>
+        }
+        {deviceInfo && deviceInfo.ramSize &&
+            <div>
+                <h5>RAM Size</h5>
+                <p>{hexToKiB(deviceInfo.ramSize)}</p>
+            </div>
+        }
+        {deviceInfo && deviceInfo.pageSize &&
+            <div>
+                <h5>Page Size</h5>
+                <p>{hexToKiB(deviceInfo.pageSize)}</p>
+            </div>
+        }
+        {targetType === CommunicationType.JLINK &&
+            <div>
+                <h5>Device memory is loaded?</h5>
+                <p>{isMemLoaded ? 'Yes' : 'No'}</p>
+            </div>
+        }
+    </div>
 );
+
+DeviceInfoView.propTypes = {
+    serialNumber: PropTypes.string.isRequired,
+    port: PropTypes.string.isRequired,
+    targetType: PropTypes.number.isRequired,
+    isMemLoaded: PropTypes.bool.isRequired,
+    deviceInfo: PropTypes.instanceOf(Object).isRequired,
+};
 
 export default DeviceInfoView;

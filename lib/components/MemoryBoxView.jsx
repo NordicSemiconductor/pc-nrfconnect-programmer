@@ -38,12 +38,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import MemoryView from '../containers/memoryView';
-import DeviceInfoView from './DeviceInfoView';
+import DeviceInfoView from '../containers/deviceInfoView';
+
+let triggerRef;
 
 const popover = (
-    // <DeviceInfoView />
-    <Popover id="popover-gg">
-        aa
+    <Popover
+        id="deviceInfo"
+        onMouseOver={() => { triggerRef.setState({ show: true }); }}
+        onMouseOut={() => { triggerRef.setState({ show: false }); }}
+    >
+        <DeviceInfoView />
     </Popover>
 );
 
@@ -73,20 +78,30 @@ const MemoryBoxView = ({
             isFile={isFile}
         />);
     }
+
+    const content = (
+        <div className="panel-heading">
+            <h3 className="panel-title">
+                { title }<span className={`pull-right glyphicon ${iconName}`} />
+            </h3>
+        </div>
+    );
+
     return (
         <div className="memory-layout">
             <div className="panel panel-default">
-                <OverlayTrigger
-                    overlay={popover}
-                    trigger={['click']}
-                    placement="bottom"
-                >
-                    <div className="panel-heading" id="popover-gg">
-                        <h3 className="panel-title">
-                            <a>{ title }<span className={`pull-right glyphicon ${iconName}`} /></a>
-                        </h3>
-                    </div>
-                </OverlayTrigger>
+                { isTarget ?
+                    <OverlayTrigger
+                        overlay={popover}
+                        trigger={['hover', 'focus']}
+                        placement="bottom"
+                        ref={r => { triggerRef = r; }}
+                    >
+                        { content }
+                    </OverlayTrigger>
+                :
+                    content
+                }
                 <div className="panel-body">
                     { placeHolder }
                 </div>

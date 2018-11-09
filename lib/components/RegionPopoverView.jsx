@@ -42,7 +42,7 @@ import { hexpad8 } from '../util/hexpad';
 
 const RegionPopoverView = ({ name, startAddress, regionSize, fileNames }, parent) => (
     <Popover
-        id="popover-top"
+        id="popover-region"
         className="memory-details"
         onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
         onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
@@ -51,7 +51,6 @@ const RegionPopoverView = ({ name, startAddress, regionSize, fileNames }, parent
             <div>
                 <h5>Region name</h5>
                 <p>{ name }</p>
-                <hr />
             </div>
         }
         { fileNames.length > 0 &&
@@ -68,13 +67,11 @@ const RegionPopoverView = ({ name, startAddress, regionSize, fileNames }, parent
                         </span>
                     ))
                 }
-                <hr />
             </div>
         }
         <div>
             <h5>Address range</h5>
             <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize) }</p>
-            <hr />
         </div>
         <div>
             <h5>Size</h5>
