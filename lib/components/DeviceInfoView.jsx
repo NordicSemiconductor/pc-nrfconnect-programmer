@@ -36,18 +36,17 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Panel } from 'react-bootstrap';
 import { hexToKiB } from '../util/hexpad';
 import { getCommunicationType, CommunicationType } from '../util/devices';
 
 const DeviceInfoView = ({
     serialNumber,
     port,
-    deviceInfo,
     targetType,
+    deviceInfo,
     isMemLoaded,
-}) => (targetType === CommunicationType.UNKNOWN ? null : (
-    <Panel header="Device Info" eventKey="1" className="device-info">
+}) => (
+    <div className="memory-details">
         {serialNumber &&
             <div>
                 <h5>Serial Number</h5>
@@ -88,23 +87,15 @@ const DeviceInfoView = ({
                 <p>{isMemLoaded ? 'Yes' : 'No'}</p>
             </div>
         }
-    </Panel>
-));
+    </div>
+);
 
 DeviceInfoView.propTypes = {
-    serialNumber: PropTypes.string,
-    port: PropTypes.string,
-    targetType: PropTypes.number,
-    deviceInfo: PropTypes.instanceOf(Object),
-    isMemLoaded: PropTypes.bool,
-};
-
-DeviceInfoView.defaultProps = {
-    serialNumber: '',
-    port: '',
-    targetType: CommunicationType.UNKNOWN,
-    deviceInfo: {},
-    isMemLoaded: false,
+    serialNumber: PropTypes.string.isRequired,
+    port: PropTypes.string.isRequired,
+    targetType: PropTypes.number.isRequired,
+    isMemLoaded: PropTypes.bool.isRequired,
+    deviceInfo: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default DeviceInfoView;

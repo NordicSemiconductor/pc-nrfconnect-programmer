@@ -36,12 +36,10 @@
 
 import React from 'react';
 import ButtonGroupView from '../containers/buttonGroupView';
-import DeviceInfoView from '../containers/deviceInfoView';
 
 const ControlPanel = () => (
     <div className="control-panel">
         <ButtonGroupView />
-        <DeviceInfoView />
     </div>
 );
 

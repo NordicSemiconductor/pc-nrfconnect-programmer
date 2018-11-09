@@ -45,12 +45,12 @@
             background-color: #fff;
             display: flex;
             flex: 1;
-
-            :last-child {
-                margin-bottom: 0;
-            }
         }
     }
+}
+
+.last-checkbox {
+    margin-bottom: 0;
 }
 
 .memory-layout-container {
@@ -156,8 +156,11 @@
     animation: progress-bar-stripes 1s linear infinite;
 }
 
-#popover-top {
+.popover {
     border-radius: 0px;
+}
+
+#popover-region {
     margin-left: -20px;
 }
 
@@ -174,13 +177,13 @@
 .popover-content p {
     font-size: 15x;
     line-height: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
 }
 
-.popover-content hr {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    border: 0;
-    border-top: 1px solid #eeeeee
+div:last-child > p {
+    padding-bottom: 0;
+    border-bottom: 0;
 }
 
 .memory-details {
@@ -190,5 +193,6 @@
         text-overflow: ellipsis;
         width: 100%;
         display: block;
+        line-height: 1.4em;
     }
 }

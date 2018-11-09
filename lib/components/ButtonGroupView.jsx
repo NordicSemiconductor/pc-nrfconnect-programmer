@@ -142,6 +142,7 @@ const ButtonGroupView = ({
             </ButtonGroup>
             <Checkbox
                 disabled={!isJLink}
+                className="last-checkbox"
             >
                 Auto read memory
             </Checkbox>
