@@ -60,13 +60,15 @@ const RegionPopoverView = ({ name, startAddress, regionSize, fileNames }, parent
                         (fileNames.length > 1) ? 'Overlapping files!' : 'File name'
                     }
                 </h5>
-                {
-                    fileNames.map((fileName, index) => (
-                        <span key={`${index + 1}`}>
-                            { basename(fileName) }
-                        </span>
-                    ))
-                }
+                <p>
+                    {
+                        fileNames.map((fileName, index) => (
+                            <span key={`${index + 1}`}>
+                                { basename(fileName) }
+                            </span>
+                        ))
+                    }
+                </p>
             </div>
         }
         <div>
