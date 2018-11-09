@@ -51,6 +51,7 @@ export default class UserInputDialogView extends React.Component {
             selectedChoice: null,
             selectedValue: null,
             customChecked: false,
+            customValue: '',
         };
     }
 
@@ -68,7 +69,15 @@ export default class UserInputDialogView extends React.Component {
     }
 
     onInputChanged(event) {
-        this.setState({ selectedValue: event.target.value });
+        let value = event.target.value || '';
+        value = value !== '0' ? value : '';
+        value = value.includes('0x') ?
+            `0x${value.slice(2).toUpperCase()}` :
+            `0x${value.toUpperCase()}`;
+        this.setState({
+            selectedValue: value,
+            customValue: value,
+        });
     }
 
 
@@ -81,6 +90,7 @@ export default class UserInputDialogView extends React.Component {
             onCancel,
         } = this.props;
         const customChecked = this.state ? this.state.customChecked : false;
+        const customValue = this.state ? this.state.customValue : '';
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
                 <ModalHeader>
@@ -107,6 +117,7 @@ export default class UserInputDialogView extends React.Component {
                             <FormControl
                                 id="sdControlsText"
                                 type="text"
+                                value={customValue}
                                 onFocus={() => this.onSelectChoice('Custom')}
                                 onChange={this.onInputChanged}
                                 placeholder="Custom SoftDevice ID"
