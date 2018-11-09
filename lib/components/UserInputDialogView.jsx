@@ -79,14 +79,8 @@ export default class UserInputDialogView extends React.Component {
         this.setState({
             selectedValue: value,
             customValue: value,
-            isValidInput: false,
+            isValidInput: !isNaN(parseInt(value, 16)),
         });
-
-        if (!isNaN(parseInt(value, 16))) {
-            this.setState({
-                isValidInput: true,
-            });
-        }
     }
 
 
