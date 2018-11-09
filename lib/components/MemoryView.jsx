@@ -128,7 +128,7 @@ const MemoryView = ({
         <div className="region-container">
             { placeHolder }
             { isTarget && isErasing &&
-                <div className="erase-indicator striped active reverse" />
+                <div className="erase-indicator striped active" />
             }
             { isTarget && refreshEnabled &&
                 <div className="centering-container">

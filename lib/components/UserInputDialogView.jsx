@@ -104,7 +104,6 @@ export default class UserInputDialogView extends React.Component {
                             onClick={() => this.onSelectChoice('Custom')}
                             checked={customChecked}
                         >
-                            { choices.length }
                             <FormControl
                                 id="sdControlsText"
                                 type="text"
