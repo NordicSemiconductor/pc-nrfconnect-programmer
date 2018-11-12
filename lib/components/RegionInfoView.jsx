@@ -77,7 +77,7 @@ const RegionInfoView = ({ name, startAddress, regionSize, fileNames }, parent) =
         </div>
         <div>
             <h5>Size</h5>
-            <p>{ hexpad8(regionSize) } bytes</p>
+            <p>{ regionSize } bytes</p>
         </div>
     </Popover>
 );
