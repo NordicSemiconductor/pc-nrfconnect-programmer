@@ -57,13 +57,15 @@ const ButtonGroupView = ({
     refreshAllFiles,
     openFileDialog,
     onToggleFileList,
+    mruFiles,
+    refreshEnabled,
     performJLinkWrite,
+    performJLinkRead,
     performUSBSDFUWrite,
     performRecover,
     performRecoverAndWrite,
     performSaveAsFile,
     performReset,
-    mruFiles,
     targetType,
     targetIsReady,
     targetIsWritable,
@@ -139,6 +141,13 @@ const ButtonGroupView = ({
                 >
                     <Glyphicon glyph="pencil" />Write
                 </Button>
+                <Button
+                    key="performJLinkRead"
+                    onClick={performJLinkRead}
+                    disabled={!targetIsReady || !refreshEnabled}
+                >
+                    <Glyphicon glyph="refresh" />Read
+                </Button>
             </ButtonGroup>
             <Checkbox
                 disabled={!isJLink}
@@ -156,13 +165,15 @@ ButtonGroupView.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    refreshEnabled: PropTypes.bool.isRequired,
     performJLinkWrite: PropTypes.func.isRequired,
+    performJLinkRead: PropTypes.func.isRequired,
     performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
     performSaveAsFile: PropTypes.func.isRequired,
     performReset: PropTypes.func.isRequired,
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     targetType: PropTypes.number.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,

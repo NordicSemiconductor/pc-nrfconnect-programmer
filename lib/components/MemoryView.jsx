@@ -36,7 +36,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Glyphicon } from 'react-bootstrap';
 import { List } from 'immutable';
 import RegionView from '../containers/regionView';
 
@@ -106,7 +105,6 @@ const MemoryView = ({
     isErasing,
     isLoading,
     refreshEnabled,
-    performJLinkRead,
 }) => {
     let placeHolder;
     if (isTarget) {
@@ -132,12 +130,10 @@ const MemoryView = ({
             }
             { isTarget && refreshEnabled &&
                 <div className="centering-container">
-                    <Button
-                        key="performJLinkRead"
-                        onClick={performJLinkRead}
-                    >
-                        <Glyphicon glyph="refresh" />Read
-                    </Button>
+                    <div className="read-indicator">
+                        <p>Device is connected.</p>
+                        <p>Press <strong>READ</strong> button to load the memory.</p>
+                    </div>
                 </div>
             }
         </div>
@@ -154,7 +150,6 @@ MemoryView.propTypes = {
     isErasing: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
-    performJLinkRead: PropTypes.func.isRequired,
 };
 
 export default MemoryView;
