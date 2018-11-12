@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -82,7 +82,11 @@ const MemoryBoxView = ({
     const content = (
         <div className="panel-heading">
             <h3 className="panel-title">
-                { title }<span className={`pull-right glyphicon ${iconName}`} />
+                { title }
+                {isTarget &&
+                    <span className="glyphicon glyphicon-info-sign target-info" />
+                }
+                <span className={`pull-right glyphicon ${iconName}`} />
             </h3>
         </div>
     );

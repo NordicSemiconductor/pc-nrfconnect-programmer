@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -57,13 +57,17 @@ const ButtonGroupView = ({
     refreshAllFiles,
     openFileDialog,
     onToggleFileList,
+    mruFiles,
+    refreshEnabled,
+    autoRead,
+    toggleAutoRead,
     performJLinkWrite,
+    performJLinkRead,
     performUSBSDFUWrite,
     performRecover,
     performRecoverAndWrite,
     performSaveAsFile,
     performReset,
-    mruFiles,
     targetType,
     targetIsReady,
     targetIsWritable,
@@ -139,10 +143,18 @@ const ButtonGroupView = ({
                 >
                     <Glyphicon glyph="pencil" />Write
                 </Button>
+                <Button
+                    key="performJLinkRead"
+                    onClick={performJLinkRead}
+                    disabled={!targetIsReady || !refreshEnabled}
+                >
+                    <Glyphicon glyph="refresh" />Read
+                </Button>
             </ButtonGroup>
             <Checkbox
-                disabled={!isJLink}
                 className="last-checkbox"
+                onChange={e => toggleAutoRead(e.target.checked)}
+                checked={autoRead}
             >
                 Auto read memory
             </Checkbox>
@@ -156,13 +168,17 @@ ButtonGroupView.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    refreshEnabled: PropTypes.bool.isRequired,
+    autoRead: PropTypes.bool.isRequired,
+    toggleAutoRead: PropTypes.func.isRequired,
     performJLinkWrite: PropTypes.func.isRequired,
+    performJLinkRead: PropTypes.func.isRequired,
     performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
     performSaveAsFile: PropTypes.func.isRequired,
     performReset: PropTypes.func.isRequired,
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     targetType: PropTypes.number.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
