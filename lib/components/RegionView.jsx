@@ -38,7 +38,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Glyphicon, OverlayTrigger } from 'react-bootstrap';
-import RegionPopoverView from './RegionPopoverView';
+import RegionInfoView from './RegionInfoView';
 
 class RegionView extends React.Component {
     render() {
@@ -80,7 +80,7 @@ class RegionView extends React.Component {
 
         const overlayRegionView = !region ? null : (
             <OverlayTrigger
-                overlay={RegionPopoverView(region, this)}
+                overlay={RegionInfoView(region, this)}
                 trigger={['focus', 'hover']}
                 placement="right"
                 ref={r => { this.triggerRef = r; }}

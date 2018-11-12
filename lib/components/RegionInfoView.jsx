@@ -40,7 +40,7 @@ import { Popover } from 'react-bootstrap';
 import { basename } from 'path';
 import { hexpad8 } from '../util/hexpad';
 
-const RegionPopoverView = ({ name, startAddress, regionSize, fileNames }, parent) => (
+const RegionInfoView = ({ name, startAddress, regionSize, fileNames }, parent) => (
     <Popover
         id="popover-region"
         className="memory-details"
@@ -77,20 +77,20 @@ const RegionPopoverView = ({ name, startAddress, regionSize, fileNames }, parent
         </div>
         <div>
             <h5>Size</h5>
-            <p>{ regionSize } bytes</p>
+            <p>{ hexpad8(regionSize) } bytes</p>
         </div>
     </Popover>
 );
 
-RegionPopoverView.propTypes = {
+RegionInfoView.propTypes = {
     name: PropTypes.string,
     startAddress: PropTypes.number.isRequired,
     regionSize: PropTypes.number.isRequired,
     fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-RegionPopoverView.defaultProps = {
+RegionInfoView.defaultProps = {
     name: null,
 };
 
-export default RegionPopoverView;
+export default RegionInfoView;
