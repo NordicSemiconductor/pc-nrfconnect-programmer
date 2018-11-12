@@ -59,6 +59,8 @@ const ButtonGroupView = ({
     onToggleFileList,
     mruFiles,
     refreshEnabled,
+    autoRead,
+    toggleAutoRead,
     performJLinkWrite,
     performJLinkRead,
     performUSBSDFUWrite,
@@ -150,8 +152,9 @@ const ButtonGroupView = ({
                 </Button>
             </ButtonGroup>
             <Checkbox
-                disabled={!isJLink}
                 className="last-checkbox"
+                onChange={e => toggleAutoRead(e.target.checked)}
+                checked={autoRead}
             >
                 Auto read memory
             </Checkbox>
@@ -167,6 +170,8 @@ ButtonGroupView.propTypes = {
     openFileDialog: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
+    autoRead: PropTypes.bool.isRequired,
+    toggleAutoRead: PropTypes.func.isRequired,
     performJLinkWrite: PropTypes.func.isRequired,
     performJLinkRead: PropTypes.func.isRequired,
     performUSBSDFUWrite: PropTypes.func.isRequired,

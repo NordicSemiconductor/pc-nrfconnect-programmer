@@ -40,6 +40,7 @@ import ControlPanel from './lib/components/ControlPanel';
 import AppMainView from './lib/containers/appMainView';
 import { openFile } from './lib/actions/fileActions';
 import { openDevice } from './lib/actions/targetActions';
+import { loadSettings } from './lib/actions/settingsActions';
 import appReducer from './lib/reducers';
 import logJprogVersion from './lib/util/logJprogVersion';
 import './resources/css/index.less';
@@ -58,6 +59,7 @@ export default {
     },
 
     onInit: dispatch => {
+        dispatch(loadSettings());
         document.body.ondragover = event => {
             const ev = event;
             ev.dataTransfer.dropEffect = 'copy';

@@ -131,8 +131,8 @@ const MemoryView = ({
             { isTarget && refreshEnabled &&
                 <div className="centering-container">
                     <div className="read-indicator">
-                        <p>Device is connected.</p>
-                        <p>Press <strong>READ</strong> button to load the memory.</p>
+                        <p>Device is connected</p>
+                        <p>Press <strong>READ</strong> button to read the memory</p>
                     </div>
                 </div>
             }
