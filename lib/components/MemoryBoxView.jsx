@@ -82,7 +82,11 @@ const MemoryBoxView = ({
     const content = (
         <div className="panel-heading">
             <h3 className="panel-title">
-                { title }<span className={`pull-right glyphicon ${iconName}`} />
+                { title }
+                {isTarget &&
+                    <span className="glyphicon glyphicon-info-sign target-info" />
+                }
+                <span className={`pull-right glyphicon ${iconName}`} />
             </h3>
         </div>
     );
