@@ -86,7 +86,7 @@ const ButtonGroupView = ({
             <ButtonGroup vertical>
                 <Dropdown pullRight id="files-dropdown">
                     <Dropdown.Toggle onClick={onToggleFileList}>
-                        <Glyphicon glyph="folder-open" />Add a HEX file
+                        <Glyphicon glyph="folder-open" />Add HEX file
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         {MruMenuItems(mruFiles, openFile)}
@@ -95,7 +95,7 @@ const ButtonGroupView = ({
                     </Dropdown.Menu>
                 </Dropdown>
                 <Button onClick={refreshAllFiles}>
-                    <Glyphicon glyph="refresh" />Reload HEX files
+                    <Glyphicon glyph="refresh" />Reload files
                 </Button>
                 <Button onClick={closeFiles}>
                     <Glyphicon glyph="minus-sign" />Clear files
