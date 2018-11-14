@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -36,7 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon, Button, Dropdown, MenuItem } from 'react-bootstrap';
+import { Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox } from 'react-bootstrap';
 import { CommunicationType } from '../util/devices';
 
 const MruMenuItems = (mruFiles, openFile) => {
@@ -51,86 +51,116 @@ const MruMenuItems = (mruFiles, openFile) => {
     return mruMenuItems;
 };
 
-const getWriteAction = (
-    targetType,
-    performJLinkWrite,
-    performUSBSDFUWrite,
-) => {
-    if (targetType === CommunicationType.JLINK) {
-        return performJLinkWrite;
-    } else if (targetType === CommunicationType.USBSDFU) {
-        return performUSBSDFUWrite;
-    }
-    return undefined;
-};
-
 const ButtonGroupView = ({
     openFile,
     closeFiles,
     refreshAllFiles,
     openFileDialog,
     onToggleFileList,
+    mruFiles,
+    refreshEnabled,
+    autoRead,
+    toggleAutoRead,
     performJLinkWrite,
+    performJLinkRead,
     performUSBSDFUWrite,
     performRecover,
     performRecoverAndWrite,
     performSaveAsFile,
-    mruFiles,
+    performReset,
     targetType,
     targetIsReady,
     targetIsWritable,
     targetIsRecoverable,
     targetIsMemLoaded,
-}) => (
-    <div>
-        <Dropdown pullRight id="files-dropdown">
-            <Dropdown.Toggle onClick={onToggleFileList}>
-                <Glyphicon glyph="folder-open" />Add a .hex file
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-                {MruMenuItems(mruFiles, openFile)}
-                <MenuItem divider />
-                <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
-            </Dropdown.Menu>
-        </Dropdown>
-        <Button onClick={refreshAllFiles}>
-            <Glyphicon glyph="refresh" />Reload .hex files
-        </Button>
-        <Button onClick={closeFiles}>
-            <Glyphicon glyph="minus-sign" />Clear files
-        </Button>
+}) => {
+    const isJLink = targetType === CommunicationType.JLINK;
+    const isUsbSerial = targetType === CommunicationType.USBSDFU;
+    const performWrite = {
+        [CommunicationType.JLINK]: performJLinkWrite,
+        [CommunicationType.USBSDFU]: performUSBSDFUWrite,
+    }[targetType];
 
-        <hr style={{ borderColor: 'transparent', margin: '5px 0px' }} />
-        {targetType === CommunicationType.JLINK &&
-            <div>
+    return (<div className="button-group-view">
+        <Panel header="File">
+            <ButtonGroup vertical>
+                <Dropdown pullRight id="files-dropdown">
+                    <Dropdown.Toggle onClick={onToggleFileList}>
+                        <Glyphicon glyph="folder-open" />Add HEX file
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {MruMenuItems(mruFiles, openFile)}
+                        <MenuItem divider />
+                        <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
+                    </Dropdown.Menu>
+                </Dropdown>
+                <Button onClick={refreshAllFiles}>
+                    <Glyphicon glyph="refresh" />Reload files
+                </Button>
+                <Button onClick={closeFiles}>
+                    <Glyphicon glyph="minus-sign" />Clear files
+                </Button>
+            </ButtonGroup>
+        </Panel>
+        <Panel header="Device">
+            <ButtonGroup vertical>
                 <Button
+                    key="performRecover"
                     onClick={performRecover}
-                    disabled={!targetIsReady || !targetIsRecoverable}
+                    disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="remove-sign" />Erase all
+                    <Glyphicon glyph="erase" />Erase
                 </Button>
                 <Button
+                    key="performRecoverAndWrite"
                     onClick={performRecoverAndWrite}
-                    disabled={!targetIsReady || !targetIsRecoverable}
+                    disabled={
+                        !isJLink ||
+                        !targetIsReady ||
+                        !(targetIsRecoverable && mruFiles.length)
+                    }
                 >
-                    <Glyphicon glyph="save" />Erase all & write
+                    <Glyphicon bsStyle="warning" glyph="pencil" />Erase & write
                 </Button>
                 <Button
+                    key="performSaveAsFile"
                     onClick={performSaveAsFile}
-                    disabled={!targetIsMemLoaded}
+                    disabled={!isJLink || !targetIsMemLoaded}
                 >
-                    <Glyphicon glyph="save" />Save memory as file
+                    <Glyphicon glyph="floppy-disk" />Save as file
                 </Button>
-            </div>
-        }
-        <Button
-            onClick={getWriteAction(targetType, performJLinkWrite, performUSBSDFUWrite)}
-            disabled={!targetIsReady || !targetIsWritable}
-        >
-            <Glyphicon glyph="download-alt" />Write
-        </Button>
-    </div>
-);
+                <Button
+                    key="performReset"
+                    onClick={performReset}
+                    disabled={!isUsbSerial || !targetIsReady}
+                >
+                    <Glyphicon glyph="record" />Reset
+                </Button>
+                <Button
+                    key="performJLinkWrite"
+                    onClick={performWrite}
+                    disabled={!targetIsReady || !targetIsWritable}
+                >
+                    <Glyphicon glyph="pencil" />Write
+                </Button>
+                <Button
+                    key="performJLinkRead"
+                    onClick={performJLinkRead}
+                    disabled={!targetIsReady || !refreshEnabled}
+                >
+                    <Glyphicon glyph="refresh" />Read
+                </Button>
+            </ButtonGroup>
+            <Checkbox
+                className="last-checkbox"
+                onChange={e => toggleAutoRead(e.target.checked)}
+                checked={autoRead}
+            >
+                Auto read memory
+            </Checkbox>
+        </Panel>
+    </div>);
+};
 
 ButtonGroupView.propTypes = {
     openFile: PropTypes.func.isRequired,
@@ -138,12 +168,17 @@ ButtonGroupView.propTypes = {
     refreshAllFiles: PropTypes.func.isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    refreshEnabled: PropTypes.bool.isRequired,
+    autoRead: PropTypes.bool.isRequired,
+    toggleAutoRead: PropTypes.func.isRequired,
     performJLinkWrite: PropTypes.func.isRequired,
+    performJLinkRead: PropTypes.func.isRequired,
     performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
     performSaveAsFile: PropTypes.func.isRequired,
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    performReset: PropTypes.func.isRequired,
     targetType: PropTypes.number.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,

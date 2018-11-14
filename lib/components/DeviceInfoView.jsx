@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -36,77 +36,66 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Accordion, Panel } from 'react-bootstrap';
 import { hexToKiB } from '../util/hexpad';
 import { getCommunicationType, CommunicationType } from '../util/devices';
 
 const DeviceInfoView = ({
     serialNumber,
     port,
-    deviceInfo,
     targetType,
+    deviceInfo,
     isMemLoaded,
-}) => (targetType === CommunicationType.UNKNOWN ? null : (
-    <Accordion defaultActiveKey="1" className="device-info">
-        <Panel header="Device Info" eventKey="1">
-            {serialNumber &&
-                <div>
-                    <h5>SerialNumber</h5>
-                    <p>{serialNumber}</p>
-                </div>
-            }
-            {port &&
-                <div>
-                    <h5>Port</h5>
-                    <p>{port}</p>
-                </div>
-            }
+}) => (
+    <div className="memory-details">
+        {serialNumber &&
             <div>
-                <h5>Communication Type</h5>
-                <p>{getCommunicationType(targetType)}</p>
+                <h5>Serial Number</h5>
+                <p>{serialNumber}</p>
             </div>
-            {deviceInfo && deviceInfo.romSize &&
-                <div>
-                    <h5>ROM Size</h5>
-                    <p>{hexToKiB(deviceInfo.romSize)}</p>
-                </div>
-            }
-            {deviceInfo && deviceInfo.ramSize &&
-                <div>
-                    <h5>RAM Size</h5>
-                    <p>{hexToKiB(deviceInfo.ramSize)}</p>
-                </div>
-            }
-            {deviceInfo && deviceInfo.pageSize &&
-                <div>
-                    <h5>Page Size</h5>
-                    <p>{hexToKiB(deviceInfo.pageSize)}</p>
-                </div>
-            }
-            {targetType === CommunicationType.JLINK &&
-                <div>
-                    <h5>Device memory is loaded?</h5>
-                    <p>{isMemLoaded ? 'Yes' : 'No'}</p>
-                </div>
-            }
-        </Panel>
-    </Accordion>
-));
+        }
+        {port &&
+            <div>
+                <h5>Port</h5>
+                <p>{port}</p>
+            </div>
+        }
+        <div>
+            <h5>Communication Type</h5>
+            <p>{getCommunicationType(targetType)}</p>
+        </div>
+        {deviceInfo && deviceInfo.romSize &&
+            <div>
+                <h5>ROM Size</h5>
+                <p>{hexToKiB(deviceInfo.romSize)}</p>
+            </div>
+        }
+        {deviceInfo && deviceInfo.ramSize &&
+            <div>
+                <h5>RAM Size</h5>
+                <p>{hexToKiB(deviceInfo.ramSize)}</p>
+            </div>
+        }
+        {deviceInfo && deviceInfo.pageSize &&
+            <div>
+                <h5>Page Size</h5>
+                <p>{hexToKiB(deviceInfo.pageSize)}</p>
+            </div>
+        }
+        {targetType === CommunicationType.JLINK &&
+            <div>
+                <h5>Device memory is loaded?</h5>
+                <p>{isMemLoaded ? 'Yes' : 'No'}</p>
+            </div>
+        }
+    </div>
+);
 
 DeviceInfoView.propTypes = {
-    serialNumber: PropTypes.string,
-    port: PropTypes.string,
-    targetType: PropTypes.number,
-    deviceInfo: PropTypes.instanceOf(Object),
-    isMemLoaded: PropTypes.bool,
-};
-
-DeviceInfoView.defaultProps = {
-    serialNumber: '',
-    port: '',
-    targetType: CommunicationType.UNKNOWN,
-    deviceInfo: {},
-    isMemLoaded: false,
+    serialNumber: PropTypes.string.isRequired,
+    port: PropTypes.string.isRequired,
+    targetType: PropTypes.number.isRequired,
+    isMemLoaded: PropTypes.bool.isRequired,
+    deviceInfo: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default DeviceInfoView;

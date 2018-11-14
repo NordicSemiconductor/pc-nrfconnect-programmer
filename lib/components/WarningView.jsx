@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -36,91 +36,31 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon } from 'react-bootstrap';
+import { Alert, Glyphicon } from 'react-bootstrap';
 import { List } from 'immutable';
-import MemoryMap from 'nrf-intel-hex';
-import { hexpad8 } from '../util/hexpad';
 
-const FileWarnings = (memMaps, targetSize) => {
-    const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
+const warningIcon = <Glyphicon glyph="exclamation-sign" className="warning-sign" />;
 
-    // This warning is to warn about overlap in the hex files.
-    let overlapWarning = '';
-    const outsideFlashBlocks = [];
-    overlaps.forEach((overlap, startAddress) => {
-        if (overlap.length > 1) {
-            overlapWarning = (
-                <div className="alert alert-warning" key={`overlap-warning-${startAddress + 1}`}>
-                    <center>
-                        <Glyphicon glyph="warning-sign" className="warning-sign" />
-                        <p>Some of the .hex files have overlapping data.</p>
-                        <p>In regions with overlapping data, data from the file which
-                        was <strong>last</strong> added will be used.</p>
-                    </center>
-                </div>
-            );
-        }
-
-        const endAddress = startAddress + overlap[0][1].length;
-
-        // This assumes UICR at 0x10001000, size 4KiB
-        if ((startAddress < 0x10001000 && endAddress > targetSize) ||
-            (startAddress >= 0x10001000 && endAddress > 0x10002000)) {
-            outsideFlashBlocks.push(`${hexpad8(startAddress)}-${hexpad8(endAddress)}`);
-        }
-    });
-
-    // This warning is to warn about there exists some contents
-    // outside of maximum size of target device.
-    let outsideFlashWarning;
-    if (outsideFlashBlocks.length) {
-        outsideFlashWarning = (
-            <div className="alert alert-warning" key="outside-flash-warning">
-                <center>
-                    <Glyphicon glyph="warning-sign" className="warning-sign" />
-                    <p>There is data outside the user-writable areas ({ outsideFlashBlocks.join(', ') }). </p>
-                    <p>Check that the .hex files are appropiate for the current device.</p>
-                </center>
-            </div>
-        );
-    }
-
-    return [
-        overlapWarning,
-        outsideFlashWarning,
-    ];
-};
-
-const Warnings = (targetWarningStrings, userWarningStrings) => (
-    targetWarningStrings.concat(userWarningStrings).map((s, index) => (
-        <div className="alert alert-warning" key={`outside-flash-warning-${index + 1}`}>
-            <center>
-                <Glyphicon glyph="warning-sign" className="warning-sign" />
-                <p>{s}</p>
-            </center>
-        </div>
+const combineWarnings = (targetWarningStrings, fileWarningStrings, userWarningStrings) => (
+    targetWarningStrings.concat(fileWarningStrings).concat(userWarningStrings).map((s, index) => (
+        <Alert bsStyle="danger" key={`warning-${index + 1}`}>
+            <span>{warningIcon}</span>{s}
+        </Alert>
     )));
 
 const WarningView = ({
-    memMaps,
-    targetSize,
     targetWarningStrings,
+    fileWarningStrings,
     userWarningStrings,
 }) => (
     <div className="warning-view">
-        { FileWarnings(memMaps, targetSize) }
-        { Warnings(targetWarningStrings, userWarningStrings) }
+        { combineWarnings(targetWarningStrings, fileWarningStrings, userWarningStrings) }
     </div>
 );
 
 WarningView.propTypes = {
-    memMaps: PropTypes.arrayOf(
-        PropTypes.arrayOf(
-            PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        ),
-    ).isRequired,
-    targetSize: PropTypes.number.isRequired,
     targetWarningStrings: PropTypes.objectOf(List).isRequired,
+    fileWarningStrings: PropTypes.objectOf(List).isRequired,
     userWarningStrings: PropTypes.objectOf(List).isRequired,
 };
 

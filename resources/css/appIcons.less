@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'AppIcons';
+    src: url('../font/appIcons.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class*='appicon-']:before {
+    display: inline-block;
+    font-family: 'AppIcons';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+.appicon-chip:before{ content: '\0043'; }

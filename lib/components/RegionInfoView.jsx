@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -34,17 +34,63 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { connect } from 'react-redux';
-import SettingView from '../components/SettingView';
-import * as settingsActions from '../actions/settingsActions';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Popover } from 'react-bootstrap';
+import { basename } from 'path';
+import { hexpad8 } from '../util/hexpad';
 
-export default connect(
-    (state, props) => ({
-        ...props,
-        autoRead: state.app.settings.autoRead,
-    }),
-    (dispatch, props) => ({
-        ...props,
-        toggleAutoRead: () => { dispatch(settingsActions.toggleAutoReadAction()); },
-    }),
-)(SettingView);
+const RegionInfoView = ({ name, startAddress, regionSize, fileNames }, parent) => (
+    <Popover
+        id="popover-region"
+        className="memory-details"
+        onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
+        onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
+    >
+        { name &&
+            <div>
+                <h5>Region name</h5>
+                <p>{ name }</p>
+            </div>
+        }
+        { fileNames.length > 0 &&
+            <div className="files">
+                <h5>
+                    {
+                        (fileNames.length > 1) ? 'Overlapping files!' : 'File name'
+                    }
+                </h5>
+                <p>
+                    {
+                        fileNames.map((fileName, index) => (
+                            <span key={`${index + 1}`}>
+                                { basename(fileName) }
+                            </span>
+                        ))
+                    }
+                </p>
+            </div>
+        }
+        <div>
+            <h5>Address range</h5>
+            <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize) }</p>
+        </div>
+        <div>
+            <h5>Size</h5>
+            <p>{ regionSize } bytes</p>
+        </div>
+    </Popover>
+);
+
+RegionInfoView.propTypes = {
+    name: PropTypes.string,
+    startAddress: PropTypes.number.isRequired,
+    regionSize: PropTypes.number.isRequired,
+    fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
+RegionInfoView.defaultProps = {
+    name: null,
+};
+
+export default RegionInfoView;
