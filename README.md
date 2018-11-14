@@ -7,9 +7,7 @@
 
 *nRF Connect Programmer* is implemented as an app for [nRF Connect](https://github.com/NordicSemiconductor/pc-nrfconnect-core#creating-apps).
 
-Check which one is better.
 ![screenshot](resources/programmer-screenshot.png)
-![screenshot](resources/programmer-screenshot2.png)
 
 The app supports the following devices:
 * PCA10028 nRF51 Development Kit
