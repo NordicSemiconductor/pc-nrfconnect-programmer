@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -38,13 +38,12 @@ import React from 'react';
 import { logger } from 'nrfconnect/core';
 import ControlPanel from './lib/components/ControlPanel';
 import AppMainView from './lib/containers/appMainView';
-import * as fileActions from './lib/actions/fileActions';
-import * as jlinkTargetActions from './lib/actions/jlinkTargetActions';
-import * as usbsdfuTargetActions from './lib/actions/usbsdfuTargetActions';
+import { openFile } from './lib/actions/fileActions';
+import { openDevice } from './lib/actions/targetActions';
+import { loadSettings } from './lib/actions/settingsActions';
 import appReducer from './lib/reducers';
-import './resources/css/index.less';
-import { VendorId, USBProductIds } from './lib/util/devices';
 import logJprogVersion from './lib/util/logJprogVersion';
+import './resources/css/index.less';
 
 export default {
     config: {
@@ -53,11 +52,14 @@ export default {
             serialport: true,
             jlink: true,
         },
+
         deviceSetup: {
             needSerialport: true,
         },
     },
+
     onInit: dispatch => {
+        dispatch(loadSettings());
         document.body.ondragover = event => {
             const ev = event;
             ev.dataTransfer.dropEffect = 'copy';
@@ -66,60 +68,45 @@ export default {
 
         document.body.ondrop = event => {
             Array.from(event.dataTransfer.files).forEach(i => {
-                dispatch(fileActions.openFile(i.path));
+                dispatch(openFile(i.path));
             });
             event.preventDefault();
         };
 
         logJprogVersion();
     },
+
     decorateMainView: MainView => () => (
         <MainView cssClass="main-view">
             <AppMainView />
         </MainView>
     ),
+
     decorateSidePanel: SidePanel => () => (
         <SidePanel cssClass="side-panel">
             <ControlPanel />
         </SidePanel>
     ),
+
     reduceApp: appReducer,
-    mapSerialPortSelectorState: (state, props) => ({
-        ...props,
-        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
-    }),
+
     middleware: store => next => action => {
         const { dispatch } = store;
+
         switch (action.type) {
             case 'DEVICE_SETUP_COMPLETE': {
-                const device = action.device;
-                const serialNumber = device.serialNumber;
-                if (action.device.traits.includes('jlink')) {
-                    dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
-                    break;
-                }
-                if (action.device.traits.includes('nordicUsb')) {
-                    dispatch(usbsdfuTargetActions.openDevice(action.device));
-                    break;
-                }
-                if (action.device.traits.includes('serialport')) {
-                    const { vendorId, productId } = device.serialport;
-                    const vid = parseInt(vendorId.toString(16), 16);
-                    const pid = parseInt(productId.toString(16), 16);
-                    if (vid === VendorId.NORDIC_SEMICONDUCTOR && USBProductIds.includes(pid)) {
-                        dispatch(usbsdfuTargetActions.openDevice(action.device));
-                        break;
-                    }
-                }
-                logger.error('Unsupported device. The detected device is neither JLink device nor Nordic USB device.');
+                dispatch(openDevice(action.device));
                 break;
             }
+
             case 'DEVICE_DESELECTED': {
                 logger.info('Target device closed.');
                 break;
             }
+
             default:
         }
+
         next(action);
     },
 };

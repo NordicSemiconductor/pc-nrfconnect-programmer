@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -35,21 +35,11 @@
  */
 
 import React from 'react';
-import FileLegendView from '../containers/fileLegendView';
 import ButtonGroupView from '../containers/buttonGroupView';
-import WarningView from '../containers/warningView';
-import DeviceInfoView from '../containers/deviceInfoView';
-import SettingView from '../containers/settingView';
 
 const ControlPanel = () => (
     <div className="control-panel">
-        <div>
-            <ButtonGroupView />
-            <FileLegendView />
-            <WarningView />
-        </div>
-        <DeviceInfoView />
-        <SettingView />
+        <ButtonGroupView />
     </div>
 );
 

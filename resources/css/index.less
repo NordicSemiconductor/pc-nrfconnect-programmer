@@ -34,26 +34,24 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import './memoryLayout.less';
 @import './controPanel.less';
+@import './appMainView.less';
+@import './appIcons.less';
 
 .main-view, .side-panel {
     padding: 10px 15px;
 }
 
-.control-panel {
-    height: 100%;
-    flex: 0 0 260px;
-    > * {
-        margin-bottom: 20px;
-    }
-    justify-content: space-between;
-    display: flex;
-    flex-direction: column;
-}
-
 .core-main-layout > div:nth-child(2) {
     overflow-y: visible;
+}
+
+.app-main-view {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    padding: 0px;
 }
 
 .control-panel > div:nth-child(1) {
@@ -68,78 +66,22 @@
             margin-right: 15px;
         }
     }
+}
 
-    .dropdown {
-        display: block;
+.button-group-view {
+    .btn-group-vertical {
         width: 100%;
-        text-align: left;
-
-        span.glyphicon {
-            margin-right: 15px;
-        }
-
-        span.caret {
-            font-weight: bolder;
-            margin-left: 5px;
-        }
     }
 }
 
-.memlayout-spinner {
-    width: 100px;
-    height: 100px;
-    margin: auto;
-    z-index: 1000;
-    transition: opacity .4s;
-    pointer-events: none;
-    border-radius: 50%;
-    border: 8px solid rgba(0,128,192, 0.2);
-    border-left: 8px solid #0080c0;
-    animation: rotator 2s infinite linear;
-
-    @keyframes rotator {
-        0%   { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+.btn:not(.btn-primary) .glyphicon {
+    color: #0080c0;
+}
+.btn:not(.core-btn):not(.btn-xs):not(.transparent) .glyphicon {
+    margin-right: 15px;
 }
 
-.file-legend {
-    margin-top: 1em;
-    margin-bottom: 1em;
-    .legend-colour {
-        width: 1.5em;
-        height: 1.5em;
-        display: inline-block;
-        float: left;
-        margin-right: 0.2em;
-    }
-    .file-label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        width: 185px;
-        display: block;
-    }
-}
-
-
-.app-main-view {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    .column {
-        flex: 0 0 ~'calc(50% - 8px)';
-        display: flex;
-        justify-content: space-around;
-        flex-direction: column;
-
-        .target-map-disconnected {
-            display: flex;
-            justify-content: center;
-        }
-    }
+.panel-body {
+    padding: 15px;
+    background-color: #f5f5f5;
 }

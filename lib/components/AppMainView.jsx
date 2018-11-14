@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -36,71 +36,48 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import MemoryLayout from '../components/MemoryLayout';
+import WarningView from '../containers/warningView';
+import MemoryBoxView from '../containers/memoryBoxView';
 import UserInputDialogView from '../containers/userInputDialogView';
 
-const AppMainView = (
-    props => {
-        const {
-            file,
-            target,
-            refreshEnabled,
-            refreshTargetContents,
-            resetEnabled,
-            resetTarget,
-        } = props;
-        const refresh = refreshEnabled ? refreshTargetContents : null;
-        const reset = resetEnabled ? resetTarget : null;
-
-        let targetMap;
-        if (!target.serialNumber) {
-            targetMap = (
-                <div className="target-map-disconnected">
-                    Connect to a DevKit to see the contents of its non-volatile memory here.
-                </div>
-            );
-        } else if (target.serialNumber && target.isReady) {
-            const title = target.deviceInfo.type !== 'Unknown' ?
-                target.deviceInfo.type : target.deviceInfo.family;
-            targetMap = (
-                <MemoryLayout
-                    regions={target.regions}
-                    targetSize={target.deviceInfo.romSize}
-                    title={title}
-                    refresh={refresh}
-                    reset={reset}
-                />
-            );
-        } else {
-            targetMap = <div className="memlayout-spinner" />;
-        }
-
-        return (
-            <div className="app-main-view">
-                <div className="column">
-                    { targetMap }
-                </div>
-                <div className="column">
-                    <MemoryLayout
-                        regions={file.regions}
-                        targetSize={target.deviceInfo.romSize}
-                        title="Files"
-                    />
-                </div>
-
-                <UserInputDialogView />
-            </div>
-        );
+function getTargetTitle(serialNumber, deviceInfo) {
+    if (serialNumber) {
+        return (deviceInfo.type !== 'Unknown' ? deviceInfo.type : deviceInfo.family);
     }
+    return undefined;
+}
+
+function hasFileContent(file) {
+    return Object.keys(file.loaded).length > 0;
+}
+
+const AppMainView = ({ file, target }) => (
+    <div className="app-main-view">
+        <WarningView />
+        <div className="memory-box-container">
+            <MemoryBoxView
+                title={getTargetTitle(target.serialNumber, target.deviceInfo) || 'Device Memory Layout'}
+                description="Connect a device to display memory contents"
+                iconName="appicon-chip"
+                regions={target.regions}
+                isHolder={!target.serialNumber}
+                isTarget={!!target.serialNumber}
+            />
+            <MemoryBoxView
+                title="File Memory Layout"
+                description="Drag & Drop one or more HEX files here"
+                iconName="glyphicon-folder-open"
+                isHolder={!hasFileContent(file)}
+                isFile={hasFileContent(file)}
+            />
+        </div>
+        <UserInputDialogView />
+    </div>
 );
 
 AppMainView.propTypes = {
     file: PropTypes.shape({}).isRequired,
     target: PropTypes.shape({}).isRequired,
-    refreshEnabled: PropTypes.bool.isRequired,
-    refreshTargetContents: PropTypes.func.isRequired,
-    resetEnabled: PropTypes.bool.isRequired,
-    resetTarget: PropTypes.func.isRequired,
 };
 
 export default AppMainView;
