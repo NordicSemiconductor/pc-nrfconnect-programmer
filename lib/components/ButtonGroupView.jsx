@@ -110,7 +110,7 @@ const ButtonGroupView = ({
                     onClick={performRecover}
                     disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="erase" />Erase
+                    <Glyphicon glyph="erase" />Erase all
                 </Button>
                 <Button
                     key="performRecoverAndWrite"
