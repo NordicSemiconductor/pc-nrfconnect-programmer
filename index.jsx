@@ -42,7 +42,7 @@ import { openFile } from './lib/actions/fileActions';
 import { openDevice } from './lib/actions/targetActions';
 import { loadSettings } from './lib/actions/settingsActions';
 import appReducer from './lib/reducers';
-import logJprogVersion from './lib/util/logJprogVersion';
+import { logJprogVersion, logJLinkVersion } from './lib/util/logVersions';
 import './resources/css/index.less';
 
 export default {
@@ -74,6 +74,7 @@ export default {
         };
 
         logJprogVersion();
+        logJLinkVersion();
     },
 
     decorateMainView: MainView => () => (
