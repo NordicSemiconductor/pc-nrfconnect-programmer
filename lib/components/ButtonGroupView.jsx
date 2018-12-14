@@ -58,6 +58,7 @@ const ButtonGroupView = ({
     openFileDialog,
     onToggleFileList,
     mruFiles,
+    fileRegionSize,
     refreshEnabled,
     autoRead,
     toggleAutoRead,
@@ -117,6 +118,7 @@ const ButtonGroupView = ({
                     disabled={
                         !isJLink ||
                         !targetIsReady ||
+                        !fileRegionSize ||
                         !(targetIsRecoverable && mruFiles.length)
                     }
                 >
@@ -169,6 +171,7 @@ ButtonGroupView.propTypes = {
     onToggleFileList: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fileRegionSize: PropTypes.number.isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
     autoRead: PropTypes.bool.isRequired,
     toggleAutoRead: PropTypes.func.isRequired,
