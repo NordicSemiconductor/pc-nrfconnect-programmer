@@ -92,10 +92,14 @@ const DeviceInfoView = ({
 
 DeviceInfoView.propTypes = {
     serialNumber: PropTypes.string.isRequired,
-    port: PropTypes.string.isRequired,
+    port: PropTypes.string,
     targetType: PropTypes.number.isRequired,
     isMemLoaded: PropTypes.bool.isRequired,
     deviceInfo: PropTypes.instanceOf(Object).isRequired,
+};
+
+DeviceInfoView.defaultProps = {
+    port: null,
 };
 
 export default DeviceInfoView;
