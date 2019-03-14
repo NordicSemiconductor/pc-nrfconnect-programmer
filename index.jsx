@@ -36,7 +36,7 @@
 
 import React from 'react';
 import { logger } from 'nrfconnect/core';
-import ControlPanel from './lib/components/ControlPanel';
+import ControlPanel from './lib/containers/controlPanel';
 import AppMainView from './lib/containers/appMainView';
 import { openFile } from './lib/actions/fileActions';
 import { openDevice } from './lib/actions/targetActions';

@@ -35,12 +35,160 @@
  */
 
 import React from 'react';
-import ButtonGroupView from '../containers/buttonGroupView';
+import PropTypes from 'prop-types';
+import { Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox } from 'react-bootstrap';
+import { CommunicationType } from '../util/devices';
 
-const ControlPanel = () => (
+const MruMenuItems = (mruFiles, openFile) => {
+    let mruMenuItems;
+    if (mruFiles.length) {
+        mruMenuItems = mruFiles.map(filePath => (
+            <MenuItem key={filePath} onSelect={() => openFile(filePath)}>{filePath}</MenuItem>
+        ));
+    } else {
+        mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
+    }
+    return mruMenuItems;
+};
+
+const ControlPanel = ({
+    openFile,
+    closeFiles,
+    refreshAllFiles,
+    openFileDialog,
+    onToggleFileList,
+    mruFiles,
+    fileRegionSize,
+    refreshEnabled,
+    autoRead,
+    toggleAutoRead,
+    performJLinkWrite,
+    performJLinkRead,
+    performUSBSDFUWrite,
+    performRecover,
+    performRecoverAndWrite,
+    performSaveAsFile,
+    performReset,
+    targetType,
+    targetIsReady,
+    targetIsWritable,
+    targetIsRecoverable,
+    targetIsMemLoaded,
+    isJLink = (targetType === CommunicationType.JLINK),
+    isUsbSerial = (targetType === CommunicationType.USBSDFU),
+    performWrite = {
+        [CommunicationType.JLINK]: performJLinkWrite,
+        [CommunicationType.USBSDFU]: performUSBSDFUWrite,
+    }[targetType],
+}) => (
     <div className="control-panel">
-        <ButtonGroupView />
+        <Panel header="File">
+            <ButtonGroup vertical>
+                <Dropdown pullRight id="files-dropdown">
+                    <Dropdown.Toggle onClick={onToggleFileList}>
+                        <Glyphicon glyph="folder-open" />Add HEX file
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {MruMenuItems(mruFiles, openFile)}
+                        <MenuItem divider />
+                        <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
+                    </Dropdown.Menu>
+                </Dropdown>
+                <Button onClick={refreshAllFiles}>
+                    <Glyphicon glyph="refresh" />Reload files
+                </Button>
+                <Button onClick={closeFiles}>
+                    <Glyphicon glyph="minus-sign" />Clear files
+                </Button>
+            </ButtonGroup>
+        </Panel>
+        <Panel header="Device">
+            <ButtonGroup vertical>
+                <Button
+                    key="performRecover"
+                    onClick={performRecover}
+                    disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="erase" />Erase all
+                </Button>
+                <Button
+                    key="performRecoverAndWrite"
+                    onClick={performRecoverAndWrite}
+                    disabled={
+                        !isJLink ||
+                        !targetIsReady ||
+                        !fileRegionSize ||
+                        !(targetIsRecoverable && mruFiles.length)
+                    }
+                >
+                    <Glyphicon bsStyle="warning" glyph="pencil" />Erase & write
+                </Button>
+                <Button
+                    key="performSaveAsFile"
+                    onClick={performSaveAsFile}
+                    disabled={!isJLink || !targetIsMemLoaded}
+                >
+                    <Glyphicon glyph="floppy-disk" />Save as file
+                </Button>
+                <Button
+                    key="performReset"
+                    onClick={performReset}
+                    disabled={!isUsbSerial || !targetIsReady}
+                >
+                    <Glyphicon glyph="record" />Reset
+                </Button>
+                <Button
+                    key="performJLinkWrite"
+                    onClick={performWrite}
+                    disabled={!targetIsReady || !targetIsWritable}
+                >
+                    <Glyphicon glyph="pencil" />Write
+                </Button>
+                <Button
+                    key="performJLinkRead"
+                    onClick={performJLinkRead}
+                    disabled={!targetIsReady || !refreshEnabled}
+                >
+                    <Glyphicon glyph="refresh" />Read
+                </Button>
+            </ButtonGroup>
+            <Checkbox
+                className="last-checkbox"
+                onChange={e => toggleAutoRead(e.target.checked)}
+                checked={autoRead}
+            >
+                Auto read memory
+            </Checkbox>
+        </Panel>
     </div>
 );
+
+ControlPanel.propTypes = {
+    openFile: PropTypes.func.isRequired,
+    closeFiles: PropTypes.func.isRequired,
+    refreshAllFiles: PropTypes.func.isRequired,
+    onToggleFileList: PropTypes.func.isRequired,
+    openFileDialog: PropTypes.func.isRequired,
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fileRegionSize: PropTypes.number.isRequired,
+    refreshEnabled: PropTypes.bool.isRequired,
+    autoRead: PropTypes.bool.isRequired,
+    toggleAutoRead: PropTypes.func.isRequired,
+    performJLinkWrite: PropTypes.func.isRequired,
+    performJLinkRead: PropTypes.func.isRequired,
+    performUSBSDFUWrite: PropTypes.func.isRequired,
+    performRecover: PropTypes.func.isRequired,
+    performRecoverAndWrite: PropTypes.func.isRequired,
+    performSaveAsFile: PropTypes.func.isRequired,
+    performReset: PropTypes.func.isRequired,
+    targetType: PropTypes.number.isRequired,
+    targetIsReady: PropTypes.bool.isRequired,
+    targetIsWritable: PropTypes.bool.isRequired,
+    targetIsRecoverable: PropTypes.bool.isRequired,
+    targetIsMemLoaded: PropTypes.bool.isRequired,
+    isJLink: PropTypes.bool.isRequired,
+    isUsbSerial: PropTypes.bool.isRequired,
+    performWrite: PropTypes.func.isRequired,
+};
 
 export default ControlPanel;
