@@ -37,7 +37,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox } from 'react-bootstrap';
-import { CommunicationType } from '../util/devices';
 
 const MruMenuItems = (mruFiles, openFile) => {
     let mruMenuItems;
@@ -62,24 +61,18 @@ const ControlPanel = ({
     refreshEnabled,
     autoRead,
     toggleAutoRead,
-    performJLinkWrite,
     performJLinkRead,
-    performUSBSDFUWrite,
     performRecover,
     performRecoverAndWrite,
     performSaveAsFile,
     performReset,
-    targetType,
     targetIsReady,
     targetIsWritable,
     targetIsRecoverable,
     targetIsMemLoaded,
-    isJLink = (targetType === CommunicationType.JLINK),
-    isUsbSerial = (targetType === CommunicationType.USBSDFU),
-    performWrite = {
-        [CommunicationType.JLINK]: performJLinkWrite,
-        [CommunicationType.USBSDFU]: performUSBSDFUWrite,
-    }[targetType],
+    isJLink,
+    isUsbSerial,
+    performWrite,
 }) => (
     <div className="control-panel">
         <Panel header="File">
@@ -138,7 +131,7 @@ const ControlPanel = ({
                     <Glyphicon glyph="record" />Reset
                 </Button>
                 <Button
-                    key="performJLinkWrite"
+                    key="performWrite"
                     onClick={performWrite}
                     disabled={!targetIsReady || !targetIsWritable}
                 >
@@ -185,14 +178,11 @@ ControlPanel.propTypes = {
     refreshEnabled: PropTypes.bool.isRequired,
     autoRead: PropTypes.bool.isRequired,
     toggleAutoRead: PropTypes.func.isRequired,
-    performJLinkWrite: PropTypes.func.isRequired,
     performJLinkRead: PropTypes.func.isRequired,
-    performUSBSDFUWrite: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
     performSaveAsFile: PropTypes.func.isRequired,
     performReset: PropTypes.func.isRequired,
-    targetType: PropTypes.number.isRequired,
     targetIsReady: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
     targetIsRecoverable: PropTypes.bool.isRequired,
