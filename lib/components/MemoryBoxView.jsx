@@ -34,23 +34,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { Popover } from 'react-bootstrap';
 import MemoryView from '../containers/memoryView';
 import DeviceInfoView from '../containers/deviceInfoView';
-
-let triggerRef;
-
-const popover = (
-    <Popover
-        id="deviceInfo"
-        onMouseOver={() => { triggerRef.setState({ show: true }); }}
-        onMouseOut={() => { triggerRef.setState({ show: false }); }}
-    >
-        <DeviceInfoView />
-    </Popover>
-);
 
 const MemoryBoxView = ({
     title,
@@ -60,54 +48,47 @@ const MemoryBoxView = ({
     isTarget,
     isFile,
 }) => {
-    let placeHolder;
-    if (isHolder) {
-        placeHolder = (
-            <div className="memory-layout-container">
-                <h1>
-                    <span className={`glyphicon ${iconName}`} />
-                </h1>
-                <p>
-                    { description }
-                </p>
-            </div>
-        );
-    } else {
-        placeHolder = (<MemoryView
-            isTarget={isTarget}
-            isFile={isFile}
-        />);
-    }
-
-    const content = (
-        <div className="panel-heading">
-            <h3 className="panel-title">
-                { title }
-                {isTarget &&
-                    <span className="glyphicon glyphicon-info-sign target-info" />
-                }
-                <span className={`pull-right glyphicon ${iconName}`} />
-            </h3>
-        </div>
-    );
+    const [showOverlay, setShowOverlay] = useState(false);
 
     return (
         <div className="memory-layout">
             <div className="panel panel-default">
-                { isTarget ?
-                    <OverlayTrigger
-                        overlay={popover}
-                        trigger={['hover', 'focus']}
+                <div
+                    className="panel-heading"
+                    onMouseEnter={() => setShowOverlay(true)}
+                    onMouseLeave={() => setShowOverlay(false)}
+                >
+                    <h3 className="panel-title">
+                        { title }
+                        { isTarget && (
+                            <span className="glyphicon glyphicon-info-sign target-info" />
+                        )}
+                        <span className={`pull-right glyphicon ${iconName}`} />
+                    </h3>
+                </div>
+                { isTarget && showOverlay && (
+                    <Popover
+                        id="deviceInfo"
                         placement="bottom"
-                        ref={r => { triggerRef = r; }}
+                        onMouseEnter={() => setShowOverlay(true)}
+                        onMouseLeave={() => setShowOverlay(false)}
                     >
-                        { content }
-                    </OverlayTrigger>
-                :
-                    content
-                }
+                        <DeviceInfoView />
+                    </Popover>
+                )}
                 <div className="panel-body">
-                    { placeHolder }
+                    { isHolder
+                        ? <div className="memory-layout-container">
+                            <h1>
+                                <span className={`glyphicon ${iconName}`} />
+                            </h1>
+                            <p>{ description }</p>
+                        </div>
+                        : <MemoryView
+                            isTarget={isTarget}
+                            isFile={isFile}
+                        />
+                    }
                 </div>
             </div>
         </div>
