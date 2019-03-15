@@ -160,6 +160,17 @@ const ControlPanel = ({
                 Auto read memory
             </Checkbox>
         </Panel>
+        <Panel header="Cellular Modem">
+            <ButtonGroup vertical>
+                <Button
+                    key="performModemUpdate"
+                    onClick={performOmodemUpdate}
+                    disabled={!isJLink || ! hasModem || !targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="erase" />Erase all
+                </Button>
+            </ButtonGroup>
+        </Panel>
     </div>
 );
 
