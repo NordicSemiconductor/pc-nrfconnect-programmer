@@ -39,6 +39,7 @@ import PropTypes from 'prop-types';
 import WarningView from '../containers/warningView';
 import MemoryBoxView from '../containers/memoryBoxView';
 import UserInputDialogView from '../containers/userInputDialogView';
+import ModemUpdateDialogView from '../containers/modemUpdateDialogView';
 
 function getTargetTitle(serialNumber, deviceInfo) {
     if (serialNumber) {
@@ -72,6 +73,7 @@ const AppMainView = ({ file, target }) => (
             />
         </div>
         <UserInputDialogView />
+        <ModemUpdateDialogView />
     </div>
 );
 

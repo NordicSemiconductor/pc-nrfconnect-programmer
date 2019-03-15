@@ -86,14 +86,11 @@ export default class ModemUpdateDialogView extends React.Component {
     render() {
         const {
             isVisible,
-            message,
-            choices,
             onOk,
             onCancel,
         } = this.props;
+        console.log(isVisible);
         const isValidInput = this.state ? this.state.isValidInput : false;
-        const customChecked = this.state ? this.state.customChecked : false;
-        const customValue = this.state ? this.state.customValue : '';
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
                 <ModalHeader>
@@ -126,6 +123,7 @@ export default class ModemUpdateDialogView extends React.Component {
 }
 
 ModemUpdateDialogView.propTypes = {
+    isVisible: PropTypes.bool.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
 };
