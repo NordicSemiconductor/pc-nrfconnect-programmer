@@ -66,6 +66,7 @@ const ControlPanel = ({
     performRecoverAndWrite,
     performSaveAsFile,
     performReset,
+    performModemUpdate,
     targetIsReady,
     targetIsWritable,
     targetIsRecoverable,
@@ -73,6 +74,7 @@ const ControlPanel = ({
     isJLink,
     isUsbSerial,
     performWrite,
+    isModem,
 }) => (
     <div className="control-panel">
         <Panel header="File">
@@ -157,10 +159,10 @@ const ControlPanel = ({
             <ButtonGroup vertical>
                 <Button
                     key="performModemUpdate"
-                    onClick={performOmodemUpdate}
-                    disabled={!isJLink || ! hasModem || !targetIsReady || !targetIsRecoverable}
+                    onClick={performModemUpdate}
+                    disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="erase" />Erase all
+                    <Glyphicon glyph="erase" />Update modem
                 </Button>
             </ButtonGroup>
         </Panel>
@@ -189,6 +191,8 @@ ControlPanel.propTypes = {
     targetIsMemLoaded: PropTypes.bool.isRequired,
     isJLink: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
+    isModem: PropTypes.bool.isRequired,
+    performModemUpdate: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
 };
 
