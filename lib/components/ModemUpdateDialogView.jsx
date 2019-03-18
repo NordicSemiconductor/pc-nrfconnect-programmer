@@ -36,7 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormControl, FormGroup, Radio } from 'react-bootstrap';
+import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, ControlLabel, FormGroup } from 'react-bootstrap';
 
 export default class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -86,27 +86,30 @@ export default class ModemUpdateDialogView extends React.Component {
     render() {
         const {
             isVisible,
+            fwName,
             onOk,
             onCancel,
         } = this.props;
-        console.log(isVisible);
-        const isValidInput = this.state ? this.state.isValidInput : false;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
                 <ModalHeader>
-                    <ModalTitle>Need user input</ModalTitle>
+                    <ModalTitle>Modem DFU</ModalTitle>
                 </ModalHeader>
                 <ModalBody>
-                    Modem DFU
+                    <FormGroup>
+                        <ControlLabel>Modem firmware</ControlLabel>
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>{ fwName }</ControlLabel>
+                    </FormGroup>
                 </ModalBody>
                 <ModalFooter>
                     <Button
                         bsStyle="primary"
                         className="core-btn"
-                        disabled={!isValidInput}
-                        onClick={() => onOk(this.state.selectedValue)}
+                        onClick={onOk}
                     >
-                        OK
+                        Write
                     </Button>
                     {
                         <Button
@@ -124,6 +127,7 @@ export default class ModemUpdateDialogView extends React.Component {
 
 ModemUpdateDialogView.propTypes = {
     isVisible: PropTypes.bool.isRequired,
+    fwName: PropTypes.string.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
 };
