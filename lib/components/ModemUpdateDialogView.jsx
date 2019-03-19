@@ -87,6 +87,8 @@ export default class ModemUpdateDialogView extends React.Component {
         const {
             isVisible,
             isWriting,
+            isWritingSucceed,
+            isWritingFail,
             modemFwName,
             onOk,
             onCancel,
@@ -106,23 +108,33 @@ export default class ModemUpdateDialogView extends React.Component {
                             <div className="glyphicon glyphicon-refresh glyphicon-spin" />
                         }
                     </FormGroup>
+                    {isWritingSucceed &&
+                        <FormGroup>
+                            <ControlLabel>Succeed!</ControlLabel>
+                        </FormGroup>
+                    }
+                    {isWritingFail &&
+                        <FormGroup>
+                            <ControlLabel>Fail!</ControlLabel>
+                        </FormGroup>
+                    }
                 </ModalBody>
                 <ModalFooter>
-                    <Button
-                        bsStyle="primary"
-                        className="core-btn"
-                        onClick={onOk}
-                    >
-                        Write
-                    </Button>
-                    {
+                    {!isWritingSucceed &&
                         <Button
+                            bsStyle="primary"
                             className="core-btn"
-                            onClick={() => onCancel()}
+                            onClick={onOk}
                         >
-                            Cancel
+                            Write
                         </Button>
                     }
+                    <Button
+                        className="core-btn"
+                        onClick={() => onCancel()}
+                    >
+                        Close
+                    </Button>
                 </ModalFooter>
             </Modal>
         );
@@ -132,6 +144,8 @@ export default class ModemUpdateDialogView extends React.Component {
 ModemUpdateDialogView.propTypes = {
     isVisible: PropTypes.bool.isRequired,
     isWriting: PropTypes.bool.isRequired,
+    isWritingSucceed: PropTypes.bool.isRequired,
+    isWritingFail: PropTypes.bool.isRequired,
     modemFwName: PropTypes.string.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
