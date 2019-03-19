@@ -86,7 +86,7 @@ export default class ModemUpdateDialogView extends React.Component {
     render() {
         const {
             isVisible,
-            fwName,
+            modemFwName,
             onOk,
             onCancel,
         } = this.props;
@@ -100,7 +100,8 @@ export default class ModemUpdateDialogView extends React.Component {
                         <ControlLabel>Modem firmware</ControlLabel>
                     </FormGroup>
                     <FormGroup>
-                        <ControlLabel>{ fwName }</ControlLabel>
+                        <ControlLabel>{ modemFwName }</ControlLabel>
+                        <div className="glyphicon glyphicon-refresh glyphicon-spin" />
                     </FormGroup>
                 </ModalBody>
                 <ModalFooter>
@@ -127,7 +128,7 @@ export default class ModemUpdateDialogView extends React.Component {
 
 ModemUpdateDialogView.propTypes = {
     isVisible: PropTypes.bool.isRequired,
-    fwName: PropTypes.string.isRequired,
+    modemFwName: PropTypes.string.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
 };
