@@ -37,6 +37,7 @@
 // Allows jest to test files that import nrfconnect/core.
 
 module.exports = {
-    logger: {},
-    getAppDir: () => {},
+    logger: {
+        info: () => {},
+    },
 };
