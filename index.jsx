@@ -43,7 +43,11 @@ import { openDevice } from './lib/actions/targetActions';
 import { loadSettings } from './lib/actions/settingsActions';
 import appReducer from './lib/reducers';
 import logJprogVersion from './lib/util/logJprogVersion';
+import { hexpad2, hexToKiB } from './lib/util/hexpad';
 import './resources/css/index.less';
+
+let detectedDevices = [];
+let currentDeviceInfo;
 
 export default {
     config: {
@@ -104,9 +108,52 @@ export default {
                 break;
             }
 
+            case 'DEVICES_DETECTED': {
+                detectedDevices = [...action.devices];
+                break;
+            }
+
+            case 'TARGET_INFO_KNOWN': {
+                currentDeviceInfo = { ...action.deviceInfo.toJS() };
+                break;
+            }
+
             default:
         }
 
         next(action);
+    },
+
+    decorateSystemReport: coreReport => {
+        const report = [
+            '- Connected devices:',
+            ...detectedDevices.map(d => (
+                `    - ${d.serialport.comName}: ${d.serialNumber} ${d.boardVersion || ''}`
+            )),
+            '',
+        ];
+        if (currentDeviceInfo) {
+            const c = currentDeviceInfo;
+            report.push(
+                '- Current device:',
+                `    - family:          ${c.family}`,
+                `    - type:            ${c.type}`,
+                `    - romBaseAddr:     ${hexpad2(c.romBaseAddr)}`,
+                `    - romSize:         ${hexToKiB(c.romSize)}`,
+                `    - ramSize:         ${hexToKiB(c.ramSize)}`,
+                `    - pageSize:        ${hexToKiB(c.pageSize)}`,
+                `    - blAddrOffset:    ${hexpad2(c.blAddrOffset)}`,
+                `    - blockSize:       ${c.blockSize}`,
+                `    - ficrBaseAddr:    ${hexpad2(c.ficrBaseAddr)}`,
+                `    - ficrSize:        ${c.ficrSize}`,
+                `    - uicrBaseAddr:    ${hexpad2(c.uicrBaseAddr)}`,
+                `    - uicrSize:        ${c.uicrSize}`,
+                `    - mbrBaseAddr:     ${hexpad2(c.mbrBaseAddr)}`,
+                `    - mbrParamsOffset: ${c.mbrParamsOffset}`,
+                `    - mbrSize:         ${c.mbrSize}`,
+                '',
+            );
+        }
+        return coreReport.concat(report.join('\n'));
     },
 };
