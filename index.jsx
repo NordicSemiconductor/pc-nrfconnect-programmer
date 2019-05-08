@@ -44,7 +44,7 @@ import { loadSettings } from './lib/actions/settingsActions';
 import appReducer from './lib/reducers';
 import logJprogVersion from './lib/util/logJprogVersion';
 import { hexpad2, hexToKiB } from './lib/util/hexpad';
-import './resources/css/index.less';
+import './resources/css/index.scss';
 
 let detectedDevices = [];
 let currentDeviceInfo;

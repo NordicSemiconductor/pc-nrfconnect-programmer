@@ -34,9 +34,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import './controPanel.less';
-@import './appMainView.less';
-@import './appIcons.less';
+@import './controPanel.scss';
+@import './appMainView.scss';
+@import './appIcons.scss';
 
 .main-view, .side-panel {
     padding: 10px 15px;
