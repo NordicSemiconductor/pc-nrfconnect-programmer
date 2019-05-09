@@ -50,12 +50,19 @@ export default class ModemUpdateDialogView extends React.Component {
     }
 
     onWriteStart() {
-        this.setState({ timer: 40 });
-        setInterval(() => {
+        this.setState({
+            timer: 10,
+            timerString: '',
+        });
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
+        this.intervalId = setInterval(() => {
             if (this.state.timer && this.state.timer > 0) {
                 this.setState({ timer: this.state.timer - 1 });
             } else {
                 this.setState({ timerString: 'Please wait...' });
+                clearInterval(this.intervalId);
             }
         }, 1000);
         this.onOk();
@@ -73,32 +80,38 @@ export default class ModemUpdateDialogView extends React.Component {
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
                 <ModalHeader>
-                    <ModalTitle>Modem DFU</ModalTitle>
+                    <ModalTitle className="modem-dialog-title">Modem DFU</ModalTitle>
+                    {isWriting &&
+                        <span className="glyphicon glyphicon-refresh glyphicon-spin" />
+                    }
                 </ModalHeader>
                 <ModalBody>
                     <FormGroup>
                         <div>Modem firmware</div>
                     </FormGroup>
                     <FormGroup>
-                        <div className="modem-file-name">{ modemFwName }</div>
-                        {isWriting &&
-                            <span className="glyphicon glyphicon-refresh glyphicon-spin" />
-                        }
+                        <div>{ modemFwName }</div>
                     </FormGroup>
                     {isWriting &&
                         <FormGroup>
-                            <div>{this.state.timer}</div>
+                            <div>
+                                Modem update in progress.
+                                This process usually takes less than one minute.
+                            </div>
+                            {this.state.timer > 0 &&
+                                <div>Will finish in about {this.state.timer} seconds...</div>
+                            }
                             <div>{this.state.timerString}</div>
                         </FormGroup>
                     }
                     {isWritingSucceed &&
                         <FormGroup>
-                            <ControlLabel>Succeed!</ControlLabel>
+                            <ControlLabel className="nordic-green">Succeed!</ControlLabel>
                         </FormGroup>
                     }
                     {isWritingFail &&
                         <FormGroup>
-                            <ControlLabel>Fail!</ControlLabel>
+                            <ControlLabel className="nordic-red">Fail!</ControlLabel>
                         </FormGroup>
                     }
                 </ModalBody>
