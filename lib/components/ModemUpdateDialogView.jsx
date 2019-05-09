@@ -41,47 +41,25 @@ import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, Control
 export default class ModemUpdateDialogView extends React.Component {
     constructor(props) {
         super(props);
-        this.onSelectChoice = this.onSelectChoice.bind(this);
-        this.onInputChanged = this.onInputChanged.bind(this);
-    }
-
-    componentDidMount() {
         this.state = {
-            selectedChoice: null,
-            selectedValue: null,
-            customChecked: false,
-            customValue: '',
-            isValidInput: false,
+            timer: 0,
+            timerString: '',
         };
+        this.onOk = props.onOk;
+        this.onWriteStart = this.onWriteStart.bind(this);
     }
 
-    onSelectChoice(choice) {
-        if (choice === 'Custom') {
-            this.setState({
-                customChecked: true,
-            });
-        } else {
-            this.setState({
-                selectedValue: choice,
-                customChecked: false,
-                isValidInput: true,
-            });
-        }
+    onWriteStart() {
+        this.setState({ timer: 40 });
+        setInterval(() => {
+            if (this.state.timer && this.state.timer > 0) {
+                this.setState({ timer: this.state.timer - 1 });
+            } else {
+                this.setState({ timerString: 'Please wait...' });
+            }
+        }, 1000);
+        this.onOk();
     }
-
-    onInputChanged(event) {
-        let value = event.target.value || '';
-        value = value !== '0' ? value : '';
-        value = value.includes('0x') ?
-            `0x${value.slice(2).toUpperCase()}` :
-            `0x${value.toUpperCase()}`;
-        this.setState({
-            selectedValue: value,
-            customValue: value,
-            isValidInput: !isNaN(parseInt(value, 16)),
-        });
-    }
-
 
     render() {
         const {
@@ -90,7 +68,6 @@ export default class ModemUpdateDialogView extends React.Component {
             isWritingSucceed,
             isWritingFail,
             modemFwName,
-            onOk,
             onCancel,
         } = this.props;
         return (
@@ -100,14 +77,20 @@ export default class ModemUpdateDialogView extends React.Component {
                 </ModalHeader>
                 <ModalBody>
                     <FormGroup>
-                        <ControlLabel>Modem firmware</ControlLabel>
+                        <div>Modem firmware</div>
                     </FormGroup>
                     <FormGroup>
-                        <ControlLabel>{ modemFwName }</ControlLabel>
+                        <div className="modem-file-name">{ modemFwName }</div>
                         {isWriting &&
-                            <div className="glyphicon glyphicon-refresh glyphicon-spin" />
+                            <span className="glyphicon glyphicon-refresh glyphicon-spin" />
                         }
                     </FormGroup>
+                    {isWriting &&
+                        <FormGroup>
+                            <div>{this.state.timer}</div>
+                            <div>{this.state.timerString}</div>
+                        </FormGroup>
+                    }
                     {isWritingSucceed &&
                         <FormGroup>
                             <ControlLabel>Succeed!</ControlLabel>
@@ -124,14 +107,16 @@ export default class ModemUpdateDialogView extends React.Component {
                         <Button
                             bsStyle="primary"
                             className="core-btn"
-                            onClick={onOk}
+                            onClick={this.onWriteStart}
+                            disabled={isWriting}
                         >
                             Write
                         </Button>
                     }
                     <Button
                         className="core-btn"
-                        onClick={() => onCancel()}
+                        onClick={onCancel}
+                        disabled={isWriting}
                     >
                         Close
                     </Button>

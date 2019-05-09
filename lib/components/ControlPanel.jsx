@@ -162,7 +162,7 @@ const ControlPanel = ({
                     onClick={performModemUpdate}
                     disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="erase" />Update modem
+                    <Glyphicon glyph="pencil" />Update modem
                 </Button>
             </ButtonGroup>
         </Panel>
