@@ -41,29 +41,17 @@ import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, Control
 export default class ModemUpdateDialogView extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            timer: 0,
-            timerString: '',
-        };
         this.onOk = props.onOk;
         this.onWriteStart = this.onWriteStart.bind(this);
     }
 
     onWriteStart() {
-        this.setState({
-            timer: 10,
-            timerString: '',
-        });
+        this.setState({ timer: 0 });
         if (this.intervalId) {
             clearInterval(this.intervalId);
         }
         this.intervalId = setInterval(() => {
-            if (this.state.timer && this.state.timer > 0) {
-                this.setState({ timer: this.state.timer - 1 });
-            } else {
-                this.setState({ timerString: 'Please wait...' });
-                clearInterval(this.intervalId);
-            }
+            this.setState({ timer: this.state.timer + 1 });
         }, 1000);
         this.onOk();
     }
@@ -99,9 +87,8 @@ export default class ModemUpdateDialogView extends React.Component {
                                 This process usually takes less than one minute.
                             </div>
                             {this.state.timer > 0 &&
-                                <div>Will finish in about {this.state.timer} seconds...</div>
+                                <div>{this.state.timer} seconds...</div>
                             }
-                            <div>{this.state.timerString}</div>
                         </FormGroup>
                     }
                     {isWritingSucceed &&
