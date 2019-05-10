@@ -36,7 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, ControlLabel, FormGroup } from 'react-bootstrap';
+import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup } from 'react-bootstrap';
 
 export default class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -65,6 +65,9 @@ export default class ModemUpdateDialogView extends React.Component {
             modemFwName,
             onCancel,
         } = this.props;
+        if (this.intervalId && (isWritingSucceed || isWritingFail)) {
+            clearInterval(this.intervalId);
+        }
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
                 <ModalHeader>
@@ -86,19 +89,21 @@ export default class ModemUpdateDialogView extends React.Component {
                                 Modem update in progress.
                                 This process usually takes less than one minute.
                             </div>
-                            {this.state.timer > 0 &&
-                                <div>{this.state.timer} seconds...</div>
-                            }
+                            <div>{this.state.timer} seconds...</div>
                         </FormGroup>
                     }
                     {isWritingSucceed &&
                         <FormGroup>
-                            <ControlLabel className="nordic-green">Succeed!</ControlLabel>
+                            <div>Used {this.state.timer} seconds</div>
+                            <div className="modem-success">Complete successfully!</div>
                         </FormGroup>
                     }
                     {isWritingFail &&
                         <FormGroup>
-                            <ControlLabel className="nordic-red">Fail!</ControlLabel>
+                            <div>Used {this.state.timer} seconds</div>
+                            <div className="modem-fail">
+                                Failed. Check the log below for more detail...
+                            </div>
                         </FormGroup>
                     }
                 </ModalBody>
