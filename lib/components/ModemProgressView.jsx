@@ -68,7 +68,7 @@ const ModemProgressView = ({ messages }) => {
         }
     }
 
-    return <ProgressBar now={progress} label={`${progress}%`} />;
+    return <ProgressBar className="modem-progress" now={progress} label={`${progress}%`} />;
 };
 
 ModemProgressView.propTypes = {
@@ -79,14 +79,16 @@ ModemProgressView.defaultProps = {
     messages: [
         'File 1 of 2',
         'Block 1 of 1',
-        'don\'t care',
+        // 'don\'t care',
         // 'File 2 of 2',
         // 'Block 1 of 4',
-        'foo',
+        // 'foo',
         // 'Block 2 of 4',
         // 'Block 3 of 4',
-        'some bogus',
+        // 'some bogus',
         // 'Block 4 of 4',
-        //'Verification completed',
+        'Verification completed',
     ],
 };
+
+export default ModemProgressView;

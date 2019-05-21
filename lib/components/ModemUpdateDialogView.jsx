@@ -37,6 +37,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup } from 'react-bootstrap';
+import ModemProgressView from './ModemProgressView';
 
 export default class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -107,6 +108,7 @@ export default class ModemUpdateDialogView extends React.Component {
                         </FormGroup>
                     }
                 </ModalBody>
+                <ModemProgressView />
                 <ModalFooter>
                     {!isWritingSucceed &&
                         <Button
