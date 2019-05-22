@@ -40,20 +40,24 @@ import { Popover } from 'react-bootstrap';
 import { basename } from 'path';
 import { hexpad8 } from '../util/hexpad';
 
-const RegionInfoView = ({ name, startAddress, regionSize, fileNames }, parent) => (
+const RegionInfoView = ({
+    name, startAddress, regionSize, fileNames,
+}, parent) => (
     <Popover
         id="popover-region"
         className="memory-details"
         onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
         onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
+        onFocus={() => {}}
+        onBlur={() => {}}
     >
-        { name &&
+        { name && (
             <div>
                 <h5>Region name</h5>
                 <p>{ name }</p>
             </div>
-        }
-        { fileNames.length > 0 &&
+        )}
+        { fileNames.length > 0 && (
             <div className="files">
                 <h5>
                     {
@@ -70,7 +74,7 @@ const RegionInfoView = ({ name, startAddress, regionSize, fileNames }, parent) =
                     }
                 </p>
             </div>
-        }
+        )}
         <div>
             <h5>Address range</h5>
             <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize) }</p>

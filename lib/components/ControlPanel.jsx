@@ -36,7 +36,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox } from 'react-bootstrap';
+import {
+    Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox,
+} from 'react-bootstrap';
 
 const MruMenuItems = (mruFiles, openFile) => {
     let mruMenuItems;
@@ -108,10 +110,10 @@ const ControlPanel = ({
                     key="performRecoverAndWrite"
                     onClick={performRecoverAndWrite}
                     disabled={
-                        !isJLink ||
-                        !targetIsReady ||
-                        !fileRegionSize ||
-                        !(targetIsRecoverable && mruFiles.length)
+                        !isJLink
+                        || !targetIsReady
+                        || !fileRegionSize
+                        || !(targetIsRecoverable && mruFiles.length)
                     }
                 >
                     <Glyphicon bsStyle="warning" glyph="pencil" />Erase & write

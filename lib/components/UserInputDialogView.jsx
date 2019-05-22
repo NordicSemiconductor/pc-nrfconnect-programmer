@@ -36,7 +36,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormControl, FormGroup, Radio } from 'react-bootstrap';
+import {
+    Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormControl, FormGroup, Radio,
+} from 'react-bootstrap';
 import { hexpad2 } from '../util/hexpad';
 
 export default class UserInputDialogView extends React.Component {
@@ -44,11 +46,7 @@ export default class UserInputDialogView extends React.Component {
         super(props);
         this.onSelectChoice = this.onSelectChoice.bind(this);
         this.onInputChanged = this.onInputChanged.bind(this);
-    }
-
-    componentDidMount() {
         this.state = {
-            selectedChoice: null,
             selectedValue: null,
             customChecked: false,
             customValue: '',
@@ -73,16 +71,15 @@ export default class UserInputDialogView extends React.Component {
     onInputChanged(event) {
         let value = event.target.value || '';
         value = value !== '0' ? value : '';
-        value = value.includes('0x') ?
-            `0x${value.slice(2).toUpperCase()}` :
-            `0x${value.toUpperCase()}`;
+        value = value.includes('0x')
+            ? `0x${value.slice(2).toUpperCase()}`
+            : `0x${value.toUpperCase()}`;
         this.setState({
             selectedValue: value,
             customValue: value,
-            isValidInput: !isNaN(parseInt(value, 16)),
+            isValidInput: !Number.isNaN(parseInt(value, 16)),
         });
     }
-
 
     render() {
         const {
@@ -92,11 +89,15 @@ export default class UserInputDialogView extends React.Component {
             onOk,
             onCancel,
         } = this.props;
-        const isValidInput = this.state ? this.state.isValidInput : false;
-        const customChecked = this.state ? this.state.customChecked : false;
-        const customValue = this.state ? this.state.customValue : '';
+        const {
+            selectedValue,
+            isValidInput,
+            customChecked,
+            customValue,
+        } = this.state;
+
         return (
-            <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
+            <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <ModalHeader>
                     <ModalTitle>Need user input</ModalTitle>
                 </ModalHeader>
@@ -113,7 +114,7 @@ export default class UserInputDialogView extends React.Component {
                             </Radio>
                         ))}
                         <Radio
-                            key={'Custom'}
+                            key="Custom"
                             name="radioGroup"
                             onClick={() => this.onSelectChoice('Custom')}
                             checked={customChecked}
@@ -134,7 +135,7 @@ export default class UserInputDialogView extends React.Component {
                         bsStyle="primary"
                         className="core-btn"
                         disabled={!isValidInput}
-                        onClick={() => onOk(this.state.selectedValue)}
+                        onClick={() => onOk(selectedValue)}
                     >
                         OK
                     </Button>

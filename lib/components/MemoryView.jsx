@@ -125,17 +125,17 @@ const MemoryView = ({
     return (
         <div className="region-container">
             { placeHolder }
-            { isTarget && isErasing &&
+            { isTarget && isErasing && (
                 <div className="erase-indicator striped active" />
-            }
-            { isTarget && refreshEnabled &&
+            )}
+            { isTarget && refreshEnabled && (
                 <div className="centering-container">
                     <div className="read-indicator">
                         <p>Device is connected</p>
                         <p>Press <strong>READ</strong> button to read the memory</p>
                     </div>
                 </div>
-            }
+            )}
         </div>
     );
 };

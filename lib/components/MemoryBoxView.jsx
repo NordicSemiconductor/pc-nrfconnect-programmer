@@ -78,16 +78,20 @@ const MemoryBoxView = ({
                 )}
                 <div className="panel-body">
                     { isHolder
-                        ? <div className="memory-layout-container">
-                            <h1>
-                                <span className={`glyphicon ${iconName}`} />
-                            </h1>
-                            <p>{ description }</p>
-                        </div>
-                        : <MemoryView
-                            isTarget={isTarget}
-                            isFile={isFile}
-                        />
+                        ? (
+                            <div className="memory-layout-container">
+                                <h1>
+                                    <span className={`glyphicon ${iconName}`} />
+                                </h1>
+                                <p>{ description }</p>
+                            </div>
+                        )
+                        : (
+                            <MemoryView
+                                isTarget={isTarget}
+                                isFile={isFile}
+                            />
+                        )
                     }
                 </div>
             </div>
