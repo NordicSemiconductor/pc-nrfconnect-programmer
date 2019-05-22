@@ -63,6 +63,7 @@ export default class ModemUpdateDialogView extends React.Component {
             isWritingSucceed,
             isWritingFail,
             modemFwName,
+            progressMsg,
             onCancel,
         } = this.props;
         if (this.intervalId && (isWritingSucceed || isWritingFail)) {
@@ -83,10 +84,8 @@ export default class ModemUpdateDialogView extends React.Component {
                     </FormGroup>
                     <FormGroup>
                         <ControlLabel>Process</ControlLabel>
-                        {isWriting &&
-                            <div>{this.state.timer} seconds...</div>
-                        }
-                        </FormGroup>
+                        <div>{ progressMsg }</div>
+                    </FormGroup>
                     {isWritingSucceed &&
                         <FormGroup>
                             <div>Used {this.state.timer} seconds</div>
@@ -133,9 +132,11 @@ ModemUpdateDialogView.propTypes = {
     isWritingSucceed: PropTypes.bool.isRequired,
     isWritingFail: PropTypes.bool.isRequired,
     modemFwName: PropTypes.string.isRequired,
+    progressMsg: PropTypes.string.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
 };
 
 ModemUpdateDialogView.defaultProps = {
+    progressMsg: 'Not started.',
 };
