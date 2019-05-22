@@ -36,7 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'react-bootstrap';
+import Popover from 'react-bootstrap/Popover';
 import { basename } from 'path';
 import { hexpad8 } from '../util/hexpad';
 

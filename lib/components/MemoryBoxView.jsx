@@ -36,7 +36,7 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'react-bootstrap';
+import Popover from 'react-bootstrap/Popover';
 import MemoryView from '../containers/memoryView';
 import DeviceInfoView from '../containers/deviceInfoView';
 

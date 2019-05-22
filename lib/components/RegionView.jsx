@@ -37,7 +37,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Glyphicon, OverlayTrigger } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import RegionInfoView from './RegionInfoView';
 
 class RegionView extends React.Component {
@@ -72,7 +73,7 @@ class RegionView extends React.Component {
                         className="transparent"
                         onClick={() => removeFile(region.fileNames.pop())}
                     >
-                        <Glyphicon glyph="minus-sign" />
+                        <span className="mdi mdi-minus-circle" />
                     </Button>
                 )}
             </div>

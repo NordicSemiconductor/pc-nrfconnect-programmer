@@ -36,18 +36,22 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox,
-} from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Dropdown from 'react-bootstrap/Dropdown';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
 
 const MruMenuItems = (mruFiles, openFile) => {
     let mruMenuItems;
     if (mruFiles.length) {
         mruMenuItems = mruFiles.map(filePath => (
-            <MenuItem key={filePath} onSelect={() => openFile(filePath)}>{filePath}</MenuItem>
+            <Dropdown.Item key={filePath} onSelect={() => openFile(filePath)}>
+                {filePath}
+            </Dropdown.Item>
         ));
     } else {
-        mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
+        mruMenuItems = (<Dropdown.Item disabled>No recently used files</Dropdown.Item>);
     }
     return mruMenuItems;
 };
@@ -77,34 +81,36 @@ const ControlPanel = ({
     performWrite,
 }) => (
     <div className="control-panel">
-        <Panel header="File">
+        <Card>
+            <Card.Header>File</Card.Header>
             <ButtonGroup vertical>
                 <Dropdown pullRight id="files-dropdown">
                     <Dropdown.Toggle onClick={onToggleFileList}>
-                        <Glyphicon glyph="folder-open" />Add HEX file
+                        <span className="mdi mdi-folder-open" />Add HEX file
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         {MruMenuItems(mruFiles, openFile)}
-                        <MenuItem divider />
-                        <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
+                        <Dropdown.Divider />
+                        <Dropdown.Item onSelect={openFileDialog}>Browse...</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
                 <Button onClick={refreshAllFiles}>
-                    <Glyphicon glyph="refresh" />Reload files
+                    <span className="mdi mdi-refresh" />Reload files
                 </Button>
                 <Button onClick={closeFiles}>
-                    <Glyphicon glyph="minus-sign" />Clear files
+                    <span className="mdi mdi-minus-circle" />Clear files
                 </Button>
             </ButtonGroup>
-        </Panel>
-        <Panel header="Device">
+        </Card>
+        <Card>
+            <Card.Header>Device</Card.Header>
             <ButtonGroup vertical>
                 <Button
                     key="performRecover"
                     onClick={performRecover}
                     disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
                 >
-                    <Glyphicon glyph="erase" />Erase all
+                    <span className="mdi mdi-erase" />Erase all
                 </Button>
                 <Button
                     key="performRecoverAndWrite"
@@ -116,45 +122,45 @@ const ControlPanel = ({
                         || !(targetIsRecoverable && mruFiles.length)
                     }
                 >
-                    <Glyphicon bsStyle="warning" glyph="pencil" />Erase & write
+                    <span bsStyle="warning" className="mdi mdi-pencil" />Erase & write
                 </Button>
                 <Button
                     key="performSaveAsFile"
                     onClick={performSaveAsFile}
                     disabled={!isJLink || !targetIsMemLoaded}
                 >
-                    <Glyphicon glyph="floppy-disk" />Save as file
+                    <span className="mdi mdi-floppy" />Save as file
                 </Button>
                 <Button
                     key="performReset"
                     onClick={performReset}
                     disabled={!isUsbSerial || !targetIsReady}
                 >
-                    <Glyphicon glyph="record" />Reset
+                    <span className="mdi mdi-record" />Reset
                 </Button>
                 <Button
                     key="performWrite"
                     onClick={performWrite}
                     disabled={!targetIsReady || !targetIsWritable}
                 >
-                    <Glyphicon glyph="pencil" />Write
+                    <span className="mdi mdi-pencil" />Write
                 </Button>
                 <Button
                     key="performJLinkRead"
                     onClick={performJLinkRead}
                     disabled={!targetIsReady || !refreshEnabled}
                 >
-                    <Glyphicon glyph="refresh" />Read
+                    <span className="mdi mdi-refresh" />Read
                 </Button>
             </ButtonGroup>
-            <Checkbox
+            <Form.Check
+                type="checkbox"
                 className="last-checkbox"
                 onChange={e => toggleAutoRead(e.target.checked)}
                 checked={autoRead}
-            >
-                Auto read memory
-            </Checkbox>
-        </Panel>
+                label="Auto read memory"
+            />
+        </Card>
     </div>
 );
 

@@ -36,10 +36,10 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Glyphicon } from 'react-bootstrap';
+import Alert from 'react-bootstrap/Alert';
 import { List } from 'immutable';
 
-const warningIcon = <Glyphicon glyph="exclamation-sign" className="warning-sign" />;
+const warningIcon = <span className="mdi mdi-exclamation warning-sign" />;
 
 const combineWarnings = (targetWarningStrings, fileWarningStrings, userWarningStrings) => (
     targetWarningStrings.concat(fileWarningStrings).concat(userWarningStrings).map((s, index) => (

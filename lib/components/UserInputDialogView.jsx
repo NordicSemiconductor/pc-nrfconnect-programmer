@@ -36,9 +36,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormControl, FormGroup, Radio,
-} from 'react-bootstrap';
+
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+
 import { hexpad2 } from '../util/hexpad';
 
 export default class UserInputDialogView extends React.Component {
@@ -98,28 +100,29 @@ export default class UserInputDialogView extends React.Component {
 
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
-                <ModalHeader>
-                    <ModalTitle>Need user input</ModalTitle>
-                </ModalHeader>
-                <ModalBody>
+                <Modal.Header>
+                    <Modal.Title>Need user input</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
                     {message}
-                    <FormGroup>
+                    <Form.Group>
                         {Object.keys(choices).map(choice => (
-                            <Radio
+                            <Form.Check
+                                type="radio"
                                 key={choice}
                                 name="radioGroup"
                                 onClick={() => this.onSelectChoice(choice)}
-                            >
-                                {hexpad2(parseInt(choice, 16))} ({choices[choice]})
-                            </Radio>
+                                label={`${hexpad2(parseInt(choice, 16))} (${choices[choice]})`}
+                            />
                         ))}
-                        <Radio
+                        <Form.Check
+                            type="radio"
                             key="Custom"
                             name="radioGroup"
                             onClick={() => this.onSelectChoice('Custom')}
                             checked={customChecked}
                         >
-                            <FormControl
+                            <Form.Control
                                 id="sdControlsText"
                                 type="text"
                                 value={customValue}
@@ -127,10 +130,10 @@ export default class UserInputDialogView extends React.Component {
                                 onChange={this.onInputChanged}
                                 placeholder="Custom SoftDevice ID"
                             />
-                        </Radio>
-                    </FormGroup>
-                </ModalBody>
-                <ModalFooter>
+                        </Form.Check>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
                     <Button
                         bsStyle="primary"
                         className="core-btn"
@@ -147,7 +150,7 @@ export default class UserInputDialogView extends React.Component {
                             Cancel
                         </Button>
                     }
-                </ModalFooter>
+                </Modal.Footer>
             </Modal>
         );
     }
