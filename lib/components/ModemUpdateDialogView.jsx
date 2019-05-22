@@ -36,8 +36,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup } from 'react-bootstrap';
-import ModemProgressView from './ModemProgressView';
+import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup, ControlLabel } from 'react-bootstrap';
 
 export default class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -79,20 +78,15 @@ export default class ModemUpdateDialogView extends React.Component {
                 </ModalHeader>
                 <ModalBody>
                     <FormGroup>
-                        <div>Modem firmware</div>
-                    </FormGroup>
-                    <FormGroup>
+                        <ControlLabel>Modem firmware</ControlLabel>
                         <div>{ modemFwName }</div>
                     </FormGroup>
-                    {isWriting &&
-                        <FormGroup>
-                            <div>
-                                Modem update in progress.
-                                This process usually takes less than one minute.
-                            </div>
+                    <FormGroup>
+                        <ControlLabel>Process</ControlLabel>
+                        {isWriting &&
                             <div>{this.state.timer} seconds...</div>
+                        }
                         </FormGroup>
-                    }
                     {isWritingSucceed &&
                         <FormGroup>
                             <div>Used {this.state.timer} seconds</div>
@@ -108,7 +102,7 @@ export default class ModemUpdateDialogView extends React.Component {
                         </FormGroup>
                     }
                 </ModalBody>
-                <ModemProgressView />
+                {/* <ModemProgressView /> */}
                 <ModalFooter>
                     {!isWritingSucceed &&
                         <Button

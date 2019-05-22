@@ -40,13 +40,27 @@ import { ProgressBar } from 'react-bootstrap';
 
 const fileRx = /File (\d+) of (\d+)/;
 const blockRx = /Block (\d+) of (\d+)/;
+const testMessages = [
+    'File 1 of 2',
+    'Block 1 of 1',
+    // 'don\'t care',
+    // 'File 2 of 2',
+    // 'Block 1 of 4',
+    // 'foo',
+    // 'Block 2 of 4',
+    'Block 3 of 4',
+    // 'some bogus',
+    // 'Block 4 of 4',
+    // 'Verification completed',
+];
 
 const ModemProgressView = ({ messages }) => {
     let progress = 0;
-    if (messages.includes('Verification completed')) {
+    if (testMessages.includes('Verification completed')) {
         progress = 100;
     } else {
-        const msgs = messages.splice(0).reverse();
+        console.log(testMessages);
+        const msgs = testMessages.splice(0).reverse();
 
         const ixNbOfFiles = msgs.findIndex(e => fileRx.test(e));
         if (ixNbOfFiles > -1) {
@@ -76,19 +90,7 @@ ModemProgressView.propTypes = {
 };
 
 ModemProgressView.defaultProps = {
-    messages: [
-        'File 1 of 2',
-        'Block 1 of 1',
-        // 'don\'t care',
-        // 'File 2 of 2',
-        // 'Block 1 of 4',
-        // 'foo',
-        // 'Block 2 of 4',
-        // 'Block 3 of 4',
-        // 'some bogus',
-        // 'Block 4 of 4',
-        'Verification completed',
-    ],
+    messages: testMessages,
 };
 
 export default ModemProgressView;
