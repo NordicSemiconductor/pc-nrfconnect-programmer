@@ -138,5 +138,4 @@ ModemUpdateDialogView.propTypes = {
 };
 
 ModemUpdateDialogView.defaultProps = {
-    progressMsg: 'Not started.',
 };
