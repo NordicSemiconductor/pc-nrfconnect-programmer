@@ -36,7 +36,18 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalHeader, ModalTitle, ModalBody, ModalFooter, Button, FormGroup, ControlLabel } from 'react-bootstrap';
+import {
+    Button,
+    ControlLabel,
+    FormGroup,
+    Modal,
+    ModalBody,
+    ModalFooter,
+    ModalHeader,
+    ModalTitle,
+    Alert,
+} from 'react-bootstrap';
+
 
 export default class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -86,20 +97,18 @@ export default class ModemUpdateDialogView extends React.Component {
                         <ControlLabel>Process</ControlLabel>
                         <div>{ progressMsg }</div>
                     </FormGroup>
-                    {isWritingSucceed &&
-                        <FormGroup>
-                            <div>Used {this.state.timer} seconds</div>
-                            <div className="modem-success">Complete successfully!</div>
-                        </FormGroup>
-                    }
-                    {isWritingFail &&
-                        <FormGroup>
-                            <div>Used {this.state.timer} seconds</div>
-                            <div className="modem-fail">
+                    <FormGroup>
+                        {isWritingSucceed &&
+                            <Alert bsStyle="success">
+                                Complete  successfully in {this.state.timer} seconds.
+                            </Alert>
+                        }
+                        {isWritingFail &&
+                            <Alert bsStyle="danger">
                                 Failed. Check the log below for more detail...
-                            </div>
-                        </FormGroup>
-                    }
+                            </Alert>
+                        }
+                    </FormGroup>
                 </ModalBody>
                 {/* <ModemProgressView /> */}
                 <ModalFooter>
