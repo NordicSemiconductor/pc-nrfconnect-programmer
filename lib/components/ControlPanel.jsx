@@ -110,7 +110,7 @@ const ControlPanel = ({
                     onClick={performRecover}
                     disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
                 >
-                    <span className="mdi mdi-erase" />Erase all
+                    <span className="mdi mdi-eraser" />Erase all
                 </Button>
                 <Button
                     key="performRecoverAndWrite"

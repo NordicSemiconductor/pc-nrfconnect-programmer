@@ -51,7 +51,6 @@ const MemoryBoxView = ({
     isFile,
 }) => {
     const [showOverlay, setShowOverlay] = useState(false);
-    console.log(iconName);
 
     return (
         <Card className="memory-layout">

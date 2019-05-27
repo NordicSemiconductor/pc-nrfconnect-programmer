@@ -54,24 +54,6 @@
     padding: 0px;
 }
 
-.control-panel {
-    height: 100%;
-
-    .btn-group-vertical {
-        width: 100%;
-    }
-
-    button {
-        display: block;
-        width: 100%;
-        text-align: left;
-
-        span.glyphicon {
-            margin-right: 15px;
-        }
-    }
-}
-
 .btn:not(.btn-primary) .glyphicon {
     color: #0080c0;
 }
