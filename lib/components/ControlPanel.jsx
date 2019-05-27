@@ -34,13 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
-import Dropdown from 'react-bootstrap/Dropdown';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
+import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 const MruMenuItems = (mruFiles, openFile) => {
     let mruMenuItems;
@@ -153,13 +153,15 @@ const ControlPanel = ({
                     <span className="mdi mdi-refresh" />Read
                 </Button>
             </ButtonGroup>
-            <Form.Check
-                type="checkbox"
-                className="last-checkbox"
-                onChange={e => toggleAutoRead(e.target.checked)}
-                checked={autoRead}
-                label="Auto read memory"
-            />
+            <Form.Group controlId="formBasicChecbox">
+                <Form.Check
+                    type="checkbox"
+                    className="last-checkbox"
+                    onChange={e => toggleAutoRead(e.target.checked)}
+                    checked={autoRead}
+                    label="Auto read memory"
+                />
+            </Form.Group>
         </Card>
     </div>
 );
