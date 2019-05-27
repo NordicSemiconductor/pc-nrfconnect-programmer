@@ -84,7 +84,7 @@ const ControlPanel = ({
         <Card>
             <Card.Header>File</Card.Header>
             <ButtonGroup vertical>
-                <Dropdown pullRight id="files-dropdown">
+                <Dropdown id="files-dropdown">
                     <Dropdown.Toggle onClick={onToggleFileList}>
                         <span className="mdi mdi-folder-open" />Add HEX file
                     </Dropdown.Toggle>
@@ -122,7 +122,7 @@ const ControlPanel = ({
                         || !(targetIsRecoverable && mruFiles.length)
                     }
                 >
-                    <span bsStyle="warning" className="mdi mdi-pencil" />Erase & write
+                    <span className="mdi mdi-pencil" />Erase & write
                 </Button>
                 <Button
                     key="performSaveAsFile"
