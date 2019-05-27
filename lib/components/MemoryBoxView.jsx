@@ -51,6 +51,7 @@ const MemoryBoxView = ({
     isFile,
 }) => {
     const [showOverlay, setShowOverlay] = useState(false);
+    console.log(iconName);
 
     return (
         <Card className="memory-layout">
@@ -64,73 +65,36 @@ const MemoryBoxView = ({
                     { isTarget && (
                         <span className="glyphicon glyphicon-info-sign target-info" />
                     )}
-                    <span className={`pull-right glyphicon ${iconName}`} />
+                    <span className={`glyphicon ${iconName}`} />
                 </Card.Title>
             </Card.Header>
+            { isTarget && showOverlay && (
+                <Popover
+                    id="deviceInfo"
+                    placement="bottom"
+                    onMouseEnter={() => setShowOverlay(true)}
+                    onMouseLeave={() => setShowOverlay(false)}
+                >
+                    <DeviceInfoView />
+                </Popover>
+            )}
             <Card.Body className="panel-body">
-                { isHolder
-                    ? (
-                        <div className="memory-layout-container">
-                            <h1>
-                                <span className={`glyphicon ${iconName}`} />
-                            </h1>
-                            <p>{ description }</p>
-                        </div>
-                    )
-                    : (
-                        <MemoryView
-                            isTarget={isTarget}
-                            isFile={isFile}
-                        />
-                    )
-                }
+                { isHolder && (
+                    <div className="memory-layout-container">
+                        <h1>
+                            <span className={`glyphicon ${iconName}`} />
+                        </h1>
+                        <p>{ description }</p>
+                    </div>
+                )}
+                { !isHolder && (
+                    <MemoryView
+                        isTarget={isTarget}
+                        isFile={isFile}
+                    />
+                )}
             </Card.Body>
         </Card>
-        // <div className="memory-layout">
-        //     <div className="panel panel-default">
-        //         <div
-                    // className="panel-heading"
-                    // onMouseEnter={() => setShowOverlay(true)}
-                    // onMouseLeave={() => setShowOverlay(false)}
-        //         >
-                    // <h3 className="panel-title">
-                    //     { title }
-                    //     { isTarget && (
-                    //         <span className="glyphicon glyphicon-info-sign target-info" />
-                    //     )}
-                    //     <span className={`pull-right glyphicon ${iconName}`} />
-                    // </h3>
-        //         </div>
-        //         { isTarget && showOverlay && (
-        //             <Popover
-        //                 id="deviceInfo"
-        //                 placement="bottom"
-        //                 onMouseEnter={() => setShowOverlay(true)}
-        //                 onMouseLeave={() => setShowOverlay(false)}
-        //             >
-        //                 <DeviceInfoView />
-        //             </Popover>
-        //         )}
-        //         <div className="panel-body">
-                    // { isHolder
-                    //     ? (
-                    //         <div className="memory-layout-container">
-                    //             <h1>
-                    //                 <span className={`glyphicon ${iconName}`} />
-                    //             </h1>
-                    //             <p>{ description }</p>
-                    //         </div>
-                    //     )
-                    //     : (
-                    //         <MemoryView
-                    //             isTarget={isTarget}
-                    //             isFile={isFile}
-                    //         />
-                    //     )
-                    // }
-        //         </div>
-        //     </div>
-        // </div>
     );
 };
 
