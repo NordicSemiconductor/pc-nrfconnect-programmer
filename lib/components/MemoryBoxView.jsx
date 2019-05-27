@@ -54,24 +54,36 @@ const MemoryBoxView = ({
 
     return (
         <Card className="memory-layout">
-            <Card.Body className="panel panel-default">
-                <Card.Title
-                    className="panel-heading"
-                    onMouseEnter={() => setShowOverlay(true)}
-                    onMouseLeave={() => setShowOverlay(false)}
-                >
-                    <h3 className="panel-title">
-                        { title }
-                        { isTarget && (
-                            <span className="glyphicon glyphicon-info-sign target-info" />
-                        )}
-                        <span className={`pull-right glyphicon ${iconName}`} />
-                    </h3>
+            <Card.Header
+                className="panel-heading"
+                onMouseEnter={() => setShowOverlay(true)}
+                onMouseLeave={() => setShowOverlay(false)}
+            >
+                <Card.Title className="panel-title">
+                    { title }
+                    { isTarget && (
+                        <span className="glyphicon glyphicon-info-sign target-info" />
+                    )}
+                    <span className={`pull-right glyphicon ${iconName}`} />
                 </Card.Title>
-                <Card.Text>
-                Some quick example text to build on the card title and make up the bulk of
-                the card's content.
-                </Card.Text>
+            </Card.Header>
+            <Card.Body className="panel-body">
+                { isHolder
+                    ? (
+                        <div className="memory-layout-container">
+                            <h1>
+                                <span className={`glyphicon ${iconName}`} />
+                            </h1>
+                            <p>{ description }</p>
+                        </div>
+                    )
+                    : (
+                        <MemoryView
+                            isTarget={isTarget}
+                            isFile={isFile}
+                        />
+                    )
+                }
             </Card.Body>
         </Card>
         // <div className="memory-layout">
@@ -100,22 +112,22 @@ const MemoryBoxView = ({
         //             </Popover>
         //         )}
         //         <div className="panel-body">
-        //             { isHolder
-        //                 ? (
-        //                     <div className="memory-layout-container">
-        //                         <h1>
-        //                             <span className={`glyphicon ${iconName}`} />
-        //                         </h1>
-        //                         <p>{ description }</p>
-        //                     </div>
-        //                 )
-        //                 : (
-        //                     <MemoryView
-        //                         isTarget={isTarget}
-        //                         isFile={isFile}
-        //                     />
-        //                 )
-        //             }
+                    // { isHolder
+                    //     ? (
+                    //         <div className="memory-layout-container">
+                    //             <h1>
+                    //                 <span className={`glyphicon ${iconName}`} />
+                    //             </h1>
+                    //             <p>{ description }</p>
+                    //         </div>
+                    //     )
+                    //     : (
+                    //         <MemoryView
+                    //             isTarget={isTarget}
+                    //             isFile={isFile}
+                    //         />
+                    //     )
+                    // }
         //         </div>
         //     </div>
         // </div>
