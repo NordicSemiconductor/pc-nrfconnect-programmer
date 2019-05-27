@@ -37,10 +37,10 @@
 import React, { useState } from 'react';
 
 import Card from 'react-bootstrap/Card';
-import DeviceInfoView from '../containers/deviceInfoView';
-import MemoryView from '../containers/memoryView';
 import Popover from 'react-bootstrap/Popover';
 import PropTypes from 'prop-types';
+import DeviceInfoView from '../containers/deviceInfoView';
+import MemoryView from '../containers/memoryView';
 
 const MemoryBoxView = ({
     title,
