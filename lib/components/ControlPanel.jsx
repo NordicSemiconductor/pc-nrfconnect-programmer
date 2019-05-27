@@ -88,7 +88,7 @@ const ControlPanel = ({
                     <Dropdown.Toggle>
                         <span className="mdi mdi-folder-open" />Add HEX file
                     </Dropdown.Toggle>
-                    <Dropdown.Menu>
+                    <Dropdown.Menu alignRight>
                         {MruMenuItems(mruFiles, openFile)}
                         <Dropdown.Divider />
                         <Dropdown.Item onSelect={openFileDialog}>Browse...</Dropdown.Item>

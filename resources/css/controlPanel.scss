@@ -45,13 +45,16 @@ $labelHeight: 12px;
             font-size: 1.2em;
         }
         .dropdown {
-            width: 100%
+            width: 100%;
+            .btn {
+                box-shadow: none;
+            }
         }
         .dropdown-toggle {
             width: 100%;
         }
         .btn {
-            padding: 5px 15px 0px 15px;
+            box-shadow: none;
             text-align: left;
             font-size: 1.1em;
             line-height: 2em;
