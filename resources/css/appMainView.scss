@@ -25,7 +25,7 @@
 .memory-layout {
     height: 100%;
     flex-grow: 1;
-    padding: 1.5% 3% 3% 3%;
+    margin: 1.5% 3% 3% 3%;
     max-width: 500px;
     width: 50%;
     display: flex;
@@ -40,8 +40,11 @@
             background-color: #fff;
             .panel-title {
                 color: gray;
+                display: flex;
                 .glyphicon {
                     color: rgba(0, 0, 0, 0.175);
+                    margin-left: 8px;
+                    align-self: auto;
                 }
                 .target-info {
                     padding-left: 0.5em;

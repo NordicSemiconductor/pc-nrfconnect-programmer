@@ -35,10 +35,12 @@
  */
 
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import Popover from 'react-bootstrap/Popover';
-import MemoryView from '../containers/memoryView';
+
+import Card from 'react-bootstrap/Card';
 import DeviceInfoView from '../containers/deviceInfoView';
+import MemoryView from '../containers/memoryView';
+import Popover from 'react-bootstrap/Popover';
+import PropTypes from 'prop-types';
 
 const MemoryBoxView = ({
     title,
@@ -51,9 +53,9 @@ const MemoryBoxView = ({
     const [showOverlay, setShowOverlay] = useState(false);
 
     return (
-        <div className="memory-layout">
-            <div className="panel panel-default">
-                <div
+        <Card className="memory-layout">
+            <Card.Body className="panel panel-default">
+                <Card.Title
                     className="panel-heading"
                     onMouseEnter={() => setShowOverlay(true)}
                     onMouseLeave={() => setShowOverlay(false)}
@@ -65,37 +67,58 @@ const MemoryBoxView = ({
                         )}
                         <span className={`pull-right glyphicon ${iconName}`} />
                     </h3>
-                </div>
-                { isTarget && showOverlay && (
-                    <Popover
-                        id="deviceInfo"
-                        placement="bottom"
-                        onMouseEnter={() => setShowOverlay(true)}
-                        onMouseLeave={() => setShowOverlay(false)}
-                    >
-                        <DeviceInfoView />
-                    </Popover>
-                )}
-                <div className="panel-body">
-                    { isHolder
-                        ? (
-                            <div className="memory-layout-container">
-                                <h1>
-                                    <span className={`glyphicon ${iconName}`} />
-                                </h1>
-                                <p>{ description }</p>
-                            </div>
-                        )
-                        : (
-                            <MemoryView
-                                isTarget={isTarget}
-                                isFile={isFile}
-                            />
-                        )
-                    }
-                </div>
-            </div>
-        </div>
+                </Card.Title>
+                <Card.Text>
+                Some quick example text to build on the card title and make up the bulk of
+                the card's content.
+                </Card.Text>
+            </Card.Body>
+        </Card>
+        // <div className="memory-layout">
+        //     <div className="panel panel-default">
+        //         <div
+                    // className="panel-heading"
+                    // onMouseEnter={() => setShowOverlay(true)}
+                    // onMouseLeave={() => setShowOverlay(false)}
+        //         >
+                    // <h3 className="panel-title">
+                    //     { title }
+                    //     { isTarget && (
+                    //         <span className="glyphicon glyphicon-info-sign target-info" />
+                    //     )}
+                    //     <span className={`pull-right glyphicon ${iconName}`} />
+                    // </h3>
+        //         </div>
+        //         { isTarget && showOverlay && (
+        //             <Popover
+        //                 id="deviceInfo"
+        //                 placement="bottom"
+        //                 onMouseEnter={() => setShowOverlay(true)}
+        //                 onMouseLeave={() => setShowOverlay(false)}
+        //             >
+        //                 <DeviceInfoView />
+        //             </Popover>
+        //         )}
+        //         <div className="panel-body">
+        //             { isHolder
+        //                 ? (
+        //                     <div className="memory-layout-container">
+        //                         <h1>
+        //                             <span className={`glyphicon ${iconName}`} />
+        //                         </h1>
+        //                         <p>{ description }</p>
+        //                     </div>
+        //                 )
+        //                 : (
+        //                     <MemoryView
+        //                         isTarget={isTarget}
+        //                         isFile={isFile}
+        //                     />
+        //                 )
+        //             }
+        //         </div>
+        //     </div>
+        // </div>
     );
 };
 
