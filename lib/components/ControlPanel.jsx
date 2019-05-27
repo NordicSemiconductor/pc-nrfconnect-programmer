@@ -85,7 +85,7 @@ const ControlPanel = ({
             <Card.Header>File</Card.Header>
             <ButtonGroup vertical>
                 <Dropdown id="files-dropdown">
-                    <Dropdown.Toggle onClick={onToggleFileList}>
+                    <Dropdown.Toggle>
                         <span className="mdi mdi-folder-open" />Add HEX file
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
