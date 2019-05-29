@@ -135,7 +135,7 @@ export default class UserInputDialogView extends React.Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
-                        bsStyle="primary"
+                        variant="primary"
                         className="core-btn"
                         disabled={!isValidInput}
                         onClick={() => onOk(selectedValue)}
