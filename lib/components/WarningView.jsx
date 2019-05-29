@@ -43,7 +43,7 @@ const warningIcon = <span className="mdi mdi-exclamation warning-sign" />;
 
 const combineWarnings = (targetWarningStrings, fileWarningStrings, userWarningStrings) => (
     targetWarningStrings.concat(fileWarningStrings).concat(userWarningStrings).map((s, index) => (
-        <Alert bsStyle="danger" key={`warning-${index + 1}`}>
+        <Alert variant="danger" key={`warning-${index + 1}`}>
             <span>{warningIcon}</span>{s}
         </Alert>
     )));
