@@ -189,20 +189,21 @@
     margin-left: -20px;
 }
 
-.popover-content {
+.popover-body {
+    padding-top: 24px;
     color: #005c84;
 }
 
-.popover-content h5 {
+.popover-body h5 {
     font-size: 12px;
     line-height: 6px;
     color: darkgrey;
 }
 
-.popover-content p {
+.popover-body p {
     font-size: 15x;
     line-height: 12px;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     border-bottom: 1px solid #eee;
 }
 
