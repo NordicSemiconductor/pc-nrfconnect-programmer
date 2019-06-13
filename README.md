@@ -1,6 +1,6 @@
 # nRF Connect Programmer
 
-[![Build Status](https://travis-ci.org/NordicSemiconductor/pc-nrfconnect-programmer.svg?branch=master)](https://travis-ci.org/NordicSemiconductor/pc-nrfconnect-programmer)
+[![Build Status](https://dev.azure.com/NordicSemiconductor/Wayland/_apis/build/status/NordicSemiconductor.pc-nrfconnect-programmer?branchName=master)](https://dev.azure.com/NordicSemiconductor/Wayland/_build/latest?definitionId=4&branchName=master)
 [![License](https://img.shields.io/badge/license-Modified%20BSD%20License-blue.svg)](LICENSE)
 
 *nRF Connect Programmer* is a cross-platform tool that enables programming firmwares to device. Memory layout for both *JLink* and *Nordic USB* devices can be displayed. Content for the *HEX* files can be displayed, too. Moreover, content of *HEX* files can be written to the devices.

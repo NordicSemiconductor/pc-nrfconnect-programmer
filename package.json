@@ -47,10 +47,5 @@
   },
   "bundledDependencies": [
     "electron-store"
-  ],
-  "jest": {
-    "moduleNameMapper": {
-      "nrfconnect/core": "<rootDir>/mocks/coreMock.js"
-    }
-  }
+  ]
 }
