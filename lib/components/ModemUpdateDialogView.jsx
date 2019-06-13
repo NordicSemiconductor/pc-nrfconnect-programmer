@@ -100,7 +100,7 @@ export default class ModemUpdateDialogView extends React.Component {
                     <FormGroup>
                         {isWritingSucceed &&
                             <Alert bsStyle="success">
-                                Complete  successfully in {this.state.timer} seconds.
+                                Completed successfully in {this.state.timer} seconds.
                             </Alert>
                         }
                         {isWritingFail &&
@@ -110,7 +110,6 @@ export default class ModemUpdateDialogView extends React.Component {
                         }
                     </FormGroup>
                 </ModalBody>
-                {/* <ModemProgressView /> */}
                 <ModalFooter>
                     {!isWritingSucceed &&
                         <Button
