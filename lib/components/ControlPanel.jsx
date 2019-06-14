@@ -66,6 +66,7 @@ const ControlPanel = ({
     performRecoverAndWrite,
     performSaveAsFile,
     performReset,
+    performModemUpdate,
     targetIsReady,
     targetIsWritable,
     targetIsRecoverable,
@@ -73,6 +74,7 @@ const ControlPanel = ({
     isJLink,
     isUsbSerial,
     performWrite,
+    isModem,
 }) => (
     <div className="control-panel">
         <Panel header="File">
@@ -153,6 +155,17 @@ const ControlPanel = ({
                 Auto read memory
             </Checkbox>
         </Panel>
+        <Panel header="Cellular Modem">
+            <ButtonGroup vertical>
+                <Button
+                    key="performModemUpdate"
+                    onClick={performModemUpdate}
+                    disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
+                >
+                    <Glyphicon glyph="pencil" />Update modem
+                </Button>
+            </ButtonGroup>
+        </Panel>
     </div>
 );
 
@@ -178,6 +191,8 @@ ControlPanel.propTypes = {
     targetIsMemLoaded: PropTypes.bool.isRequired,
     isJLink: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
+    isModem: PropTypes.bool.isRequired,
+    performModemUpdate: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
 };
 
