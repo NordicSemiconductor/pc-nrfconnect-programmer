@@ -222,3 +222,56 @@ div:last-child > p {
         line-height: 1.4em;
     }
 }
+
+.glyphicon-spin {
+    float: right;
+    margin-right: 16px;
+    margin-top: 4px;
+    -webkit-animation: spin 1000ms infinite linear;
+    animation: spin 1000ms infinite linear;
+}
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+.modem-dialog-title {
+    display: inline-block;
+}
+
+.modem-success {
+    background-color: #D0DF00;
+    color: #FFF;
+    text-align: center;
+}
+
+.modem-fail {
+    background-color: #EE2F4E;
+    color: #FFF;
+    text-align: center;
+}
+
+.modem-progress .progress {
+  background: lightgray;
+}
+.modem-progress .progress-bar {
+  background: steelblue;
+  color: white;
+  transition: width 1s;
+}
