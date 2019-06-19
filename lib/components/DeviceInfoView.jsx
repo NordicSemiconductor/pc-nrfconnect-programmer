@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -47,46 +47,46 @@ const DeviceInfoView = ({
     isMemLoaded,
 }) => (
     <div className="memory-details">
-        {serialNumber &&
+        {serialNumber && (
             <div>
                 <h5>Serial Number</h5>
                 <p>{serialNumber}</p>
             </div>
-        }
-        {port &&
+        )}
+        {port && (
             <div>
                 <h5>Port</h5>
                 <p>{port}</p>
             </div>
-        }
+        )}
         <div>
             <h5>Communication Type</h5>
             <p>{getCommunicationType(targetType)}</p>
         </div>
-        {deviceInfo && deviceInfo.romSize &&
+        {deviceInfo && deviceInfo.romSize && (
             <div>
                 <h5>ROM Size</h5>
                 <p>{hexToKiB(deviceInfo.romSize)}</p>
             </div>
-        }
-        {deviceInfo && deviceInfo.ramSize &&
+        )}
+        {deviceInfo && deviceInfo.ramSize && (
             <div>
                 <h5>RAM Size</h5>
                 <p>{hexToKiB(deviceInfo.ramSize)}</p>
             </div>
-        }
-        {deviceInfo && deviceInfo.pageSize &&
+        )}
+        {deviceInfo && deviceInfo.pageSize && (
             <div>
                 <h5>Page Size</h5>
                 <p>{hexToKiB(deviceInfo.pageSize)}</p>
             </div>
-        }
-        {targetType === CommunicationType.JLINK &&
+        )}
+        {targetType === CommunicationType.JLINK && (
             <div>
                 <h5>Device memory is loaded?</h5>
                 <p>{isMemLoaded ? 'Yes' : 'No'}</p>
             </div>
-        }
+        )}
     </div>
 );
 

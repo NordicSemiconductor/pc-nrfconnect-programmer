@@ -36,35 +36,29 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    ControlLabel,
-    FormGroup,
-    Modal,
-    ModalBody,
-    ModalFooter,
-    ModalHeader,
-    ModalTitle,
-    Alert,
-} from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import Alert from 'react-bootstrap/Alert';
 
-
-export default class ModemUpdateDialogView extends React.Component {
+class ModemUpdateDialogView extends React.Component {
     constructor(props) {
         super(props);
-        this.onOk = props.onOk;
+        this.state = { timer: 0 };
         this.onWriteStart = this.onWriteStart.bind(this);
     }
 
     onWriteStart() {
+        const { onOk } = this.props;
         this.setState({ timer: 0 });
         if (this.intervalId) {
             clearInterval(this.intervalId);
         }
         this.intervalId = setInterval(() => {
-            this.setState({ timer: this.state.timer + 1 });
+            const { timer } = this.state;
+            this.setState({ timer: timer + 1 });
         }, 1000);
-        this.onOk();
+        onOk();
     }
 
     render() {
@@ -80,47 +74,48 @@ export default class ModemUpdateDialogView extends React.Component {
         if (this.intervalId && (isWritingSucceed || isWritingFail)) {
             clearInterval(this.intervalId);
         }
+        const { timer } = this.state;
         return (
-            <Modal show={isVisible} onHide={this.onCancel} backdrop={'static'}>
-                <ModalHeader>
-                    <ModalTitle className="modem-dialog-title">Modem DFU</ModalTitle>
-                    {isWriting &&
+            <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
+                <Modal.Header>
+                    <Modal.Title className="modem-dialog-title">Modem DFU</Modal.Title>
+                    {isWriting && (
                         <span className="glyphicon glyphicon-refresh glyphicon-spin" />
-                    }
-                </ModalHeader>
-                <ModalBody>
-                    <FormGroup>
-                        <ControlLabel>Modem firmware</ControlLabel>
+                    )}
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Modem firmware</Form.Label>
                         <div>{ modemFwName }</div>
-                    </FormGroup>
-                    <FormGroup>
-                        <ControlLabel>Process</ControlLabel>
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Process</Form.Label>
                         <div>{ progressMsg }</div>
-                    </FormGroup>
-                    <FormGroup>
-                        {isWritingSucceed &&
-                            <Alert bsStyle="success">
-                                Completed successfully in {this.state.timer} seconds.
+                    </Form.Group>
+                    <Form.Group>
+                        {isWritingSucceed && (
+                            <Alert variant="success">
+                                Completed successfully in {timer} seconds.
                             </Alert>
-                        }
-                        {isWritingFail &&
-                            <Alert bsStyle="danger">
+                        )}
+                        {isWritingFail && (
+                            <Alert variant="danger">
                                 Failed. Check the log below for more detail...
                             </Alert>
-                        }
-                    </FormGroup>
-                </ModalBody>
-                <ModalFooter>
-                    {!isWritingSucceed &&
+                        )}
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    {!isWritingSucceed && (
                         <Button
-                            bsStyle="primary"
+                            variant="primary"
                             className="core-btn"
                             onClick={this.onWriteStart}
                             disabled={isWriting}
                         >
                             Write
                         </Button>
-                    }
+                    )}
                     <Button
                         className="core-btn"
                         onClick={onCancel}
@@ -128,7 +123,7 @@ export default class ModemUpdateDialogView extends React.Component {
                     >
                         Close
                     </Button>
-                </ModalFooter>
+                </Modal.Footer>
             </Modal>
         );
     }
@@ -147,3 +142,5 @@ ModemUpdateDialogView.propTypes = {
 
 ModemUpdateDialogView.defaultProps = {
 };
+
+export default ModemUpdateDialogView;

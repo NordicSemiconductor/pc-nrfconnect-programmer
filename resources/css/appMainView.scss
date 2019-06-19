@@ -1,7 +1,7 @@
 .warning-view {
     width: 100%;
-    padding: 0 3%;
-    margin-top: 1%;
+    padding: 0 1.5%;
+    margin: 2% 0;
     max-width: 1000px;
     align-self: center;
     .alert {
@@ -23,43 +23,42 @@
 }
 
 .memory-layout {
-    height: 100%;
+    position: relative;
+    display: flex;
+    flex: 1;
     flex-grow: 1;
-    padding: 1.5% 3% 3% 3%;
+    flex-direction: column;
+    margin: 1.5% 3% 3% 3%;
     max-width: 500px;
     width: 50%;
-    display: flex;
+    height: 100%;
 
-    .panel {
-        position: relative;
+    .panel-heading {
+        padding-bottom: 0;
+        .panel-title {
+            color: gray;
+            display: flex;
+            .glyphicon {
+                color: rgba(0, 0, 0, 0.175);
+                align-self: auto;
+                margin-left: auto;
+            }
+            .target-info {
+                padding-left: 0.5em;
+                font-size: 12px;
+            }
+        }
+    }
+    .panel-heading:hover {
+        .target-info {
+            color: rgba(0, 0, 0, 0.375);
+        }
+    }
+    .panel-body {
+        padding: 15px;
+        background-color: #fff;
         display: flex;
         flex: 1;
-        flex-direction: column;
-        margin-bottom: 0;
-        .panel-heading {
-            background-color: #fff;
-            .panel-title {
-                color: gray;
-                .glyphicon {
-                    color: rgba(0, 0, 0, 0.175);
-                }
-                .target-info {
-                    padding-left: 0.5em;
-                    font-size: 12px;
-                }
-            }
-        }
-        .panel-heading:hover {
-            .target-info {
-                color: rgba(0, 0, 0, 0.375);
-            }
-        }
-        .panel-body {
-            padding: 15px;
-            background-color: #fff;
-            display: flex;
-            flex: 1;
-        }
     }
 
     #deviceInfo {
@@ -190,20 +189,21 @@
     margin-left: -20px;
 }
 
-.popover-content {
+.popover-body {
+    padding-top: 24px;
     color: #005c84;
 }
 
-.popover-content h5 {
+.popover-body h5 {
     font-size: 12px;
     line-height: 6px;
     color: darkgrey;
 }
 
-.popover-content p {
+.popover-body p {
     font-size: 15x;
     line-height: 12px;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     border-bottom: 1px solid #eee;
 }
 

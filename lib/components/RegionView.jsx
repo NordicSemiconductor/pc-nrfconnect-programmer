@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -37,7 +37,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Glyphicon, OverlayTrigger } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import RegionInfoView from './RegionInfoView';
 
 class RegionView extends React.Component {
@@ -67,14 +68,14 @@ class RegionView extends React.Component {
                     backgroundColor: color,
                 }}
             >
-                { region && region.fileNames.length > 0 && !active &&
+                { region && region.fileNames.length > 0 && !active && (
                     <Button
                         className="transparent"
                         onClick={() => removeFile(region.fileNames.pop())}
                     >
-                        <Glyphicon glyph="minus-sign" />
+                        <span className="mdi mdi-minus-circle" />
                     </Button>
-                }
+                )}
             </div>
         );
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -67,7 +67,7 @@ const AppMainView = ({ file, target }) => (
             <MemoryBoxView
                 title="File Memory Layout"
                 description="Drag & Drop one or more HEX files here"
-                iconName="glyphicon-folder-open"
+                iconName="mdi mdi-folder-open"
                 isHolder={!hasFileContent(file)}
                 isFile={hasFileContent(file)}
             />
