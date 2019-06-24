@@ -85,97 +85,103 @@ const ControlPanel = ({
     <div className="control-panel">
         <Card>
             <Card.Header>File</Card.Header>
-            <ButtonGroup vertical>
-                <Dropdown id="files-dropdown" onClick={onToggleFileList}>
-                    <Dropdown.Toggle>
-                        <span className="mdi mdi-folder-open" />Add HEX file
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu alignRight>
-                        {MruMenuItems(mruFiles, openFile)}
-                        <Dropdown.Divider />
-                        <Dropdown.Item onSelect={openFileDialog}>Browse...</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-                <Button onClick={refreshAllFiles}>
-                    <span className="mdi mdi-refresh" />Reload files
-                </Button>
-                <Button onClick={closeFiles}>
-                    <span className="mdi mdi-minus-circle" />Clear files
-                </Button>
-            </ButtonGroup>
+            <Card.Body>
+                <ButtonGroup vertical>
+                    <Dropdown id="files-dropdown" onClick={onToggleFileList}>
+                        <Dropdown.Toggle>
+                            <span className="mdi mdi-folder-open" />Add HEX file
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu alignRight>
+                            {MruMenuItems(mruFiles, openFile)}
+                            <Dropdown.Divider />
+                            <Dropdown.Item onSelect={openFileDialog}>Browse...</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                    <Button onClick={refreshAllFiles}>
+                        <span className="mdi mdi-refresh" />Reload files
+                    </Button>
+                    <Button onClick={closeFiles}>
+                        <span className="mdi mdi-minus-circle" />Clear files
+                    </Button>
+                </ButtonGroup>
+            </Card.Body>
         </Card>
         <Card>
             <Card.Header>Device</Card.Header>
-            <ButtonGroup vertical>
-                <Button
-                    key="performRecover"
-                    onClick={performRecover}
-                    disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
-                >
-                    <span className="mdi mdi-eraser" />Erase all
-                </Button>
-                <Button
-                    key="performRecoverAndWrite"
-                    onClick={performRecoverAndWrite}
-                    disabled={
-                        !isJLink
-                        || !targetIsReady
-                        || !fileRegionSize
-                        || !(targetIsRecoverable && mruFiles.length)
-                    }
-                >
-                    <span className="mdi mdi-pencil" />Erase & write
-                </Button>
-                <Button
-                    key="performSaveAsFile"
-                    onClick={performSaveAsFile}
-                    disabled={!isJLink || !targetIsMemLoaded}
-                >
-                    <span className="mdi mdi-floppy" />Save as file
-                </Button>
-                <Button
-                    key="performReset"
-                    onClick={performReset}
-                    disabled={!isUsbSerial || !targetIsReady}
-                >
-                    <span className="mdi mdi-record" />Reset
-                </Button>
-                <Button
-                    key="performWrite"
-                    onClick={performWrite}
-                    disabled={!targetIsReady || !targetIsWritable}
-                >
-                    <span className="mdi mdi-pencil" />Write
-                </Button>
-                <Button
-                    key="performJLinkRead"
-                    onClick={performJLinkRead}
-                    disabled={!targetIsReady || !refreshEnabled}
-                >
-                    <span className="mdi mdi-refresh" />Read
-                </Button>
-            </ButtonGroup>
-            <Form.Group controlId="formBasicChecbox">
-                <Form.Check
-                    type="checkbox"
-                    className="last-checkbox"
-                    onChange={e => toggleAutoRead(e.target.checked)}
-                    checked={autoRead}
-                    label="Auto read memory"
-                />
-            </Form.Group>
+            <Card.Body>
+                <ButtonGroup vertical>
+                    <Button
+                        key="performRecover"
+                        onClick={performRecover}
+                        disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
+                    >
+                        <span className="mdi mdi-eraser" />Erase all
+                    </Button>
+                    <Button
+                        key="performRecoverAndWrite"
+                        onClick={performRecoverAndWrite}
+                        disabled={
+                            !isJLink
+                            || !targetIsReady
+                            || !fileRegionSize
+                            || !(targetIsRecoverable && mruFiles.length)
+                        }
+                    >
+                        <span className="mdi mdi-pencil" />Erase & write
+                    </Button>
+                    <Button
+                        key="performSaveAsFile"
+                        onClick={performSaveAsFile}
+                        disabled={!isJLink || !targetIsMemLoaded}
+                    >
+                        <span className="mdi mdi-floppy" />Save as file
+                    </Button>
+                    <Button
+                        key="performReset"
+                        onClick={performReset}
+                        disabled={!isUsbSerial || !targetIsReady}
+                    >
+                        <span className="mdi mdi-record" />Reset
+                    </Button>
+                    <Button
+                        key="performWrite"
+                        onClick={performWrite}
+                        disabled={!targetIsReady || !targetIsWritable}
+                    >
+                        <span className="mdi mdi-pencil" />Write
+                    </Button>
+                    <Button
+                        key="performJLinkRead"
+                        onClick={performJLinkRead}
+                        disabled={!targetIsReady || !refreshEnabled}
+                    >
+                        <span className="mdi mdi-refresh" />Read
+                    </Button>
+                </ButtonGroup>
+                <Form.Group controlId="formBasicChecbox">
+                    <Form.Check
+                        type="checkbox"
+                        className="last-checkbox"
+                        onChange={e => toggleAutoRead(e.target.checked)}
+                        checked={autoRead}
+                        label="Auto read memory"
+                    />
+                </Form.Group>
+            </Card.Body>
         </Card>
         <Card>
             <Card.Header>Cellular Modem</Card.Header>
-            <ButtonGroup vertical>
-                <Button
-                    key="performModemUpdate"
-                    onClick={performModemUpdate}
-                    disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
-                >
-                    <span className="mdi mdi-pencil" />Update modem
-                </Button>
-            </ButtonGroup>
+            <Card.Body>
+                <ButtonGroup vertical>
+                    <Button
+                        key="performModemUpdate"
+                        onClick={performModemUpdate}
+                        disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
+                    >
+                        <span className="mdi mdi-pencil" />Update modem
+                    </Button>
+                </ButtonGroup>
+            </Card.Body>
         </Card>
     </div>
 );
