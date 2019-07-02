@@ -39,12 +39,10 @@ import PropTypes from 'prop-types';
 import Alert from 'react-bootstrap/Alert';
 import { List } from 'immutable';
 
-const warningIcon = <span className="mdi mdi-exclamation warning-sign" />;
-
 const combineWarnings = (targetWarningStrings, fileWarningStrings, userWarningStrings) => (
     targetWarningStrings.concat(fileWarningStrings).concat(userWarningStrings).map((s, index) => (
         <Alert variant="danger" key={`warning-${index + 1}`}>
-            <span>{warningIcon}</span>{s}
+            <span className="mdi mdi-alert" />{s}
         </Alert>
     )));
 
