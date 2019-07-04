@@ -92,6 +92,11 @@ export default {
         </SidePanel>
     ),
 
+    mapDeviceSelectorState: (state, props) => ({
+        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
+        ...props,
+    }),
+
     reduceApp: appReducer,
 
     middleware: store => next => action => {
