@@ -67,6 +67,7 @@ class ModemUpdateDialogView extends React.Component {
             isWriting,
             isWritingSucceed,
             isWritingFail,
+            errorMsg,
             modemFwName,
             progressMsg,
             onCancel,
@@ -100,7 +101,7 @@ class ModemUpdateDialogView extends React.Component {
                         )}
                         {isWritingFail && (
                             <Alert variant="danger">
-                                Failed. Check the log below for more detail...
+                                {errorMsg || 'Failed. Check the log below for more detail...'}
                             </Alert>
                         )}
                     </Form.Group>
@@ -134,6 +135,7 @@ ModemUpdateDialogView.propTypes = {
     isWriting: PropTypes.bool.isRequired,
     isWritingSucceed: PropTypes.bool.isRequired,
     isWritingFail: PropTypes.bool.isRequired,
+    errorMsg: PropTypes.string.isRequired,
     modemFwName: PropTypes.string.isRequired,
     progressMsg: PropTypes.string.isRequired,
     onOk: PropTypes.func.isRequired,
