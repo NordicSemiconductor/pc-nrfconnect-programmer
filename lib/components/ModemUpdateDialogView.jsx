@@ -101,7 +101,7 @@ class ModemUpdateDialogView extends React.Component {
                         )}
                         {isWritingFail && (
                             <Alert variant="danger">
-                                {errorMsg || 'Failed. Check the log below for more detail...'}
+                                {errorMsg || 'Failed. Check the log below for more details...'}
                             </Alert>
                         )}
                     </Form.Group>
