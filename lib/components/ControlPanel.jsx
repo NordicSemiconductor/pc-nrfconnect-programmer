@@ -64,7 +64,6 @@ const ControlPanel = ({
     onToggleFileList,
     mruFiles,
     fileRegionSize,
-    refreshEnabled,
     autoRead,
     toggleAutoRead,
     performJLinkRead,
@@ -153,7 +152,7 @@ const ControlPanel = ({
                     <Button
                         key="performJLinkRead"
                         onClick={performJLinkRead}
-                        disabled={!targetIsReady || !refreshEnabled}
+                        disabled={!targetIsReady || !isJLink}
                     >
                         <span className="mdi mdi-refresh" />Read
                     </Button>
@@ -194,7 +193,6 @@ ControlPanel.propTypes = {
     openFileDialog: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     fileRegionSize: PropTypes.number.isRequired,
-    refreshEnabled: PropTypes.bool.isRequired,
     autoRead: PropTypes.bool.isRequired,
     toggleAutoRead: PropTypes.func.isRequired,
     performJLinkRead: PropTypes.func.isRequired,
