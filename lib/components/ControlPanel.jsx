@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -34,18 +34,24 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Card from 'react-bootstrap/Card';
+import Dropdown from 'react-bootstrap/Dropdown';
+import Form from 'react-bootstrap/Form';
 import PropTypes from 'prop-types';
-import { Glyphicon, Button, Dropdown, MenuItem, ButtonGroup, Panel, Checkbox } from 'react-bootstrap';
+import React from 'react';
 
 const MruMenuItems = (mruFiles, openFile) => {
     let mruMenuItems;
     if (mruFiles.length) {
         mruMenuItems = mruFiles.map(filePath => (
-            <MenuItem key={filePath} onSelect={() => openFile(filePath)}>{filePath}</MenuItem>
+            <Dropdown.Item key={filePath} onSelect={() => openFile(filePath)}>
+                {filePath}
+            </Dropdown.Item>
         ));
     } else {
-        mruMenuItems = (<MenuItem disabled>No recently used files</MenuItem>);
+        mruMenuItems = (<Dropdown.Item disabled>No recently used files</Dropdown.Item>);
     }
     return mruMenuItems;
 };
@@ -66,6 +72,7 @@ const ControlPanel = ({
     performRecoverAndWrite,
     performSaveAsFile,
     performReset,
+    performModemUpdate,
     targetIsReady,
     targetIsWritable,
     targetIsRecoverable,
@@ -73,86 +80,109 @@ const ControlPanel = ({
     isJLink,
     isUsbSerial,
     performWrite,
+    isModem,
 }) => (
     <div className="control-panel">
-        <Panel header="File">
-            <ButtonGroup vertical>
-                <Dropdown pullRight id="files-dropdown">
-                    <Dropdown.Toggle onClick={onToggleFileList}>
-                        <Glyphicon glyph="folder-open" />Add HEX file
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        {MruMenuItems(mruFiles, openFile)}
-                        <MenuItem divider />
-                        <MenuItem onSelect={openFileDialog}>Browse...</MenuItem>
-                    </Dropdown.Menu>
-                </Dropdown>
-                <Button onClick={refreshAllFiles}>
-                    <Glyphicon glyph="refresh" />Reload files
-                </Button>
-                <Button onClick={closeFiles}>
-                    <Glyphicon glyph="minus-sign" />Clear files
-                </Button>
-            </ButtonGroup>
-        </Panel>
-        <Panel header="Device">
-            <ButtonGroup vertical>
-                <Button
-                    key="performRecover"
-                    onClick={performRecover}
-                    disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
-                >
-                    <Glyphicon glyph="erase" />Erase all
-                </Button>
-                <Button
-                    key="performRecoverAndWrite"
-                    onClick={performRecoverAndWrite}
-                    disabled={
-                        !isJLink ||
-                        !targetIsReady ||
-                        !fileRegionSize ||
-                        !(targetIsRecoverable && mruFiles.length)
-                    }
-                >
-                    <Glyphicon bsStyle="warning" glyph="pencil" />Erase & write
-                </Button>
-                <Button
-                    key="performSaveAsFile"
-                    onClick={performSaveAsFile}
-                    disabled={!isJLink || !targetIsMemLoaded}
-                >
-                    <Glyphicon glyph="floppy-disk" />Save as file
-                </Button>
-                <Button
-                    key="performReset"
-                    onClick={performReset}
-                    disabled={!isUsbSerial || !targetIsReady}
-                >
-                    <Glyphicon glyph="record" />Reset
-                </Button>
-                <Button
-                    key="performWrite"
-                    onClick={performWrite}
-                    disabled={!targetIsReady || !targetIsWritable}
-                >
-                    <Glyphicon glyph="pencil" />Write
-                </Button>
-                <Button
-                    key="performJLinkRead"
-                    onClick={performJLinkRead}
-                    disabled={!targetIsReady || !refreshEnabled}
-                >
-                    <Glyphicon glyph="refresh" />Read
-                </Button>
-            </ButtonGroup>
-            <Checkbox
-                className="last-checkbox"
-                onChange={e => toggleAutoRead(e.target.checked)}
-                checked={autoRead}
-            >
-                Auto read memory
-            </Checkbox>
-        </Panel>
+        <Card>
+            <Card.Header>File</Card.Header>
+            <Card.Body>
+                <ButtonGroup vertical>
+                    <Dropdown id="files-dropdown" onClick={onToggleFileList}>
+                        <Dropdown.Toggle>
+                            <span className="mdi mdi-folder-open" />Add HEX file
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu alignRight>
+                            {MruMenuItems(mruFiles, openFile)}
+                            <Dropdown.Divider />
+                            <Dropdown.Item onSelect={openFileDialog}>Browse...</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                    <Button onClick={refreshAllFiles}>
+                        <span className="mdi mdi-refresh" />Reload files
+                    </Button>
+                    <Button onClick={closeFiles}>
+                        <span className="mdi mdi-minus-circle" />Clear files
+                    </Button>
+                </ButtonGroup>
+            </Card.Body>
+        </Card>
+        <Card>
+            <Card.Header>Device</Card.Header>
+            <Card.Body>
+                <ButtonGroup vertical>
+                    <Button
+                        key="performRecover"
+                        onClick={performRecover}
+                        disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
+                    >
+                        <span className="mdi mdi-eraser" />Erase all
+                    </Button>
+                    <Button
+                        key="performRecoverAndWrite"
+                        onClick={performRecoverAndWrite}
+                        disabled={
+                            !isJLink
+                            || !targetIsReady
+                            || !fileRegionSize
+                            || !(targetIsRecoverable && mruFiles.length)
+                        }
+                    >
+                        <span className="mdi mdi-pencil" />Erase & write
+                    </Button>
+                    <Button
+                        key="performSaveAsFile"
+                        onClick={performSaveAsFile}
+                        disabled={!isJLink || !targetIsMemLoaded}
+                    >
+                        <span className="mdi mdi-floppy" />Save as file
+                    </Button>
+                    <Button
+                        key="performReset"
+                        onClick={performReset}
+                        disabled={!isUsbSerial || !targetIsReady}
+                    >
+                        <span className="mdi mdi-record" />Reset
+                    </Button>
+                    <Button
+                        key="performWrite"
+                        onClick={performWrite}
+                        disabled={!targetIsReady || !targetIsWritable}
+                    >
+                        <span className="mdi mdi-pencil" />Write
+                    </Button>
+                    <Button
+                        key="performJLinkRead"
+                        onClick={performJLinkRead}
+                        disabled={!targetIsReady || !refreshEnabled}
+                    >
+                        <span className="mdi mdi-refresh" />Read
+                    </Button>
+                </ButtonGroup>
+                <Form.Group controlId="formBasicChecbox">
+                    <Form.Check
+                        type="checkbox"
+                        className="last-checkbox"
+                        onChange={e => toggleAutoRead(e.target.checked)}
+                        checked={autoRead}
+                        label="Auto read memory"
+                    />
+                </Form.Group>
+            </Card.Body>
+        </Card>
+        <Card>
+            <Card.Header>Cellular Modem</Card.Header>
+            <Card.Body>
+                <ButtonGroup vertical>
+                    <Button
+                        key="performModemUpdate"
+                        onClick={performModemUpdate}
+                        disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
+                    >
+                        <span className="mdi mdi-pencil" />Update modem
+                    </Button>
+                </ButtonGroup>
+            </Card.Body>
+        </Card>
     </div>
 );
 
@@ -178,6 +208,8 @@ ControlPanel.propTypes = {
     targetIsMemLoaded: PropTypes.bool.isRequired,
     isJLink: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
+    isModem: PropTypes.bool.isRequired,
+    performModemUpdate: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
 };
 

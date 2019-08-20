@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -34,9 +34,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import './controPanel.less';
-@import './appMainView.less';
-@import './appIcons.less';
+@import './controlPanel.scss';
+@import './appMainView.scss';
+@import './appIcons.scss';
 
 .main-view, .side-panel {
     padding: 10px 15px;
@@ -52,24 +52,6 @@
     width: 100%;
     flex-direction: column;
     padding: 0px;
-}
-
-.control-panel {
-    height: 100%;
-
-    .btn-group-vertical {
-        width: 100%;
-    }
-
-    button {
-        display: block;
-        width: 100%;
-        text-align: left;
-
-        span.glyphicon {
-            margin-right: 15px;
-        }
-    }
 }
 
 .btn:not(.btn-primary) .glyphicon {

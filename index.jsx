@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -44,7 +44,7 @@ import { loadSettings } from './lib/actions/settingsActions';
 import appReducer from './lib/reducers';
 import logJprogVersion from './lib/util/logJprogVersion';
 import { hexpad2, hexToKiB } from './lib/util/hexpad';
-import './resources/css/index.less';
+import './resources/css/index.scss';
 
 let detectedDevices = [];
 let currentDeviceInfo;
@@ -91,6 +91,11 @@ export default {
             <ControlPanel />
         </SidePanel>
     ),
+
+    mapDeviceSelectorState: (state, props) => ({
+        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
+        ...props,
+    }),
 
     reduceApp: appReducer,
 

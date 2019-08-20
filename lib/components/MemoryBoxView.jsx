@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2018, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -35,10 +35,12 @@
  */
 
 import React, { useState } from 'react';
+
+import Card from 'react-bootstrap/Card';
+import Popover from 'react-bootstrap/Popover';
 import PropTypes from 'prop-types';
-import { Popover } from 'react-bootstrap';
-import MemoryView from '../containers/memoryView';
 import DeviceInfoView from '../containers/deviceInfoView';
+import MemoryView from '../containers/memoryView';
 
 const MemoryBoxView = ({
     title,
@@ -51,47 +53,47 @@ const MemoryBoxView = ({
     const [showOverlay, setShowOverlay] = useState(false);
 
     return (
-        <div className="memory-layout">
-            <div className="panel panel-default">
-                <div
-                    className="panel-heading"
+        <Card className="memory-layout">
+            <Card.Header
+                className="panel-heading"
+                onMouseEnter={() => setShowOverlay(true)}
+                onMouseLeave={() => setShowOverlay(false)}
+            >
+                <Card.Title className="panel-title">
+                    { title }
+                    { isTarget && (
+                        <span className="glyphicon glyphicon-info-sign target-info" />
+                    )}
+                    <span className={`glyphicon ${iconName}`} />
+                </Card.Title>
+            </Card.Header>
+            { isTarget && showOverlay && (
+                <Popover
+                    id="deviceInfo"
+                    placement="bottom"
                     onMouseEnter={() => setShowOverlay(true)}
                     onMouseLeave={() => setShowOverlay(false)}
                 >
-                    <h3 className="panel-title">
-                        { title }
-                        { isTarget && (
-                            <span className="glyphicon glyphicon-info-sign target-info" />
-                        )}
-                        <span className={`pull-right glyphicon ${iconName}`} />
-                    </h3>
-                </div>
-                { isTarget && showOverlay && (
-                    <Popover
-                        id="deviceInfo"
-                        placement="bottom"
-                        onMouseEnter={() => setShowOverlay(true)}
-                        onMouseLeave={() => setShowOverlay(false)}
-                    >
-                        <DeviceInfoView />
-                    </Popover>
+                    <DeviceInfoView />
+                </Popover>
+            )}
+            <Card.Body className="panel-body">
+                { isHolder && (
+                    <div className="memory-layout-container">
+                        <h1>
+                            <span className={`glyphicon ${iconName}`} />
+                        </h1>
+                        <p>{ description }</p>
+                    </div>
                 )}
-                <div className="panel-body">
-                    { isHolder
-                        ? <div className="memory-layout-container">
-                            <h1>
-                                <span className={`glyphicon ${iconName}`} />
-                            </h1>
-                            <p>{ description }</p>
-                        </div>
-                        : <MemoryView
-                            isTarget={isTarget}
-                            isFile={isFile}
-                        />
-                    }
-                </div>
-            </div>
-        </div>
+                { !isHolder && (
+                    <MemoryView
+                        isTarget={isTarget}
+                        isFile={isFile}
+                    />
+                )}
+            </Card.Body>
+        </Card>
     );
 };
 
