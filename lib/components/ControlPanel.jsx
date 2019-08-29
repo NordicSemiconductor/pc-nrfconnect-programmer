@@ -34,27 +34,77 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import React, { useRef } from 'react';
+import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
-import PropTypes from 'prop-types';
-import React from 'react';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
 
-const MruMenuItems = (mruFiles, openFile) => {
-    let mruMenuItems;
-    if (mruFiles.length) {
-        mruMenuItems = mruFiles.map(filePath => (
-            <Dropdown.Item key={filePath} onSelect={() => openFile(filePath)}>
-                {filePath}
-            </Dropdown.Item>
-        ));
-    } else {
-        mruMenuItems = (<Dropdown.Item disabled>No recently used files</Dropdown.Item>);
-    }
-    return mruMenuItems;
+const Mru = ({
+    onToggleFileList,
+    openFileDialog,
+    openFile,
+    mruFiles,
+}) => {
+    const target = useRef(null);
+    return (
+        <OverlayTrigger
+            placement="bottom-end"
+            trigger="click"
+            rootClose
+            ref={target}
+            popperConfig={{ modifiers: { preventOverflow: { boundariesElement: window } } }}
+            transition={false}
+            overlay={(
+                <Popover
+                    id="mru-popover"
+                    className="mru-popover"
+                    placement="bottom-end"
+                >
+                    { mruFiles.length
+                        ? mruFiles.map(filePath => (
+                            <Dropdown.Item
+                                key={filePath}
+                                onSelect={() => {
+                                    openFile(filePath);
+                                    target.current.setState({ show: false });
+                                }}
+                            >
+                                {filePath}
+                            </Dropdown.Item>
+                        ))
+                        : <Dropdown.Item disabled>No recently used files</Dropdown.Item>
+                    }
+                    <Dropdown.Divider />
+                    <Dropdown.Item
+                        onSelect={() => {
+                            openFileDialog();
+                            target.current.setState({ show: false });
+                        }}
+                    >
+                        Browse...
+                    </Dropdown.Item>
+                </Popover>
+            )}
+        >
+            <Button variant="danger" onClick={onToggleFileList}>
+                <span className="mdi mdi-folder-open" />Add HEX file
+            </Button>
+        </OverlayTrigger>
+    );
 };
+
+Mru.propTypes = {
+    openFile: PropTypes.func.isRequired,
+    onToggleFileList: PropTypes.func.isRequired,
+    openFileDialog: PropTypes.func.isRequired,
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
 
 const ControlPanel = ({
     openFile,
@@ -86,16 +136,12 @@ const ControlPanel = ({
             <Card.Header>File</Card.Header>
             <Card.Body>
                 <ButtonGroup vertical>
-                    <Dropdown id="files-dropdown" onClick={onToggleFileList}>
-                        <Dropdown.Toggle>
-                            <span className="mdi mdi-folder-open" />Add HEX file
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu alignRight>
-                            {MruMenuItems(mruFiles, openFile)}
-                            <Dropdown.Divider />
-                            <Dropdown.Item onSelect={openFileDialog}>Browse...</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <Mru
+                        openFile={openFile}
+                        openFileDialog={openFileDialog}
+                        mruFiles={mruFiles}
+                        onToggleFileList={onToggleFileList}
+                    />
                     <Button onClick={refreshAllFiles}>
                         <span className="mdi mdi-refresh" />Reload files
                     </Button>
