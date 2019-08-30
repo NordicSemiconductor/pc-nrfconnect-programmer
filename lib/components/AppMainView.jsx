@@ -34,12 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import WarningView from '../containers/warningView';
+import React from 'react';
+
 import MemoryBoxView from '../containers/memoryBoxView';
-import UserInputDialogView from '../containers/userInputDialogView';
 import ModemUpdateDialogView from '../containers/modemUpdateDialogView';
+import UserInputDialogView from '../containers/userInputDialogView';
+import WarningView from '../containers/warningView';
 
 function getTargetTitle(serialNumber, deviceInfo) {
     if (serialNumber) {
@@ -52,17 +53,24 @@ function hasFileContent(file) {
     return Object.keys(file.loaded).length > 0;
 }
 
-const AppMainView = ({ file, target }) => (
+const AppMainView = ({
+    file,
+    target: {
+        serialNumber,
+        deviceInfo,
+        regions,
+    },
+}) => (
     <div className="app-main-view">
         <WarningView />
         <div className="memory-box-container">
             <MemoryBoxView
-                title={getTargetTitle(target.serialNumber, target.deviceInfo) || 'Device Memory Layout'}
+                title={getTargetTitle(serialNumber, deviceInfo) || 'Device Memory Layout'}
                 description="Connect a device to display memory contents"
                 iconName="appicon-chip"
-                regions={target.regions}
-                isHolder={!target.serialNumber}
-                isTarget={!!target.serialNumber}
+                regions={regions}
+                isHolder={!serialNumber}
+                isTarget={!!serialNumber}
             />
             <MemoryBoxView
                 title="File Memory Layout"
@@ -79,7 +87,11 @@ const AppMainView = ({ file, target }) => (
 
 AppMainView.propTypes = {
     file: PropTypes.shape({}).isRequired,
-    target: PropTypes.shape({}).isRequired,
+    target: PropTypes.shape({
+        serialNumber: PropTypes.string,
+        deviceInfo: PropTypes.object,
+        regions: PropTypes.object,
+    }).isRequired,
 };
 
 export default AppMainView;
