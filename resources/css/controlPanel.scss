@@ -87,3 +87,11 @@ $labelHeight: 12px;
         }
     }
 }
+
+.mru-popover {
+    max-width: initial !important;
+    .popover-body {
+        padding: 0.25rem 0;
+        font-size: 0.875rem;
+    }
+}

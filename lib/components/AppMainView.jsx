@@ -88,9 +88,9 @@ const AppMainView = ({
 AppMainView.propTypes = {
     file: PropTypes.shape({}).isRequired,
     target: PropTypes.shape({
-        serialNumber: PropTypes.shape({}).isRequired,
-        deviceInfo: PropTypes.shape({}).isRequired,
-        regions: PropTypes.shape({}).isRequired,
+        serialNumber: PropTypes.string,
+        deviceInfo: PropTypes.object,
+        regions: PropTypes.object,
     }).isRequired,
 };
 

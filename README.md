@@ -29,6 +29,9 @@ nRF Connect currently supports the following operating systems:
 
 After *nRF Connect* is installed, you can find *Programmer* in the app list by selecting *Add/remove apps*.
 
+# Usage documentation
+
+See [user guide](https://infocenter.nordicsemi.com/topic/ug_nc_programmer/UG/nrf_connect_programmer/ncp_introduction.html).
 
 # Contributing
 
