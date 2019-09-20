@@ -62,7 +62,7 @@ const MemoryBoxView = ({
                 <Card.Title className="panel-title">
                     { title }
                     { isTarget && (
-                        <span className="glyphicon glyphicon-info-sign target-info" />
+                        <span className="mdi mdi-information-outline target-info" />
                     )}
                     <span className={`glyphicon ${iconName}`} />
                 </Card.Title>
