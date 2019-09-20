@@ -65,7 +65,7 @@ const AppMainView = ({
         <WarningView />
         <div className="memory-box-container">
             <MemoryBoxView
-                title={getTargetTitle(serialNumber, deviceInfo) || 'Device Memory Layout'}
+                title={getTargetTitle(serialNumber, deviceInfo) || 'Device memory layout'}
                 description="Connect a device to display memory contents"
                 iconName="appicon-chip"
                 regions={regions}
@@ -73,8 +73,8 @@ const AppMainView = ({
                 isTarget={!!serialNumber}
             />
             <MemoryBoxView
-                title="File Memory Layout"
-                description="Drag & Drop one or more HEX files here"
+                title="File memory layout"
+                description="Drag & drop one or more HEX files here"
                 iconName="mdi mdi-folder-open"
                 isHolder={!hasFileContent(file)}
                 isFile={hasFileContent(file)}
