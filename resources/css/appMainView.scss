@@ -55,7 +55,7 @@
         }
     }
     .panel-body {
-        padding: 15px;
+        padding: 1rem;
         background-color: #fff;
         display: flex;
         flex: 1;
@@ -173,8 +173,8 @@
 }
 
 .striped {
-    background-image:  linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-    background-size: 40px 40px;
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
 }
 
 .active {
@@ -223,30 +223,17 @@ div:last-child > p {
     }
 }
 
-.glyphicon-spin {
+.icon-spin {
     float: right;
     margin-right: 16px;
     margin-top: 4px;
-    -webkit-animation: spin 1000ms infinite linear;
     animation: spin 1000ms infinite linear;
-}
-@-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
 }
 @keyframes spin {
     0% {
-        -webkit-transform: rotate(0deg);
         transform: rotate(0deg);
     }
     100% {
-        -webkit-transform: rotate(359deg);
         transform: rotate(359deg);
     }
 }

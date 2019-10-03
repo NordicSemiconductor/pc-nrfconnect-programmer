@@ -81,7 +81,7 @@ class ModemUpdateDialogView extends React.Component {
                 <Modal.Header>
                     <Modal.Title className="modem-dialog-title">Modem DFU</Modal.Title>
                     {isWriting && (
-                        <span className="glyphicon glyphicon-refresh glyphicon-spin" />
+                        <span className="mdi mdi-refresh icon-spin" />
                     )}
                 </Modal.Header>
                 <Modal.Body>
