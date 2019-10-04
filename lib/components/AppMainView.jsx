@@ -37,6 +37,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import McuUpdateDialogView from '../containers/mcuUpdateDialogView';
 import MemoryBoxView from '../containers/memoryBoxView';
 import ModemUpdateDialogView from '../containers/modemUpdateDialogView';
 import UserInputDialogView from '../containers/userInputDialogView';
@@ -82,6 +83,7 @@ const AppMainView = ({
         </div>
         <UserInputDialogView />
         <ModemUpdateDialogView />
+        <McuUpdateDialogView />
     </div>
 );
 
