@@ -34,12 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 
 class McuUpdateDialogView extends React.Component {
     constructor(props) {
@@ -93,12 +94,18 @@ class McuUpdateDialogView extends React.Component {
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>Process</Form.Label>
-                        <div>{ `${progressMsg} ${progressPercentage} ${progressDuration}` }</div>
+                        <div>{progressMsg}</div>
+                        <ProgressBar
+                            hidden={!isWriting}
+                            animated
+                            now={progressPercentage}
+                            label={`${progressPercentage}%`}
+                        />
                     </Form.Group>
                     <Form.Group>
                         {isWritingSucceed && (
                             <Alert variant="success">
-                                Completed successfully in {timer} seconds.
+                                Completed successfully in {progressDuration / 1000} seconds.
                             </Alert>
                         )}
                         {isWritingFail && (
