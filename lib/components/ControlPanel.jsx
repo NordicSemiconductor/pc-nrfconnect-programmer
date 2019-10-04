@@ -228,6 +228,20 @@ const ControlPanel = ({
                 </ButtonGroup>
             </Card.Body>
         </Card>
+        <Card>
+            <Card.Header>MCU Boot</Card.Header>
+            <Card.Body>
+                <ButtonGroup vertical>
+                    <Button
+                        key="performMcuUpdate"
+                        onClick={performModemUpdate}
+                        disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
+                    >
+                        <span className="mdi mdi-pencil" />Update
+                    </Button>
+                </ButtonGroup>
+            </Card.Body>
+        </Card>
     </div>
 );
 
