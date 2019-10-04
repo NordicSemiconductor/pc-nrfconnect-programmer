@@ -122,6 +122,7 @@ const ControlPanel = ({
     performSaveAsFile,
     performReset,
     performModemUpdate,
+    performMcuUpdate,
     targetIsReady,
     targetIsWritable,
     targetIsRecoverable,
@@ -129,6 +130,7 @@ const ControlPanel = ({
     isJLink,
     isUsbSerial,
     performWrite,
+    isMcu,
     isModem,
 }) => (
     <div className="control-panel">
@@ -229,15 +231,15 @@ const ControlPanel = ({
             </Card.Body>
         </Card>
         <Card>
-            <Card.Header>MCU Boot</Card.Header>
+            <Card.Header>MCUBoot</Card.Header>
             <Card.Body>
                 <ButtonGroup vertical>
                     <Button
                         key="performMcuUpdate"
-                        onClick={performModemUpdate}
-                        disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
+                        onClick={performMcuUpdate}
+                        disabled={!isMcu || !targetIsReady}
                     >
-                        <span className="mdi mdi-pencil" />Update
+                        <span className="mdi mdi-pencil" />Program
                     </Button>
                 </ButtonGroup>
             </Card.Body>
@@ -266,8 +268,10 @@ ControlPanel.propTypes = {
     targetIsMemLoaded: PropTypes.bool.isRequired,
     isJLink: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
+    isMcu: PropTypes.bool.isRequired,
     isModem: PropTypes.bool.isRequired,
     performModemUpdate: PropTypes.func.isRequired,
+    performMcuUpdate: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
 };
 
