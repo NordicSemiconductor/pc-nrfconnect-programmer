@@ -92,7 +92,7 @@ class McuUpdateDialogView extends React.Component {
                         <div>{ mcuFwName }</div>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>Process</Form.Label>
+                        <Form.Label>Status</Form.Label>
                         <div>{progressMsg}</div>
                         <ProgressBar
                             hidden={!isWriting}
