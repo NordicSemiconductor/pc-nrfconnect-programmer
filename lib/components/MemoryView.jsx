@@ -129,7 +129,7 @@ const MemoryView = ({
             { isTarget && isErasing && (
                 <div className="erase-indicator striped active" />
             )}
-            { isTarget && refreshEnabled && (
+            { isTarget && refreshEnabled && !isMcu && (
                 <div className="centering-container">
                     <div className="read-indicator">
                         <p>Device is connected</p>
@@ -142,7 +142,7 @@ const MemoryView = ({
                     <div className="read-indicator">
                         <p>Device is connected</p>
                         <p>This device is programmed with MCUBoot</p>
-                        <p>It is not possible to read and display the memory</p>
+                        <p>It is not possible to read and display the memory via MCUBoot</p>
                         <p>Make sure <strong>MCUBoot mode</strong> is enabled on the device</p>
                     </div>
                 </div>

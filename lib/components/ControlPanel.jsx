@@ -34,8 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import React, { useRef } from 'react';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
@@ -107,32 +107,33 @@ Mru.propTypes = {
 
 
 const ControlPanel = ({
-    openFile,
-    closeFiles,
-    refreshAllFiles,
-    openFileDialog,
-    onToggleFileList,
-    mruFiles,
-    fileRegionSize,
     autoRead,
-    toggleAutoRead,
-    performJLinkRead,
-    performRecover,
-    performRecoverAndWrite,
-    performSaveAsFile,
-    performReset,
-    performModemUpdate,
-    performMcuUpdate,
-    targetIsReady,
-    targetIsWritable,
-    targetIsRecoverable,
-    targetIsMemLoaded,
+    closeFiles,
+    fileRegionSize,
     isJLink,
-    isUsbSerial,
-    performWrite,
     isMcu,
     isMcuFile,
     isModem,
+    isUsbSerial,
+    mruFiles,
+    onToggleFileList,
+    openFile,
+    openFileDialog,
+    performJLinkRead,
+    performMcuUpdate,
+    performModemUpdate,
+    performRecover,
+    performRecoverAndWrite,
+    performReset,
+    performSaveAsFile,
+    performWrite,
+    refreshAllFiles,
+    targetIsMemLoaded,
+    targetIsReady,
+    targetIsRecoverable,
+    targetIsWritable,
+    toggleAutoRead,
+    toggleMcu,
 }) => (
     <div className="control-panel">
         <Card>
@@ -161,7 +162,7 @@ const ControlPanel = ({
                     <Button
                         key="performRecover"
                         onClick={performRecover}
-                        disabled={!isJLink || !targetIsReady || !targetIsRecoverable}
+                        disabled={isMcu || !isJLink || !targetIsReady || !targetIsRecoverable}
                     >
                         <span className="mdi mdi-eraser" />Erase all
                     </Button>
@@ -169,7 +170,8 @@ const ControlPanel = ({
                         key="performRecoverAndWrite"
                         onClick={performRecoverAndWrite}
                         disabled={
-                            !isJLink
+                            isMcu
+                            || !isJLink
                             || !targetIsReady
                             || !fileRegionSize
                             || !(targetIsRecoverable && mruFiles.length)
@@ -201,7 +203,11 @@ const ControlPanel = ({
                     <Button
                         key="performJLinkRead"
                         onClick={performJLinkRead}
-                        disabled={!targetIsReady || !isJLink}
+                        disabled={
+                            isMcu
+                            || !isJLink
+                            || !targetIsReady
+                        }
                     >
                         <span className="mdi mdi-refresh" />Read
                     </Button>
@@ -213,6 +219,14 @@ const ControlPanel = ({
                         onChange={e => toggleAutoRead(e.target.checked)}
                         checked={autoRead}
                         label="Auto read memory"
+                    />
+                    <Form.Check
+                        type="checkbox"
+                        className="last-checkbox"
+                        onChange={e => toggleMcu(e.target.checked)}
+                        checked={isMcu}
+                        label="Enable MCU"
+                        disabled={!isJLink}
                     />
                 </Form.Group>
             </Card.Body>
@@ -231,7 +245,7 @@ const ControlPanel = ({
                 </ButtonGroup>
             </Card.Body>
         </Card>
-        <Card>
+        {/* <Card>
             <Card.Header>MCUBoot</Card.Header>
             <Card.Body>
                 <ButtonGroup vertical>
@@ -244,37 +258,38 @@ const ControlPanel = ({
                     </Button>
                 </ButtonGroup>
             </Card.Body>
-        </Card>
+        </Card> */}
     </div>
 );
 
 ControlPanel.propTypes = {
-    openFile: PropTypes.func.isRequired,
-    closeFiles: PropTypes.func.isRequired,
-    refreshAllFiles: PropTypes.func.isRequired,
-    onToggleFileList: PropTypes.func.isRequired,
-    openFileDialog: PropTypes.func.isRequired,
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
-    fileRegionSize: PropTypes.number.isRequired,
     autoRead: PropTypes.bool.isRequired,
-    toggleAutoRead: PropTypes.func.isRequired,
-    performJLinkRead: PropTypes.func.isRequired,
-    performRecover: PropTypes.func.isRequired,
-    performRecoverAndWrite: PropTypes.func.isRequired,
-    performSaveAsFile: PropTypes.func.isRequired,
-    performReset: PropTypes.func.isRequired,
-    targetIsReady: PropTypes.bool.isRequired,
-    targetIsWritable: PropTypes.bool.isRequired,
-    targetIsRecoverable: PropTypes.bool.isRequired,
-    targetIsMemLoaded: PropTypes.bool.isRequired,
+    closeFiles: PropTypes.func.isRequired,
+    fileRegionSize: PropTypes.number.isRequired,
     isJLink: PropTypes.bool.isRequired,
-    isUsbSerial: PropTypes.bool.isRequired,
     isMcu: PropTypes.bool.isRequired,
     isMcuFile: PropTypes.bool.isRequired,
     isModem: PropTypes.bool.isRequired,
-    performModemUpdate: PropTypes.func.isRequired,
+    isUsbSerial: PropTypes.bool.isRequired,
+    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
+    onToggleFileList: PropTypes.func.isRequired,
+    openFile: PropTypes.func.isRequired,
+    openFileDialog: PropTypes.func.isRequired,
+    performJLinkRead: PropTypes.func.isRequired,
     performMcuUpdate: PropTypes.func.isRequired,
+    performModemUpdate: PropTypes.func.isRequired,
+    performRecover: PropTypes.func.isRequired,
+    performRecoverAndWrite: PropTypes.func.isRequired,
+    performReset: PropTypes.func.isRequired,
+    performSaveAsFile: PropTypes.func.isRequired,
     performWrite: PropTypes.func.isRequired,
+    refreshAllFiles: PropTypes.func.isRequired,
+    targetIsMemLoaded: PropTypes.bool.isRequired,
+    targetIsReady: PropTypes.bool.isRequired,
+    targetIsRecoverable: PropTypes.bool.isRequired,
+    targetIsWritable: PropTypes.bool.isRequired,
+    toggleAutoRead: PropTypes.func.isRequired,
+    toggleMcu: PropTypes.func.isRequired,
 };
 
 export default ControlPanel;
