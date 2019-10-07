@@ -101,6 +101,7 @@ const MemoryView = ({
     fileRegions,
     isTarget,
     isFile,
+    isMcu,
     isWriting,
     isErasing,
     isLoading,
@@ -136,6 +137,16 @@ const MemoryView = ({
                     </div>
                 </div>
             )}
+            { isTarget && isMcu && (
+                <div className="centering-container">
+                    <div className="read-indicator">
+                        <p>Device is connected</p>
+                        <p>This device is programmed with MCUBoot</p>
+                        <p>It is not possible to read and display the memory</p>
+                        <p>Make sure <strong>MCUBoot mode</strong> is enabled on the device</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -146,6 +157,7 @@ MemoryView.propTypes = {
     fileRegions: PropTypes.instanceOf(List).isRequired,
     isTarget: PropTypes.bool.isRequired,
     isFile: PropTypes.bool.isRequired,
+    isMcu: PropTypes.bool.isRequired,
     isWriting: PropTypes.bool.isRequired,
     isErasing: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
