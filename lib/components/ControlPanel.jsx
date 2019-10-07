@@ -130,6 +130,7 @@ const ControlPanel = ({
     isJLink,
     isUsbSerial,
     performWrite,
+    isMcu,
     isMcuFile,
     isModem,
 }) => (
@@ -237,7 +238,7 @@ const ControlPanel = ({
                     <Button
                         key="performMcuUpdate"
                         onClick={performMcuUpdate}
-                        disabled={!isMcuFile || !targetIsReady}
+                        disabled={!isMcu || !isMcuFile || !targetIsReady}
                     >
                         <span className="mdi mdi-pencil" />Program
                     </Button>
@@ -268,6 +269,7 @@ ControlPanel.propTypes = {
     targetIsMemLoaded: PropTypes.bool.isRequired,
     isJLink: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
+    isMcu: PropTypes.bool.isRequired,
     isMcuFile: PropTypes.bool.isRequired,
     isModem: PropTypes.bool.isRequired,
     performModemUpdate: PropTypes.func.isRequired,
