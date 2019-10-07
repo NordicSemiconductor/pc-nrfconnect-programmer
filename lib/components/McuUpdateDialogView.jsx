@@ -78,7 +78,6 @@ class McuUpdateDialogView extends React.Component {
         if (this.intervalId && (isWritingSucceed || isWritingFail)) {
             clearInterval(this.intervalId);
         }
-        const { timer } = this.state;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <Modal.Header>
@@ -145,7 +144,7 @@ McuUpdateDialogView.propTypes = {
     isWritingSucceed: PropTypes.bool.isRequired,
     isWritingFail: PropTypes.bool.isRequired,
     errorMsg: PropTypes.string.isRequired,
-    mcuFwName: PropTypes.string.isRequired,
+    mcuFwName: PropTypes.string,
     progressMsg: PropTypes.string.isRequired,
     progressPercentage: PropTypes.number.isRequired,
     progressDuration: PropTypes.number.isRequired,
@@ -154,6 +153,7 @@ McuUpdateDialogView.propTypes = {
 };
 
 McuUpdateDialogView.defaultProps = {
+    mcuFwName: '',
 };
 
 export default McuUpdateDialogView;
