@@ -69,7 +69,7 @@ class McuUpdateDialogView extends React.Component {
             isWritingSucceed,
             isWritingFail,
             errorMsg,
-            isMcuboot,
+            mcubootFwPath,
             progressMsg,
             progressPercentage,
             progressDuration,
@@ -89,7 +89,7 @@ class McuUpdateDialogView extends React.Component {
                 <Modal.Body>
                     <Form.Group>
                         <Form.Label>Firmware</Form.Label>
-                        <div>{ isMcuboot }</div>
+                        <div>{ mcubootFwPath }</div>
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>Status</Form.Label>
@@ -151,7 +151,7 @@ McuUpdateDialogView.propTypes = {
     isWritingSucceed: PropTypes.bool.isRequired,
     isWritingFail: PropTypes.bool.isRequired,
     errorMsg: PropTypes.string.isRequired,
-    isMcuboot: PropTypes.string,
+    mcubootFwPath: PropTypes.string,
     progressMsg: PropTypes.string.isRequired,
     progressPercentage: PropTypes.number.isRequired,
     progressDuration: PropTypes.number.isRequired,
@@ -160,7 +160,7 @@ McuUpdateDialogView.propTypes = {
 };
 
 McuUpdateDialogView.defaultProps = {
-    isMcuboot: '',
+    mcubootFwPath: '',
 };
 
 export default McuUpdateDialogView;
