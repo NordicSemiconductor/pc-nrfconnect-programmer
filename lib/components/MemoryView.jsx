@@ -141,7 +141,7 @@ const MemoryView = ({
                 <div className="centering-container">
                     <div className="read-indicator">
                         <p>Device is connected</p>
-                        <p>Memory layout is not available via MCUBoot</p>
+                        <p>Memory layout is not available via MCUboot</p>
                     </div>
                 </div>
             )}

@@ -223,7 +223,7 @@ const ControlPanel = ({
                         className="last-checkbox"
                         onChange={e => toggleMcu(e.target.checked)}
                         checked={isMcu}
-                        label="Enable MCU"
+                        label="Enable MCUboot"
                         disabled={!isJLink}
                     />
                 </Form.Group>

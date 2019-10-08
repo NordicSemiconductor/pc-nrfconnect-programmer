@@ -81,7 +81,7 @@ class McuUpdateDialogView extends React.Component {
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <Modal.Header>
-                    <Modal.Title className="modem-dialog-title">MCUBoot DFU</Modal.Title>
+                    <Modal.Title className="modem-dialog-title">MCUboot DFU</Modal.Title>
                     {isWriting && (
                         <span className="mdi mdi-refresh icon-spin" />
                     )}
@@ -106,7 +106,7 @@ class McuUpdateDialogView extends React.Component {
                             <Alert variant="warning">
                                 <p>You are now programming via MCUBoot.</p>
                                 <p>The device will be recovered if you proceed to write.</p>
-                                <p>Make sure the device is in <strong>MCUBoot mode</strong>.</p>
+                                <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
                             </Alert>
                         )}
                         {isWritingSucceed && (
