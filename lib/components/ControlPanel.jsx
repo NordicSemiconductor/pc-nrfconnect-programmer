@@ -112,7 +112,6 @@ const ControlPanel = ({
     fileRegionSize,
     isJLink,
     isMcu,
-    isMcuFile,
     isModem,
     isUsbSerial,
     mruFiles,
@@ -120,7 +119,6 @@ const ControlPanel = ({
     openFile,
     openFileDialog,
     performJLinkRead,
-    performMcuUpdate,
     performModemUpdate,
     performRecover,
     performRecoverAndWrite,
@@ -245,20 +243,6 @@ const ControlPanel = ({
                 </ButtonGroup>
             </Card.Body>
         </Card>
-        {/* <Card>
-            <Card.Header>MCUBoot</Card.Header>
-            <Card.Body>
-                <ButtonGroup vertical>
-                    <Button
-                        key="performMcuUpdate"
-                        onClick={performMcuUpdate}
-                        disabled={!isMcu || !isMcuFile || !targetIsReady}
-                    >
-                        <span className="mdi mdi-pencil" />Program
-                    </Button>
-                </ButtonGroup>
-            </Card.Body>
-        </Card> */}
     </div>
 );
 
@@ -268,7 +252,6 @@ ControlPanel.propTypes = {
     fileRegionSize: PropTypes.number.isRequired,
     isJLink: PropTypes.bool.isRequired,
     isMcu: PropTypes.bool.isRequired,
-    isMcuFile: PropTypes.bool.isRequired,
     isModem: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -276,7 +259,6 @@ ControlPanel.propTypes = {
     openFile: PropTypes.func.isRequired,
     openFileDialog: PropTypes.func.isRequired,
     performJLinkRead: PropTypes.func.isRequired,
-    performMcuUpdate: PropTypes.func.isRequired,
     performModemUpdate: PropTypes.func.isRequired,
     performRecover: PropTypes.func.isRequired,
     performRecoverAndWrite: PropTypes.func.isRequired,
