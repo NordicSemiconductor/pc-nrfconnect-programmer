@@ -111,7 +111,7 @@ const ControlPanel = ({
     closeFiles,
     fileRegionSize,
     isJLink,
-    isMcu,
+    isMcuboot,
     isModem,
     isUsbSerial,
     mruFiles,
@@ -131,7 +131,7 @@ const ControlPanel = ({
     targetIsRecoverable,
     targetIsWritable,
     toggleAutoRead,
-    toggleMcu,
+    toggleMcuboot,
 }) => (
     <div className="control-panel">
         <Card>
@@ -160,7 +160,7 @@ const ControlPanel = ({
                     <Button
                         key="performRecover"
                         onClick={performRecover}
-                        disabled={isMcu || !isJLink || !targetIsReady || !targetIsRecoverable}
+                        disabled={isMcuboot || !isJLink || !targetIsReady || !targetIsRecoverable}
                     >
                         <span className="mdi mdi-eraser" />Erase all
                     </Button>
@@ -168,7 +168,7 @@ const ControlPanel = ({
                         key="performRecoverAndWrite"
                         onClick={performRecoverAndWrite}
                         disabled={
-                            isMcu
+                            isMcuboot
                             || !isJLink
                             || !targetIsReady
                             || !fileRegionSize
@@ -202,7 +202,7 @@ const ControlPanel = ({
                         key="performJLinkRead"
                         onClick={performJLinkRead}
                         disabled={
-                            isMcu
+                            isMcuboot
                             || !isJLink
                             || !targetIsReady
                         }
@@ -221,8 +221,8 @@ const ControlPanel = ({
                     <Form.Check
                         type="checkbox"
                         className="last-checkbox"
-                        onChange={e => toggleMcu(e.target.checked)}
-                        checked={isMcu}
+                        onChange={e => toggleMcuboot(e.target.checked)}
+                        checked={isMcuboot}
                         label="Enable MCUboot"
                         disabled={!isJLink}
                     />
@@ -251,7 +251,7 @@ ControlPanel.propTypes = {
     closeFiles: PropTypes.func.isRequired,
     fileRegionSize: PropTypes.number.isRequired,
     isJLink: PropTypes.bool.isRequired,
-    isMcu: PropTypes.bool.isRequired,
+    isMcuboot: PropTypes.bool.isRequired,
     isModem: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -271,7 +271,7 @@ ControlPanel.propTypes = {
     targetIsRecoverable: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
     toggleAutoRead: PropTypes.func.isRequired,
-    toggleMcu: PropTypes.func.isRequired,
+    toggleMcuboot: PropTypes.func.isRequired,
 };
 
 export default ControlPanel;
