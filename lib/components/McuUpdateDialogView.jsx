@@ -104,7 +104,7 @@ class McuUpdateDialogView extends React.Component {
                     <Form.Group>
                         {!isWriting && !isWritingSucceed && !isWritingFail && (
                             <Alert variant="warning">
-                                <p>You are now programming via MCUBoot.</p>
+                                <p>You are now programming via MCUboot.</p>
                                 <p>The device will be recovered if you proceed to write.</p>
                                 <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
                             </Alert>

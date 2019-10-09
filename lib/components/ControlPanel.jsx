@@ -131,7 +131,6 @@ const ControlPanel = ({
     targetIsRecoverable,
     targetIsWritable,
     toggleAutoRead,
-    toggleMcuboot,
 }) => (
     <div className="control-panel">
         <Card>
@@ -218,14 +217,6 @@ const ControlPanel = ({
                         checked={autoRead}
                         label="Auto read memory"
                     />
-                    <Form.Check
-                        type="checkbox"
-                        className="last-checkbox"
-                        onChange={e => toggleMcuboot(e.target.checked)}
-                        checked={isMcuboot}
-                        label="Enable MCUboot"
-                        disabled={!isJLink}
-                    />
                 </Form.Group>
             </Card.Body>
         </Card>
@@ -271,7 +262,6 @@ ControlPanel.propTypes = {
     targetIsRecoverable: PropTypes.bool.isRequired,
     targetIsWritable: PropTypes.bool.isRequired,
     toggleAutoRead: PropTypes.func.isRequired,
-    toggleMcuboot: PropTypes.func.isRequired,
 };
 
 export default ControlPanel;
