@@ -90,7 +90,7 @@ class ModemUpdateDialogView extends React.Component {
                         <div>{ modemFwName }</div>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>Process</Form.Label>
+                        <Form.Label>Status</Form.Label>
                         <div>{ progressMsg }</div>
                     </Form.Group>
                     <Form.Group>

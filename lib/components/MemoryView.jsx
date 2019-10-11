@@ -101,6 +101,7 @@ const MemoryView = ({
     fileRegions,
     isTarget,
     isFile,
+    isMcuboot,
     isWriting,
     isErasing,
     isLoading,
@@ -128,11 +129,19 @@ const MemoryView = ({
             { isTarget && isErasing && (
                 <div className="erase-indicator striped active" />
             )}
-            { isTarget && refreshEnabled && (
+            { isTarget && refreshEnabled && !isMcuboot && (
                 <div className="centering-container">
                     <div className="read-indicator">
                         <p>Device is connected</p>
                         <p>Press <strong>READ</strong> button to read the memory</p>
+                    </div>
+                </div>
+            )}
+            { isTarget && isMcuboot && (
+                <div className="centering-container">
+                    <div className="read-indicator">
+                        <p>Device is connected</p>
+                        <p>Memory layout is not available via MCUboot</p>
                     </div>
                 </div>
             )}
@@ -146,6 +155,7 @@ MemoryView.propTypes = {
     fileRegions: PropTypes.instanceOf(List).isRequired,
     isTarget: PropTypes.bool.isRequired,
     isFile: PropTypes.bool.isRequired,
+    isMcuboot: PropTypes.bool.isRequired,
     isWriting: PropTypes.bool.isRequired,
     isErasing: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,

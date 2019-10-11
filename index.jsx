@@ -34,17 +34,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
-import { logger } from 'nrfconnect/core';
-import ControlPanel from './lib/containers/controlPanel';
-import AppMainView from './lib/containers/appMainView';
-import { openFile } from './lib/actions/fileActions';
-import { openDevice } from './lib/actions/targetActions';
-import { loadSettings } from './lib/actions/settingsActions';
-import appReducer from './lib/reducers';
-import logJprogVersion from './lib/util/logJprogVersion';
-import { hexpad2, hexToKiB } from './lib/util/hexpad';
 import './resources/css/index.scss';
+
+import { logger } from 'nrfconnect/core';
+import React from 'react';
+
+import { openFile } from './lib/actions/fileActions';
+import { loadSettings } from './lib/actions/settingsActions';
+import { openDevice } from './lib/actions/targetActions';
+import AppMainView from './lib/containers/appMainView';
+import ControlPanel from './lib/containers/controlPanel';
+import appReducer from './lib/reducers';
+import { hexToKiB, hexpad2 } from './lib/util/hexpad';
+import logJprogVersion from './lib/util/logJprogVersion';
 
 let detectedDevices = [];
 let currentDeviceInfo;
