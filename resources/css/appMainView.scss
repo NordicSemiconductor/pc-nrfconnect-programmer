@@ -57,8 +57,24 @@
     .panel-body {
         padding: 1rem;
         background-color: #fff;
-        display: flex;
         flex: 1;
+        display: grid;
+    }
+    .panel-body.vertical {
+        column-gap: 1rem;
+        row-gap: 0.5rem;
+    }
+    .panel-body.stacked {
+        column-gap: 0rem;
+        row-gap: 0rem;
+    }
+    .panel-body.vertical:not(.empty) {
+        grid-template-rows: 1rem;
+        grid-auto-columns: 1fr;
+    }
+    .panel-body.stacked:not(.empty) {
+        grid-template-columns: 1rem;
+        grid-auto-rows: 1fr;
     }
 
     #deviceInfo {
@@ -86,6 +102,36 @@
         color: #9d9d9d;
         padding-top: 20px;
         text-align: center;
+    }
+}
+
+.core-number {
+    text-align: center;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.vertical {
+    .core-number {
+        grid-row: 1;
+    }
+    .region-container {
+        grid-row: 2;
+    }
+}
+
+.stacked {
+    .core-number {
+        grid-column: 1;
+        writing-mode: vertical-rl;
+        border-width: 1px 0;
+        border-color: #ccc;
+        border-style: solid;
+    }
+    .region-container {
+        grid-column: 2;
     }
 }
 
@@ -161,7 +207,7 @@
 }
 
 .hoverable {
-    min-height: 2%;
+    min-height: 0.75rem;
 }
 
 .hoverable:hover::after {

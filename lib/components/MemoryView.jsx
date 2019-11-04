@@ -38,67 +38,80 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import RegionView from '../containers/regionView';
+import { getCoreName } from '../util/devices';
 
-const convertRegionsToViews = (regions, targetSize, active) => {
-    const regionViews = [];
+const CORE_MEMORY_OFFSET = 0x1000000;
+
+const convertRegionsToViews = (regions, targetSize, active, targetFicrBaseAddr) => {
+    const regionViews = [[]];
+    if (regions.size === 0) {
+        return regionViews;
+    }
     let lastAddress = 0;
-    regions.sortBy(r => r.startAddress).forEach(region => {
-        const { startAddress, regionSize } = region;
+    const sortedRegions = regions.sortBy(r => r.startAddress);
+    const lastStartAddress = sortedRegions.last().startAddress;
+    const coreCount = Math.trunc(lastStartAddress / CORE_MEMORY_OFFSET) + 1;
+    const memPerCore = targetSize / coreCount;
 
-        if (startAddress < targetSize) {
-            if (lastAddress === 0) {
-                if (startAddress > 0) {
-                    regionViews.push(
-                        <RegionView
-                            key={lastAddress}
-                            width={startAddress}
-                        />,
-                    );
-                }
-                regionViews.push(
+    sortedRegions.forEach(region => {
+        const { startAddress, regionSize } = region;
+        if (startAddress > targetFicrBaseAddr) {
+            return;
+        }
+        const startAddr = startAddress % targetSize;
+        const core = Math.trunc(startAddress / CORE_MEMORY_OFFSET);
+        if (!regionViews[core]) {
+            regionViews[core] = [];
+        }
+        if (lastAddress === 0) {
+            if (startAddr > 0) {
+                regionViews[core].push(
                     <RegionView
-                        key={startAddress}
-                        region={region}
-                        hoverable
-                        active={active}
-                        width={regionSize}
+                        key={`${core}-${lastAddress}`}
+                        width={startAddr}
                     />,
                 );
-                lastAddress = (startAddress + regionSize) - 1;
-            } else {
-                regionViews.push(
-                    <RegionView
-                        key={lastAddress}
-                        width={startAddress - lastAddress}
-                    />,
-                );
-                regionViews.push(
-                    <RegionView
-                        key={startAddress}
-                        region={region}
-                        hoverable
-                        active={active}
-                        width={regionSize}
-                    />,
-                );
-                lastAddress = (startAddress + regionSize) - 1;
             }
+            regionViews[core].push(
+                <RegionView
+                    key={`${core}-${startAddr}`}
+                    region={region}
+                    hoverable
+                    active={active}
+                    width={regionSize}
+                />,
+            );
+            lastAddress = (startAddr + regionSize) - 1;
+        } else {
+            regionViews[core].push(
+                <RegionView
+                    key={`${core}-${lastAddress}`}
+                    width={startAddr - lastAddress}
+                />,
+            );
+            regionViews[core].push(
+                <RegionView
+                    key={`${core}-${startAddr}`}
+                    region={region}
+                    hoverable
+                    active={active}
+                    width={regionSize}
+                />,
+            );
+            lastAddress = (startAddr + regionSize) - 1;
         }
     });
-    regionViews.push(
-        <RegionView
-            key={lastAddress}
-            width={targetSize - lastAddress}
-        />,
-    );
+    regionViews.forEach((core, index) => {
+        const sum = core.reduce((acc, { props }) => (acc + props.width), 0);
+        core.push(<RegionView key={`${index.toString()}-${sum}`} width={memPerCore - sum} />);
+    });
 
     return regionViews;
 };
 
 const MemoryView = ({
     targetSize,
-    targetRegions,
-    fileRegions,
+    regions,
     isTarget,
     isFile,
     isMcuboot,
@@ -106,53 +119,49 @@ const MemoryView = ({
     isErasing,
     isLoading,
     refreshEnabled,
+    targetFamily,
+    targetFicrBaseAddr,
 }) => {
-    let placeHolder;
-    if (isTarget) {
-        if (isLoading) {
-            // When it is target and during loading, show something.
-            placeHolder = <RegionView width={1} striped active />;
-        } else if (isWriting) {
-            // When it is target and during writing, show file regions active.
-            placeHolder = convertRegionsToViews(fileRegions, targetSize, true);
-        } else {
-            // When it is target and regions are known, show target regions without animation.
-            placeHolder = convertRegionsToViews(targetRegions, targetSize);
-        }
-    } else if (isFile) {
-        // When it is file, show file regions without animation.
-        placeHolder = convertRegionsToViews(fileRegions, targetSize);
-    }
+    const placeHolder = (isTarget && isLoading)
+        // When it is target and during loading, show something.
+        ? [<RegionView width={1} striped active />]
+        // When it is target and during writing, show file regions active.
+        : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
+
     return (
-        <div className="region-container">
-            { placeHolder }
-            { isTarget && isErasing && (
-                <div className="erase-indicator striped active" />
-            )}
-            { isTarget && refreshEnabled && !isMcuboot && (
-                <div className="centering-container">
-                    <div className="read-indicator">
-                        <p>Device is connected</p>
-                        <p>Press <strong>READ</strong> button to read the memory</p>
-                    </div>
+        placeHolder.map((coreRegionViews, index) => (
+            <React.Fragment key={index.toString()}>
+                <span className="core-number">{getCoreName(targetFamily, index)}</span>
+                <div className="region-container">
+                    { coreRegionViews }
+                    { isTarget && isErasing && (
+                        <div className="erase-indicator striped active" />
+                    )}
+                    { isTarget && refreshEnabled && (
+                        <div className="centering-container">
+                            <div className="read-indicator">
+                                <p>Device is connected</p>
+                                <p>Press <strong>READ</strong> button to read the memory</p>
+                            </div>
+                        </div>
+                    )}
+                    { isTarget && isMcuboot && (
+                        <div className="centering-container">
+                            <div className="read-indicator">
+                                <p>Device is connected</p>
+                                <p>Memory layout is not available via MCUboot</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
-            { isTarget && isMcuboot && (
-                <div className="centering-container">
-                    <div className="read-indicator">
-                        <p>Device is connected</p>
-                        <p>Memory layout is not available via MCUboot</p>
-                    </div>
-                </div>
-            )}
-        </div>
+            </React.Fragment>
+        ))
     );
 };
 
 MemoryView.propTypes = {
     targetSize: PropTypes.number.isRequired,
-    targetRegions: PropTypes.instanceOf(List).isRequired,
-    fileRegions: PropTypes.instanceOf(List).isRequired,
+    regions: PropTypes.instanceOf(List).isRequired,
     isTarget: PropTypes.bool.isRequired,
     isFile: PropTypes.bool.isRequired,
     isMcuboot: PropTypes.bool.isRequired,
@@ -160,6 +169,8 @@ MemoryView.propTypes = {
     isErasing: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
+    targetFamily: PropTypes.string.isRequired,
+    targetFicrBaseAddr: PropTypes.number.isRequired,
 };
 
 export default MemoryView;
