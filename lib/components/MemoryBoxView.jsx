@@ -77,7 +77,7 @@ const MemoryBoxView = ({
                     <DeviceInfoView />
                 </Popover>
             )}
-            <Card.Body className="panel-body">
+            <Card.Body className={`panel-body ${isHolder && 'empty'} stacked`}>
                 { isHolder && (
                     <div className="memory-layout-container">
                         <h1>
