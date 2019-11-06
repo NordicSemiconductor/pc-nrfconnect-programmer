@@ -106,11 +106,6 @@ const CoreView = ({
             }
         }
     });
-    console.log(core);
-    console.log('last address');
-    console.log(romBaseAddr + romSize);
-    console.log(lastAddress);
-    console.log(romBaseAddr + romSize - lastAddress);
     regionViews.push(
         <RegionView
             key={lastAddress}
