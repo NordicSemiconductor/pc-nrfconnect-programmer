@@ -38,11 +38,24 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import RegionView from '../containers/regionView';
+import CoreView from '../containers/coreView';
 import { getCoreName } from '../util/devices';
 
 const CORE_MEMORY_OFFSET = 0x1000000;
 
-const convertRegionsToViews = (regions, targetSize, active, targetFicrBaseAddr) => {
+const allocateCores = (cores, regions) => Object.values(cores).map(core => ({
+    ...core,
+    regions: regions.filter(r => r.startAddress >= core.romBaseAddr
+        && (r.startAddress + r.size) <= (core.romBaseAddr + core.romSize)),
+}));
+
+const convertRegionsToViews = (
+    regions,
+    targetSize,
+    active,
+    targetFicrBaseAddr,
+    targetCores,
+) => {
     const regionViews = [[]];
     if (regions.size === 0) {
         return regionViews;
@@ -109,8 +122,96 @@ const convertRegionsToViews = (regions, targetSize, active, targetFicrBaseAddr) 
     return regionViews;
 };
 
+// const convertRegionsToViews = (
+//     regions,
+//     coreNumber,
+//     coreRomBaseAddr,
+//     coreSize,
+//     coreFicrBaseAddr,
+// ) => {
+//     const regionViews = [[]];
+//     if (regions.size === 0) {
+//         return regionViews;
+//     }
+//     let lastAddress = coreRomBaseAddr;
+//     const sortedRegions = regions.sortBy(r => r.startAddress);
+//     const lastStartAddress = sortedRegions.last().startAddress;
+//     const coreCount = Math.trunc(lastStartAddress / CORE_MEMORY_OFFSET) + 1;
+//     const memPerCore = coreSize / coreCount;
+
+//     sortedRegions.forEach(region => {
+//         const { startAddress, regionSize } = region;
+//         if (startAddress > coreFicrBaseAddr) {
+//             return;
+//         }
+//         const startAddr = startAddress % core;
+//         const core = Math.trunc(startAddress / CORE_MEMORY_OFFSET);
+//         if (!regionViews[core]) {
+//             regionViews[core] = [];
+//         }
+//         if (lastAddress === 0) {
+//             if (startAddr > 0) {
+//                 regionViews[core].push(
+//                     <RegionView
+//                         key={`${core}-${lastAddress}`}
+//                         width={startAddr}
+//                     />,
+//                 );
+//             }
+//             regionViews[core].push(
+//                 <RegionView
+//                     key={`${core}-${startAddr}`}
+//                     region={region}
+//                     hoverable
+//                     active={active}
+//                     width={regionSize}
+//                 />,
+//             );
+//             lastAddress = (startAddr + regionSize) - 1;
+//         } else {
+//             regionViews[core].push(
+//                 <RegionView
+//                     key={`${core}-${lastAddress}`}
+//                     width={startAddr - lastAddress}
+//                 />,
+//             );
+//             regionViews[core].push(
+//                 <RegionView
+//                     key={`${core}-${startAddr}`}
+//                     region={region}
+//                     hoverable
+//                     active={active}
+//                     width={regionSize}
+//                 />,
+//             );
+//             lastAddress = (startAddr + regionSize) - 1;
+//         }
+//     });
+//     regionViews.forEach((core, index) => {
+//         const sum = core.reduce((acc, { props }) => (acc + props.width), 0);
+//         core.push(<RegionView key={`${index.toString()}-${sum}`} width={memPerCore - sum} />);
+//     });
+
+//     return regionViews;
+// };
+
+
+const convertCoresToViews = (targetCores, regions, active) => {
+    const sortedCores = allocateCores(targetCores, regions)
+        .sort((a, b) => b.romBaseAddr - a.romBaseAddr);
+
+    return sortedCores.map(c => {
+        return (
+            <CoreView
+                core={c}
+                active={active}
+            />
+
+        );
+    });
+};
+
 const MemoryView = ({
-    targetSize,
     regions,
     isTarget,
     isMcuboot,
@@ -119,20 +220,24 @@ const MemoryView = ({
     isLoading,
     refreshEnabled,
     targetFamily,
-    targetFicrBaseAddr,
+    targetCores,
 }) => {
     const placeHolder = (isTarget && isLoading)
         // When it is target and during loading, show something.
         ? [<RegionView width={1} striped active />]
         // When it is target and during writing, show file regions active.
-        : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
-
+        // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
+        : convertCoresToViews(targetCores, regions, isTarget && isWriting);
     return (
-        placeHolder.map((coreRegionViews, index) => (
+        placeHolder.map((coreView, index) => (
             <React.Fragment key={index.toString()}>
-                <span className="core-number">{getCoreName(targetFamily, index)}</span>
-                <div className="region-container">
-                    { coreRegionViews }
+                <div
+                    className="core-container"
+                    style={{
+                        flex: coreView.props.core.romSize,
+                    }}
+                >
+                    { coreView }
                     { isTarget && isErasing && (
                         <div className="erase-indicator striped active" />
                     )}
@@ -159,7 +264,6 @@ const MemoryView = ({
 };
 
 MemoryView.propTypes = {
-    targetSize: PropTypes.number.isRequired,
     regions: PropTypes.instanceOf(List).isRequired,
     isTarget: PropTypes.bool.isRequired,
     isMcuboot: PropTypes.bool.isRequired,
@@ -168,7 +272,7 @@ MemoryView.propTypes = {
     isLoading: PropTypes.bool.isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
     targetFamily: PropTypes.string.isRequired,
-    targetFicrBaseAddr: PropTypes.number.isRequired,
+    targetCores: PropTypes.shape({}).isRequired,
 };
 
 export default MemoryView;

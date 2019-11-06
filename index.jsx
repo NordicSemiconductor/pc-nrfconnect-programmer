@@ -121,7 +121,7 @@ export default {
             }
 
             case 'TARGET_INFO_KNOWN': {
-                currentDeviceInfo = { ...action.deviceInfo.toJS() };
+                currentDeviceInfo = { ...action.deviceInfo };
                 break;
             }
 

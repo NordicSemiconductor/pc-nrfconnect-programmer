@@ -58,7 +58,8 @@
         padding: 1rem;
         background-color: #fff;
         flex: 1;
-        display: grid;
+        display: flex;
+        flex-direction: column;
     }
     .panel-body.vertical {
         column-gap: 1rem;
@@ -135,13 +136,14 @@
     }
 }
 
-.region-container {
+.core-container {
     display: flex;
     flex-direction: column-reverse;
     height: 100%;
     width: 100%;
     align-self: center;
     position: relative;
+    margin-top: 8px;
 
     .region {
         position: relative;
