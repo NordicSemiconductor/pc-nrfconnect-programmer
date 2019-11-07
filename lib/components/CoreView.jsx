@@ -79,6 +79,7 @@ const CoreView = ({
                     regionViews.push(
                         <RegionView
                             key={lastAddress}
+                            core={core}
                             width={startAddress}
                         />,
                     );
@@ -90,6 +91,7 @@ const CoreView = ({
                 regionViews.push(
                     <RegionView
                         key={lastAddress}
+                        core={core}
                         width={startAddress - lastAddress}
                     />,
                 );
@@ -109,6 +111,7 @@ const CoreView = ({
     regionViews.push(
         <RegionView
             key={lastAddress}
+            core={core}
             width={romBaseAddr + romSize - lastAddress}
         />,
     );

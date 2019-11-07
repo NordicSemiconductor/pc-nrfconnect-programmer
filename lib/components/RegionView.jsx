@@ -40,6 +40,7 @@ import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import RegionInfoView from './RegionInfoView';
+import CoreInfoView from './CoreInfoView';
 
 class RegionView extends React.Component {
     render() {
@@ -49,6 +50,7 @@ class RegionView extends React.Component {
             striped,
             hoverable,
             region,
+            core,
             removeFile,
         } = this.props;
         const color = region ? region.color : '#d9e1e2';
@@ -90,7 +92,18 @@ class RegionView extends React.Component {
             </OverlayTrigger>
         );
 
-        return region ? overlayRegionView : singleRegionView;
+        const overlayCoreView = region ? null : (
+            <OverlayTrigger
+                overlay={CoreInfoView(core, this)}
+                trigger={['focus', 'hover']}
+                placement="right"
+                ref={r => { this.triggerRef = r; }}
+            >
+                { singleRegionView }
+            </OverlayTrigger>
+        );
+
+        return region ? overlayRegionView : overlayCoreView;
     }
 }
 
@@ -101,6 +114,7 @@ RegionView.propTypes = {
     striped: PropTypes.bool,
     hoverable: PropTypes.bool,
     region: PropTypes.instanceOf(Object),
+    core: PropTypes.instanceOf(Object),
 };
 
 RegionView.defaultProps = {
@@ -108,6 +122,7 @@ RegionView.defaultProps = {
     striped: false,
     hoverable: false,
     region: null,
+    core: null,
 };
 
 export default RegionView;
