@@ -143,7 +143,7 @@
     width: 100%;
     align-self: center;
     position: relative;
-    margin-top: 8px;
+    margin-bottom: 16px;
 
     .region {
         position: relative;
@@ -195,6 +195,10 @@
         color: white;
         font-size: 16px;
     }
+}
+
+.core-container:last-child {
+    margin-bottom: 0;
 }
 
 .centering-container {
