@@ -104,7 +104,6 @@ export default {
     middleware: store => next => action => {
         const { dispatch } = store;
 
-        console.log(action);
         switch (action.type) {
             case 'DEVICE_SETUP_COMPLETE': {
                 dispatch(openDevice(action.device));

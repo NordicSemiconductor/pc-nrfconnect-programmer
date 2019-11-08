@@ -45,23 +45,31 @@ const CoreView = ({
     active,
 }) => {
     const { regions, romSize, romBaseAddr } = core;
-
     const regionViews = [];
-    let lastAddress = romBaseAddr;
+
+    if (!regions || regions.size <= 0) {
+        return [(
+            <RegionView
+                key={0}
+                core={core}
+                width={1}
+                active={active}
+            />
+        )];
+    }
 
     // Sort the regions by start address and generate a view for it, also
     // generate a gap view between regions
+    let lastAddress = romBaseAddr;
     regions.sortBy(r => r.startAddress).forEach(region => {
         const { startAddress, regionSize } = region;
 
+        // Generate the region view only if it is inside the ROM
         if (startAddress < (romBaseAddr + romSize)) {
-            // Generate the region view only if it is inside the ROM
-
+            // Start to generate views from the base address
             if (lastAddress === romBaseAddr) {
-                // Start to generate views from the base address
-
+                // Generate a region view if the region starts with the base address
                 if (startAddress === romBaseAddr) {
-                    // Generate a region view if the region starts with the base address
                     regionViews.push(
                         <RegionView
                             key={startAddress}
@@ -73,8 +81,8 @@ const CoreView = ({
                     );
                 }
 
+                // Generate a gap view if the region does not start with the base address
                 if (startAddress > romBaseAddr) {
-                    // Generate a gap view if the region does not start with the base address
                     regionViews.push(
                         <RegionView
                             key={lastAddress}
@@ -103,6 +111,8 @@ const CoreView = ({
                         width={regionSize}
                     />,
                 );
+
+                // Update lastAddress
                 lastAddress = (startAddress + regionSize) - 1;
             }
         }
