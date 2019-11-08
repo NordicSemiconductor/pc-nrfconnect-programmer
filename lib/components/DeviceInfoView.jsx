@@ -63,7 +63,7 @@ const DeviceInfoView = ({
             <h5>Communication Type</h5>
             <p>{getCommunicationType(targetType)}</p>
         </div>
-        {deviceInfo && deviceInfo.romSize && (
+        {/* {deviceInfo && deviceInfo.romSize && (
             <div>
                 <h5>ROM Size</h5>
                 <p>{hexToKiB(deviceInfo.romSize)}</p>
@@ -80,7 +80,7 @@ const DeviceInfoView = ({
                 <h5>Page Size</h5>
                 <p>{hexToKiB(deviceInfo.pageSize)}</p>
             </div>
-        )}
+        )} */}
         {targetType === CommunicationType.JLINK && (
             <div>
                 <h5>Device memory is loaded?</h5>
