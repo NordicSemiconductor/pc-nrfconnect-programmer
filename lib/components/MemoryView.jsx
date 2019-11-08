@@ -65,9 +65,13 @@ const MemoryView = ({
     refreshEnabled,
     targetCores,
 }) => {
+    const placeHolderCore = {
+        ...targetCores.core0,
+
+    };
     const placeHolder = (isTarget && isLoading)
         // When it is target and during loading, show something.
-        ? [<RegionView width={1} striped active />]
+        ? [<CoreView width={1} striped active core={targetCores.core0} />]
         // When it is target and during writing, show file regions active.
         // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
         : convertCoresToViews(targetCores, regions, isTarget && isWriting);
