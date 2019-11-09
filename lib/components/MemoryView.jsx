@@ -74,9 +74,6 @@ const MemoryView = ({
         // When it is target and during writing, show file regions active.
         // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
         : convertCoresToViews(targetCores, regions, isTarget && isWriting);
-    console.log('memory');
-    console.log(isTarget);
-    console.log(regions);
     return (
         placeHolder.map((coreView, index) => (
             <React.Fragment key={index.toString()}>
