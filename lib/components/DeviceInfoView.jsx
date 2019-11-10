@@ -34,10 +34,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
-import { hexToKiB } from '../util/hexpad';
-import { getCommunicationType, CommunicationType } from '../util/devices';
+import React from 'react';
+
+import { CommunicationType, getCommunicationType } from '../util/devices';
 
 const DeviceInfoView = ({
     serialNumber,
@@ -63,24 +63,12 @@ const DeviceInfoView = ({
             <h5>Communication Type</h5>
             <p>{getCommunicationType(targetType)}</p>
         </div>
-        {/* {deviceInfo && deviceInfo.romSize && (
+        {deviceInfo && deviceInfo.cores && (
             <div>
-                <h5>ROM Size</h5>
-                <p>{hexToKiB(deviceInfo.romSize)}</p>
+                <h5>Core Number</h5>
+                <p>{deviceInfo.cores.length}</p>
             </div>
         )}
-        {deviceInfo && deviceInfo.ramSize && (
-            <div>
-                <h5>RAM Size</h5>
-                <p>{hexToKiB(deviceInfo.ramSize)}</p>
-            </div>
-        )}
-        {deviceInfo && deviceInfo.pageSize && (
-            <div>
-                <h5>Page Size</h5>
-                <p>{hexToKiB(deviceInfo.pageSize)}</p>
-            </div>
-        )} */}
         {targetType === CommunicationType.JLINK && (
             <div>
                 <h5>Device memory is loaded?</h5>
@@ -91,11 +79,11 @@ const DeviceInfoView = ({
 );
 
 DeviceInfoView.propTypes = {
-    serialNumber: PropTypes.string.isRequired,
-    port: PropTypes.string,
-    targetType: PropTypes.number.isRequired,
-    isMemLoaded: PropTypes.bool.isRequired,
     deviceInfo: PropTypes.instanceOf(Object).isRequired,
+    isMemLoaded: PropTypes.bool.isRequired,
+    port: PropTypes.string,
+    serialNumber: PropTypes.string.isRequired,
+    targetType: PropTypes.number.isRequired,
 };
 
 DeviceInfoView.defaultProps = {
