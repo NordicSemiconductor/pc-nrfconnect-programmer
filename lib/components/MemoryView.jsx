@@ -39,7 +39,7 @@ import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import CoreView from '../containers/coreView';
 
-const allocateCores = (cores, regions) => Object.values(cores).map(core => ({
+const allocateCores = (cores, regions) => cores.map(core => ({
     ...core,
     regions: regions.filter(r => r.startAddress >= core.romBaseAddr
         && (r.startAddress + r.size) <= (core.romBaseAddr + core.romSize)),
@@ -64,13 +64,10 @@ const MemoryView = ({
     refreshEnabled,
     targetCores,
 }) => {
-    const placeHolderCore = {
-        ...targetCores.core0,
-
-    };
+    console.log(targetCores);
     const placeHolder = (isTarget && isLoading)
         // When it is target and during loading, show something.
-        ? [<CoreView width={1} striped active core={targetCores.core0} />]
+        ? [<CoreView width={1} striped active core={targetCores[0]} />]
         // When it is target and during writing, show file regions active.
         // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
         : convertCoresToViews(targetCores, regions, isTarget && isWriting);
@@ -118,7 +115,7 @@ MemoryView.propTypes = {
     isLoading: PropTypes.bool.isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
     targetFamily: PropTypes.string.isRequired,
-    targetCores: PropTypes.shape({}).isRequired,
+    targetCores: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
 export default MemoryView;
