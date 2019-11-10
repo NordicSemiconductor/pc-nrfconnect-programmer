@@ -46,7 +46,6 @@ const CoreView = ({
 }) => {
     const { regions, romSize, romBaseAddr } = core;
     const regionViews = [];
-
     if (!regions || regions.size <= 0) {
         return [(
             <RegionView
@@ -88,6 +87,15 @@ const CoreView = ({
                             key={lastAddress}
                             core={core}
                             width={startAddress}
+                        />,
+                    );
+                    regionViews.push(
+                        <RegionView
+                            key={startAddress}
+                            region={region}
+                            hoverable
+                            active={active}
+                            width={regionSize}
                         />,
                     );
                 }
