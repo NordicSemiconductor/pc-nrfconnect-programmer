@@ -64,7 +64,6 @@ const MemoryView = ({
     refreshEnabled,
     targetCores,
 }) => {
-    console.log(targetCores);
     const placeHolder = (isTarget && isLoading)
         // When it is target and during loading, show something.
         ? [<CoreView width={1} striped active core={targetCores[0]} />]
