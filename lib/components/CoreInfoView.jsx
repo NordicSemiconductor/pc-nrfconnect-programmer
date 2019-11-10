@@ -34,10 +34,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import Popover from 'react-bootstrap/Popover';
-import { basename } from 'path';
+
 import { hexpad8 } from '../util/hexpad';
 
 const CoreInfoView = ({
