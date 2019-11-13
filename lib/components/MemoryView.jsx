@@ -37,129 +37,84 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
-import RegionView from '../containers/regionView';
+import CoreView from './CoreView';
 
-const convertRegionsToViews = (regions, targetSize, active) => {
-    const regionViews = [];
-    let lastAddress = 0;
-    regions.sortBy(r => r.startAddress).forEach(region => {
-        const { startAddress, regionSize } = region;
+const allocateCores = (cores, regions) => cores.map(core => ({
+    ...core,
+    regions: regions.filter(r => r.startAddress >= core.romBaseAddr
+        && (r.startAddress + r.size) <= (core.romBaseAddr + core.romSize)),
+}));
 
-        if (startAddress < targetSize) {
-            if (lastAddress === 0) {
-                if (startAddress > 0) {
-                    regionViews.push(
-                        <RegionView
-                            key={lastAddress}
-                            width={startAddress}
-                        />,
-                    );
-                }
-                regionViews.push(
-                    <RegionView
-                        key={startAddress}
-                        region={region}
-                        hoverable
-                        active={active}
-                        width={regionSize}
-                    />,
-                );
-                lastAddress = (startAddress + regionSize) - 1;
-            } else {
-                regionViews.push(
-                    <RegionView
-                        key={lastAddress}
-                        width={startAddress - lastAddress}
-                    />,
-                );
-                regionViews.push(
-                    <RegionView
-                        key={startAddress}
-                        region={region}
-                        hoverable
-                        active={active}
-                        width={regionSize}
-                    />,
-                );
-                lastAddress = (startAddress + regionSize) - 1;
-            }
-        }
-    });
-    regionViews.push(
-        <RegionView
-            key={lastAddress}
-            width={targetSize - lastAddress}
-        />,
-    );
-
-    return regionViews;
-};
+const convertCoresToViews = (targetCores, regions, active) => (allocateCores(targetCores, regions)
+    .sort((a, b) => b.romBaseAddr - a.romBaseAddr)
+    .map(c => (
+        <CoreView
+            core={c}
+            active={active}
+        />
+    )));
 
 const MemoryView = ({
-    targetSize,
-    targetRegions,
-    fileRegions,
+    regions,
     isTarget,
-    isFile,
     isMcuboot,
     isWriting,
     isErasing,
     isLoading,
     refreshEnabled,
+    targetCores,
 }) => {
-    let placeHolder;
-    if (isTarget) {
-        if (isLoading) {
-            // When it is target and during loading, show something.
-            placeHolder = <RegionView width={1} striped active />;
-        } else if (isWriting) {
-            // When it is target and during writing, show file regions active.
-            placeHolder = convertRegionsToViews(fileRegions, targetSize, true);
-        } else {
-            // When it is target and regions are known, show target regions without animation.
-            placeHolder = convertRegionsToViews(targetRegions, targetSize);
-        }
-    } else if (isFile) {
-        // When it is file, show file regions without animation.
-        placeHolder = convertRegionsToViews(fileRegions, targetSize);
-    }
+    const placeHolder = (isTarget && isLoading)
+        // When it is target and during loading, show something.
+        ? [<CoreView width={1} striped active core={targetCores[0]} />]
+        // When it is target and during writing, show file regions active.
+        // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
+        : convertCoresToViews(targetCores, regions, isTarget && isWriting);
     return (
-        <div className="region-container">
-            { placeHolder }
-            { isTarget && isErasing && (
-                <div className="erase-indicator striped active" />
-            )}
-            { isTarget && refreshEnabled && !isMcuboot && (
-                <div className="centering-container">
-                    <div className="read-indicator">
-                        <p>Device is connected</p>
-                        <p>Press <strong>READ</strong> button to read the memory</p>
-                    </div>
+        placeHolder.map((coreView, index) => (
+            <React.Fragment key={index.toString()}>
+                <div
+                    className="core-container"
+                    style={{
+                        flex: coreView.props.core.romSize,
+                    }}
+                >
+                    { coreView }
+                    { isTarget && isErasing && (
+                        <div className="erase-indicator striped active" />
+                    )}
+                    { isTarget && refreshEnabled && (
+                        <div className="centering-container">
+                            <div className="read-indicator">
+                                <p>Device is connected</p>
+                                <p>Press <strong>READ</strong> button to read the memory</p>
+                            </div>
+                        </div>
+                    )}
+                    { isTarget && isMcuboot && (
+                        <div className="centering-container">
+                            <div className="read-indicator">
+                                <p>Device is connected</p>
+                                <p>Memory layout is not available via MCUboot</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
-            { isTarget && isMcuboot && (
-                <div className="centering-container">
-                    <div className="read-indicator">
-                        <p>Device is connected</p>
-                        <p>Memory layout is not available via MCUboot</p>
-                    </div>
-                </div>
-            )}
-        </div>
+            </React.Fragment>
+        ))
     );
 };
 
 MemoryView.propTypes = {
-    targetSize: PropTypes.number.isRequired,
-    targetRegions: PropTypes.instanceOf(List).isRequired,
-    fileRegions: PropTypes.instanceOf(List).isRequired,
+    regions: PropTypes.instanceOf(List).isRequired,
     isTarget: PropTypes.bool.isRequired,
-    isFile: PropTypes.bool.isRequired,
     isMcuboot: PropTypes.bool.isRequired,
     isWriting: PropTypes.bool.isRequired,
     isErasing: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
+    targetFamily: PropTypes.string.isRequired,
+    targetCores: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
 export default MemoryView;

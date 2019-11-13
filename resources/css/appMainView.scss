@@ -57,8 +57,25 @@
     .panel-body {
         padding: 1rem;
         background-color: #fff;
-        display: flex;
         flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .panel-body.vertical {
+        column-gap: 1rem;
+        row-gap: 0.5rem;
+    }
+    .panel-body.stacked {
+        column-gap: 0rem;
+        row-gap: 0rem;
+    }
+    .panel-body.vertical:not(.empty) {
+        grid-template-rows: 1rem;
+        grid-auto-columns: 1fr;
+    }
+    .panel-body.stacked:not(.empty) {
+        grid-template-columns: 1rem;
+        grid-auto-rows: 1fr;
     }
 
     #deviceInfo {
@@ -89,13 +106,44 @@
     }
 }
 
-.region-container {
+.core-number {
+    text-align: center;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.vertical {
+    .core-number {
+        grid-row: 1;
+    }
+    .region-container {
+        grid-row: 2;
+    }
+}
+
+.stacked {
+    .core-number {
+        grid-column: 1;
+        writing-mode: vertical-rl;
+        border-width: 1px 0;
+        border-color: #ccc;
+        border-style: solid;
+    }
+    .region-container {
+        grid-column: 2;
+    }
+}
+
+.core-container {
     display: flex;
     flex-direction: column-reverse;
     height: 100%;
     width: 100%;
     align-self: center;
     position: relative;
+    margin-bottom: 16px;
 
     .region {
         position: relative;
@@ -149,6 +197,10 @@
     }
 }
 
+.core-container:last-child {
+    margin-bottom: 0;
+}
+
 .centering-container {
     position: absolute;
     top: 0;
@@ -161,7 +213,7 @@
 }
 
 .hoverable {
-    min-height: 2%;
+    min-height: 0.75rem;
 }
 
 .hoverable:hover::after {

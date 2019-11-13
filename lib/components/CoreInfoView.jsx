@@ -36,58 +36,46 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import Popover from 'react-bootstrap/Popover';
 
-import { CommunicationType, getCommunicationType } from '../util/devices';
+import { hexpad8 } from '../util/hexpad';
 
-const DeviceInfoView = ({
-    serialNumber,
-    port,
-    targetType,
-    deviceInfo,
-    isMemLoaded,
-}) => (
-    <div className="memory-details">
-        {serialNumber && (
+const CoreInfoView = ({
+    name, romBaseAddr, romSize,
+}, parent) => (
+    <Popover
+        id="popover-region"
+        className="memory-details"
+        onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
+        onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
+        onFocus={() => {}}
+        onBlur={() => {}}
+    >
+        { name && (
             <div>
-                <h5>Serial Number</h5>
-                <p>{serialNumber}</p>
-            </div>
-        )}
-        {port && (
-            <div>
-                <h5>Port</h5>
-                <p>{port}</p>
+                <h5>Core name</h5>
+                <p>{ name }</p>
             </div>
         )}
         <div>
-            <h5>Communication Type</h5>
-            <p>{getCommunicationType(targetType)}</p>
+            <h5>Address range</h5>
+            <p>{ hexpad8(romBaseAddr) } &mdash; { hexpad8(romBaseAddr + romSize) }</p>
         </div>
-        {deviceInfo && deviceInfo.cores && (
-            <div>
-                <h5>Core Number</h5>
-                <p>{deviceInfo.cores.length}</p>
-            </div>
-        )}
-        {targetType === CommunicationType.JLINK && (
-            <div>
-                <h5>Device memory is loaded?</h5>
-                <p>{isMemLoaded ? 'Yes' : 'No'}</p>
-            </div>
-        )}
-    </div>
+        <div>
+            <h5>Size</h5>
+            <p>{ romSize } bytes</p>
+        </div>
+    </Popover>
 );
 
-DeviceInfoView.propTypes = {
-    deviceInfo: PropTypes.instanceOf(Object).isRequired,
-    isMemLoaded: PropTypes.bool.isRequired,
-    port: PropTypes.string,
-    serialNumber: PropTypes.string.isRequired,
-    targetType: PropTypes.number.isRequired,
+CoreInfoView.propTypes = {
+    name: PropTypes.string,
+    romBaseAddr: PropTypes.number.isRequired,
+    romSize: PropTypes.number.isRequired,
 };
 
-DeviceInfoView.defaultProps = {
-    port: null,
+CoreInfoView.defaultProps = {
+    name: null,
 };
 
-export default DeviceInfoView;
+export default CoreInfoView;
