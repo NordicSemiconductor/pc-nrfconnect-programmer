@@ -71,6 +71,7 @@ class ModemUpdateDialogView extends React.Component {
             modemFwName,
             progressMsg,
             onCancel,
+            isMcuboot,
         } = this.props;
         if (this.intervalId && (isWritingSucceed || isWritingFail)) {
             clearInterval(this.intervalId);
@@ -79,7 +80,10 @@ class ModemUpdateDialogView extends React.Component {
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <Modal.Header>
-                    <Modal.Title className="modem-dialog-title">Modem DFU</Modal.Title>
+                    <Modal.Title className="modem-dialog-title">
+                        Modem DFU
+                        {isMcuboot && (' via MCUboot')}
+                    </Modal.Title>
                     {isWriting && (
                         <span className="mdi mdi-refresh icon-spin" />
                     )}
@@ -105,6 +109,15 @@ class ModemUpdateDialogView extends React.Component {
                             </Alert>
                         )}
                     </Form.Group>
+                    {isMcuboot && (
+                        <Form.Group>
+                            <Alert variant="warning">
+                                <p>You are now proceeding modem DFU via MCUboot.</p>
+                                <p>The device will be recovered if you proceed to write.</p>
+                                <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
+                            </Alert>
+                        </Form.Group>
+                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     {!isWritingSucceed && (
@@ -140,6 +153,7 @@ ModemUpdateDialogView.propTypes = {
     progressMsg: PropTypes.string.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
+    isMcuboot: PropTypes.bool.isRequired,
 };
 
 ModemUpdateDialogView.defaultProps = {
