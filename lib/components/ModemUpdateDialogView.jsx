@@ -98,6 +98,13 @@ class ModemUpdateDialogView extends React.Component {
                         <div>{ progressMsg }</div>
                     </Form.Group>
                     <Form.Group>
+                        {isMcuboot && !isWriting && !isWritingSucceed && !isWritingFail && (
+                            <Alert variant="warning">
+                                <p>You are now proceeding modem DFU via MCUboot.</p>
+                                <p>The device will be recovered if you proceed to write.</p>
+                                <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
+                            </Alert>
+                        )}
                         {isWritingSucceed && (
                             <Alert variant="success">
                                 Completed successfully in {timer} seconds.
@@ -109,15 +116,6 @@ class ModemUpdateDialogView extends React.Component {
                             </Alert>
                         )}
                     </Form.Group>
-                    {isMcuboot && (
-                        <Form.Group>
-                            <Alert variant="warning">
-                                <p>You are now proceeding modem DFU via MCUboot.</p>
-                                <p>The device will be recovered if you proceed to write.</p>
-                                <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
-                            </Alert>
-                        </Form.Group>
-                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     {!isWritingSucceed && (
