@@ -34,12 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 
 class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -70,6 +71,8 @@ class ModemUpdateDialogView extends React.Component {
             errorMsg,
             modemFwName,
             progressMsg,
+            progressPercentage,
+            progressDuration,
             onCancel,
             isMcuboot,
         } = this.props;
@@ -96,6 +99,14 @@ class ModemUpdateDialogView extends React.Component {
                     <Form.Group>
                         <Form.Label>Status</Form.Label>
                         <div>{ progressMsg }</div>
+                        {isMcuboot && isWriting && (
+                            <ProgressBar
+                                hidden={!isWriting}
+                                animated
+                                now={progressPercentage}
+                                label={`${progressPercentage}%`}
+                            />
+                        )}
                     </Form.Group>
                     <Form.Group>
                         {isMcuboot && !isWriting && !isWritingSucceed && !isWritingFail && (
@@ -149,6 +160,8 @@ ModemUpdateDialogView.propTypes = {
     errorMsg: PropTypes.string.isRequired,
     modemFwName: PropTypes.string.isRequired,
     progressMsg: PropTypes.string.isRequired,
+    progressPercentage: PropTypes.number.isRequired,
+    progressDuration: PropTypes.number.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     isMcuboot: PropTypes.bool.isRequired,
