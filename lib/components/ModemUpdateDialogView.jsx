@@ -72,7 +72,7 @@ class ModemUpdateDialogView extends React.Component {
             modemFwName,
             progressMsg,
             progressPercentage,
-            progressDuration,
+            progressStep,
             onCancel,
             isMcuboot,
         } = this.props;
@@ -80,6 +80,9 @@ class ModemUpdateDialogView extends React.Component {
             clearInterval(this.intervalId);
         }
         const { timer } = this.state;
+        let preogressStepStatus = '';
+        preogressStepStatus = progressStep === 1 ? ': App firmware update' : preogressStepStatus;
+        preogressStepStatus = progressStep === 2 ? ': Modem firmware update' : preogressStepStatus;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <Modal.Header>
@@ -97,7 +100,14 @@ class ModemUpdateDialogView extends React.Component {
                         <div>{ modemFwName }</div>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>Status</Form.Label>
+                        <Form.Label>
+                            {!isMcuboot && (
+                                'Status'
+                            )}
+                            {isMcuboot && (
+                                `Step ${progressStep}/2${preogressStepStatus}`
+                            )}
+                        </Form.Label>
                         <div>{ progressMsg }</div>
                         {isMcuboot && isWriting && (
                             <ProgressBar
@@ -116,12 +126,12 @@ class ModemUpdateDialogView extends React.Component {
                                 <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
                             </Alert>
                         )}
-                        {isWritingSucceed && (
+                        {isWritingSucceed && !isWriting && (
                             <Alert variant="success">
                                 Completed successfully in {timer} seconds.
                             </Alert>
                         )}
-                        {isWritingFail && (
+                        {isWritingFail && !isWriting && (
                             <Alert variant="danger">
                                 {errorMsg || 'Failed. Check the log below for more details...'}
                             </Alert>
@@ -161,7 +171,7 @@ ModemUpdateDialogView.propTypes = {
     modemFwName: PropTypes.string.isRequired,
     progressMsg: PropTypes.string.isRequired,
     progressPercentage: PropTypes.number.isRequired,
-    progressDuration: PropTypes.number.isRequired,
+    progressStep: PropTypes.number.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     isMcuboot: PropTypes.bool.isRequired,
