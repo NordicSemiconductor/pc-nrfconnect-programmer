@@ -77,7 +77,7 @@ const RegionInfoView = ({
         )}
         <div>
             <h5>Address range</h5>
-            <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize) }</p>
+            <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize - 1) }</p>
         </div>
         <div>
             <h5>Size</h5>
