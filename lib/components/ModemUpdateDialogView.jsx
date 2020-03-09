@@ -80,9 +80,9 @@ class ModemUpdateDialogView extends React.Component {
             clearInterval(this.intervalId);
         }
         const { timer } = this.state;
-        let preogressStepStatus = '';
-        preogressStepStatus = progressStep === 1 ? ': App firmware update' : preogressStepStatus;
-        preogressStepStatus = progressStep === 2 ? ': Modem firmware update' : preogressStepStatus;
+        let progressStepStatus = '';
+        progressStepStatus = progressStep === 1 ? ': App firmware update' : progressStepStatus;
+        progressStepStatus = progressStep === 2 ? ': Modem firmware update' : progressStepStatus;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <Modal.Header>
@@ -105,7 +105,7 @@ class ModemUpdateDialogView extends React.Component {
                                 'Status'
                             )}
                             {isMcuboot && (
-                                `Step ${progressStep}/2${preogressStepStatus}`
+                                `Step ${progressStep}/2${progressStepStatus}`
                             )}
                         </Form.Label>
                         <div>{ progressMsg }</div>
@@ -121,8 +121,8 @@ class ModemUpdateDialogView extends React.Component {
                     <Form.Group>
                         {isMcuboot && !isWriting && !isWritingSucceed && !isWritingFail && (
                             <Alert variant="warning">
-                                <p>You are now proceeding modem DFU via MCUboot.</p>
-                                <p>The device will be recovered if you proceed to write.</p>
+                                <p>You are now performing modem DFU via MCUboot.</p>
+                                <p>The device will be overwritten if you proceed to write.</p>
                                 <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
                             </Alert>
                         )}
