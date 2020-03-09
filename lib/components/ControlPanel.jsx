@@ -227,7 +227,7 @@ const ControlPanel = ({
                     <Button
                         key="performModemUpdate"
                         onClick={performModemUpdate}
-                        disabled={!isJLink || !isModem || !targetIsReady || !targetIsRecoverable}
+                        disabled={!isModem || !targetIsReady}
                     >
                         <span className="mdi mdi-pencil" />Update modem
                     </Button>

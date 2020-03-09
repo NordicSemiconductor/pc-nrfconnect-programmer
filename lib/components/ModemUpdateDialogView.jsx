@@ -34,12 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
+import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 
 class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -70,16 +71,25 @@ class ModemUpdateDialogView extends React.Component {
             errorMsg,
             modemFwName,
             progressMsg,
+            progressPercentage,
+            progressStep,
             onCancel,
+            isMcuboot,
         } = this.props;
         if (this.intervalId && (isWritingSucceed || isWritingFail)) {
             clearInterval(this.intervalId);
         }
         const { timer } = this.state;
+        let progressStepStatus = '';
+        progressStepStatus = progressStep === 1 ? ': App firmware update' : progressStepStatus;
+        progressStepStatus = progressStep === 2 ? ': Modem firmware update' : progressStepStatus;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <Modal.Header>
-                    <Modal.Title className="modem-dialog-title">Modem DFU</Modal.Title>
+                    <Modal.Title className="modem-dialog-title">
+                        Modem DFU
+                        {isMcuboot && (' via MCUboot')}
+                    </Modal.Title>
                     {isWriting && (
                         <span className="mdi mdi-refresh icon-spin" />
                     )}
@@ -90,16 +100,38 @@ class ModemUpdateDialogView extends React.Component {
                         <div>{ modemFwName }</div>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>Status</Form.Label>
+                        <Form.Label>
+                            {!isMcuboot && (
+                                'Status'
+                            )}
+                            {isMcuboot && (
+                                `Step ${progressStep}/2${progressStepStatus}`
+                            )}
+                        </Form.Label>
                         <div>{ progressMsg }</div>
+                        {isMcuboot && isWriting && (
+                            <ProgressBar
+                                hidden={!isWriting}
+                                animated
+                                now={progressPercentage}
+                                label={`${progressPercentage}%`}
+                            />
+                        )}
                     </Form.Group>
                     <Form.Group>
-                        {isWritingSucceed && (
+                        {isMcuboot && !isWriting && !isWritingSucceed && !isWritingFail && (
+                            <Alert variant="warning">
+                                <p>You are now performing modem DFU via MCUboot.</p>
+                                <p>The device will be overwritten if you proceed to write.</p>
+                                <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
+                            </Alert>
+                        )}
+                        {isWritingSucceed && !isWriting && (
                             <Alert variant="success">
                                 Completed successfully in {timer} seconds.
                             </Alert>
                         )}
-                        {isWritingFail && (
+                        {isWritingFail && !isWriting && (
                             <Alert variant="danger">
                                 {errorMsg || 'Failed. Check the log below for more details...'}
                             </Alert>
@@ -138,8 +170,11 @@ ModemUpdateDialogView.propTypes = {
     errorMsg: PropTypes.string.isRequired,
     modemFwName: PropTypes.string.isRequired,
     progressMsg: PropTypes.string.isRequired,
+    progressPercentage: PropTypes.number.isRequired,
+    progressStep: PropTypes.number.isRequired,
     onOk: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
+    isMcuboot: PropTypes.bool.isRequired,
 };
 
 ModemUpdateDialogView.defaultProps = {
