@@ -16,6 +16,7 @@
   "files": [
     "dist/",
     "resources/icon.*",
+    "resources/firmware/*.hex",
     "icon.png",
     "LICENSE"
   ],
