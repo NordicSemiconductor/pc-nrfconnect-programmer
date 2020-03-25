@@ -26,7 +26,7 @@
 
 ## Version 1.2.2
 ### Bugfixes
-* Fixed for UICR handling that caused double reset failure #133
+* Fixed UICR handling that caused double reset failure #133
 
 ## Version 1.2.0
 ### Updates
