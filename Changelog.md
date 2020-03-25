@@ -38,7 +38,7 @@
 * Added list of devices and details of current device to system report
 ### Updates
 * Updated algorithm of detecting application regions
-* Added nRF52810 to supported devices
+* Added support for nRF52810
 * Added SdReq for SoftDevice S140 v6.1.0
 ### Bugfixes
 * Fixed logic of reloading files
