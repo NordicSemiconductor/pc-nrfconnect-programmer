@@ -1,3 +1,7 @@
+## Version 1.4.1
+## Bugfixes
+* Fixed modem dfu hex file not committed in resources
+
 ## Version 1.4.0
 ## New feature
 * Added support for nRF52820
