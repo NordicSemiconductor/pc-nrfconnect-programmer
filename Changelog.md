@@ -22,7 +22,7 @@
 
 ## Version 1.2.3
 ### Bugfixes
-* Fixed cropped most recently used files dropdown #142
+* Fixed cropping of most recently used files dropdown #142
 
 ## Version 1.2.2
 ### Bugfixes
