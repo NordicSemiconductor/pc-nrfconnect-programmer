@@ -12,7 +12,7 @@
 
 ## Version 1.3.1
 ## Bugfixes
-* Fixed programming nRF51 devices with UICR #156
+* Fixed programming of nRF51 devices with UICR #156
 
 ## Version 1.3.0
 ### New features
