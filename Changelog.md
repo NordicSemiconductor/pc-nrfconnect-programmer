@@ -1,3 +1,7 @@
+## Version 1.4.2
+## Bugfixes
+* Added warning for nRF9160 communication fail
+
 ## Version 1.4.1
 ## Bugfixes
 * Fixed modem dfu hex file not committed in resources
