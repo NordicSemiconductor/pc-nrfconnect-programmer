@@ -142,14 +142,12 @@ export default class UserInputDialogView extends React.Component {
                     >
                         OK
                     </Button>
-                    {
-                        <Button
-                            className="core-btn"
-                            onClick={() => onCancel()}
-                        >
-                            Cancel
-                        </Button>
-                    }
+                    <Button
+                        className="core-btn"
+                        onClick={() => onCancel()}
+                    >
+                        Cancel
+                    </Button>
                 </Modal.Footer>
             </Modal>
         );

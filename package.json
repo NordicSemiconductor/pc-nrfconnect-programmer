@@ -41,8 +41,11 @@
     "immutable": "^3.8.2",
     "nrf-intel-hex": "^1.2.0",
     "pc-nrf-dfu-js": "^0.2.10",
-    "pc-nrfconnect-devdep": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-devdep.git#semver:3.3.0",
-    "protobufjs": "^6.8.4"
+    "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#semver:^4.8.2",
+    "protobufjs": "^6.8.4",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-redux": "7.2.0"
   },
   "dependencies": {
     "electron-store": "^1.2.0"
