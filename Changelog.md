@@ -1,7 +1,7 @@
 ## Version 1.4.3
 ## Updates
 * Added support for nRF52805
-* Added support for new reversion of nRF5340
+* Added support for new revision of nRF5340
 ## Bugfixes
 * Fixed MCUboot DFU for nRF52840 on Thingy91
 * Fixed communication fail for nRF5340 development kit
