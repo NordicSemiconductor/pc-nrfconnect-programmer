@@ -77,8 +77,7 @@ const Mru = ({
                                 {filePath}
                             </Dropdown.Item>
                         ))
-                        : <Dropdown.Item disabled>No recently used files</Dropdown.Item>
-                    }
+                        : <Dropdown.Item disabled>No recently used files</Dropdown.Item>}
                     <Dropdown.Divider />
                     <Dropdown.Item
                         onSelect={() => {
@@ -104,7 +103,6 @@ Mru.propTypes = {
     openFileDialog: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
-
 
 const ControlPanel = ({
     autoRead,

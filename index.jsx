@@ -47,6 +47,7 @@ import ControlPanel from './lib/containers/controlPanel';
 import appReducer from './lib/reducers';
 import { hexToKiB, hexpad2 } from './lib/util/hexpad';
 import logJprogVersion from './lib/util/logJprogVersion';
+import portPath from './lib/util/portPath';
 
 let detectedDevices = [];
 let currentDeviceInfo;
@@ -135,7 +136,7 @@ export default {
         const report = [
             '- Connected devices:',
             ...detectedDevices.map(d => (
-                `    - ${d.serialport.comName}: ${d.serialNumber} ${d.boardVersion || ''}`
+                `    - ${portPath(d.serialport)}: ${d.serialNumber} ${d.boardVersion || ''}`
             )),
             '',
         ];
