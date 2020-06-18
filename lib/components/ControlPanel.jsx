@@ -68,6 +68,9 @@ const Mru = ({
         }
         setShow(false);
     };
+
+    const containerNode = document.getElementsByClassName('core-main-layout')[0];
+
     return (
         <>
             <Overlay
@@ -75,19 +78,17 @@ const Mru = ({
                 ref={ref}
                 target={target}
                 placement="bottom-end"
-                container={ref.current}
+                container={containerNode}
                 trigger="click"
                 rootClose
                 onHide={() => setShow(false)}
-                popperConfig={{
-                    options: { modifiers: { preventOverflow: { boundariesElement: window } } },
-                }}
                 transition={false}
             >
                 <Popover
                     id="mru-popover"
                     className="mru-popover"
                     placement="bottom-end"
+                    content
                 >
                     {mruFiles.length
                         ? mruFiles.map(filePath => (

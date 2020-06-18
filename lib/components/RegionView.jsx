@@ -69,39 +69,33 @@ const RegionView = ({
     className = hoverable ? `${className} hoverable` : className;
     className = (fileNames.length > 1) ? `${className} crosses` : className;
 
-    const singleRegionView = (
+    const containerNode = document.getElementsByClassName('core-main-layout')[0];
+
+    return (
         <div
+            ref={ref}
+            onPointerEnter={toggleShow}
+            onPointerLeave={toggleShow}
             className={className}
             style={{
                 flexGrow: width,
                 backgroundColor: color,
             }}
         >
-            { region && region.fileNames.length > 0 && !active && (
-                <Button
-                    className="transparent"
-                    onClick={() => removeFile(region.fileNames.pop())}
-                >
-                    <span className="mdi mdi-minus-circle" />
-                </Button>
-            )}
-        </div>
-    );
-
-    return (
-        <div ref={ref} onPointerEnter={toggleShow}>
             <Overlay
                 trigger={['focus', 'hover']}
                 placement="right"
                 target={target}
-                container={ref.current}
+                container={containerNode}
                 show={show}
                 rootClose
                 onHide={() => setShow(false)}
+                transition={false}
             >
                 <Popover
                     id="popover-region"
                     className="memory-details"
+                    content
                 >
                     {region && (
                         <RegionInfoView
@@ -120,7 +114,14 @@ const RegionView = ({
                     )}
                 </Popover>
             </Overlay>
-            { singleRegionView }
+            {region && region.fileNames.length > 0 && !active && (
+                <Button
+                    className="transparent"
+                    onClick={() => removeFile(region.fileNames.pop())}
+                >
+                    <span className="mdi mdi-minus-circle" />
+                </Button>
+            )}
         </div>
     );
 };
