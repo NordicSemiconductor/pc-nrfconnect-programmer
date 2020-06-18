@@ -1,15 +1,17 @@
 ## Version 1.4.3
 ## Updates
 * Added support for nRF52805
-* Added support for new revision of nRF5340
 ## Bugfixes
-* Fixed MCUboot DFU for nRF52840 on Thingy91
-* Fixed communication fail for nRF5340 development kit
-* Removed warning for nRF9160 communication fail
+* Fixed MCUboot DFU for nRF52840 on Thingy91 for Linux and macOS
+* Fixed MCUboot DFU for nRF52840 on Thingy91 for Windows.
+Note, the fix is valid for Thingy91 v1.0.2 and newer.
+For older versions, please use a debugger to program.
+* Fixed communication failure for nRF5340 development kit
+* Removed warning for nRF9160 communication failure
 
 ## Version 1.4.2
 ## Bugfixes
-* Added warning for nRF9160 communication fail
+* Added warning for nRF9160 communication failure
 
 ## Version 1.4.1
 ## Bugfixes
