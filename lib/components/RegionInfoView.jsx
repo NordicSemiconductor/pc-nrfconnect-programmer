@@ -36,21 +36,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Popover from 'react-bootstrap/Popover';
 import { basename } from 'path';
 import { hexpad8 } from '../util/hexpad';
 
 const RegionInfoView = ({
     name, startAddress, regionSize, fileNames,
-}, parent) => (
-    <Popover
-        id="popover-region"
-        className="memory-details"
-        onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
-        onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
-        onFocus={() => {}}
-        onBlur={() => {}}
-    >
+}) => (
+    <>
         { name && (
             <div>
                 <h5>Region name</h5>
@@ -83,7 +75,7 @@ const RegionInfoView = ({
             <h5>Size</h5>
             <p>{ regionSize } bytes</p>
         </div>
-    </Popover>
+    </>
 );
 
 RegionInfoView.propTypes = {
