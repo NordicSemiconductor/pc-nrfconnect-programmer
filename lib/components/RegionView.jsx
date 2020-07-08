@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
@@ -35,77 +34,97 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Overlay from 'react-bootstrap/Overlay';
+import Popover from 'react-bootstrap/Popover';
 import RegionInfoView from './RegionInfoView';
 import CoreInfoView from './CoreInfoView';
 
-class RegionView extends React.Component {
-    render() {
-        const {
-            width,
-            active,
-            striped,
-            hoverable,
-            region,
-            core,
-            removeFile,
-        } = this.props;
-        const color = region ? region.color : '#d9e1e2';
-        const fileNames = region ? region.fileNames : [];
+const RegionView = ({
+    width,
+    active,
+    striped,
+    hoverable,
+    region,
+    core,
+    removeFile,
+}) => {
+    const [show, setShow] = useState(false);
+    const [target, setTarget] = useState(null);
+    const ref = useRef(null);
 
-        let className = 'region centering-container';
-        className = striped ? `${className} striped` : className;
-        className = active ? `${className} active striped` : className;
-        className = hoverable ? `${className} hoverable` : className;
-        className = (fileNames.length > 1) ? `${className} crosses` : className;
+    const toggleShow = event => {
+        setShow(!show);
+        setTarget(event.target);
+    };
 
-        const singleRegionView = (
-            <div
-                className={className}
-                style={{
-                    flexGrow: width,
-                    backgroundColor: color,
-                }}
-            >
-                { region && region.fileNames.length > 0 && !active && (
-                    <Button
-                        className="transparent"
-                        onClick={() => removeFile(region.fileNames.pop())}
-                    >
-                        <span className="mdi mdi-minus-circle" />
-                    </Button>
-                )}
-            </div>
-        );
+    const color = region ? region.color : '#d9e1e2';
+    const fileNames = region ? region.fileNames : [];
 
-        const overlayRegionView = !region ? null : (
-            <OverlayTrigger
-                overlay={RegionInfoView(region, this)}
+    let className = 'region centering-container';
+    className = striped ? `${className} striped` : className;
+    className = active ? `${className} active striped` : className;
+    className = hoverable ? `${className} hoverable` : className;
+    className = (fileNames.length > 1) ? `${className} crosses` : className;
+
+    const containerNode = document.getElementsByClassName('core-main-layout')[0];
+
+    return (
+        <div
+            ref={ref}
+            onPointerEnter={toggleShow}
+            onPointerLeave={toggleShow}
+            className={className}
+            style={{
+                flexGrow: width,
+                backgroundColor: color,
+            }}
+        >
+            <Overlay
                 trigger={['focus', 'hover']}
                 placement="right"
-                ref={r => { this.triggerRef = r; }}
+                target={target}
+                container={containerNode}
+                show={show}
+                rootClose
+                onHide={() => setShow(false)}
+                transition={false}
             >
-                { singleRegionView }
-            </OverlayTrigger>
-        );
-
-        const overlayCoreView = region ? null : (
-            <OverlayTrigger
-                overlay={CoreInfoView(core, this)}
-                trigger={['focus', 'hover']}
-                placement="right"
-                ref={r => { this.triggerRef = r; }}
-            >
-                { singleRegionView }
-            </OverlayTrigger>
-        );
-
-        return region ? overlayRegionView : overlayCoreView;
-    }
-}
+                <Popover
+                    id="popover-region"
+                    className="memory-details"
+                    content
+                >
+                    {region && (
+                        <RegionInfoView
+                            name={region.name}
+                            startAddress={region.startAddress}
+                            regionSize={region.regionSize}
+                            fileNames={region.fileNames}
+                        />
+                    )}
+                    {core && (
+                        <CoreInfoView
+                            name={core.name}
+                            romBaseAddr={core.romBaseAddr}
+                            romSize={core.romSize}
+                        />
+                    )}
+                </Popover>
+            </Overlay>
+            {region && region.fileNames.length > 0 && !active && (
+                <Button
+                    className="transparent"
+                    onClick={() => removeFile(region.fileNames.pop())}
+                >
+                    <span className="mdi mdi-minus-circle" />
+                </Button>
+            )}
+        </div>
+    );
+};
 
 RegionView.propTypes = {
     removeFile: PropTypes.func.isRequired,

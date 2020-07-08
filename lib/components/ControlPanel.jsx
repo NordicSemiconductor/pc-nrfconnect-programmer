@@ -35,13 +35,13 @@
  */
 
 import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 
 const Mru = ({
@@ -50,51 +50,66 @@ const Mru = ({
     openFile,
     mruFiles,
 }) => {
-    const target = useRef(null);
+    const [show, setShow] = useState(false);
+    const [target, setTarget] = useState(null);
+    const ref = useRef(null);
+
+    const onClick = event => {
+        onToggleFileList();
+        setShow(!show);
+        setTarget(event.target);
+    };
+
+    const onSelect = filePath => {
+        if (filePath) {
+            openFile(filePath);
+        } else {
+            openFileDialog();
+        }
+        setShow(false);
+    };
+
+    const containerNode = document.getElementsByClassName('core-main-layout')[0];
+
     return (
-        <OverlayTrigger
-            placement="bottom-end"
-            trigger="click"
-            rootClose
-            ref={target}
-            popperConfig={{ modifiers: { preventOverflow: { boundariesElement: window } } }}
-            transition={false}
-            overlay={(
+        <>
+            <Overlay
+                show={show}
+                ref={ref}
+                target={target}
+                placement="bottom-end"
+                container={containerNode}
+                trigger="click"
+                rootClose
+                onHide={() => setShow(false)}
+                transition={false}
+            >
                 <Popover
                     id="mru-popover"
                     className="mru-popover"
                     placement="bottom-end"
+                    content
                 >
-                    { mruFiles.length
+                    {mruFiles.length
                         ? mruFiles.map(filePath => (
                             <Dropdown.Item
                                 key={filePath}
-                                onSelect={() => {
-                                    openFile(filePath);
-                                    target.current.setState({ show: false });
-                                }}
+                                onSelect={() => onSelect(filePath)}
                             >
                                 {filePath}
                             </Dropdown.Item>
                         ))
-                        : <Dropdown.Item disabled>No recently used files</Dropdown.Item>
-                    }
+                        : <Dropdown.Item disabled>No recently used files</Dropdown.Item>}
                     <Dropdown.Divider />
-                    <Dropdown.Item
-                        onSelect={() => {
-                            openFileDialog();
-                            target.current.setState({ show: false });
-                        }}
-                    >
+                    <Dropdown.Item onSelect={onSelect}>
                         Browse...
                     </Dropdown.Item>
                 </Popover>
-            )}
-        >
-            <Button variant="danger" onClick={onToggleFileList}>
+            </Overlay>
+            <Button variant="danger" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />Add HEX file
             </Button>
-        </OverlayTrigger>
+        </>
     );
 };
 
@@ -104,7 +119,6 @@ Mru.propTypes = {
     openFileDialog: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
-
 
 const ControlPanel = ({
     autoRead,

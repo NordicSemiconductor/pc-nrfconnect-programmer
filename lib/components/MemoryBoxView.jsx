@@ -56,8 +56,8 @@ const MemoryBoxView = ({
         <Card className="memory-layout">
             <Card.Header
                 className="panel-heading"
-                onMouseEnter={() => setShowOverlay(true)}
-                onMouseLeave={() => setShowOverlay(false)}
+                onPointerEnter={() => setShowOverlay(true)}
+                onPointerLeave={() => setShowOverlay(false)}
             >
                 <Card.Title className="panel-title">
                     { title }
@@ -71,8 +71,9 @@ const MemoryBoxView = ({
                 <Popover
                     id="deviceInfo"
                     placement="bottom"
-                    onMouseEnter={() => setShowOverlay(true)}
-                    onMouseLeave={() => setShowOverlay(false)}
+                    onPointerEnter={() => setShowOverlay(true)}
+                    onPointerLeave={() => setShowOverlay(false)}
+                    content
                 >
                     <DeviceInfoView />
                 </Popover>

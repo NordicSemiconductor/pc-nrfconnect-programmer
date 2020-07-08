@@ -36,21 +36,13 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import Popover from 'react-bootstrap/Popover';
 
 import { hexpad8 } from '../util/hexpad';
 
 const CoreInfoView = ({
     name, romBaseAddr, romSize,
-}, parent) => (
-    <Popover
-        id="popover-region"
-        className="memory-details"
-        onMouseOver={() => { parent.triggerRef.setState({ show: true }); }}
-        onMouseOut={() => { parent.triggerRef.setState({ show: false }); }}
-        onFocus={() => {}}
-        onBlur={() => {}}
-    >
+}) => (
+    <>
         { name && (
             <div>
                 <h5>Core name</h5>
@@ -65,7 +57,7 @@ const CoreInfoView = ({
             <h5>Size</h5>
             <p>{ romSize } bytes</p>
         </div>
-    </Popover>
+    </>
 );
 
 CoreInfoView.propTypes = {
