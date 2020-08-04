@@ -1,3 +1,7 @@
+## Version 1.4.4
+## Bugfixes
+* Fixed modem DFU for Thingy91 by increasing timeout between MCUboot DFU and modem UART DFU
+
 ## Version 1.4.3
 ## Updates
 * Added support for nRF52805
