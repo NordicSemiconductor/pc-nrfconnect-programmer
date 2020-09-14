@@ -47,6 +47,7 @@ const McuUpdateDialogView = ({
     isWriting,
     isWritingSucceed,
     isWritingFail,
+    isFirmwareValid,
     errorMsg,
     mcubootFwPath,
     progressMsg,
@@ -83,6 +84,21 @@ const McuUpdateDialogView = ({
                         <p>You are now programming via MCUboot.</p>
                         <p>The device will be recovered if you proceed to write.</p>
                         <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
+                    </Alert>
+                )}
+                {!isFirmwareValid && (
+                    <Alert variant="warning">
+                        <p>
+                            <span className="mdi mdi-information-outline target-info" />
+                            Warning
+                        </p>
+                        <p>
+                            The selected HEX file appears to be invalid for Thingy:91 MCUboot DFU.
+                            Make sure to select HEX files from the images_dfu_hex folder
+                            of the nrf91_fw zip file.
+                            If you proceed with the operation you risk setting the device
+                            in an unrecoverable state.
+                        </p>
                     </Alert>
                 )}
                 {isWritingSucceed && (
@@ -124,6 +140,7 @@ McuUpdateDialogView.propTypes = {
     isWriting: PropTypes.bool.isRequired,
     isWritingSucceed: PropTypes.bool.isRequired,
     isWritingFail: PropTypes.bool.isRequired,
+    isFirmwareValid: PropTypes.bool.isRequired,
     errorMsg: PropTypes.string.isRequired,
     mcubootFwPath: PropTypes.string,
     progressMsg: PropTypes.string.isRequired,
