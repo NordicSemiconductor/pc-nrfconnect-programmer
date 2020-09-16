@@ -1,6 +1,6 @@
 ## Version 1.4.5
 ## Updates
-* Updated writable logic for JLink devices
+* Updated logic behind enabling of write button
 * Added warning for Thingy:91 DFU when invalid file is detected
 
 ## Version 1.4.4
