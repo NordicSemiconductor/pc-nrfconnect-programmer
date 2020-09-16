@@ -47,6 +47,7 @@ const McuUpdateDialogView = ({
     isWriting,
     isWritingSucceed,
     isWritingFail,
+    isFirmwareValid,
     errorMsg,
     mcubootFwPath,
     progressMsg,
@@ -83,6 +84,11 @@ const McuUpdateDialogView = ({
                         <p>You are now programming via MCUboot.</p>
                         <p>The device will be recovered if you proceed to write.</p>
                         <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
+                    </Alert>
+                )}
+                {!isFirmwareValid && (
+                    <Alert variant="warning">
+                        The selected HEX file appears to be invalid for Thingy:91 MCUboot DFU.
                     </Alert>
                 )}
                 {isWritingSucceed && (
@@ -124,6 +130,7 @@ McuUpdateDialogView.propTypes = {
     isWriting: PropTypes.bool.isRequired,
     isWritingSucceed: PropTypes.bool.isRequired,
     isWritingFail: PropTypes.bool.isRequired,
+    isFirmwareValid: PropTypes.bool.isRequired,
     errorMsg: PropTypes.string.isRequired,
     mcubootFwPath: PropTypes.string,
     progressMsg: PropTypes.string.isRequired,
