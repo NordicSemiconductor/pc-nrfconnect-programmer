@@ -39,23 +39,23 @@ import React from 'react';
 
 import { hexpad8 } from '../util/hexpad';
 
-const CoreInfoView = ({
-    name, romBaseAddr, romSize,
-}) => (
+const CoreInfoView = ({ name, romBaseAddr, romSize }) => (
     <>
-        { name && (
+        {name && (
             <div>
                 <h5>Core name</h5>
-                <p>{ name }</p>
+                <p>{name}</p>
             </div>
         )}
         <div>
             <h5>Address range</h5>
-            <p>{ hexpad8(romBaseAddr) } &mdash; { hexpad8(romBaseAddr + romSize) }</p>
+            <p>
+                {hexpad8(romBaseAddr)} &mdash; {hexpad8(romBaseAddr + romSize)}
+            </p>
         </div>
         <div>
             <h5>Size</h5>
-            <p>{ romSize } bytes</p>
+            <p>{romSize} bytes</p>
         </div>
     </>
 );
