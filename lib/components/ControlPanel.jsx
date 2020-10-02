@@ -227,6 +227,7 @@ const ControlPanel = ({
                 <Form.Group controlId="formBasicChecbox">
                     <Form.Check
                         type="checkbox"
+                        id="auto-read-memory-checkbox"
                         className="last-checkbox"
                         onChange={e => toggleAutoRead(e.target.checked)}
                         checked={autoRead}
@@ -234,6 +235,7 @@ const ControlPanel = ({
                     />
                     <Form.Check
                         type="checkbox"
+                        id="toggle-mcuboot-checkbox"
                         className="last-checkbox"
                         onChange={e => toggleMcuboot(e.target.checked)}
                         checked={isMcuboot}
