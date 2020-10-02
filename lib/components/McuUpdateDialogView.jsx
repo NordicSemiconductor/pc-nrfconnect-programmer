@@ -58,15 +58,15 @@ const McuUpdateDialogView = ({
 }) => (
     <Modal show={isVisible} onHide={onCancel} backdrop="static">
         <Modal.Header>
-            <Modal.Title className="modem-dialog-title">MCUboot DFU</Modal.Title>
-            {isWriting && (
-                <span className="mdi mdi-refresh icon-spin" />
-            )}
+            <Modal.Title className="modem-dialog-title">
+                MCUboot DFU
+            </Modal.Title>
+            {isWriting && <span className="mdi mdi-refresh icon-spin" />}
         </Modal.Header>
         <Modal.Body>
             <Form.Group>
                 <Form.Label>Firmware</Form.Label>
-                <div>{ mcubootFwPath }</div>
+                <div>{mcubootFwPath}</div>
             </Form.Group>
             <Form.Group>
                 <Form.Label>Status</Form.Label>
@@ -82,23 +82,32 @@ const McuUpdateDialogView = ({
                 {!isWriting && !isWritingSucceed && !isWritingFail && (
                     <Alert variant="warning">
                         <p>You are now programming via MCUboot.</p>
-                        <p>The device will be recovered if you proceed to write.</p>
-                        <p>Make sure the device is in <strong>MCUboot mode</strong>.</p>
+                        <p>
+                            The device will be recovered if you proceed to
+                            write.
+                        </p>
+                        <p>
+                            Make sure the device is in{' '}
+                            <strong>MCUboot mode</strong>.
+                        </p>
                     </Alert>
                 )}
                 {!isFirmwareValid && (
                     <Alert variant="warning">
-                        The selected HEX file appears to be invalid for Thingy:91 MCUboot DFU.
+                        The selected HEX file appears to be invalid for
+                        Thingy:91 MCUboot DFU.
                     </Alert>
                 )}
                 {isWritingSucceed && (
                     <Alert variant="success">
-                        Completed successfully in {progressDuration / 1000} seconds.
+                        Completed successfully in {progressDuration / 1000}{' '}
+                        seconds.
                     </Alert>
                 )}
                 {isWritingFail && (
                     <Alert variant="danger">
-                        {errorMsg || 'Failed. Check the log below for more details...'}
+                        {errorMsg ||
+                            'Failed. Check the log below for more details...'}
                     </Alert>
                 )}
             </Form.Group>

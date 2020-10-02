@@ -39,20 +39,20 @@ import PropTypes from 'prop-types';
 import { List } from 'immutable';
 import CoreView from './CoreView';
 
-const allocateCores = (cores, regions) => cores.map(core => ({
-    ...core,
-    regions: regions.filter(r => r.startAddress >= core.romBaseAddr
-        && (r.startAddress + r.size) <= (core.romBaseAddr + core.romSize)),
-}));
+const allocateCores = (cores, regions) =>
+    cores.map(core => ({
+        ...core,
+        regions: regions.filter(
+            r =>
+                r.startAddress >= core.romBaseAddr &&
+                r.startAddress + r.size <= core.romBaseAddr + core.romSize
+        ),
+    }));
 
-const convertCoresToViews = (targetCores, regions, active) => (allocateCores(targetCores, regions)
-    .sort((a, b) => b.romBaseAddr - a.romBaseAddr)
-    .map(c => (
-        <CoreView
-            core={c}
-            active={active}
-        />
-    )));
+const convertCoresToViews = (targetCores, regions, active) =>
+    allocateCores(targetCores, regions)
+        .sort((a, b) => b.romBaseAddr - a.romBaseAddr)
+        .map(c => <CoreView core={c} active={active} />);
 
 const MemoryView = ({
     regions,
@@ -64,45 +64,47 @@ const MemoryView = ({
     refreshEnabled,
     targetCores,
 }) => {
-    const placeHolder = (isTarget && isLoading)
-        // When it is target and during loading, show something.
-        ? [<CoreView width={1} striped active core={targetCores[0]} />]
-        // When it is target and during writing, show file regions active.
-        // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
-        : convertCoresToViews(targetCores, regions, isTarget && isWriting);
-    return (
-        placeHolder.map((coreView, index) => (
-            <React.Fragment key={index.toString()}>
-                <div
-                    className="core-container"
-                    style={{
-                        flex: coreView.props.core.romSize,
-                    }}
-                >
-                    { coreView }
-                    { isTarget && isErasing && (
-                        <div className="erase-indicator striped active" />
-                    )}
-                    { isTarget && refreshEnabled && (
-                        <div className="centering-container">
-                            <div className="read-indicator">
-                                <p>Device is connected</p>
-                                <p>Press <strong>READ</strong> button to read the memory</p>
-                            </div>
+    const placeHolder =
+        isTarget && isLoading
+            ? // When it is target and during loading, show something.
+              [<CoreView width={1} striped active core={targetCores[0]} />]
+            : // When it is target and during writing, show file regions active.
+              // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
+              convertCoresToViews(targetCores, regions, isTarget && isWriting);
+    return placeHolder.map((coreView, index) => (
+        <React.Fragment key={index.toString()}>
+            <div
+                className="core-container"
+                style={{
+                    flex: coreView.props.core.romSize,
+                }}
+            >
+                {coreView}
+                {isTarget && isErasing && (
+                    <div className="erase-indicator striped active" />
+                )}
+                {isTarget && refreshEnabled && (
+                    <div className="centering-container">
+                        <div className="read-indicator">
+                            <p>Device is connected</p>
+                            <p>
+                                Press <strong>READ</strong> button to read the
+                                memory
+                            </p>
                         </div>
-                    )}
-                    { isTarget && isMcuboot && (
-                        <div className="centering-container">
-                            <div className="read-indicator">
-                                <p>Device is connected</p>
-                                <p>Memory layout is not available via MCUboot</p>
-                            </div>
+                    </div>
+                )}
+                {isTarget && isMcuboot && (
+                    <div className="centering-container">
+                        <div className="read-indicator">
+                            <p>Device is connected</p>
+                            <p>Memory layout is not available via MCUboot</p>
                         </div>
-                    )}
-                </div>
-            </React.Fragment>
-        ))
-    );
+                    </div>
+                )}
+            </div>
+        </React.Fragment>
+    ));
 };
 
 MemoryView.propTypes = {

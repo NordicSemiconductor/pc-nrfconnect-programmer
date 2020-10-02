@@ -60,14 +60,14 @@ const MemoryBoxView = ({
                 onPointerLeave={() => setShowOverlay(false)}
             >
                 <Card.Title className="panel-title">
-                    { title }
-                    { isTarget && (
+                    {title}
+                    {isTarget && (
                         <span className="mdi mdi-information-outline target-info" />
                     )}
                     <span className={`glyphicon ${iconName}`} />
                 </Card.Title>
             </Card.Header>
-            { isTarget && showOverlay && (
+            {isTarget && showOverlay && (
                 <Popover
                     id="deviceInfo"
                     placement="bottom"
@@ -79,19 +79,16 @@ const MemoryBoxView = ({
                 </Popover>
             )}
             <Card.Body className={`panel-body ${isHolder && 'empty'} stacked`}>
-                { isHolder && (
+                {isHolder && (
                     <div className="memory-layout-container">
                         <h1>
                             <span className={`glyphicon ${iconName}`} />
                         </h1>
-                        <p>{ description }</p>
+                        <p>{description}</p>
                     </div>
                 )}
-                { !isHolder && (
-                    <MemoryView
-                        isTarget={isTarget}
-                        isFile={isFile}
-                    />
+                {!isHolder && (
+                    <MemoryView isTarget={isTarget} isFile={isFile} />
                 )}
             </Card.Body>
         </Card>
