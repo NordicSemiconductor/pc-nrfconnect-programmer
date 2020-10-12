@@ -96,7 +96,7 @@ export default {
     ),
 
     mapDeviceSelectorState: (state, props) => ({
-        portIndicatorStatus: (state.app.target.port !== null) ? 'on' : 'off',
+        portIndicatorStatus: state.app.target.port !== null ? 'on' : 'off',
         ...props,
     }),
 
@@ -135,9 +135,12 @@ export default {
     decorateSystemReport: coreReport => {
         const report = [
             '- Connected devices:',
-            ...detectedDevices.map(d => (
-                `    - ${portPath(d.serialport)}: ${d.serialNumber} ${d.boardVersion || ''}`
-            )),
+            ...detectedDevices.map(
+                d =>
+                    `    - ${portPath(d.serialport)}: ${d.serialNumber} ${
+                        d.boardVersion || ''
+                    }`
+            ),
             '',
         ];
         if (currentDeviceInfo) {
@@ -159,7 +162,7 @@ export default {
                 `    - mbrBaseAddr:     ${hexpad2(c.mbrBaseAddr)}`,
                 `    - mbrParamsOffset: ${c.mbrParamsOffset}`,
                 `    - mbrSize:         ${c.mbrSize}`,
-                '',
+                ''
             );
         }
         return coreReport.concat(report.join('\n'));

@@ -39,41 +39,36 @@ import PropTypes from 'prop-types';
 import { basename } from 'path';
 import { hexpad8 } from '../util/hexpad';
 
-const RegionInfoView = ({
-    name, startAddress, regionSize, fileNames,
-}) => (
+const RegionInfoView = ({ name, startAddress, regionSize, fileNames }) => (
     <>
-        { name && (
+        {name && (
             <div>
                 <h5>Region name</h5>
-                <p>{ name }</p>
+                <p>{name}</p>
             </div>
         )}
-        { fileNames.length > 0 && (
+        {fileNames.length > 0 && (
             <div className="files">
                 <h5>
-                    {
-                        (fileNames.length > 1) ? 'Overlapping files!' : 'File name'
-                    }
+                    {fileNames.length > 1 ? 'Overlapping files!' : 'File name'}
                 </h5>
                 <p>
-                    {
-                        fileNames.map((fileName, index) => (
-                            <span key={`${index + 1}`}>
-                                { basename(fileName) }
-                            </span>
-                        ))
-                    }
+                    {fileNames.map((fileName, index) => (
+                        <span key={`${index + 1}`}>{basename(fileName)}</span>
+                    ))}
                 </p>
             </div>
         )}
         <div>
             <h5>Address range</h5>
-            <p>{ hexpad8(startAddress) } &mdash; { hexpad8(startAddress + regionSize - 1) }</p>
+            <p>
+                {hexpad8(startAddress)} &mdash;{' '}
+                {hexpad8(startAddress + regionSize - 1)}
+            </p>
         </div>
         <div>
             <h5>Size</h5>
-            <p>{ regionSize } bytes</p>
+            <p>{regionSize} bytes</p>
         </div>
     </>
 );

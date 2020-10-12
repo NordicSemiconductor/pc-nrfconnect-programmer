@@ -45,7 +45,9 @@ import WarningView from '../containers/warningView';
 
 function getTargetTitle(serialNumber, deviceInfo) {
     if (serialNumber) {
-        return (deviceInfo.type !== 'Unknown' ? deviceInfo.type : deviceInfo.family);
+        return deviceInfo.type !== 'Unknown'
+            ? deviceInfo.type
+            : deviceInfo.family;
     }
     return undefined;
 }
@@ -56,17 +58,16 @@ function hasFileContent(file) {
 
 const AppMainView = ({
     file,
-    target: {
-        serialNumber,
-        deviceInfo,
-        regions,
-    },
+    target: { serialNumber, deviceInfo, regions },
 }) => (
     <div className="app-main-view">
         <WarningView />
         <div className="memory-box-container">
             <MemoryBoxView
-                title={getTargetTitle(serialNumber, deviceInfo) || 'Device memory layout'}
+                title={
+                    getTargetTitle(serialNumber, deviceInfo) ||
+                    'Device memory layout'
+                }
                 description="Connect a device to display memory contents"
                 iconName="appicon-chip"
                 regions={regions}
