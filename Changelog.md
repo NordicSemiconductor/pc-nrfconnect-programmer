@@ -1,3 +1,7 @@
+## Version 1.4.6
+## Updates
+* Updated according to changes of Electron dialog API
+
 ## Version 1.4.5
 ## Updates
 * Updated logic behind enabling of write button

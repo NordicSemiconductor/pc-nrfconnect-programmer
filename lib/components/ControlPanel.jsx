@@ -44,12 +44,7 @@ import Form from 'react-bootstrap/Form';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 
-const Mru = ({
-    onToggleFileList,
-    openFileDialog,
-    openFile,
-    mruFiles,
-}) => {
+const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
     const ref = useRef(null);
@@ -69,7 +64,9 @@ const Mru = ({
         setShow(false);
     };
 
-    const containerNode = document.getElementsByClassName('core-main-layout')[0];
+    const containerNode = document.getElementsByClassName(
+        'core-main-layout'
+    )[0];
 
     return (
         <>
@@ -90,8 +87,8 @@ const Mru = ({
                     placement="bottom-end"
                     content
                 >
-                    {mruFiles.length
-                        ? mruFiles.map(filePath => (
+                    {mruFiles.length ? (
+                        mruFiles.map(filePath => (
                             <Dropdown.Item
                                 key={filePath}
                                 onSelect={() => onSelect(filePath)}
@@ -99,15 +96,18 @@ const Mru = ({
                                 {filePath}
                             </Dropdown.Item>
                         ))
-                        : <Dropdown.Item disabled>No recently used files</Dropdown.Item>}
+                    ) : (
+                        <Dropdown.Item disabled>
+                            No recently used files
+                        </Dropdown.Item>
+                    )}
                     <Dropdown.Divider />
-                    <Dropdown.Item onSelect={onSelect}>
-                        Browse...
-                    </Dropdown.Item>
+                    <Dropdown.Item onSelect={onSelect}>Browse...</Dropdown.Item>
                 </Popover>
             </Overlay>
             <Button variant="danger" onClick={onClick}>
-                <span className="mdi mdi-folder-open" />Add HEX file
+                <span className="mdi mdi-folder-open" />
+                Add HEX file
             </Button>
         </>
     );
@@ -159,10 +159,12 @@ const ControlPanel = ({
                         onToggleFileList={onToggleFileList}
                     />
                     <Button onClick={refreshAllFiles}>
-                        <span className="mdi mdi-refresh" />Reload files
+                        <span className="mdi mdi-refresh" />
+                        Reload files
                     </Button>
                     <Button onClick={closeFiles}>
-                        <span className="mdi mdi-minus-circle" />Clear files
+                        <span className="mdi mdi-minus-circle" />
+                        Clear files
                     </Button>
                 </ButtonGroup>
             </Card.Body>
@@ -174,59 +176,67 @@ const ControlPanel = ({
                     <Button
                         key="performRecover"
                         onClick={performRecover}
-                        disabled={isMcuboot || !isJLink || !targetIsReady || !targetIsRecoverable}
+                        disabled={
+                            isMcuboot ||
+                            !isJLink ||
+                            !targetIsReady ||
+                            !targetIsRecoverable
+                        }
                     >
-                        <span className="mdi mdi-eraser" />Erase all
+                        <span className="mdi mdi-eraser" />
+                        Erase all
                     </Button>
                     <Button
                         key="performRecoverAndWrite"
                         onClick={performRecoverAndWrite}
                         disabled={
-                            isMcuboot
-                            || !isJLink
-                            || !targetIsReady
-                            || !fileRegionSize
-                            || !(targetIsRecoverable && mruFiles.length)
+                            isMcuboot ||
+                            !isJLink ||
+                            !targetIsReady ||
+                            !fileRegionSize ||
+                            !(targetIsRecoverable && mruFiles.length)
                         }
                     >
-                        <span className="mdi mdi-pencil" />Erase & write
+                        <span className="mdi mdi-pencil" />
+                        Erase & write
                     </Button>
                     <Button
                         key="performSaveAsFile"
                         onClick={performSaveAsFile}
                         disabled={!isJLink || !targetIsMemLoaded}
                     >
-                        <span className="mdi mdi-floppy" />Save as file
+                        <span className="mdi mdi-floppy" />
+                        Save as file
                     </Button>
                     <Button
                         key="performReset"
                         onClick={performReset}
                         disabled={!isUsbSerial || !targetIsReady}
                     >
-                        <span className="mdi mdi-record" />Reset
+                        <span className="mdi mdi-record" />
+                        Reset
                     </Button>
                     <Button
                         key="performWrite"
                         onClick={performWrite}
                         disabled={!targetIsReady || !targetIsWritable}
                     >
-                        <span className="mdi mdi-pencil" />Write
+                        <span className="mdi mdi-pencil" />
+                        Write
                     </Button>
                     <Button
                         key="performJLinkRead"
                         onClick={performJLinkRead}
-                        disabled={
-                            isMcuboot
-                            || !isJLink
-                            || !targetIsReady
-                        }
+                        disabled={isMcuboot || !isJLink || !targetIsReady}
                     >
-                        <span className="mdi mdi-refresh" />Read
+                        <span className="mdi mdi-refresh" />
+                        Read
                     </Button>
                 </ButtonGroup>
                 <Form.Group controlId="formBasicChecbox">
                     <Form.Check
                         type="checkbox"
+                        id="auto-read-memory-checkbox"
                         className="last-checkbox"
                         onChange={e => toggleAutoRead(e.target.checked)}
                         checked={autoRead}
@@ -234,6 +244,7 @@ const ControlPanel = ({
                     />
                     <Form.Check
                         type="checkbox"
+                        id="toggle-mcuboot-checkbox"
                         className="last-checkbox"
                         onChange={e => toggleMcuboot(e.target.checked)}
                         checked={isMcuboot}
@@ -251,7 +262,8 @@ const ControlPanel = ({
                         onClick={performModemUpdate}
                         disabled={!isModem || !targetIsReady}
                     >
-                        <span className="mdi mdi-pencil" />Update modem
+                        <span className="mdi mdi-pencil" />
+                        Update modem
                     </Button>
                 </ButtonGroup>
             </Card.Body>

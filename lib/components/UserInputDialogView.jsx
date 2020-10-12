@@ -84,13 +84,7 @@ export default class UserInputDialogView extends React.Component {
     }
 
     render() {
-        const {
-            isVisible,
-            message,
-            choices,
-            onOk,
-            onCancel,
-        } = this.props;
+        const { isVisible, message, choices, onOk, onCancel } = this.props;
         const {
             selectedValue,
             isValidInput,
@@ -112,7 +106,9 @@ export default class UserInputDialogView extends React.Component {
                                 key={choice}
                                 name="radioGroup"
                                 onClick={() => this.onSelectChoice(choice)}
-                                label={`${hexpad2(parseInt(choice, 16))} (${choices[choice]})`}
+                                label={`${hexpad2(parseInt(choice, 16))} (${
+                                    choices[choice]
+                                })`}
                             />
                         ))}
                         <Form.Check
@@ -142,10 +138,7 @@ export default class UserInputDialogView extends React.Component {
                     >
                         OK
                     </Button>
-                    <Button
-                        className="core-btn"
-                        onClick={() => onCancel()}
-                    >
+                    <Button className="core-btn" onClick={() => onCancel()}>
                         Cancel
                     </Button>
                 </Modal.Footer>

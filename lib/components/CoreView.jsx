@@ -39,54 +39,67 @@ import React from 'react';
 
 import RegionView from '../containers/regionView';
 
-const CoreView = ({
-    core,
-    active,
-}) => {
+const CoreView = ({ core, active }) => {
     const { regions, romSize, romBaseAddr } = core;
     const regionViews = [];
     if (!regions || regions.size <= 0) {
-        return [(
-            <RegionView
-                key={0}
-                core={core}
-                width={1}
-                active={active}
-            />
-        )];
+        return [<RegionView key={0} core={core} width={1} active={active} />];
     }
 
     // Sort the regions by start address and generate a view for it, also
     // generate a gap view between regions
     let lastAddress = romBaseAddr;
-    regions.sortBy(r => r.startAddress).forEach(region => {
-        const { startAddress, regionSize } = region;
+    regions
+        .sortBy(r => r.startAddress)
+        .forEach(region => {
+            const { startAddress, regionSize } = region;
 
-        // Generate the region view only if it is inside the ROM
-        if (startAddress < (romBaseAddr + romSize)) {
-            // Start to generate views from the base address
-            if (lastAddress === romBaseAddr) {
-                // Generate a region view if the region starts with the base address
-                if (startAddress === romBaseAddr) {
-                    regionViews.push(
-                        <RegionView
-                            key={startAddress}
-                            region={region}
-                            hoverable
-                            active={active}
-                            width={regionSize}
-                        />,
-                    );
-                }
+            // Generate the region view only if it is inside the ROM
+            if (startAddress < romBaseAddr + romSize) {
+                // Start to generate views from the base address
+                if (lastAddress === romBaseAddr) {
+                    // Generate a region view if the region starts with the base address
+                    if (startAddress === romBaseAddr) {
+                        regionViews.push(
+                            <RegionView
+                                key={startAddress}
+                                region={region}
+                                hoverable
+                                active={active}
+                                width={regionSize}
+                            />
+                        );
+                    }
 
-                // Generate a gap view if the region does not start with the base address
-                if (startAddress > romBaseAddr) {
+                    // Generate a gap view if the region does not start with the base address
+                    if (startAddress > romBaseAddr) {
+                        regionViews.push(
+                            <RegionView
+                                key={lastAddress}
+                                core={core}
+                                width={startAddress}
+                            />
+                        );
+                        regionViews.push(
+                            <RegionView
+                                key={startAddress}
+                                region={region}
+                                hoverable
+                                active={active}
+                                width={regionSize}
+                            />
+                        );
+                    }
+
+                    // Update lastAddress
+                    lastAddress = startAddress + regionSize - 1;
+                } else {
                     regionViews.push(
                         <RegionView
                             key={lastAddress}
                             core={core}
-                            width={startAddress}
-                        />,
+                            width={startAddress - lastAddress}
+                        />
                     );
                     regionViews.push(
                         <RegionView
@@ -95,41 +108,20 @@ const CoreView = ({
                             hoverable
                             active={active}
                             width={regionSize}
-                        />,
+                        />
                     );
+
+                    // Update lastAddress
+                    lastAddress = startAddress + regionSize - 1;
                 }
-
-                // Update lastAddress
-                lastAddress = (startAddress + regionSize) - 1;
-            } else {
-                regionViews.push(
-                    <RegionView
-                        key={lastAddress}
-                        core={core}
-                        width={startAddress - lastAddress}
-                    />,
-                );
-                regionViews.push(
-                    <RegionView
-                        key={startAddress}
-                        region={region}
-                        hoverable
-                        active={active}
-                        width={regionSize}
-                    />,
-                );
-
-                // Update lastAddress
-                lastAddress = (startAddress + regionSize) - 1;
             }
-        }
-    });
+        });
     regionViews.push(
         <RegionView
             key={lastAddress}
             core={core}
             width={romBaseAddr + romSize - lastAddress}
-        />,
+        />
     );
 
     return regionViews;
@@ -140,7 +132,6 @@ CoreView.propTypes = {
     active: PropTypes.bool.isRequired,
 };
 
-CoreView.defaultProps = {
-};
+CoreView.defaultProps = {};
 
 export default CoreView;

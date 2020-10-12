@@ -67,9 +67,11 @@ const RegionView = ({
     className = striped ? `${className} striped` : className;
     className = active ? `${className} active striped` : className;
     className = hoverable ? `${className} hoverable` : className;
-    className = (fileNames.length > 1) ? `${className} crosses` : className;
+    className = fileNames.length > 1 ? `${className} crosses` : className;
 
-    const containerNode = document.getElementsByClassName('core-main-layout')[0];
+    const containerNode = document.getElementsByClassName(
+        'core-main-layout'
+    )[0];
 
     return (
         <div
@@ -92,11 +94,7 @@ const RegionView = ({
                 onHide={() => setShow(false)}
                 transition={false}
             >
-                <Popover
-                    id="popover-region"
-                    className="memory-details"
-                    content
-                >
+                <Popover id="popover-region" className="memory-details" content>
                     {region && (
                         <RegionInfoView
                             name={region.name}
