@@ -100,7 +100,8 @@ const McuUpdateDialogView = ({
                 )}
                 {!isFirmwareValid && (
                     <Alert variant="warning">
-                        The selected HEX file appears to be invalid for Thingy:91 MCUboot DFU.
+                        The selected HEX file appears to be invalid for
+                        Thingy:91 MCUboot DFU.
                     </Alert>
                 )}
                 {isWritingSucceed && (
