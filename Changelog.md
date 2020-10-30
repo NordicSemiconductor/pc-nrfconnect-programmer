@@ -1,3 +1,7 @@
+## Version 1.4.7
+### Updates
+* Add USB PID of OpenThread devices
+
 ## Version 1.4.6
 ## Updates
 * Updated according to changes of Electron dialog API
