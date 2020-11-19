@@ -100,7 +100,7 @@ const MemoryView = ({
                                 <p>Device is protected</p>
                                 <p>
                                     Press <strong>Erase all</strong> button to
-                                    reocver the protected memory
+                                    recover the protected memory
                                 </p>
                             </div>
                         )}
