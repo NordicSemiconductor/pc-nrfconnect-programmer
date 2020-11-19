@@ -128,6 +128,7 @@ const ControlPanel = ({
     isMcuboot,
     isModem,
     isUsbSerial,
+    isProtected,
     mruFiles,
     onToggleFileList,
     openFile,
@@ -227,7 +228,12 @@ const ControlPanel = ({
                     <Button
                         key="performJLinkRead"
                         onClick={performJLinkRead}
-                        disabled={isMcuboot || !isJLink || !targetIsReady}
+                        disabled={
+                            isMcuboot ||
+                            !isJLink ||
+                            !targetIsReady ||
+                            isProtected
+                        }
                     >
                         <span className="mdi mdi-refresh" />
                         Read
@@ -279,6 +285,7 @@ ControlPanel.propTypes = {
     isMcuboot: PropTypes.bool.isRequired,
     isModem: PropTypes.bool.isRequired,
     isUsbSerial: PropTypes.bool.isRequired,
+    isProtected: PropTypes.bool.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
     onToggleFileList: PropTypes.func.isRequired,
     openFile: PropTypes.func.isRequired,
