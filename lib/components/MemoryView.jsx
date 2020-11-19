@@ -86,21 +86,24 @@ const MemoryView = ({
                 )}
                 {isTarget && refreshEnabled && (
                     <div className="centering-container">
-                        <div className="read-indicator">
-                            <p>Device is connected</p>
-                            {isProtected && (
+                        {!isProtected && (
+                            <div className="read-indicator">
+                                <p>Device is connected</p>
                                 <p>
                                     Press <strong>READ</strong> button to read
                                     the memory
                                 </p>
-                            )}
-                            {!isProtected && (
+                            </div>
+                        )}
+                        {isProtected && (
+                            <div className="read-indicator">
+                                <p>Device is protected</p>
                                 <p>
                                     Press <strong>Erase all</strong> button to
                                     reocver the protected memory
                                 </p>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 )}
                 {isTarget && isMcuboot && (
