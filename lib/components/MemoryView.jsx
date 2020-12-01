@@ -61,6 +61,7 @@ const MemoryView = ({
     isWriting,
     isErasing,
     isLoading,
+    isProtected,
     refreshEnabled,
     targetCores,
 }) => {
@@ -85,13 +86,24 @@ const MemoryView = ({
                 )}
                 {isTarget && refreshEnabled && (
                     <div className="centering-container">
-                        <div className="read-indicator">
-                            <p>Device is connected</p>
-                            <p>
-                                Press <strong>READ</strong> button to read the
-                                memory
-                            </p>
-                        </div>
+                        {!isProtected && (
+                            <div className="read-indicator">
+                                <p>Device is connected</p>
+                                <p>
+                                    Press <strong>READ</strong> button to read
+                                    the memory
+                                </p>
+                            </div>
+                        )}
+                        {isProtected && (
+                            <div className="read-indicator">
+                                <p>Device is protected</p>
+                                <p>
+                                    Press <strong>Erase all</strong> button to
+                                    recover the protected memory
+                                </p>
+                            </div>
+                        )}
                     </div>
                 )}
                 {isTarget && isMcuboot && (
@@ -114,6 +126,7 @@ MemoryView.propTypes = {
     isWriting: PropTypes.bool.isRequired,
     isErasing: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
+    isProtected: PropTypes.bool.isRequired,
     refreshEnabled: PropTypes.bool.isRequired,
     targetFamily: PropTypes.string.isRequired,
     targetCores: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
