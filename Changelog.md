@@ -1,3 +1,7 @@
+## Version 1.4.8
+### Updates
+* Add APPPROTECT support
+
 ## Version 1.4.7
 ### Updates
 * Add USB PID of OpenThread devices
