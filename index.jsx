@@ -36,6 +36,7 @@
 
 import './resources/css/index.scss';
 
+import nrfdl from 'nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 import React from 'react';
 
@@ -46,7 +47,6 @@ import AppMainView from './lib/containers/appMainView';
 import ControlPanel from './lib/containers/controlPanel';
 import appReducer from './lib/reducers';
 import { hexToKiB, hexpad2 } from './lib/util/hexpad';
-import logJprogVersion from './lib/util/logJprogVersion';
 import portPath from './lib/util/portPath';
 
 let detectedDevices = [];
@@ -80,7 +80,8 @@ export default {
             event.preventDefault();
         };
 
-        logJprogVersion();
+        // TODO: display versions from nrf-device-lib-js
+        // logJprogVersion();
     },
 
     decorateMainView: MainView => () => (
