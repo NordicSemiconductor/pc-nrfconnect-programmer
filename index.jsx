@@ -42,7 +42,7 @@ import React from 'react';
 
 import { openFile } from './lib/actions/fileActions';
 import { loadSettings } from './lib/actions/settingsActions';
-import { openDevice } from './lib/actions/targetActions';
+import { getLibVersions, openDevice } from './lib/actions/targetActions';
 import AppMainView from './lib/containers/appMainView';
 import ControlPanel from './lib/containers/controlPanel';
 import appReducer from './lib/reducers';
@@ -80,8 +80,7 @@ export default {
             event.preventDefault();
         };
 
-        // TODO: display versions from nrf-device-lib-js
-        // logJprogVersion();
+        getLibVersions();
     },
 
     decorateMainView: MainView => () => (
