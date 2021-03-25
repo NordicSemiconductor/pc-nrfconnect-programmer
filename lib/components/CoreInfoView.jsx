@@ -39,7 +39,7 @@ import React from 'react';
 
 import { hexpad8 } from '../util/hexpad';
 
-const hexpad9 = x => hexpad8(x ? x : '');
+const hexpad9 = x => hexpad8(x || '');
 
 const CoreInfoView = ({ name, romBaseAddr, romSize }) => (
     <>

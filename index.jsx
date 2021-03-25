@@ -36,7 +36,6 @@
 
 import './resources/css/index.scss';
 
-import nrfdl from 'nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 import React from 'react';
 
