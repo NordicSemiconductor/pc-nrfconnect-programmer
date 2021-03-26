@@ -35,12 +35,11 @@
  */
 
 /**
- * Creates an array of numbers from start and up to (and including) end.
+ * Create an array of numbers from start and up to (and including) end.
  *
  * @param {number} start Start of range.
  * @param {number} end End of range.
  * @returns {Array} Range of numbers.
  */
-export default function range(start, end) {
-    return Array.from({ length: end + 1 - start }, (_, i) => i + start);
-}
+export default (start: number, end: number): Array<number> =>
+    Array.from({ length: end + 1 - start }, (_, i) => i + start);
