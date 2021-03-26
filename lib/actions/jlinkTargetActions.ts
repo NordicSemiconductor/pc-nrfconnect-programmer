@@ -36,51 +36,158 @@
 
 /* eslint-disable import/no-cycle */
 
-import fs from 'fs';
-
-import { remote } from 'electron';
 import MemoryMap from 'nrf-intel-hex';
-import { logger } from 'nrfconnect/core';
+import fs from 'fs';
+import { logger } from 'pc-nrfconnect-shared';
 import nrfdl from 'nrf-device-lib-js';
+import { remote } from 'electron';
+import * as fileActions from './fileActions';
+import * as targetActions from './targetActions';
+import * as warningActions from './warningActions';
 
 import {
     CommunicationType,
     addCoreToDeviceInfo,
-    getDeviceInfoByNrfdl,
-    getDeviceFromNrfdl,
     context,
+    getDeviceFromNrfdl,
+    getDeviceInfoByNrfdl,
 } from '../util/devices';
-import { sequence } from '../util/promise';
+
 import { getTargetRegions } from '../util/regions';
-import * as fileActions from './fileActions';
 import { modemKnownAction } from './modemTargetActions';
-import * as targetActions from './targetActions';
-import * as warningActions from './warningActions';
+import { sequence } from '../util/promise';
 
-const ERROR_CODE_NOT_AVAILABLE_BECAUSE_PROTECTION = -90; // ffffffa6
+const ERROR_CODE_NOT_AVAILABLE_BECAUSE_PROTECTION = -90; // 0xFFFFFFA6
 const ERROR_CODE_COULD_NOT_RESET_DEVICE = 0x5;
-
-export const USE_NRFDL = true;
 
 // nrf-device-lib returns serial numbers padded with zeros
 // and without a colon at the end, so we need to change ours
 // to that format (at least until the device lister is replaced).
-export function transformJlinkSerialForNrfdl(serialNumber) {
+export const formatSerialNumber = (serialNumber: number | string) => {
     serialNumber =
         typeof serialNumber === 'number'
             ? serialNumber.toString()
             : serialNumber;
 
     return `000${serialNumber.substring(0, 9)}`;
-}
+};
 
-// Get device infos by calling nrfjprog
-const getDevice = async serialNumber => {
+// Display some information about a DevKit. Called on a DevKit connection.
+// This also triggers reading the whole memory contents of the device.
+export const loadDeviceInfo = (
+    serialNumber: string,
+    fullRead = false,
+    eraseAndWrite = false
+): Promise<AppThunk> => async (dispatch, getState) => {
+    dispatch(targetActions.loadingStartAction());
+    dispatch(warningActions.targetWarningRemoveAction());
+    dispatch(
+        targetActions.targetTypeKnownAction(CommunicationType.JLINK, true)
+    );
+    logger.info('Using nrf-device-lib-js to communicate with target');
+
+    const device = await getDevice(serialNumber);
+    let deviceInfo = getDeviceInfoByNrfdl(device);
+
+    // Update modem target info according to detected device info
+    dispatch(modemKnownAction(device.jlink.device_family.includes('NRF91')));
+
+    // By default readback protection is none
+    let readbackProtection = nrfdl.NRFDL_PROTECTION_STATUS_NONE;
+
+    try {
+        readbackProtection = (
+            await nrfdl.deviceControlGetProtectionStatus(context, device.id)
+        ).protection_status;
+    } catch (error) {
+        logger.error('Error while getting readback protection');
+        dispatch(targetActions.loadingEndAction());
+        return;
+    }
+
+    let coreName = 'Application';
+
+    let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(context, device.id);
+    deviceCoreInfo = { ...deviceCoreInfo, readbackProtection };
+    deviceInfo = addCoreToDeviceInfo(deviceInfo, deviceCoreInfo, coreName);
+    const isFamilyNrf53 = device.jlink.device_family.includes('NRF53');
+
+    // Since nRF53 family is dual core devices
+    // It needs an additional check for readback protection on network core
+    if (isFamilyNrf53) {
+        coreName = 'Network';
+        const coreNameConstant = 'NRFDL_DEVICE_CORE_NETWORK';
+        deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
+            context,
+            device.id,
+            'NRFDL_DEVICE_CORE_NETWORK'
+        );
+        try {
+            readbackProtection = (
+                await nrfdl.deviceControlGetProtectionStatus(
+                    context,
+                    device.id,
+                    coreNameConstant
+                )
+            ).protection_status;
+        } catch (error) {
+            logger.error(
+                'Failed to get readback protection status on network core'
+            );
+            dispatch(targetActions.loadingEndAction());
+            return;
+        }
+        deviceCoreInfo = { ...deviceCoreInfo, readbackProtection };
+        deviceInfo = addCoreToDeviceInfo(deviceInfo, deviceCoreInfo, coreName);
+    }
+    dispatch(targetActions.targetInfoKnownAction(deviceInfo));
+
+    // Read from the device
+    if (
+        deviceInfo.cores.find(
+            c => c.readbackProtection !== nrfdl.NRFDL_PROTECTION_STATUS_NONE
+        )
+    ) {
+        logger.info(
+            'Skipped reading, since at least one core has app readback protection'
+        );
+    } else {
+        let memMap;
+        let mergedMemMap = new MemoryMap();
+        let isMemLoaded = false;
+        const readAll =
+            !eraseAndWrite && (fullRead || getState().app.settings.autoRead);
+        try {
+            memMap = await sequence(
+                getDeviceMemMap,
+                [],
+                ...deviceInfo.cores.map(c => [device.id, c, readAll])
+            );
+            mergedMemMap = MemoryMap.flattenOverlaps(
+                MemoryMap.overlapMemoryMaps(
+                    memMap.filter(m => m).map(m => ['', m])
+                )
+            );
+            isMemLoaded = readAll;
+        } catch (error) {
+            logger.error(`getDeviceMemMap: ${error.message}`);
+            return;
+        }
+        dispatch(
+            targetActions.targetContentsKnownAction(mergedMemMap, isMemLoaded)
+        );
+        dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
+    }
+
+    dispatch(targetActions.updateTargetWritable());
+    dispatch(targetActions.loadingEndAction());
+};
+
+// Get device by calling nrf-device-lib-js
+const getDevice = async (serialNumber: string) => {
     let device;
     try {
-        device = await getDeviceFromNrfdl(
-            transformJlinkSerialForNrfdl(serialNumber)
-        );
+        device = await getDeviceFromNrfdl(serialNumber);
         const {
             jlink_ob_firmware_version: jlinkOBFwVersion,
             device_family: deviceFamily,
@@ -304,120 +411,6 @@ const updateTargetRegions = (memMap, deviceInfo) => dispatch => {
     dispatch(fileActions.updateFileRegions());
 };
 
-// Display some information about a devkit. Called on a devkit connection.
-// This also triggers reading the whole memory contents of the device.
-export const loadDeviceInfo = (
-    serialNumberInput,
-    fullRead = false,
-    eraseAndWrite = false
-) => async (dispatch, getState) => {
-    dispatch(targetActions.loadingStartAction());
-    dispatch(warningActions.targetWarningRemoveAction());
-    dispatch(
-        targetActions.targetTypeKnownAction(CommunicationType.JLINK, true)
-    );
-    logger.info('Using nrf-device-lib-js to communicate with target');
-
-    // Load lib info and device info
-    const serialNumber = parseInt(serialNumberInput, 10);
-
-    const device = await getDevice(serialNumber);
-    let deviceInfo = getDeviceInfoByNrfdl(device);
-
-    // Update modem target info according to detected device info
-    dispatch(modemKnownAction(device.jlink.device_family.includes('NRF91')));
-
-    // By default readback protection is none
-    let readbackProtection = nrfdl.NRFDL_PROTECTION_STATUS_NONE;
-
-    try {
-        readbackProtection = (
-            await nrfdl.deviceControlGetProtectionStatus(context, device.id)
-        ).protection_status;
-    } catch (error) {
-        logger.error('Error while getting readback protection');
-        dispatch(targetActions.loadingEndAction());
-        return;
-    }
-
-    let coreName = 'Application';
-
-    let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(context, device.id);
-    deviceCoreInfo = { ...deviceCoreInfo, readbackProtection };
-    deviceInfo = addCoreToDeviceInfo(deviceInfo, deviceCoreInfo, coreName);
-    const isFamilyNrf53 = device.jlink.device_family.includes('NRF53');
-
-    // Since nRF53 family is dual core devices
-    // It needs an additional check for readback protection on network core
-    if (isFamilyNrf53) {
-        coreName = 'Network';
-        const coreNameConstant = 'NRFDL_DEVICE_CORE_NETWORK';
-        deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
-            context,
-            device.id,
-            'NRFDL_DEVICE_CORE_NETWORK'
-        );
-        try {
-            readbackProtection = (
-                await nrfdl.deviceControlGetProtectionStatus(
-                    context,
-                    device.id,
-                    coreNameConstant
-                )
-            ).protection_status;
-        } catch (error) {
-            logger.error(
-                'Failed to get readback protection status on network core'
-            );
-            dispatch(targetActions.loadingEndAction());
-            return;
-        }
-        deviceCoreInfo = { ...deviceCoreInfo, readbackProtection };
-        deviceInfo = addCoreToDeviceInfo(deviceInfo, deviceCoreInfo, coreName);
-    }
-    dispatch(targetActions.targetInfoKnownAction(deviceInfo));
-
-    // Read from the device
-    if (
-        deviceInfo.cores.find(
-            c => c.readbackProtection !== nrfdl.NRFDL_PROTECTION_STATUS_NONE
-        )
-    ) {
-        logger.info(
-            'Skipped reading, since at least one core has app readback protection'
-        );
-    } else {
-        let memMap;
-        let mergedMemMap = new MemoryMap();
-        let isMemLoaded = false;
-        const readAll =
-            !eraseAndWrite && (fullRead || getState().app.settings.autoRead);
-        try {
-            memMap = await sequence(
-                getDeviceMemMap,
-                [],
-                ...deviceInfo.cores.map(c => [device.id, c, readAll])
-            );
-            mergedMemMap = MemoryMap.flattenOverlaps(
-                MemoryMap.overlapMemoryMaps(
-                    memMap.filter(m => m).map(m => ['', m])
-                )
-            );
-            isMemLoaded = readAll;
-        } catch (error) {
-            logger.error(`getDeviceMemMap: ${error.message}`);
-            return;
-        }
-        dispatch(
-            targetActions.targetContentsKnownAction(mergedMemMap, isMemLoaded)
-        );
-        dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
-    }
-
-    dispatch(targetActions.updateTargetWritable());
-    dispatch(targetActions.loadingEndAction());
-};
-
 // Read device flash memory
 export const read = () => async (dispatch, getState) => {
     dispatch(targetActions.loadingStartAction());
@@ -462,7 +455,7 @@ export const recover = willEraseAndWrite => async (dispatch, getState) => {
         deviceInfo: { cores },
     } = getState().app.target;
     const { id: deviceId } = await getDeviceFromNrfdl(
-        transformJlinkSerialForNrfdl(parseInt(serialNumber, 10))
+        formatSerialNumber(parseInt(serialNumber, 10))
     );
     const results = [];
     const argsArray = cores.map(c => [deviceId, c]);
@@ -485,7 +478,7 @@ const writeHex = (serialNumber, coreInfo, hexFileString) =>
         logger.info('Writing hex file with nrf-device-lib-js.');
 
         const { id: deviceId } = await getDeviceFromNrfdl(
-            transformJlinkSerialForNrfdl(serialNumber)
+            formatSerialNumber(serialNumber)
         );
 
         console.log(hexFileString);
