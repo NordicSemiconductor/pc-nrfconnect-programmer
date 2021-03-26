@@ -34,6 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Prefer to use the serialport 8 property or fall back to the serialport 7 property
-export default serialPort =>
+/**
+ * Prefer to use the serialport 8 property or fall back to the serialport 7 property.
+ *
+ * @param {any} serialPort serialport v8/v7
+ * @returns {string} the path of serialport
+ * appended with the result of each promise.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default (serialPort: any): string =>
     serialPort ? serialPort.path || serialPort.comName : undefined;
