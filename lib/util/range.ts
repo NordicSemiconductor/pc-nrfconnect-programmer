@@ -39,6 +39,7 @@
  *
  * @param {number} start Start of range.
  * @param {number} end End of range.
+ *
  * @returns {Array} Range of numbers.
  */
 export default (start: number, end: number): Array<number> =>

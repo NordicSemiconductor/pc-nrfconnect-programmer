@@ -34,17 +34,43 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import nrfjprog from 'pc-nrfjprog-js';
-import nrfdl from 'nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
+import nrfdl, {
+    ProtectionStatus,
+    DeviceCore,
+    DeviceFamily,
+    DeviceCoreInfo,
+} from 'nrf-device-lib-js';
 import range from './range';
 
-export const CoreDefinition = {
-    name: 'Application',
+export type CoreDefinition = {
+    name: DeviceCore;
+    coreNumber: number;
+    romBaseAddr: number;
+    romSize: number;
+    ramSize: number;
+    pageSize: number;
+    blockSize: number;
+    ficrBaseAddr: number;
+    ficrSize: number;
+    uicrBaseAddr: number;
+    uicrSize: number;
+    blAddrOffset: number;
+    mbrParamsOffset: number;
+    mbrBaseAddr: number;
+    mbrSize: number;
+    protectionStatus: ProtectionStatus;
+};
+
+/**
+ * Default definition for device core
+ */
+export const coreDefinition: CoreDefinition = {
+    name: 'NRFDL_DEVICE_CORE_APPLICATION',
     coreNumber: 0,
     romBaseAddr: 0x0,
     romSize: 0x100000, // 1 MB
-    ramSize: null,
+    ramSize: 0x0,
     pageSize: 0x1000, // 4 KB
     blockSize: 0x200, // 0.5 KB
     ficrBaseAddr: 0x10000000,
@@ -55,46 +81,56 @@ export const CoreDefinition = {
     mbrParamsOffset: 0x18,
     mbrBaseAddr: 0x0,
     mbrSize: 0x1000,
-    readbackProtection: nrfdl.NRFDL_PROTECTION_STATUS_NONE,
+    protectionStatus: 'PROTECTION_STATUS_SECURE_REGIONS',
 };
 
-export const DeviceDefinition = {
+export interface DeviceDefinition {
+    family: DeviceFamily | null;
+    type: string | null;
+    cores: CoreDefinition[];
+}
+
+/**
+ * Default definition for device info
+ */
+export const deviceDefinition: DeviceDefinition = {
     family: null,
     type: null,
-    cores: [CoreDefinition],
+    cores: [coreDefinition],
 };
 
-// Some infomation cannot be feteched by nrfjprog
-// so they need to be pre-defined here.
+/**
+ * Some information cannot be fetch by nrf-device-lib-js
+ * Define the default values here
+ */
 const deviceDefinitions = [
-    // nRF52840 dongle cannot fetch info by nrfjprog
+    // nRF52840 dongle cannot fetch info by nrf-device-lib-js
     {
-        ...DeviceDefinition,
+        ...deviceDefinition,
         family: 'nRF52',
         type: 'nRF52840',
     },
     // nRF9160 has different ficr and uicr base address
     {
-        ...DeviceDefinition,
+        ...deviceDefinition,
         family: 'nRF91',
         type: 'nRF9160',
         cores: [
             {
-                ...CoreDefinition,
+                ...coreDefinition,
                 ficrBaseAddr: 0xff0000,
                 uicrBaseAddr: 0xff8000,
             },
         ],
     },
-    // TODO: Update comment here
-    // nRF5340
+    // nRF5340 has dual core definitions
     {
-        ...DeviceDefinition,
+        ...deviceDefinition,
         family: 'nRF53',
         type: 'nRF5340',
         cores: [
             {
-                ...CoreDefinition,
+                ...coreDefinition,
                 coreNumber: 0,
                 name: 'Application',
                 romBaseAddr: 0x0,
@@ -103,7 +139,7 @@ const deviceDefinitions = [
                 uicrBaseAddr: 0xff8000,
             },
             {
-                ...CoreDefinition,
+                ...coreDefinition,
                 coreNumber: 1,
                 name: 'Network',
                 romBaseAddr: 0x1000000,
@@ -115,7 +151,9 @@ const deviceDefinitions = [
     },
 ];
 
-// Refer to pc-nrfutil
+/**
+ * Nordic SoftDevice Id referring to pc-nrfutil
+ */
 export const NordicFwIds = {
     '0xA7': 's112_nrf51_6.0.0',
     '0x67': 's130_nrf51_1.0.0',
@@ -141,88 +179,89 @@ export const NordicFwIds = {
     '0x100': 's140_nrf52_7.2.0',
 };
 
-export const VendorId = {
-    SEGGER: 0x1366,
-    NORDIC_SEMICONDUCTOR: 0x1915,
-};
+/**
+ * Supported communication types
+ */
+export enum CommunicationType {
+    UNKNOWN,
+    JLINK,
+    USBSDFU,
+    MCUBOOT,
+}
 
+/**
+ * Supported USB vender IDs
+ */
+export enum VendorId {
+    SEGGER = 0x1366,
+    NORDIC_SEMICONDUCTOR = 0x1915,
+}
+
+/**
+ * Supported USB serial DFU product IDs
+ */
 export const USBProductIds = [0x521f, 0xc00a, 0xcafe];
 
-export const McubootProductIds = [0x520f, 0x9100];
+/**
+ * Supported USB MCUboot product IDs
+ */
+export const MCUbootProductIds = [0x520f, 0x9100];
 
-// IDs can be found in 99-jlink.rules from JLink deb package
-export const JlinkProductIds = [
+/**
+ * Supported JLink product IDs
+ * which can be found in 99-JLink.rules from JLink deb package
+ */
+export const JLinkProductIds = [
     ...range(0x0101, 0x0108),
     ...range(0x1001, 0x101f),
 ];
 
-export const CommunicationType = {
-    UNKNOWN: 0,
-    JLINK: 1,
-    USBSDFU: 2,
-    MCUBOOT: 3,
-};
+// const deviceFamilies = {};
 
-// Get communication type in string format
-export const getCommunicationType = type => {
-    switch (type) {
-        case CommunicationType.JLINK:
-            return 'JLink';
-        case CommunicationType.USBSDFU:
-            return 'USBSDFU';
-        case CommunicationType.MCUBOOT:
-            return 'MCUBOOT';
-        default:
-            return 'Unknown';
-    }
-};
+// const deviceModels = {};
 
-const deviceFamilies = {};
+// Object.keys(nrfjprog).forEach(key => {
+//     if (/NRF\d+_FAMILY/.test(key)) {
+//         Object.assign(deviceFamilies, {
+//             [nrfjprog[key]]: key.split('_')[0].replace('NRF', 'nRF'),
+//         });
+//     }
+//     if (/NRF\d+_xx.*/.test(key)) {
+//         const family = `${key.slice(0, 5)}_FAMILY`;
+//         deviceModels[nrfjprog[family]] = deviceModels[nrfjprog[family]] || {};
+//         Object.assign(deviceModels[nrfjprog[family]], { [nrfjprog[key]]: key });
+//     }
+// });
 
-const deviceModels = {};
+// // Device variants from jprog.
+// export const getDeviceModel = (family, type) => {
+//     if (family in deviceModels && type in deviceModels[family]) {
+//         return deviceModels[family][type];
+//     }
 
-Object.keys(nrfjprog).forEach(key => {
-    if (/NRF\d+_FAMILY/.test(key)) {
-        Object.assign(deviceFamilies, {
-            [nrfjprog[key]]: key.split('_')[0].replace('NRF', 'nRF'),
-        });
-    }
-    if (/NRF\d+_xx.*/.test(key)) {
-        const family = `${key.slice(0, 5)}_FAMILY`;
-        deviceModels[nrfjprog[family]] = deviceModels[nrfjprog[family]] || {};
-        Object.assign(deviceModels[nrfjprog[family]], { [nrfjprog[key]]: key });
-    }
-});
+//     return 'Unknown model';
+// };
 
-// Device variants from jprog.
-export const getDeviceModel = (family, type) => {
-    if (family in deviceModels && type in deviceModels[family]) {
-        return deviceModels[family][type];
-    }
+// export const getDeviceFamily = family => {
+//     if (family in deviceFamilies) {
+//         return deviceFamilies[family];
+//     }
 
-    return 'Unknown model';
-};
-
-export const getDeviceFamily = family => {
-    if (family in deviceFamilies) {
-        return deviceFamilies[family];
-    }
-
-    return 'Unknown family';
-};
+//     return 'Unknown family';
+// };
 
 // TODO: due to type defined in nrfjprog, the type in string
 // does not always match the type in number.
 // Update the function and enhence the logic
-export const getDeviceDefinition = type =>
+export const getdeviceDefinition = type =>
     deviceDefinitions.find(device => device.type.includes(type)) || {
-        ...DeviceDefinition,
+        ...deviceDefinition,
         type: `nRF${type}`,
     };
 
 // Get device info by calling version command
 export const getDeviceInfoByUSB = ({ part, memory }) => {
-    const deviceInfoByUsb = getDeviceDefinition(part.toString(16));
+    const deviceInfoByUsb = getdeviceDefinition(part.toString(16));
     const [core] = deviceInfoByUsb.cores;
     return {
         ...deviceInfoByUsb,
@@ -262,28 +301,40 @@ export const getDeviceInfoByNrfdl = device => {
     }
 
     return {
-        ...getDeviceDefinition(type),
+        ...getdeviceDefinition(type),
         family,
         cores: [],
     };
 };
 
-// Add core info to device info
-export const addCoreToDeviceInfo = (deviceInfo, coreInfo, coreName) => ({
+/**
+ * Add core info to device info
+ *
+ * @param {DeviceDefinition} deviceInfo - existing device info
+ * @param {DeviceCoreInfo} inputCoreInfo - core info to be added
+ * @param {string} coreName - the name of the core
+ *
+ * @returns {DeviceDefinition} the updated device info
+ */
+export const addCoreToDeviceInfo = (
+    deviceInfo: DeviceDefinition,
+    inputCoreInfo: DeviceCoreInfo,
+    coreName: string
+) => ({
     ...deviceInfo,
     cores: [
         ...deviceInfo.cores,
         {
-            ...CoreDefinition,
+            ...coreDefinition,
             name: coreName,
             coreNumber: deviceInfo.cores.length,
-            romBaseAddr: coreInfo.codeAddress,
-            romSize: coreInfo.codeSize,
-            ramSize: coreInfo.ramSize,
-            pageSize: coreInfo.codePageSize,
-            uicrBaseAddr: coreInfo.uicrAddress,
-            uicrSize: coreInfo.codePageSize,
-            readbackProtection: coreInfo.readbackProtection,
+            romBaseAddr: inputCoreInfo.codeAddress,
+            romSize: inputCoreInfo.codeSize,
+            ramSize: inputCoreInfo.RAMSize,
+            pageSize: inputCoreInfo.codePageSize,
+            // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
+            // uicrBaseAddr: inputCoreInfo.uicrAddress,
+            uicrSize: inputCoreInfo.codePageSize,
         },
     ],
 });
@@ -297,8 +348,10 @@ export const context = nrfdl.createContext();
  * @param {string} serialNumber The serial number of the device to return.
  * @returns {Promise<nrfdl.Device>} A promise potentially containing the device info.
  */
-export function getDeviceFromNrfdl(serialNumber) {
-    return new Promise((resolve, reject) => {
+export const getDeviceFromNrfdl = (
+    serialNumber: string
+): Promise<nrfdl.Device> =>
+    new Promise((resolve, reject) => {
         nrfdl.enumerate(context).then(devices => {
             // This is not needed when nrf-device-lib-js is integrated in device selector
             // eslint-disable-next-line no-restricted-syntax
@@ -315,4 +368,3 @@ export function getDeviceFromNrfdl(serialNumber) {
             );
         });
     });
-}
