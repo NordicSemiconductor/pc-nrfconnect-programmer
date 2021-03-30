@@ -85,8 +85,8 @@ export const coreDefinition: CoreDefinition = {
 };
 
 export interface DeviceDefinition {
-    family: DeviceFamily | null;
-    type: string | null;
+    family?: DeviceFamily;
+    type?: string;
     cores: CoreDefinition[];
 }
 
@@ -94,8 +94,8 @@ export interface DeviceDefinition {
  * Default definition for device info
  */
 export const deviceDefinition: DeviceDefinition = {
-    family: null,
-    type: null,
+    family: 'Unknown',
+    type: 'Unknown',
     cores: [coreDefinition],
 };
 
@@ -103,7 +103,7 @@ export const deviceDefinition: DeviceDefinition = {
  * Some information cannot be fetch by nrf-device-lib-js
  * Define the default values here
  */
-const deviceDefinitions = [
+const deviceDefinitions: DeviceDefinition[] = [
     // nRF52840 dongle cannot fetch info by nrf-device-lib-js
     {
         ...deviceDefinition,
@@ -132,7 +132,7 @@ const deviceDefinitions = [
             {
                 ...coreDefinition,
                 coreNumber: 0,
-                name: 'Application',
+                name: 'NRFDL_DEVICE_CORE_APPLICATION',
                 romBaseAddr: 0x0,
                 romSize: 0x100000, // 1 MB
                 ficrBaseAddr: 0xff0000,
@@ -141,7 +141,7 @@ const deviceDefinitions = [
             {
                 ...coreDefinition,
                 coreNumber: 1,
-                name: 'Network',
+                name: 'NRFDL_DEVICE_CORE_NETWORK',
                 romBaseAddr: 0x1000000,
                 romSize: 0x40000, // 256 KB
                 ficrBaseAddr: 0x1ff0000,
@@ -252,56 +252,58 @@ export const JLinkProductIds = [
 
 // TODO: due to type defined in nrfjprog, the type in string
 // does not always match the type in number.
-// Update the function and enhence the logic
-export const getdeviceDefinition = type =>
-    deviceDefinitions.find(device => device.type.includes(type)) || {
+// Update the function and enhance the logic
+export const getDeviceDefinition = (type: string): DeviceDefinition =>
+    deviceDefinitions.find((device: DeviceDefinition) =>
+        device?.type?.includes(type)
+    ) || {
         ...deviceDefinition,
-        type: `nRF${type}`,
+        type,
     };
 
 // Get device info by calling version command
-export const getDeviceInfoByUSB = ({ part, memory }) => {
-    const deviceInfoByUsb = getdeviceDefinition(part.toString(16));
-    const [core] = deviceInfoByUsb.cores;
-    return {
-        ...deviceInfoByUsb,
-        cores: [
-            {
-                ...core,
-                romSize: memory.romSize,
-                pageSize: memory.romPageSize,
-                ramSize: memory.ramSize,
-            },
-        ],
-    };
-};
+// export const getDeviceInfoByUSB = ({ part, memory }) => {
+//     const deviceInfoByUsb = getdeviceDefinition(part.toString(16));
+//     const [core] = deviceInfoByUsb.cores;
+//     return {
+//         ...deviceInfoByUsb,
+//         cores: [
+//             {
+//                 ...core,
+//                 romSize: memory.romSize,
+//                 pageSize: memory.romPageSize,
+//                 ramSize: memory.ramSize,
+//             },
+//         ],
+//     };
+// };
 
 // Get device info by calling nrf-devicie-lib-js
-export const getDeviceInfoByNrfdl = device => {
-    const model = device.jlink.device_version || 'Unknown model';
-    let family = device.jlink.device_family || 'Unknown family';
+export const getDeviceInfoByNrfdl = (device: nrfdl.Device) => {
+    const model = device.jlink.device_version;
+    const family = device.jlink.device_family;
     logger.info(`Device family ${family}`);
     logger.info(`Device model ${model}`);
 
-    let type;
-    if (model === 'Unknown model') {
-        type = 'Unknown';
-        logger.info(
-            'Device type is unknown. It may be a new version of product from Nordic Semiconductor.'
-        );
-        logger.info('Please check device list supported by nrfjprog.');
-    } else {
-        type = model.split('_')[0].substring(3); // Get device type digits
-        type = parseInt(type, 10);
-    }
-    if (family === 'Unknown family') {
-        family = 'Unknown';
-        logger.info('Device family is unknown. It is not supported.');
-        logger.info('Please check device list supported by nrfjprog.');
-    }
+    // let type;
+    // if (!model) {
+    //     type = 'Unknown';
+    //     logger.info(
+    //         'Device type is unknown. It may be a new version of product from Nordic Semiconductor.'
+    //     );
+    //     logger.info('Please check device list supported by nrfjprog.');
+    // } else {
+    //     type = model.split('_')[0].substring(3); // Get device type digits
+    //     type = parseInt(type, 10);
+    // }
+    // if (!family) {
+    //     family = 'Unknown';
+    //     logger.info('Device family is unknown. It is not supported.');
+    //     logger.info('Please check device list supported by nrfjprog.');
+    // }
 
     return {
-        ...getdeviceDefinition(type),
+        ...getDeviceDefinition(model),
         family,
         cores: [],
     };

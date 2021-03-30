@@ -40,6 +40,7 @@
  * @param {Function} fun Function that returns a promise
  * @param {Array} results Initial array that will hold the results
  * @param {Array} argsArray First arguments in array
+ *
  * @returns {Promise} Promise resolved to the initial results array
  * appended with the result of each promise
  */
