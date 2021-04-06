@@ -35,7 +35,6 @@
  */
 
 import produce from 'immer';
-import { List, Record } from 'immutable';
 import MemoryMap from 'nrf-intel-hex';
 import SerialPort from 'serialport';
 
@@ -73,10 +72,10 @@ export interface TargetState {
     readonly serialNumber?: string;
     readonly deviceInfo?: DeviceDefinition;
     readonly memMap?: MemoryMap;
-    readonly regions?: Region[]; // TODO: Define region
+    readonly regions?: any[]; // TODO: Define region
     readonly warnings?: string[];
     readonly writtenAddress?: number;
-    readonly dfuImages?: Image[]; // TODO: Define image
+    readonly dfuImages?: any[]; // TODO: Define image
     readonly isMemLoaded: boolean;
     readonly isWritable: boolean;
     readonly isRecoverable: boolean;
@@ -112,68 +111,84 @@ export default (state = defaultState, action: any): TargetState =>
         console.log(action.device);
         switch (action.type) {
             case 'DEVICE_SELECTED':
-                draft = defaultState;
+                draft = { ...defaultState };
                 draft.serialNumber = action.device.serialNumber;
+                break;
 
-            // case 'DEVICE_DESELECTED':
-            //     return new InitialState();
+            case 'DEVICE_DESELECTED':
+                draft = defaultState;
+                break;
 
-            // case targetActions.TARGET_TYPE_KNOWN:
-            //     return state
-            //         .set('targetType', action.targetType)
-            //         .set('isRecoverable', action.isRecoverable);
+            case targetActions.TARGET_TYPE_KNOWN:
+                draft.targetType = action.targetType;
+                draft.isRecoverable = action.isRecoverable;
+                break;
 
-            // case targetActions.TARGET_INFO_KNOWN:
-            //     return state.set('deviceInfo', action.deviceInfo);
+            case targetActions.TARGET_INFO_KNOWN:
+                draft.deviceInfo = action.deviceInfo;
+                break;
 
-            // case targetActions.TARGET_PORT_CHANGED:
-            //     return state
-            //         .set('serialNumber', action.serialNumber)
-            //         .set('port', action.path);
+            case targetActions.TARGET_PORT_CHANGED:
+                draft.serialNumber = action.serialNumber;
+                draft.port = action.path;
+                break;
 
-            // case targetActions.TARGET_CONTENTS_KNOWN:
-            //     return state
-            //         .set('memMap', action.targetMemMap)
-            //         .set('isMemLoaded', action.isMemLoaded);
+            case targetActions.TARGET_CONTENTS_KNOWN:
+                draft.memMap = action.targetMemMap;
+                draft.isMemLoaded = action.isMemLoaded;
+                break;
 
-            // case targetActions.TARGET_REGIONS_KNOWN:
-            //     return state.set('regions', action.regions);
+            case targetActions.TARGET_REGIONS_KNOWN:
+                draft.regions = action.regions;
+                break;
 
-            // case targetActions.TARGET_WRITABLE_KNOWN:
-            //     return state.set('isWritable', action.isWritable);
+            case targetActions.TARGET_WRITABLE_KNOWN:
+                draft.isWritable = action.isWritable;
+                break;
 
-            // case targetActions.DFU_IMAGES_UPDATE:
-            //     return state.set('dfuImages', action.dfuImages);
+            case targetActions.DFU_IMAGES_UPDATE:
+                draft.dfuImages = action.dfuImages;
+                break;
 
-            // case fileActions.FILES_EMTPY:
-            //     return state.set('writtenAddress', 0);
+            case fileActions.FILES_EMTPY:
+                draft.writtenAddress = 0;
+                break;
 
-            // case fileActions.FILE_PARSE:
-            //     return state.set('writtenAddress', 0);
+            case fileActions.FILE_PARSE:
+                draft.writtenAddress = 0;
+                break;
 
-            // case targetActions.WRITE_PROGRESS:
-            //     return state
-            //         .set('writtenAddress', action.address)
-            //         .set('isWriting', true);
+            case targetActions.WRITE_PROGRESS:
+                draft.writtenAddress = action.address;
+                draft.isWriting = true;
+                break;
 
-            // case targetActions.WRITING_START:
-            //     return state.set('isWriting', true).set('isErased', false);
+            case targetActions.WRITING_START:
+                draft.isWriting = true;
+                draft.isErased = false;
+                break;
 
-            // case targetActions.WRITING_END:
-            //     return state.set('isWriting', false);
+            case targetActions.WRITING_END:
+                draft.isWriting = false;
+                break;
 
-            // case targetActions.ERASING_START:
-            //     return state.set('isErasing', true);
+            case targetActions.ERASING_START:
+                draft.isErasing = true;
+                break;
 
-            // case targetActions.ERASING_END:
-            //     return state.set('isErasing', false).set('isErased', true);
+            case targetActions.ERASING_END:
+                draft.isErasing = false;
+                draft.isErased = true;
+                break;
 
-            // case targetActions.LOADING_START:
-            //     return state.set('isLoading', true);
+            case targetActions.LOADING_START:
+                draft.isLoading = true;
+                break;
 
-            // case targetActions.LOADING_END:
-            //     return state.set('isLoading', false);
+            case targetActions.LOADING_END:
+                draft.isLoading = false;
+                break;
 
-            // default:
+            default:
         }
     });

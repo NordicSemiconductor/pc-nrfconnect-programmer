@@ -337,6 +337,7 @@ export const addCoreToDeviceInfo = (
             // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
             // uicrBaseAddr: inputCoreInfo.uicrAddress,
             uicrSize: inputCoreInfo.codePageSize,
+            ...inputCoreInfo,
         },
     ],
 });
