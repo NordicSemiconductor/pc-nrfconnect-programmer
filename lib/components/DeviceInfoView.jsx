@@ -37,7 +37,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { CommunicationType, getCommunicationType } from '../util/devices';
+import { CommunicationType } from '../util/devices';
 
 const DeviceInfoView = ({
     serialNumber,
@@ -61,7 +61,7 @@ const DeviceInfoView = ({
         )}
         <div>
             <h5>Communication Type</h5>
-            <p>{getCommunicationType(targetType)}</p>
+            <p>{targetType}</p>
         </div>
         {deviceInfo && deviceInfo.cores && (
             <div>
