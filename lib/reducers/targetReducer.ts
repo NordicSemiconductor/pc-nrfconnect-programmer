@@ -34,6 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import produce from 'immer';
 import MemoryMap from 'nrf-intel-hex';
 import SerialPort from 'serialport';
@@ -88,7 +90,6 @@ const defaultState: TargetState = {
 
 export default (state = defaultState, action: any): TargetState =>
     produce<TargetState>(state, draft => {
-        console.log(action.device);
         switch (action.type) {
             case 'DEVICE_SELECTED':
                 draft = { ...defaultState };
