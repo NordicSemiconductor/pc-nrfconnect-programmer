@@ -262,24 +262,24 @@ export const getDeviceDefinition = (type: string): DeviceDefinition =>
     };
 
 // Get device info by calling version command
-// export const getDeviceInfoByUSB = ({ part, memory }) => {
-//     const deviceInfoByUsb = getdeviceDefinition(part.toString(16));
-//     const [core] = deviceInfoByUsb.cores;
-//     return {
-//         ...deviceInfoByUsb,
-//         cores: [
-//             {
-//                 ...core,
-//                 romSize: memory.romSize,
-//                 pageSize: memory.romPageSize,
-//                 ramSize: memory.ramSize,
-//             },
-//         ],
-//     };
-// };
+export const getDeviceInfoByUSB = ({ part, memory }) => {
+    const deviceInfoByUsb = getDeviceDefinition(part.toString(16));
+    const [core] = deviceInfoByUsb.cores;
+    return {
+        ...deviceInfoByUsb,
+        cores: [
+            {
+                ...core,
+                romSize: memory.romSize,
+                pageSize: memory.romPageSize,
+                ramSize: memory.ramSize,
+            },
+        ],
+    };
+};
 
 // Get device info by calling nrf-devicie-lib-js
-export const getDeviceInfoByNrfdl = (device: nrfdl.Device) => {
+export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
     const model = device.jlink.device_version;
     const family = device.jlink.device_family;
     logger.info(`Device family ${family}`);
