@@ -46,26 +46,6 @@ import {
     deviceDefinition,
 } from '../util/devices';
 
-// const InitialState = new Record({
-//     targetType: CommunicationType.UNKNOWN,
-//     port: null,
-//     serialNumber: null,
-//     deviceInfo: deviceDefinition,
-//     memMap: new MemoryMap(),
-//     regions: new List(),
-//     warnings: new List(),
-//     writtenAddress: 0,
-//     dfuImages: new List(),
-//     isMemLoaded: false,
-//     isWritable: false,
-//     isRecoverable: false,
-//     isWriting: false,
-//     isErasing: false,
-//     isErased: false,
-//     isLoading: false,
-//     isProtected: false,
-// });
-
 export interface TargetState {
     readonly targetType: CommunicationType;
     readonly port?: SerialPort;
@@ -150,7 +130,7 @@ export default (state = defaultState, action: any): TargetState =>
                 draft.dfuImages = action.dfuImages;
                 break;
 
-            case fileActions.FILES_EMTPY:
+            case fileActions.FILES_EMPTY:
                 draft.writtenAddress = 0;
                 break;
 
