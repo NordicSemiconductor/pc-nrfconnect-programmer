@@ -86,4 +86,4 @@ export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
  *
  * @returns {string} the number in MiB
  */
-export const hexToMiB = (n) => `${n / 1024 / 1024} MiB`;
+export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
