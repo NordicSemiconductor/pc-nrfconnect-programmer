@@ -50,7 +50,7 @@ const CoreView = ({ core, active }) => {
     // generate a gap view between regions
     let lastAddress = romBaseAddr;
     regions
-        .sortBy(r => r.startAddress)
+        .sort((a, b) => a.startAddress - b.startAddress)
         .forEach(region => {
             const { startAddress, regionSize } = region;
 

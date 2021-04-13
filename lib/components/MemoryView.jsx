@@ -36,7 +36,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'immutable';
 import CoreView from './CoreView';
 
 const allocateCores = (cores, regions) =>
@@ -120,7 +119,7 @@ const MemoryView = ({
 };
 
 MemoryView.propTypes = {
-    regions: PropTypes.instanceOf(List).isRequired,
+    regions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     isTarget: PropTypes.bool.isRequired,
     isMcuboot: PropTypes.bool.isRequired,
     isWriting: PropTypes.bool.isRequired,

@@ -34,51 +34,69 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Record, List } from 'immutable';
 import MemoryMap from 'nrf-intel-hex';
 import { logger } from 'nrfconnect/core';
+import { CoreDefinition } from './devices';
 import { hexpad2 } from './hexpad';
 
-// Definition of RegionPermission
-export const RegionPermission = {
-    NONE: 0,
-    READ_ONLY: 1,
-    READ_WRITE: 2,
-};
+/**
+ * Definition of RegionPermission
+ */
+export const enum RegionPermission {
+    NONE = 0,
+    READ_ONLY = 1,
+    READ_WRITE = 2,
+}
 
-// Definition of Region
-export const Region = new Record({
-    name: null,
-    startAddress: null,
-    regionSize: null,
+/**
+ * Definition of Region
+ */
+export interface Region {
+    name: string;
+    startAddress: number;
+    regionSize: number;
+    color: string;
+    fileNames: [];
+    permission: RegionPermission;
+}
+
+/**
+ * Default definition of region
+ */
+export const defaultRegion: Region = {
+    name: 'N/A',
+    startAddress: 0,
+    regionSize: 0,
     color: '#333F48',
     fileNames: [],
     permission: RegionPermission.READ_ONLY,
-});
-
-// Definition of RegionName
-export const RegionName = {
-    MBR_PARAMS: 'MBR Paramters',
-    MBR: 'MBR',
-    MBR_OR_APP: 'MBR or Application',
-    BOOTLOADER: 'Bootloader',
-    SOFTDEVICE: 'SoftDevice',
-    APPLICATION: 'Application',
-    UICR: 'UICR',
-    NONE: null,
 };
+
+/**
+ * Definition of RegionName
+ */
+export const enum RegionName {
+    MBR_PARAMS = 'MBR Paramters',
+    MBR = 'MBR',
+    MBR_OR_APP = 'MBR or Application',
+    BOOTLOADER = 'Bootloader',
+    SOFTDEVICE = 'SoftDevice',
+    APPLICATION = 'Application',
+    UICR = 'UICR',
+    NONE = 'N/A',
+}
 
 // Definition of RegionColor
-export const RegionColor = {
-    MBR_PARAMS: '#333F48',
-    MBR: '#FF9800',
-    MBR_OR_APP: '#FFC107',
-    BOOTLOADER: '#E91E63',
-    SOFTDEVICE: '#3F51B5',
-    APPLICATION: ' #4CAF50',
-    UICR: '#333F48',
-    NONE: '#333F48',
-};
+export const enum RegionColor {
+    MBR_PARAMS = '#333F48',
+    MBR = '#FF9800',
+    MBR_OR_APP = '#FFC107',
+    BOOTLOADER = '#E91E63',
+    SOFTDEVICE = '#3F51B5',
+    APPLICATION = ' #4CAF50',
+    UICR = '#333F48',
+    NONE = '#333F48',
+}
 
 // List taken from py-nrfutil and
 // https://devzone.nordicsemi.com/f/nordic-q-a/1171/how-do-i-access-softdevice-version-string#post-id-3693
@@ -145,13 +163,13 @@ const knownSoftDevices = {
 };
 
 // Check if the region is insde a range
-const isRegionInRange = (region, startAddr, endAddr) =>
+const isRegionInRange = (region: Region, startAddr: number, endAddr: number) =>
     region.startAddress >= startAddr &&
     region.startAddress + region.regionSize <= endAddr;
 
 const isRegionInCore = (
-    region,
-    { romBaseAddr, romSize, pageSize, uicrBaseAddr }
+    region: Region,
+    { romBaseAddr, romSize, pageSize, uicrBaseAddr }: CoreDefinition
 ) => {
     const isInRange = isRegionInRange(
         region,
@@ -167,7 +185,10 @@ const isRegionInCore = (
 };
 
 // Add Bootloader region
-export const getBootloaderRegion = (memMap, coreInfo) => {
+export const getBootloaderRegion = (
+    memMap: MemoryMap,
+    coreInfo: CoreDefinition
+) => {
     const { uicrBaseAddr, blAddrOffset } = coreInfo;
     const bootloaderAddress = memMap.getUint32(
         uicrBaseAddr + blAddrOffset,
@@ -178,13 +199,14 @@ export const getBootloaderRegion = (memMap, coreInfo) => {
         bootloaderAddress !== 0xffffffff &&
         memMap.get(bootloaderAddress)
     ) {
-        const region = new Region({
+        const region = {
+            ...defaultRegion,
             name: RegionName.BOOTLOADER,
             startAddress: bootloaderAddress,
-            regionSize: memMap.get(bootloaderAddress).length,
+            regionSize: memMap.get(bootloaderAddress)?.length,
             color: RegionColor.BOOTLOADER,
             permission: RegionPermission.READ_WRITE,
-        });
+        };
         return region;
     }
     return undefined;

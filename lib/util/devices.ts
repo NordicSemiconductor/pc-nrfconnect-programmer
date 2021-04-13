@@ -63,9 +63,9 @@ export type CoreDefinition = {
 };
 
 /**
- * Default definition for device core
+ * Default definition of device core
  */
-export const coreDefinition: CoreDefinition = {
+export const defaultCore: CoreDefinition = {
     name: 'NRFDL_DEVICE_CORE_APPLICATION',
     coreNumber: 0,
     romBaseAddr: 0x0,
@@ -96,7 +96,7 @@ export interface DeviceDefinition {
 export const deviceDefinition: DeviceDefinition = {
     family: 'Unknown',
     type: 'Unknown',
-    cores: [coreDefinition],
+    cores: [defaultCore],
 };
 
 /**
@@ -117,7 +117,7 @@ const deviceDefinitions: DeviceDefinition[] = [
         type: 'nRF9160',
         cores: [
             {
-                ...coreDefinition,
+                ...defaultCore,
                 ficrBaseAddr: 0xff0000,
                 uicrBaseAddr: 0xff8000,
             },
@@ -130,7 +130,7 @@ const deviceDefinitions: DeviceDefinition[] = [
         type: 'nRF5340',
         cores: [
             {
-                ...coreDefinition,
+                ...defaultCore,
                 coreNumber: 0,
                 name: 'NRFDL_DEVICE_CORE_APPLICATION',
                 romBaseAddr: 0x0,
@@ -139,7 +139,7 @@ const deviceDefinitions: DeviceDefinition[] = [
                 uicrBaseAddr: 0xff8000,
             },
             {
-                ...coreDefinition,
+                ...defaultCore,
                 coreNumber: 1,
                 name: 'NRFDL_DEVICE_CORE_NETWORK',
                 romBaseAddr: 0x1000000,
@@ -327,7 +327,7 @@ export const addCoreToDeviceInfo = (
     cores: [
         ...deviceInfo.cores,
         {
-            ...coreDefinition,
+            ...defaultCore,
             name: coreName,
             coreNumber: deviceInfo.cores.length,
             romBaseAddr: inputCoreInfo.codeAddress,
@@ -355,10 +355,14 @@ export const getDeviceFromNrfdl = (
     serialNumber: string
 ): Promise<nrfdl.Device> =>
     new Promise((resolve, reject) => {
+        console.log(nrfdl);
+        console.log(context);
         nrfdl.enumerate(context).then(devices => {
+            console.log(devices);
             // This is not needed when nrf-device-lib-js is integrated in device selector
             // eslint-disable-next-line no-restricted-syntax
             for (const device of devices) {
+                console.log(device.serialnumber);
                 if (device.serialnumber === serialNumber) {
                     return resolve(device);
                 }
