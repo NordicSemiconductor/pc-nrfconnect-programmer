@@ -480,15 +480,15 @@ export const getMemoryRegions = (
  * the loaded memory content and deviceDefinition,
  * return the heuristically detected regions for loaded memory contents.
  *
- * @param {Array} overlaps the overlaps
+ * @param {Overlaps} overlaps the overlaps
  * @param {CorDefinition} coreInfo the specific core
  *
- * @returns {List} the list of region
+ * @returns {array} the list of region
  */
 export const getRegionsFromOverlaps = (
     overlaps: Overlaps,
     coreInfo: CoreDefinition
-) => {
+): Region[] => {
     const memMap = MemoryMap.flattenOverlaps(overlaps);
     const memRegions = getMemoryRegions(memMap, coreInfo);
     const sdRegion = memRegions.find((r) => r.name === RegionName.SOFTDEVICE);
@@ -507,61 +507,66 @@ export const getRegionsFromOverlaps = (
         });
         region = memRegions.find((r) => r.startAddress === startAddress);
         region = region
-            ? region
-                  .set("startAddress", startAddress)
-                  .set("fileNames", fileNames)
-                  .set("regionSize", regionSize)
-            : new Region({
+            ? {
+                  ...region,
+                  fileNames,
+                  startAddress,
+                  regionSize,
+              }
+            : {
+                  ...defaultRegion,
                   name: RegionName.NONE,
                   color: RegionColor.NONE,
                   startAddress,
                   regionSize,
                   fileNames,
-              });
+              };
 
         // The content read from device flash memory via JLink is padded.
         // If the gap between SoftDevice and Application is too small,
         // then the content read by nrfjprog will be regarded as a single part.
         // Split them apart if this happens.
-        if (
-            region.name === RegionName.SOFTDEVICE &&
-            regionSize - sdRegion.regionSize > coreInfo.pageSize
-        ) {
-            region = region.set("regionSize", sdRegion.regionSize);
+        if (sdRegion && regionSize - sdRegion.regionSize > coreInfo.pageSize) {
+            region = region.set("regionSize", sdRegion?.regionSize!!);
 
-            const appRegion = new Region({
+            const appRegion = {
+                ...defaultRegion,
                 name: RegionName.APPLICATION,
                 color: RegionColor.APPLICATION,
                 startAddress: startAddress + region.regionSize,
                 regionSize: regionSize - region.regionSize,
                 fileNames,
-            });
-            regions = regions.push(appRegion);
+            };
+            regions = [...regions, appRegion];
         }
 
         // If both SoftDevice and Bootloader exist
-        // the regions between SoftDevcie and Bootloader are Applications
+        // the regions between SoftDevice and Bootloader are Applications
         if (
             sdRegion &&
             blRegion &&
             startAddress >= sdRegion.startAddress + sdRegion.regionSize &&
             startAddress + regionSize < blRegion.startAddress
         ) {
-            region = region
-                .set("name", RegionName.APPLICATION)
-                .set("color", RegionColor.APPLICATION);
+            region = {
+                ...region,
+                name: RegionName.APPLICATION,
+                color: RegionColor.APPLICATION,
+            };
         }
 
         // If SoftDevice exists but not Bootloader
-        // the regions above SoftDevcie are Applications
+        // the regions above SoftDevice are Applications
         if (
             sdRegion &&
             !blRegion &&
             startAddress >= sdRegion.startAddress + sdRegion.regionSize
         ) {
-            region = region
-                .set("name", RegionName.APPLICATION)
-                .set("color", RegionColor.APPLICATION);
+            region = {
+                ...region,
+                name: RegionName.APPLICATION,
+                color: RegionColor.APPLICATION,
+            };
         }
 
         // If Bootloader exists but not SoftDevice
@@ -572,20 +577,24 @@ export const getRegionsFromOverlaps = (
             startAddress !== coreInfo.romBaseAddr &&
             startAddress + regionSize < blRegion.startAddress
         ) {
-            region = region
-                .set("name", RegionName.APPLICATION)
-                .set("color", RegionColor.APPLICATION);
+            region = {
+                ...region,
+                name: RegionName.APPLICATION,
+                color: RegionColor.APPLICATION,
+            };
         }
 
         // If neither Bootloader nor SoftDevice exists
         // then we regard the region as Application
         if (!sdRegion && !blRegion && region.name === RegionName.NONE) {
-            region = region
-                .set("name", RegionName.APPLICATION)
-                .set("color", RegionColor.APPLICATION);
+            region = {
+                ...region,
+                name: RegionName.APPLICATION,
+                color: RegionColor.APPLICATION,
+            };
         }
 
-        regions = regions.includes(region) ? regions : regions.push(region);
+        regions = regions.includes(region) ? regions : [...regions, region];
     });
     regions = regions.filter((r) => isRegionInCore(r, coreInfo));
 
