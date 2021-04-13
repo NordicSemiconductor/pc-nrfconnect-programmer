@@ -16,7 +16,7 @@ declare module "nrf-intel-hex" {
 
         static overlapMemoryMaps(
             memoryBlock: MemoryBlocks
-        ): Map<number, Uint8Array>;
+        ): Overlaps;
 
         public fromHex(hexText: string, maxBlockSize: number): MemoryMap;
 

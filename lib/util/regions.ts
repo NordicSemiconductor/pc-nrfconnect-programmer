@@ -34,9 +34,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import MemoryMap, { Overlaps } from "nrf-intel-hex";
+import MemoryMap, { MemoryBlocks, Overlaps } from "nrf-intel-hex";
 import { logger } from "nrfconnect/core";
-import { CoreDefinition } from "./devices";
+import { CoreDefinition, DeviceDefinition } from "./devices";
 import { hexpad2 } from "./hexpad";
 
 const SOFTDEVICE_MAGIC_START = 0x1000;
@@ -605,12 +605,15 @@ export const getRegionsFromOverlaps = (
  * Given an instance of MemoryMap, content of loaded files and deviceDefinition,
  * return the heuristically detected regions for loaded files.
  *
- * @param {Array}              memMaps      the memory map
- * @param {deviceDefinition}   coreInfo   the device infomation
+ * @param {MemoryBlocks} memMaps the array of memory content
+ * @param {CorDefinition} coreInfo the specific core
  *
- * @returns {List} the list of region
+ * @returns {Array} the list of region
  */
-export const getFileRegions = (memMaps, coreInfo) => {
+export const getFileRegions = (
+    memMaps: MemoryBlocks,
+    coreInfo: CoreDefinition
+): Region[] => {
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     const regions = getRegionsFromOverlaps(overlaps, coreInfo);
 
@@ -621,12 +624,15 @@ export const getFileRegions = (memMaps, coreInfo) => {
  * Given an instance of MemoryMap, content of loaded device and deviceDefinition,
  * return the heuristically detected regions for loaded device.
  *
- * @param {Array}              memMaps      the memory map
- * @param {deviceDefinition}   coreInfo   the device infomation
+ * @param {MemoryBlocks} memMaps the array of memory content
+ * @param {CorDefinition} coreInfo the specific core
  *
- * @returns {List} the list of region
+ * @returns {Array} the list of region
  */
-export const getCoreRegions = (memMaps, coreInfo) => {
+export const getCoreRegions = (
+    memMaps: MemoryBlocks,
+    coreInfo: CoreDefinition
+): Region[] => {
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     const regions = getRegionsFromOverlaps(overlaps, coreInfo);
 
@@ -637,15 +643,18 @@ export const getCoreRegions = (memMaps, coreInfo) => {
  * Given an instance of MemoryMap, content of loaded device and deviceDefinition,
  * return the heuristically detected regions for loaded device.
  *
- * @param {Array}              memMaps      the memory map
- * @param {deviceDefinition}   deviceInfo   the device infomation
+ * @param {MemoryBlocks} memMaps the array of memory content
+ * @param {deviceDefinition}   deviceInfo   the specific  device
  *
- * @returns {List} the list of region
+ * @returns {Array} the list of region
  */
-export const getTargetRegions = (memMaps, deviceInfo) => {
-    let regions = List();
+export const getTargetRegions = (
+    memMaps: MemoryBlocks,
+    deviceInfo: DeviceDefinition
+): Region[] => {
+    let regions: Region[] = [];
     deviceInfo.cores.forEach((c) => {
-        regions = regions.concat(getCoreRegions(memMaps, c));
+        regions = [...regions, ...getCoreRegions(memMaps, c)];
     });
     return regions;
 };
