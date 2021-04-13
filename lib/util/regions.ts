@@ -39,6 +39,14 @@ import { logger } from "nrfconnect/core";
 import { CoreDefinition } from "./devices";
 import { hexpad2 } from "./hexpad";
 
+const SOFTDEVICE_MAGIC_START = 0x1000;
+const SOFTDEVICE_MAGIC_END = 0x10000;
+const SOFTDEVICE_MAGIC_NUMBER = 0x51b1e5db;
+const SOFTDEVICE_MAGIC_OFFSET = 0x4;
+const SOFTDEVICE_FWID_OFFSET = 0xc;
+const SOFTDEVICE_ID_OFFSET = 0x10;
+const SOFTDEVICE_VERSION_OFFSET = 0x14;
+
 /**
  * Definition of RegionPermission
  */
@@ -302,27 +310,22 @@ export const getSoftDeviceRegion = (
     coreInfo: CoreDefinition
 ): Region | undefined => {
     const { pageSize } = coreInfo;
-    const softDeviceMagicStart = 0x1000;
-    const softDeviceMagicEnd = 0x10000;
-    const softDeviceMagicNumber = 0x51b1e5db;
-    const softDeviceMagicOffset = 0x4;
-    const softDeviceSizeOffset = 0x8;
     for (
-        let address = softDeviceMagicStart;
-        address < softDeviceMagicEnd;
+        let address = SOFTDEVICE_MAGIC_START;
+        address < SOFTDEVICE_MAGIC_END;
         address += pageSize
     ) {
         if (
-            memMap.getUint32(address + softDeviceMagicOffset, true) ===
-            softDeviceMagicNumber
+            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ===
+            SOFTDEVICE_MAGIC_NUMBER
         ) {
             const regionSize =
-                memMap.getUint32(address + softDeviceSizeOffset, true)!! -
-                softDeviceMagicStart;
+                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)!! -
+                SOFTDEVICE_MAGIC_START;
             const region: Region = {
                 ...defaultRegion,
                 name: RegionName.SOFTDEVICE,
-                startAddress: softDeviceMagicStart,
+                startAddress: SOFTDEVICE_MAGIC_START,
                 regionSize,
                 color: RegionColor.SOFTDEVICE,
                 permission: RegionPermission.READ_WRITE,
@@ -333,27 +336,30 @@ export const getSoftDeviceRegion = (
     return undefined;
 };
 
-// Get SoftDevice ID
-export const getSoftDeviceId = (memMap, coreInfo) => {
+/**
+ * Get SoftDevice ID from a memory content according to a specific core
+ * @param memMap the memory content
+ * @param coreInfo the specific core
+ *
+ * @returns the SoftDevice ID if exist
+ */
+export const getSoftDeviceId = (
+    memMap: MemoryMap,
+    coreInfo: CoreDefinition
+): number | undefined => {
     const { pageSize } = coreInfo;
-    const softDeviceMagicStart = 0x1000;
-    const softDeviceMagicEnd = 0x10000;
-    const softDeviceMagicNumber = 0x51b1e5db;
-    const softDeviceMagicOffset = 0x4;
-    const softDeviceFwIdOffset = 0xc;
     let fwId;
     for (
-        let address = softDeviceMagicStart;
-        address < softDeviceMagicEnd;
+        let address = SOFTDEVICE_MAGIC_START;
+        address < SOFTDEVICE_MAGIC_END;
         address += pageSize
     ) {
         if (
-            memMap.getUint32(address + softDeviceMagicOffset, true) ===
-            softDeviceMagicNumber
+            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ===
+            SOFTDEVICE_MAGIC_NUMBER
         ) {
-            /* eslint-disable no-bitwise */
             fwId =
-                memMap.getUint32(address + softDeviceFwIdOffset, true) &
+                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)!! &
                 0x0000ffff;
         }
     }
@@ -363,27 +369,20 @@ export const getSoftDeviceId = (memMap, coreInfo) => {
 // Display SoftDevice region info in logger
 export const logSoftDeviceRegion = (memMap, coreInfo) => {
     const { pageSize } = coreInfo;
-    const softDeviceMagicStart = 0x1000;
-    const softDeviceMagicEnd = 0x10000;
-    const softDeviceMagicNumber = 0x51b1e5db;
-    const softDeviceMagicOffset = 0x4;
-    const softDeviceFwIdOffset = 0xc;
-    const softDeviceIdOffset = 0x10;
-    const softDeviceVersionOffset = 0x14;
     for (
-        let address = softDeviceMagicStart;
-        address < softDeviceMagicEnd;
+        let address = SOFTDEVICE_MAGIC_START;
+        address < SOFTDEVICE_MAGIC_END;
         address += pageSize
     ) {
         if (
-            memMap.getUint32(address + softDeviceMagicOffset, true) ===
-            softDeviceMagicNumber
+            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ===
+            SOFTDEVICE_MAGIC_NUMBER
         ) {
             // const softDeviceSize = memMap.getUint32(address + softDeviceSizeOffset, true);
             /* eslint-disable no-bitwise */
             const infoBlockSize = memMap.getUint32(address, true) & 0x000000ff;
             const fwId =
-                memMap.getUint32(address + softDeviceFwIdOffset, true) &
+                memMap.getUint32(address + SOFTDEVICE_FWID_OFFSET, true) &
                 0x0000ffff;
 
             if (infoBlockSize >= 0x18) {
@@ -400,11 +399,11 @@ export const logSoftDeviceRegion = (memMap, coreInfo) => {
                 // }
 
                 const softDeviceId = memMap.getUint32(
-                    address + softDeviceIdOffset,
+                    address + SOFTDEVICE_ID_OFFSET,
                     true
                 );
                 const softDeviceVersion = memMap.getUint32(
-                    address + softDeviceVersionOffset,
+                    address + SOFTDEVICE_VERSION_OFFSET,
                     true
                 );
                 if (softDeviceVersion === 0) {
