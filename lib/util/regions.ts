@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import MemoryMap from "nrf-intel-hex";
+import MemoryMap, { Overlaps } from "nrf-intel-hex";
 import { logger } from "nrfconnect/core";
 import { CoreDefinition } from "./devices";
 import { hexpad2 } from "./hexpad";
@@ -88,6 +88,7 @@ export enum RegionColor {
  * Definition of Region
  */
 export interface Region {
+    set(arg0: string, startAddress: number);
     name: RegionName;
     startAddress: number;
     regionSize: number;
@@ -195,7 +196,7 @@ const isRegionInRange = (
  * Check if the region is inside a specific core
  *
  * @param region the region to be checked
- * @param coreInfo the specific core
+ * @param {CorDefinition} coreInfo the specific core
  *
  * @returns whether the region is inside the specific core
  */
@@ -217,8 +218,8 @@ const isRegionInCore = (region: Region, coreInfo: CoreDefinition): boolean => {
 /**
  * Get Bootloader region from a memory content according to a specific core
  *
- * @param memMap the memory content
- * @param coreInfo the specific core
+ * @param {MemoryMap} memMap the memory content
+ * @param {CorDefinition} coreInfo the specific core
  * @returns the Bootloader region if exist
  */
 export const getBootloaderRegion = (
@@ -251,8 +252,8 @@ export const getBootloaderRegion = (
 /**
  * Get MBR parameters region from a memory content according to a specific core
  *
- * @param memMap the memory content
- * @param coreInfo the specific core
+ * @param {MemoryMap} memMap the memory content
+ * @param {CorDefinition} coreInfo the specific core
  *
  * @returns the MBR parameters region if exist
  */
@@ -280,8 +281,8 @@ export const getMBRParamsRegion = (
 /**
  * Get MBR region from a memory content according to a specific core
  *
- * @param memMap the memory content
- * @param coreInfo the specific core
+ * @param {MemoryMap} memMap the memory content
+ * @param {CorDefinition} coreInfo the specific core
  *
  * @returns the MBR region if exist
  */
@@ -308,8 +309,8 @@ export const getMBRRegion = (
 /**
  * Get SoftDevice region from a memory content according to a specific core
  *
- * @param memMap the memory content
- * @param coreInfo the specific core
+ * @param {MemoryMap} memMap the memory content
+ * @param {CorDefinition} coreInfo the specific core
  *
  * @returns the SoftDevice region if exist
  */
@@ -347,8 +348,8 @@ export const getSoftDeviceRegion = (
 /**
  * Get SoftDevice ID from a memory content according to a specific core
  *
- * @param memMap the memory content
- * @param coreInfo the specific core
+ * @param {MemoryMap} memMap the memory content
+ * @param {CorDefinition} coreInfo the specific core
  *
  * @returns the SoftDevice ID if exist
  */
@@ -378,8 +379,8 @@ export const getSoftDeviceId = (
 /**
  * Display SoftDevice information in the log
  *
- * @param memMap the memory content
- * @param coreInfo the specific core
+ * @param {MemoryMap} memMap the memory content
+ * @param {CorDefinition} coreInfo the specific core
  */
 export const logSoftDeviceRegion = (
     memMap: MemoryMap,
@@ -450,8 +451,8 @@ export const logSoftDeviceRegion = (
  * Given an instance of MemoryMap and deviceDefinition,
  * return the heuristically detected regions.
  *
- * @param memMap the memory content
- * @param coreInfo the specific core
+ * @param {MemoryMap} memMap the memory content
+ * @param {CorDefinition} coreInfo the specific core
  *
  * @returns {Array} the list of region
  */
@@ -479,24 +480,27 @@ export const getMemoryRegions = (
  * the loaded memory content and deviceDefinition,
  * return the heuristically detected regions for loaded memory contents.
  *
- * @param {Array}              overlaps      the overlaps
- * @param {deviceDefinition}   coreInfo    the device infomation
+ * @param {Array} overlaps the overlaps
+ * @param {CorDefinition} coreInfo the specific core
  *
  * @returns {List} the list of region
  */
-export const getRegionsFromOverlaps = (overlaps, coreInfo) => {
+export const getRegionsFromOverlaps = (
+    overlaps: Overlaps,
+    coreInfo: CoreDefinition
+) => {
     const memMap = MemoryMap.flattenOverlaps(overlaps);
     const memRegions = getMemoryRegions(memMap, coreInfo);
     const sdRegion = memRegions.find((r) => r.name === RegionName.SOFTDEVICE);
     const blRegion = memRegions.find((r) => r.name === RegionName.BOOTLOADER);
-    let regions = new List();
+    let regions: Region[] = [];
     let region;
     overlaps.forEach((overlap, startAddress) => {
-        const fileNames = [];
+        const fileNames: string[] = [];
         let regionSize = 0;
 
         overlap.forEach(([fileName, bytes]) => {
-            regionSize = bytes.length;
+            regionSize = bytes?.length!!;
             if (fileName) {
                 fileNames.push(fileName);
             }

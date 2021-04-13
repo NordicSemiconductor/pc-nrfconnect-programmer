@@ -6,18 +6,21 @@ declare module "nrf-intel-hex" {
         | { [x: number]: Uint8Array }
         | [number, Uint8Array][];
 
+    export type Overlap = [string, Uint8Array][];
+    export type Overlaps = Map<number, Overlap>;
+
     export default class MemoryMap extends Map<number, Uint8Array> {
         constructor(blocks: MemoryBlocks);
 
-        public fromHex(hexText: string, maxBlockSize: number): MemoryMap;
-
-        public join(maxBlockSize: number): MemoryMap;
+        static flattenOverlaps(overlaps: Overlaps): MemoryMap;
 
         static overlapMemoryMaps(
             memoryBlock: MemoryBlocks
         ): Map<number, Uint8Array>;
 
-        static flattenOverlaps(overlaps: Map<number, Uint8Array>): MemoryMap;
+        public fromHex(hexText: string, maxBlockSize: number): MemoryMap;
+
+        public join(maxBlockSize: number): MemoryMap;
 
         public paginate(pageSize?: number, pad?: number): MemoryMap;
 
