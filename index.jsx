@@ -111,7 +111,7 @@ export default {
             }
 
             case 'DEVICE_DESELECTED': {
-                logger.info('Target device closed.');
+                logger.info('Target device closed');
                 break;
             }
 
@@ -136,8 +136,7 @@ export default {
             '- Connected devices:',
             ...detectedDevices.map(
                 d =>
-                    `    - ${portPath(d.serialport)}: ${d.serialNumber} ${
-                        d.boardVersion || ''
+                    `    - ${portPath(d.serialport)}: ${d.serialNumber} ${d.boardVersion || ''
                     }`
             ),
             '',
