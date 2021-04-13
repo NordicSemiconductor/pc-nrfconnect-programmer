@@ -108,9 +108,11 @@ export const defaultRegion: Region = {
     permission: RegionPermission.READ_ONLY,
 };
 
-// List taken from py-nrfutil and
-// https://devzone.nordicsemi.com/f/nordic-q-a/1171/how-do-i-access-softdevice-version-string#post-id-3693
-const knownSoftDevices = {
+/**
+ * List of known SoftDevices taken from py-nrfutil and
+ * https://devzone.nordicsemi.com/f/nordic-q-a/1171/how-do-i-access-softdevice-version-string#post-id-3693
+ */
+const knownSoftDevices: { [key: number]: string } = {
     0x43: "S110 v5.2.1",
     0x49: "S110 v6.0.0",
     0x35: "S110 v6.2.1",
@@ -366,76 +368,73 @@ export const getSoftDeviceId = (
     return fwId;
 };
 
-// Display SoftDevice region info in logger
-export const logSoftDeviceRegion = (memMap, coreInfo) => {
+/**
+ * Display SoftDevice information in the log
+ * @param memMap the memory content
+ * @param coreInfo the specific core
+ */
+export const logSoftDeviceRegion = (
+    memMap: MemoryMap,
+    coreInfo: CoreDefinition
+) => {
     const { pageSize } = coreInfo;
+    const softdeviceMagicNumber = memMap.getUint32(
+        SOFTDEVICE_MAGIC_START + SOFTDEVICE_MAGIC_OFFSET,
+        true
+    );
     for (
         let address = SOFTDEVICE_MAGIC_START;
         address < SOFTDEVICE_MAGIC_END;
         address += pageSize
     ) {
-        if (
-            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ===
-            SOFTDEVICE_MAGIC_NUMBER
-        ) {
-            // const softDeviceSize = memMap.getUint32(address + softDeviceSizeOffset, true);
-            /* eslint-disable no-bitwise */
-            const infoBlockSize = memMap.getUint32(address, true) & 0x000000ff;
-            const fwId =
-                memMap.getUint32(address + SOFTDEVICE_FWID_OFFSET, true) &
-                0x0000ffff;
+        if (softdeviceMagicNumber !== SOFTDEVICE_MAGIC_NUMBER) return;
 
-            if (infoBlockSize >= 0x18) {
-                // Including SoftDev ID (S000) and version
-                // if (infoBlockSize >= 0x2C) {    // Including 20-byte rev hash
-                //     // rev hash is only logged, not explicitly shown in the GUI.
-                //     let hash = [
-                //         memMap.getUint32(address + 0x18, false),
-                //         memMap.getUint32(address + 0x1C, false),
-                //         memMap.getUint32(address + 0x20, false),
-                //         memMap.getUint32(address + 0x24, false),
-                //         memMap.getUint32(address + 0x28, false)];
-                //     hash = hash.map(n => n.toString(16).padStart(8, '0')).join('');
-                // }
+        const infoBlockSize = memMap.getUint32(address, true)!! & 0x000000ff;
+        const fwId =
+            memMap.getUint32(address + SOFTDEVICE_FWID_OFFSET, true)!! &
+            0x0000ffff;
 
-                const softDeviceId = memMap.getUint32(
-                    address + SOFTDEVICE_ID_OFFSET,
-                    true
-                );
-                const softDeviceVersion = memMap.getUint32(
-                    address + SOFTDEVICE_VERSION_OFFSET,
-                    true
-                );
-                if (softDeviceVersion === 0) {
-                    logger.info(
-                        `SoftDevice detected, id ${hexpad2(
-                            fwId
-                        )} (S${softDeviceId} prerelease)`
-                    );
-                } else {
-                    const softDeviceVersionMajor = Math.floor(
-                        (softDeviceVersion / 1000000) % 1000
-                    );
-                    const softDeviceVersionMinor = Math.floor(
-                        (softDeviceVersion / 1000) % 1000
-                    );
-                    const softDeviceVersionPatch = softDeviceVersion % 1000;
-                    logger.info(
-                        `SoftDevice detected, id ${hexpad2(
-                            fwId
-                        )} (S${softDeviceId} v${softDeviceVersionMajor}.${softDeviceVersionMinor}.${softDeviceVersionPatch})`
-                    );
-                }
-            } else if (knownSoftDevices[fwId]) {
+        if (infoBlockSize >= 0x18) {
+            const softDeviceId = memMap.getUint32(
+                address + SOFTDEVICE_ID_OFFSET,
+                true
+            );
+            const softDeviceVersion = memMap.getUint32(
+                address + SOFTDEVICE_VERSION_OFFSET,
+                true
+            );
+            if (softDeviceVersion === 0) {
                 logger.info(
-                    `SoftDevice detected, id ${hexpad2(fwId)} (${
-                        knownSoftDevices[fwId]
-                    })`
+                    `SoftDevice detected, id ${hexpad2(
+                        fwId
+                    )} (S${softDeviceId} prerelease)`
                 );
-            } else {
-                logger.info(`SoftDevice detected, id ${hexpad2(fwId)}`);
+                return;
+            }
+            if (softDeviceVersion) {
+                const softDeviceVersionMajor = Math.floor(
+                    (softDeviceVersion / 1000000) % 1000
+                );
+                const softDeviceVersionMinor = Math.floor(
+                    (softDeviceVersion / 1000) % 1000
+                );
+                const softDeviceVersionPatch = softDeviceVersion % 1000;
+                logger.info(
+                    `SoftDevice detected, id ${hexpad2(
+                        fwId
+                    )} (S${softDeviceId} v${softDeviceVersionMajor}.${softDeviceVersionMinor}.${softDeviceVersionPatch})`
+                );
             }
         }
+        if (knownSoftDevices[fwId]) {
+            logger.info(
+                `SoftDevice detected, id ${hexpad2(fwId)} (${
+                    knownSoftDevices[fwId]
+                })`
+            );
+        }
+
+        logger.info(`SoftDevice detected, id ${hexpad2(fwId)}`);
     }
 };
 
