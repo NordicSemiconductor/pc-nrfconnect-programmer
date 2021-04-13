@@ -263,18 +263,28 @@ export const getMBRParamsRegion = (
     return undefined;
 };
 
-// Add MBR region
-export const getMBRRegion = (memMap, coreInfo) => {
+/**
+ * Get MBR region from a memory content according to a specific core
+ * @param memMap the memory content
+ * @param coreInfo the specific core
+ *
+ * @returns the MBR region if exist
+ */
+export const getMBRRegion = (
+    memMap: MemoryMap,
+    coreInfo: CoreDefinition
+): Region | undefined => {
     const { romBaseAddr } = coreInfo;
     const mbr = memMap.getUint32(romBaseAddr, true);
     if (mbr && mbr !== 0xffffffff && memMap.get(romBaseAddr)) {
-        const region = new Region({
+        const region: Region = {
+            ...defaultRegion,
             name: RegionName.MBR_OR_APP,
             startAddress: romBaseAddr,
-            regionSize: memMap.get(romBaseAddr).length,
+            regionSize: memMap.get(romBaseAddr)?.length!!,
             color: RegionColor.MBR,
             permission: RegionPermission.READ_ONLY,
-        });
+        };
         return region;
     }
     return undefined;
