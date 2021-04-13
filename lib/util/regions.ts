@@ -290,8 +290,17 @@ export const getMBRRegion = (
     return undefined;
 };
 
-// Add SoftDevice region
-export const getSoftDeviceRegion = (memMap, coreInfo) => {
+/**
+ * Get SoftDevice region from a memory content according to a specific core
+ * @param memMap the memory content
+ * @param coreInfo the specific core
+ *
+ * @returns the SoftDevice region if exist
+ */
+export const getSoftDeviceRegion = (
+    memMap: MemoryMap,
+    coreInfo: CoreDefinition
+): Region | undefined => {
     const { pageSize } = coreInfo;
     const softDeviceMagicStart = 0x1000;
     const softDeviceMagicEnd = 0x10000;
@@ -308,15 +317,16 @@ export const getSoftDeviceRegion = (memMap, coreInfo) => {
             softDeviceMagicNumber
         ) {
             const regionSize =
-                memMap.getUint32(address + softDeviceSizeOffset, true) -
+                memMap.getUint32(address + softDeviceSizeOffset, true)!! -
                 softDeviceMagicStart;
-            const region = new Region({
+            const region: Region = {
+                ...defaultRegion,
                 name: RegionName.SOFTDEVICE,
                 startAddress: softDeviceMagicStart,
                 regionSize,
                 color: RegionColor.SOFTDEVICE,
                 permission: RegionPermission.READ_WRITE,
-            });
+            };
             return region;
         }
     }
