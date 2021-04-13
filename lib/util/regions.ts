@@ -176,6 +176,7 @@ const knownSoftDevices: { [key: number]: string } = {
 
 /**
  * Check if the region is inside a range
+ *
  * @param region the region to be checked
  * @param startAddr the start address of the range
  * @param endAddr the end address of the range
@@ -192,6 +193,7 @@ const isRegionInRange = (
 
 /**
  * Check if the region is inside a specific core
+ *
  * @param region the region to be checked
  * @param coreInfo the specific core
  *
@@ -214,6 +216,7 @@ const isRegionInCore = (region: Region, coreInfo: CoreDefinition): boolean => {
 
 /**
  * Get Bootloader region from a memory content according to a specific core
+ *
  * @param memMap the memory content
  * @param coreInfo the specific core
  * @returns the Bootloader region if exist
@@ -247,6 +250,7 @@ export const getBootloaderRegion = (
 
 /**
  * Get MBR parameters region from a memory content according to a specific core
+ *
  * @param memMap the memory content
  * @param coreInfo the specific core
  *
@@ -275,6 +279,7 @@ export const getMBRParamsRegion = (
 
 /**
  * Get MBR region from a memory content according to a specific core
+ *
  * @param memMap the memory content
  * @param coreInfo the specific core
  *
@@ -302,6 +307,7 @@ export const getMBRRegion = (
 
 /**
  * Get SoftDevice region from a memory content according to a specific core
+ *
  * @param memMap the memory content
  * @param coreInfo the specific core
  *
@@ -340,6 +346,7 @@ export const getSoftDeviceRegion = (
 
 /**
  * Get SoftDevice ID from a memory content according to a specific core
+ *
  * @param memMap the memory content
  * @param coreInfo the specific core
  *
@@ -370,6 +377,7 @@ export const getSoftDeviceId = (
 
 /**
  * Display SoftDevice information in the log
+ *
  * @param memMap the memory content
  * @param coreInfo the specific core
  */
@@ -442,24 +450,25 @@ export const logSoftDeviceRegion = (
  * Given an instance of MemoryMap and deviceDefinition,
  * return the heuristically detected regions.
  *
- * @param {MemoryMap}   memMap              the memory map
- * @param {deviceDefinition}   coreInfo   the device infomation
+ * @param memMap the memory content
+ * @param coreInfo the specific core
  *
- * @returns {List} the list of region
+ * @returns {Array} the list of region
  */
-export const getMemoryRegions = (memMap, coreInfo) => {
-    // TODO: Get some HEX files which handle clenr0/rpbConf
-
-    let regions = new List();
+export const getMemoryRegions = (
+    memMap: MemoryMap,
+    coreInfo: CoreDefinition
+): Region[] => {
+    let regions: Region[] = [];
     let region;
     region = getMBRParamsRegion(memMap, coreInfo);
-    if (region) regions = regions.push(region);
+    if (region) regions = [...regions, region];
     region = getMBRRegion(memMap, coreInfo);
-    if (region) regions = regions.push(region);
+    if (region) regions = [...regions, region];
     region = getBootloaderRegion(memMap, coreInfo);
-    if (region) regions = regions.push(region);
+    if (region) regions = [...regions, region];
     region = getSoftDeviceRegion(memMap, coreInfo);
-    if (region) regions = regions.push(region);
+    if (region) regions = [...regions, region];
     logSoftDeviceRegion(memMap, coreInfo);
 
     return regions;
