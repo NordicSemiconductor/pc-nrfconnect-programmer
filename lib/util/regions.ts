@@ -34,29 +34,57 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import MemoryMap from 'nrf-intel-hex';
-import { logger } from 'nrfconnect/core';
-import { CoreDefinition } from './devices';
-import { hexpad2 } from './hexpad';
+import MemoryMap from "nrf-intel-hex";
+import { logger } from "nrfconnect/core";
+import { CoreDefinition } from "./devices";
+import { hexpad2 } from "./hexpad";
 
 /**
  * Definition of RegionPermission
  */
-export const enum RegionPermission {
+export enum RegionPermission {
     NONE = 0,
     READ_ONLY = 1,
     READ_WRITE = 2,
 }
 
 /**
+ * Definition of RegionName
+ */
+export enum RegionName {
+    MBR_PARAMS = "MBR Paramters",
+    MBR = "MBR",
+    MBR_OR_APP = "MBR or Application",
+    BOOTLOADER = "Bootloader",
+    SOFTDEVICE = "SoftDevice",
+    APPLICATION = "Application",
+    UICR = "UICR",
+    NONE = "N/A",
+}
+
+/**
+ * Definition of RegionColor
+ */
+export enum RegionColor {
+    MBR_PARAMS = "#333F48",
+    MBR = "#FF9800",
+    MBR_OR_APP = "#FFC107",
+    BOOTLOADER = "#E91E63",
+    SOFTDEVICE = "#3F51B5",
+    APPLICATION = " #4CAF50",
+    UICR = "#333F48",
+    NONE = "#333F48",
+}
+
+/**
  * Definition of Region
  */
 export interface Region {
-    name: string;
+    name: RegionName;
     startAddress: number;
     regionSize: number;
-    color: string;
-    fileNames: [];
+    color: RegionColor;
+    fileNames: string[];
     permission: RegionPermission;
 }
 
@@ -64,113 +92,103 @@ export interface Region {
  * Default definition of region
  */
 export const defaultRegion: Region = {
-    name: 'N/A',
+    name: RegionName.NONE,
     startAddress: 0,
     regionSize: 0,
-    color: '#333F48',
+    color: RegionColor.NONE,
     fileNames: [],
     permission: RegionPermission.READ_ONLY,
 };
 
-/**
- * Definition of RegionName
- */
-export const enum RegionName {
-    MBR_PARAMS = 'MBR Paramters',
-    MBR = 'MBR',
-    MBR_OR_APP = 'MBR or Application',
-    BOOTLOADER = 'Bootloader',
-    SOFTDEVICE = 'SoftDevice',
-    APPLICATION = 'Application',
-    UICR = 'UICR',
-    NONE = 'N/A',
-}
-
-// Definition of RegionColor
-export const enum RegionColor {
-    MBR_PARAMS = '#333F48',
-    MBR = '#FF9800',
-    MBR_OR_APP = '#FFC107',
-    BOOTLOADER = '#E91E63',
-    SOFTDEVICE = '#3F51B5',
-    APPLICATION = ' #4CAF50',
-    UICR = '#333F48',
-    NONE = '#333F48',
-}
-
 // List taken from py-nrfutil and
 // https://devzone.nordicsemi.com/f/nordic-q-a/1171/how-do-i-access-softdevice-version-string#post-id-3693
 const knownSoftDevices = {
-    0x43: 'S110 v5.2.1',
-    0x49: 'S110 v6.0.0',
-    0x35: 'S110 v6.2.1',
-    0x4f: 'S110 v7.0.0',
-    0x5a: 'S110 v7.1.0',
-    0x63: 'S110 v7.3.0',
-    0x64: 'S110 v8.0.0',
+    0x43: "S110 v5.2.1",
+    0x49: "S110 v6.0.0",
+    0x35: "S110 v6.2.1",
+    0x4f: "S110 v7.0.0",
+    0x5a: "S110 v7.1.0",
+    0x63: "S110 v7.3.0",
+    0x64: "S110 v8.0.0",
 
-    0xa7: 'S112 v6.0.0',
+    0xa7: "S112 v6.0.0",
 
-    0x55: 'S120 v1.0.0',
-    0x58: 'S120 v1.0.1',
-    0x5b: 'S120 v2.0.0-1.alpha',
-    0x60: 'S120 v2.0.0',
-    0x6b: 'S120 v2.1.0',
+    0x55: "S120 v1.0.0",
+    0x58: "S120 v1.0.1",
+    0x5b: "S120 v2.0.0-1.alpha",
+    0x60: "S120 v2.0.0",
+    0x6b: "S120 v2.1.0",
 
-    0x5e: 'S130 v0.9.0-1.alpha',
-    0x66: 'S130 v1.0.0-3.alpha',
-    0x67: 'S130 v1.0.0',
-    0x80: 'S130 v2.0.0',
-    0x87: 'S130 v2.0.1',
+    0x5e: "S130 v0.9.0-1.alpha",
+    0x66: "S130 v1.0.0-3.alpha",
+    0x67: "S130 v1.0.0",
+    0x80: "S130 v2.0.0",
+    0x87: "S130 v2.0.1",
 
-    0x4b: 'S210 v3.0.0',
-    0x57: 'S210 v4.0.0',
+    0x4b: "S210 v3.0.0",
+    0x57: "S210 v4.0.0",
 
-    0x4d: 'S310 v1.0.0',
-    0x5d: 'S310 v2.0.0 / v2.0.1',
-    0x65: 'S310 v3.0.0',
+    0x4d: "S310 v1.0.0",
+    0x5d: "S310 v2.0.0 / v2.0.1",
+    0x65: "S310 v3.0.0",
 
-    0x6d: 'S132 v1.0.0-3.alpha',
-    0x74: 'S132 v2.0.0-4.alpha',
-    0x79: 'S132 v2.0.0-7.alpha',
-    0x81: 'S132 v2.0.0',
-    0x88: 'S132 v2.0.1',
-    0x8c: 'S132 v3.0.0',
-    0x91: 'S132 v3.1.0',
-    0x95: 'S132 v4.0.0',
-    0x98: 'S132 v4.0.2',
-    0x99: 'S132 v4.0.3',
-    0x9e: 'S132 v4.0.4',
-    0x9d: 'S132 v5.0.0',
-    0xa5: 'S132 v5.1.0',
-    0xa8: 'S132 v6.0.0',
+    0x6d: "S132 v1.0.0-3.alpha",
+    0x74: "S132 v2.0.0-4.alpha",
+    0x79: "S132 v2.0.0-7.alpha",
+    0x81: "S132 v2.0.0",
+    0x88: "S132 v2.0.1",
+    0x8c: "S132 v3.0.0",
+    0x91: "S132 v3.1.0",
+    0x95: "S132 v4.0.0",
+    0x98: "S132 v4.0.2",
+    0x99: "S132 v4.0.3",
+    0x9e: "S132 v4.0.4",
+    0x9d: "S132 v5.0.0",
+    0xa5: "S132 v5.1.0",
+    0xa8: "S132 v6.0.0",
 
-    0x96: 'S140 v5.0.0-2.alpha',
-    0xa9: 'S140 v6.0.0',
-    0xae: 'S140 v6.1.0',
+    0x96: "S140 v5.0.0-2.alpha",
+    0xa9: "S140 v6.0.0",
+    0xae: "S140 v6.1.0",
 
-    0x7f: 'S212 v0.6.0.alpha',
-    0x83: 'S212 v0.9.1.alpha',
-    0x8d: 'S212 v2.0.1',
-    0x93: 'S212 v4.0.5',
-    0x9c: 'S212 v5.0.0',
+    0x7f: "S212 v0.6.0.alpha",
+    0x83: "S212 v0.9.1.alpha",
+    0x8d: "S212 v2.0.1",
+    0x93: "S212 v4.0.5",
+    0x9c: "S212 v5.0.0",
 
-    0x7e: 'S332 v0.6.0.alpha',
-    0x82: 'S332 v0.9.1.alpha',
-    0x8e: 'S332 v2.0.1',
-    0x94: 'S332 v4.0.5',
-    0x9b: 'S332 v5.0.0',
+    0x7e: "S332 v0.6.0.alpha",
+    0x82: "S332 v0.9.1.alpha",
+    0x8e: "S332 v2.0.1",
+    0x94: "S332 v4.0.5",
+    0x9b: "S332 v5.0.0",
 };
 
-// Check if the region is insde a range
-const isRegionInRange = (region: Region, startAddr: number, endAddr: number) =>
+/**
+ * Check if the region is inside a range
+ * @param region the region to be checked
+ * @param startAddr the start address of the range
+ * @param endAddr the end address of the range
+ *
+ * @returns whether the region is inside the specific range
+ */
+const isRegionInRange = (
+    region: Region,
+    startAddr: number,
+    endAddr: number
+): boolean =>
     region.startAddress >= startAddr &&
     region.startAddress + region.regionSize <= endAddr;
 
-const isRegionInCore = (
-    region: Region,
-    { romBaseAddr, romSize, pageSize, uicrBaseAddr }: CoreDefinition
-) => {
+/**
+ * Check if the region is inside a specific core
+ * @param region the region to be checked
+ * @param coreInfo the specific core
+ *
+ * @returns whether the region is inside the specific core
+ */
+const isRegionInCore = (region: Region, coreInfo: CoreDefinition): boolean => {
+    const { romBaseAddr, romSize, pageSize, uicrBaseAddr } = coreInfo;
     const isInRange = isRegionInRange(
         region,
         romBaseAddr,
@@ -184,11 +202,16 @@ const isRegionInCore = (
     return isInRange || isUicr;
 };
 
-// Add Bootloader region
+/**
+ * Get Bootloader region from a memory content according to a specific core
+ * @param memMap the memory content
+ * @param coreInfo the specific core
+ * @returns the Bootloader region if exist
+ */
 export const getBootloaderRegion = (
     memMap: MemoryMap,
     coreInfo: CoreDefinition
-) => {
+): Region | undefined => {
     const { uicrBaseAddr, blAddrOffset } = coreInfo;
     const bootloaderAddress = memMap.getUint32(
         uicrBaseAddr + blAddrOffset,
@@ -199,11 +222,11 @@ export const getBootloaderRegion = (
         bootloaderAddress !== 0xffffffff &&
         memMap.get(bootloaderAddress)
     ) {
-        const region = {
+        const region: Region = {
             ...defaultRegion,
             name: RegionName.BOOTLOADER,
             startAddress: bootloaderAddress,
-            regionSize: memMap.get(bootloaderAddress)?.length,
+            regionSize: memMap.get(bootloaderAddress)?.length!!,
             color: RegionColor.BOOTLOADER,
             permission: RegionPermission.READ_WRITE,
         };
@@ -212,18 +235,29 @@ export const getBootloaderRegion = (
     return undefined;
 };
 
-// Add MBR parameters region
-export const getMBRParamsRegion = (memMap, coreInfo) => {
+/**
+ * Get MBR parameters region from a memory content according to a specific core
+ * @param memMap the memory content
+ * @param coreInfo the specific core
+ *
+ * @returns the MBR parameters region if exist
+ */
+export const getMBRParamsRegion = (
+    memMap: MemoryMap,
+    coreInfo: CoreDefinition
+): Region | undefined => {
     const { uicrBaseAddr, mbrParamsOffset } = coreInfo;
-    const mbrParams = memMap.getUint32(uicrBaseAddr + mbrParamsOffset, true);
+    const mbrParamsAddr = uicrBaseAddr + mbrParamsOffset;
+    const mbrParams = memMap.getUint32(mbrParamsAddr, true);
     if (mbrParams && mbrParams !== 0xffffffff) {
-        const region = new Region({
-            type: RegionName.MBR_PARAMS,
+        const region: Region = {
+            ...defaultRegion,
             name: RegionName.MBR_PARAMS,
-            startAddress: mbrParams,
+            startAddress: mbrParamsAddr,
+            regionSize: memMap.get(mbrParamsAddr)?.length!!,
             color: RegionColor.MBR_PARAMS,
-            permission: RegionPermission.READ,
-        });
+            permission: RegionPermission.READ_ONLY,
+        };
         return region;
     }
     return undefined;
@@ -239,7 +273,7 @@ export const getMBRRegion = (memMap, coreInfo) => {
             startAddress: romBaseAddr,
             regionSize: memMap.get(romBaseAddr).length,
             color: RegionColor.MBR,
-            permission: RegionPermission.READ,
+            permission: RegionPermission.READ_ONLY,
         });
         return region;
     }
@@ -426,8 +460,8 @@ export const getMemoryRegions = (memMap, coreInfo) => {
 export const getRegionsFromOverlaps = (overlaps, coreInfo) => {
     const memMap = MemoryMap.flattenOverlaps(overlaps);
     const memRegions = getMemoryRegions(memMap, coreInfo);
-    const sdRegion = memRegions.find(r => r.name === RegionName.SOFTDEVICE);
-    const blRegion = memRegions.find(r => r.name === RegionName.BOOTLOADER);
+    const sdRegion = memRegions.find((r) => r.name === RegionName.SOFTDEVICE);
+    const blRegion = memRegions.find((r) => r.name === RegionName.BOOTLOADER);
     let regions = new List();
     let region;
     overlaps.forEach((overlap, startAddress) => {
@@ -440,12 +474,12 @@ export const getRegionsFromOverlaps = (overlaps, coreInfo) => {
                 fileNames.push(fileName);
             }
         });
-        region = memRegions.find(r => r.startAddress === startAddress);
+        region = memRegions.find((r) => r.startAddress === startAddress);
         region = region
             ? region
-                  .set('startAddress', startAddress)
-                  .set('fileNames', fileNames)
-                  .set('regionSize', regionSize)
+                  .set("startAddress", startAddress)
+                  .set("fileNames", fileNames)
+                  .set("regionSize", regionSize)
             : new Region({
                   name: RegionName.NONE,
                   color: RegionColor.NONE,
@@ -462,7 +496,7 @@ export const getRegionsFromOverlaps = (overlaps, coreInfo) => {
             region.name === RegionName.SOFTDEVICE &&
             regionSize - sdRegion.regionSize > coreInfo.pageSize
         ) {
-            region = region.set('regionSize', sdRegion.regionSize);
+            region = region.set("regionSize", sdRegion.regionSize);
 
             const appRegion = new Region({
                 name: RegionName.APPLICATION,
@@ -483,8 +517,8 @@ export const getRegionsFromOverlaps = (overlaps, coreInfo) => {
             startAddress + regionSize < blRegion.startAddress
         ) {
             region = region
-                .set('name', RegionName.APPLICATION)
-                .set('color', RegionColor.APPLICATION);
+                .set("name", RegionName.APPLICATION)
+                .set("color", RegionColor.APPLICATION);
         }
 
         // If SoftDevice exists but not Bootloader
@@ -495,8 +529,8 @@ export const getRegionsFromOverlaps = (overlaps, coreInfo) => {
             startAddress >= sdRegion.startAddress + sdRegion.regionSize
         ) {
             region = region
-                .set('name', RegionName.APPLICATION)
-                .set('color', RegionColor.APPLICATION);
+                .set("name", RegionName.APPLICATION)
+                .set("color", RegionColor.APPLICATION);
         }
 
         // If Bootloader exists but not SoftDevice
@@ -508,21 +542,21 @@ export const getRegionsFromOverlaps = (overlaps, coreInfo) => {
             startAddress + regionSize < blRegion.startAddress
         ) {
             region = region
-                .set('name', RegionName.APPLICATION)
-                .set('color', RegionColor.APPLICATION);
+                .set("name", RegionName.APPLICATION)
+                .set("color", RegionColor.APPLICATION);
         }
 
         // If neither Bootloader nor SoftDevice exists
         // then we regard the region as Application
         if (!sdRegion && !blRegion && region.name === RegionName.NONE) {
             region = region
-                .set('name', RegionName.APPLICATION)
-                .set('color', RegionColor.APPLICATION);
+                .set("name", RegionName.APPLICATION)
+                .set("color", RegionColor.APPLICATION);
         }
 
         regions = regions.includes(region) ? regions : regions.push(region);
     });
-    regions = regions.filter(r => isRegionInCore(r, coreInfo));
+    regions = regions.filter((r) => isRegionInCore(r, coreInfo));
 
     return regions;
 };
@@ -570,7 +604,7 @@ export const getCoreRegions = (memMaps, coreInfo) => {
  */
 export const getTargetRegions = (memMaps, deviceInfo) => {
     let regions = List();
-    deviceInfo.cores.forEach(c => {
+    deviceInfo.cores.forEach((c) => {
         regions = regions.concat(getCoreRegions(memMaps, c));
     });
     return regions;
