@@ -34,6 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* eslint-disable no-bitwise */
+
 import MemoryMap, { MemoryBlocks, Overlaps } from 'nrf-intel-hex';
 import { logger } from 'nrfconnect/core';
 
@@ -178,11 +180,11 @@ const knownSoftDevices: { [key: number]: string } = {
 /**
  * Check if the region is inside a range
  *
- * @param region the region to be checked
- * @param startAddr the start address of the range
- * @param endAddr the end address of the range
+ * @param {Region} region the region to be checked
+ * @param {number} startAddr the start address of the range
+ * @param {number} endAddr the end address of the range
  *
- * @returns whether the region is inside the specific range
+ * @returns {boolean} whether the region is inside the specific range
  */
 const isRegionInRange = (
     region: Region,
@@ -195,10 +197,10 @@ const isRegionInRange = (
 /**
  * Check if the region is inside a specific core
  *
- * @param region the region to be checked
+ * @param {Region} region the region to be checked
  * @param {CorDefinition} coreInfo the specific core
  *
- * @returns whether the region is inside the specific core
+ * @returns {boolean} whether the region is inside the specific core
  */
 const isRegionInCore = (region: Region, coreInfo: CoreDefinition): boolean => {
     const { romBaseAddr, romSize, pageSize, uicrBaseAddr } = coreInfo;
@@ -220,7 +222,7 @@ const isRegionInCore = (region: Region, coreInfo: CoreDefinition): boolean => {
  *
  * @param {MemoryMap} memMap the memory content
  * @param {CorDefinition} coreInfo the specific core
- * @returns the Bootloader region if exist
+ * @returns {Region} the Bootloader region if exist
  */
 export const getBootloaderRegion = (
     memMap: MemoryMap,
@@ -240,7 +242,7 @@ export const getBootloaderRegion = (
             ...defaultRegion,
             name: RegionName.BOOTLOADER,
             startAddress: bootloaderAddress,
-            regionSize: memMap.get(bootloaderAddress)?.length!,
+            regionSize: memMap.get(bootloaderAddress)?.length || 0,
             color: RegionColor.BOOTLOADER,
             permission: RegionPermission.READ_WRITE,
         };
@@ -255,7 +257,7 @@ export const getBootloaderRegion = (
  * @param {MemoryMap} memMap the memory content
  * @param {CorDefinition} coreInfo the specific core
  *
- * @returns the MBR parameters region if exist
+ * @returns {Region} the MBR parameters region if exist
  */
 export const getMBRParamsRegion = (
     memMap: MemoryMap,
@@ -269,7 +271,7 @@ export const getMBRParamsRegion = (
             ...defaultRegion,
             name: RegionName.MBR_PARAMS,
             startAddress: mbrParamsAddr,
-            regionSize: memMap.get(mbrParamsAddr)?.length!,
+            regionSize: memMap.get(mbrParamsAddr)?.length || 0,
             color: RegionColor.MBR_PARAMS,
             permission: RegionPermission.READ_ONLY,
         };
@@ -284,7 +286,7 @@ export const getMBRParamsRegion = (
  * @param {MemoryMap} memMap the memory content
  * @param {CorDefinition} coreInfo the specific core
  *
- * @returns the MBR region if exist
+ * @returns {Region} the MBR region if exist
  */
 export const getMBRRegion = (
     memMap: MemoryMap,
@@ -297,7 +299,7 @@ export const getMBRRegion = (
             ...defaultRegion,
             name: RegionName.MBR_OR_APP,
             startAddress: romBaseAddr,
-            regionSize: memMap.get(romBaseAddr)?.length!,
+            regionSize: memMap.get(romBaseAddr)?.length || 0,
             color: RegionColor.MBR,
             permission: RegionPermission.READ_ONLY,
         };
@@ -312,7 +314,7 @@ export const getMBRRegion = (
  * @param {MemoryMap} memMap the memory content
  * @param {CorDefinition} coreInfo the specific core
  *
- * @returns the SoftDevice region if exist
+ * @returns {Region} the SoftDevice region if exist
  */
 export const getSoftDeviceRegion = (
     memMap: MemoryMap,
@@ -324,13 +326,11 @@ export const getSoftDeviceRegion = (
         address < SOFTDEVICE_MAGIC_END;
         address += pageSize
     ) {
-        if (
-            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ===
-            SOFTDEVICE_MAGIC_NUMBER
-        ) {
-            const regionSize =
-                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)! -
-                SOFTDEVICE_MAGIC_START;
+        const softdeviceMagicNumber =
+            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ||
+            undefined;
+        if (softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER) {
+            const regionSize = softdeviceMagicNumber - SOFTDEVICE_MAGIC_START;
             const region: Region = {
                 ...defaultRegion,
                 name: RegionName.SOFTDEVICE,
@@ -351,7 +351,7 @@ export const getSoftDeviceRegion = (
  * @param {MemoryMap} memMap the memory content
  * @param {CorDefinition} coreInfo the specific core
  *
- * @returns the SoftDevice ID if exist
+ * @returns {Region} the SoftDevice ID if exist
  */
 export const getSoftDeviceId = (
     memMap: MemoryMap,
@@ -364,13 +364,11 @@ export const getSoftDeviceId = (
         address < SOFTDEVICE_MAGIC_END;
         address += pageSize
     ) {
-        if (
-            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ===
-            SOFTDEVICE_MAGIC_NUMBER
-        ) {
-            fwId =
-                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)! &
-                0x0000ffff;
+        const softdeviceMagicNumber =
+            memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ||
+            undefined;
+        if (softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER) {
+            fwId = softdeviceMagicNumber & 0x0000ffff;
         }
     }
     return fwId;
@@ -381,6 +379,8 @@ export const getSoftDeviceId = (
  *
  * @param {MemoryMap} memMap the memory content
  * @param {CorDefinition} coreInfo the specific core
+ *
+ * @returns {void}
  */
 export const logSoftDeviceRegion = (
     memMap: MemoryMap,
@@ -398,12 +398,22 @@ export const logSoftDeviceRegion = (
     ) {
         if (softdeviceMagicNumber !== SOFTDEVICE_MAGIC_NUMBER) return;
 
-        const infoBlockSize = memMap.getUint32(address, true)! & 0x000000ff;
-        const fwId =
-            memMap.getUint32(address + SOFTDEVICE_FWID_OFFSET, true)! &
-            0x0000ffff;
+        const infoBlockSizeBit = memMap.getUint32(address, true);
+        const infoBlockSize = infoBlockSizeBit
+            ? infoBlockSizeBit & 0x000000ff
+            : undefined;
 
-        if (infoBlockSize >= 0x18) {
+        const fwIdBit = memMap.getUint32(
+            address + SOFTDEVICE_FWID_OFFSET,
+            true
+        );
+        const fwId: number = fwIdBit ? fwIdBit & 0x0000ffff : 0;
+        if (fwId === 0) {
+            logger.info('SoftDevice Id not found');
+            return;
+        }
+
+        if (infoBlockSize && infoBlockSize >= 0x18) {
             const softDeviceId = memMap.getUint32(
                 address + SOFTDEVICE_ID_OFFSET,
                 true
@@ -500,7 +510,7 @@ export const getRegionsFromOverlaps = (
         let regionSize = 0;
 
         overlap.forEach(([fileName, bytes]) => {
-            regionSize = bytes?.length!;
+            regionSize = bytes ? bytes?.length : 0;
             if (fileName) {
                 fileNames.push(fileName);
             }
@@ -527,7 +537,7 @@ export const getRegionsFromOverlaps = (
         // then the content read by nrfjprog will be regarded as a single part.
         // Split them apart if this happens.
         if (sdRegion && regionSize - sdRegion.regionSize > coreInfo.pageSize) {
-            region = { ...region, regionSize: sdRegion?.regionSize! };
+            region = { ...region, regionSize: sdRegion?.regionSize };
 
             const appRegion = {
                 ...defaultRegion,
