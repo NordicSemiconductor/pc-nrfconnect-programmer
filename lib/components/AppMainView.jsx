@@ -93,7 +93,7 @@ AppMainView.propTypes = {
     target: PropTypes.shape({
         serialNumber: PropTypes.string,
         deviceInfo: PropTypes.object,
-        regions: PropTypes.object,
+        regions: PropTypes.array,
     }).isRequired,
 };
 

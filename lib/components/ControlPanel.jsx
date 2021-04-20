@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
@@ -47,7 +47,6 @@ import PropTypes from 'prop-types';
 const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
-    const ref = useRef(null);
 
     const onClick = event => {
         onToggleFileList();
@@ -72,7 +71,6 @@ const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
         <>
             <Overlay
                 show={show}
-                ref={ref}
                 target={target}
                 placement="bottom-end"
                 container={containerNode}
