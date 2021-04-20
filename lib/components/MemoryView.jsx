@@ -45,7 +45,7 @@ const allocateCores = (cores, regions) =>
         regions: regions.filter(
             r =>
                 r.startAddress >= core.romBaseAddr &&
-                r.startAddress + r.size <= core.romBaseAddr + core.romSize
+                r.startAddress + r.regionSize <= core.romBaseAddr + core.romSize
         ),
     }));
 
