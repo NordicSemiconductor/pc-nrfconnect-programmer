@@ -34,42 +34,61 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Record, Set } from 'immutable';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import produce from 'immer';
 
 import * as fileActions from '../actions/fileActions';
+import { Region } from '../util/regions';
 
-const InitialState = new Record({
-    detectedRegionNames: new Set(),
+export interface FileState {
+    detectedRegionNames: Set<string>;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    loaded: {};
+    mcubootFilePath?: string;
+    memMaps: [];
+    mruFiles: string[];
+    regions: Region[];
+}
+
+const defaultState: FileState = {
+    detectedRegionNames: new Set<string>(),
     loaded: {},
-    mcubootFilePath: null,
+    mcubootFilePath: undefined,
     memMaps: [],
     mruFiles: [],
     regions: [],
-});
+};
 
-export default function reducer(state = new InitialState(), action) {
-    switch (action.type) {
-        case fileActions.FILES_EMPTY:
-            return new InitialState().set('mruFiles', state.mruFiles);
+export default (state = defaultState, action: any): FileState =>
+    produce<FileState>(state, draft => {
+        switch (action.type) {
+            case fileActions.FILES_EMPTY:
+                draft = { ...defaultState };
+                draft.mruFiles = state.mruFiles;
+                break;
 
-        case fileActions.FILE_PARSE:
-            return state
-                .set('memMaps', action.memMaps)
-                .set('loaded', action.loaded);
+            case fileActions.FILE_PARSE:
+                draft.memMaps = action.memMaps;
+                draft.loaded = action.loaded;
+                break;
 
-        case fileActions.FILE_REGIONS_KNOWN:
-            return state.set('regions', action.regions);
+            case fileActions.FILE_REGIONS_KNOWN:
+                draft.regions = action.regions;
+                break;
 
-        case fileActions.FILE_REGION_NAMES_KNOWN:
-            return state.set('detectedRegionNames', action.detectedRegionNames);
+            case fileActions.FILE_REGION_NAMES_KNOWN:
+                draft.detectedRegionNames = action.detectedRegionNames;
+                break;
 
-        case fileActions.MRU_FILES_LOAD_SUCCESS:
-            return state.set('mruFiles', action.files || []);
+            case fileActions.MRU_FILES_LOAD_SUCCESS:
+                draft.mruFiles = action.files || [];
+                break;
 
-        case fileActions.MCUBOOT_FILE_KNOWN:
-            return state.set('mcubootFilePath', action.filePath);
+            case fileActions.MCUBOOT_FILE_KNOWN:
+                draft.mcubootFilePath = action.filePath;
+                break;
 
-        default:
-    }
-    return state;
-}
+            default:
+        }
+    });
