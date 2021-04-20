@@ -34,10 +34,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import { basename } from 'path';
-import { hexpad8 } from '../util/hexpad';
+import React from "react";
+import { basename } from "path";
+import PropTypes from "prop-types";
+
+import { hexpad8 } from "../util/hexpad";
 
 const RegionInfoView = ({ name, startAddress, regionSize, fileNames }) => (
     <>
@@ -50,7 +51,7 @@ const RegionInfoView = ({ name, startAddress, regionSize, fileNames }) => (
         {fileNames.length > 0 && (
             <div className="files">
                 <h5>
-                    {fileNames.length > 1 ? 'Overlapping files!' : 'File name'}
+                    {fileNames.length > 1 ? "Overlapping files!" : "File name"}
                 </h5>
                 <p>
                     {fileNames.map((fileName, index) => (
@@ -62,7 +63,7 @@ const RegionInfoView = ({ name, startAddress, regionSize, fileNames }) => (
         <div>
             <h5>Address range</h5>
             <p>
-                {hexpad8(startAddress)} &mdash;{' '}
+                {hexpad8(startAddress)} &mdash;{" "}
                 {hexpad8(startAddress + regionSize - 1)}
             </p>
         </div>

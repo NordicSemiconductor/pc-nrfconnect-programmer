@@ -36,6 +36,7 @@
 
 import MemoryMap, { MemoryBlocks, Overlaps } from "nrf-intel-hex";
 import { logger } from "nrfconnect/core";
+
 import { CoreDefinition, DeviceDefinition } from "./devices";
 import { hexpad2 } from "./hexpad";
 
@@ -240,7 +241,7 @@ export const getBootloaderRegion = (
             ...defaultRegion,
             name: RegionName.BOOTLOADER,
             startAddress: bootloaderAddress,
-            regionSize: memMap.get(bootloaderAddress)?.length!!,
+            regionSize: memMap.get(bootloaderAddress)?.length!,
             color: RegionColor.BOOTLOADER,
             permission: RegionPermission.READ_WRITE,
         };
@@ -269,7 +270,7 @@ export const getMBRParamsRegion = (
             ...defaultRegion,
             name: RegionName.MBR_PARAMS,
             startAddress: mbrParamsAddr,
-            regionSize: memMap.get(mbrParamsAddr)?.length!!,
+            regionSize: memMap.get(mbrParamsAddr)?.length!,
             color: RegionColor.MBR_PARAMS,
             permission: RegionPermission.READ_ONLY,
         };
@@ -297,7 +298,7 @@ export const getMBRRegion = (
             ...defaultRegion,
             name: RegionName.MBR_OR_APP,
             startAddress: romBaseAddr,
-            regionSize: memMap.get(romBaseAddr)?.length!!,
+            regionSize: memMap.get(romBaseAddr)?.length!,
             color: RegionColor.MBR,
             permission: RegionPermission.READ_ONLY,
         };
@@ -329,7 +330,7 @@ export const getSoftDeviceRegion = (
             SOFTDEVICE_MAGIC_NUMBER
         ) {
             const regionSize =
-                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)!! -
+                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)! -
                 SOFTDEVICE_MAGIC_START;
             const region: Region = {
                 ...defaultRegion,
@@ -369,7 +370,7 @@ export const getSoftDeviceId = (
             SOFTDEVICE_MAGIC_NUMBER
         ) {
             fwId =
-                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)!! &
+                memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true)! &
                 0x0000ffff;
         }
     }
@@ -398,9 +399,9 @@ export const logSoftDeviceRegion = (
     ) {
         if (softdeviceMagicNumber !== SOFTDEVICE_MAGIC_NUMBER) return;
 
-        const infoBlockSize = memMap.getUint32(address, true)!! & 0x000000ff;
+        const infoBlockSize = memMap.getUint32(address, true)! & 0x000000ff;
         const fwId =
-            memMap.getUint32(address + SOFTDEVICE_FWID_OFFSET, true)!! &
+            memMap.getUint32(address + SOFTDEVICE_FWID_OFFSET, true)! &
             0x0000ffff;
 
         if (infoBlockSize >= 0x18) {
@@ -500,7 +501,7 @@ export const getRegionsFromOverlaps = (
         let regionSize = 0;
 
         overlap.forEach(([fileName, bytes]) => {
-            regionSize = bytes?.length!!;
+            regionSize = bytes?.length!;
             if (fileName) {
                 fileNames.push(fileName);
             }
@@ -527,7 +528,7 @@ export const getRegionsFromOverlaps = (
         // then the content read by nrfjprog will be regarded as a single part.
         // Split them apart if this happens.
         if (sdRegion && regionSize - sdRegion.regionSize > coreInfo.pageSize) {
-            region = region.set("regionSize", sdRegion?.regionSize!!);
+            region = region.set("regionSize", sdRegion?.regionSize!);
 
             const appRegion = {
                 ...defaultRegion,

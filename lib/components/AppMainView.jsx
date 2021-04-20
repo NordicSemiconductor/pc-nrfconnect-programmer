@@ -34,18 +34,18 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import PropTypes from 'prop-types';
-import React from 'react';
+import React from "react";
+import PropTypes from "prop-types";
 
-import McuUpdateDialogView from '../containers/mcuUpdateDialogView';
-import MemoryBoxView from '../containers/memoryBoxView';
-import ModemUpdateDialogView from '../containers/modemUpdateDialogView';
-import UserInputDialogView from '../containers/userInputDialogView';
-import WarningView from '../containers/warningView';
+import McuUpdateDialogView from "../containers/mcuUpdateDialogView";
+import MemoryBoxView from "../containers/memoryBoxView";
+import ModemUpdateDialogView from "../containers/modemUpdateDialogView";
+import UserInputDialogView from "../containers/userInputDialogView";
+import WarningView from "../containers/warningView";
 
 function getTargetTitle(serialNumber, deviceInfo) {
     if (serialNumber) {
-        return deviceInfo.type !== 'Unknown'
+        return deviceInfo.type !== "Unknown"
             ? deviceInfo.type
             : deviceInfo.family;
     }
@@ -66,7 +66,7 @@ const AppMainView = ({
             <MemoryBoxView
                 title={
                     getTargetTitle(serialNumber, deviceInfo) ||
-                    'Device memory layout'
+                    "Device memory layout"
                 }
                 description="Connect a device to display memory contents"
                 iconName="appicon-chip"

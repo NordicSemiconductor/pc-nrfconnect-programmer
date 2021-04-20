@@ -34,14 +34,15 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { logger } from 'nrfconnect/core';
 import nrfdl, {
-    ProtectionStatus,
     DeviceCore,
-    DeviceFamily,
     DeviceCoreInfo,
-} from 'nrf-device-lib-js';
-import range from './range';
+    DeviceFamily,
+    ProtectionStatus,
+} from "nrf-device-lib-js";
+import { logger } from "nrfconnect/core";
+
+import range from "./range";
 
 export type CoreDefinition = {
     name: DeviceCore;
@@ -66,7 +67,7 @@ export type CoreDefinition = {
  * Default definition of device core
  */
 export const defaultCore: CoreDefinition = {
-    name: 'NRFDL_DEVICE_CORE_APPLICATION',
+    name: "NRFDL_DEVICE_CORE_APPLICATION",
     coreNumber: 0,
     romBaseAddr: 0x0,
     romSize: 0x100000, // 1 MB
@@ -81,7 +82,7 @@ export const defaultCore: CoreDefinition = {
     mbrParamsOffset: 0x18,
     mbrBaseAddr: 0x0,
     mbrSize: 0x1000,
-    protectionStatus: 'PROTECTION_STATUS_SECURE_REGIONS',
+    protectionStatus: "PROTECTION_STATUS_SECURE_REGIONS",
 };
 
 export interface DeviceDefinition {
@@ -94,8 +95,8 @@ export interface DeviceDefinition {
  * Default definition for device info
  */
 export const deviceDefinition: DeviceDefinition = {
-    family: 'Unknown',
-    type: 'Unknown',
+    family: "Unknown",
+    type: "Unknown",
     cores: [defaultCore],
 };
 
@@ -107,14 +108,14 @@ const deviceDefinitions: DeviceDefinition[] = [
     // nRF52840 dongle cannot fetch info by nrf-device-lib-js
     {
         ...deviceDefinition,
-        family: 'nRF52',
-        type: 'nRF52840',
+        family: "nRF52",
+        type: "nRF52840",
     },
     // nRF9160 has different ficr and uicr base address
     {
         ...deviceDefinition,
-        family: 'nRF91',
-        type: 'nRF9160',
+        family: "nRF91",
+        type: "nRF9160",
         cores: [
             {
                 ...defaultCore,
@@ -126,13 +127,13 @@ const deviceDefinitions: DeviceDefinition[] = [
     // nRF5340 has dual core definitions
     {
         ...deviceDefinition,
-        family: 'nRF53',
-        type: 'nRF5340',
+        family: "nRF53",
+        type: "nRF5340",
         cores: [
             {
                 ...defaultCore,
                 coreNumber: 0,
-                name: 'NRFDL_DEVICE_CORE_APPLICATION',
+                name: "NRFDL_DEVICE_CORE_APPLICATION",
                 romBaseAddr: 0x0,
                 romSize: 0x100000, // 1 MB
                 ficrBaseAddr: 0xff0000,
@@ -141,7 +142,7 @@ const deviceDefinitions: DeviceDefinition[] = [
             {
                 ...defaultCore,
                 coreNumber: 1,
-                name: 'NRFDL_DEVICE_CORE_NETWORK',
+                name: "NRFDL_DEVICE_CORE_NETWORK",
                 romBaseAddr: 0x1000000,
                 romSize: 0x40000, // 256 KB
                 ficrBaseAddr: 0x1ff0000,
@@ -155,28 +156,28 @@ const deviceDefinitions: DeviceDefinition[] = [
  * Nordic SoftDevice Id referring to pc-nrfutil
  */
 export const NordicFwIds = {
-    '0xA7': 's112_nrf51_6.0.0',
-    '0x67': 's130_nrf51_1.0.0',
-    '0x80': 's130_nrf51_2.0.0',
-    '0x87': 's130_nrf51_2.0.1',
-    '0x81': 's132_nrf52_2.0.0',
-    '0x88': 's132_nrf52_2.0.1',
-    '0x8C': 's132_nrf52_3.0.0',
-    '0x91': 's132_nrf52_3.1.0',
-    '0x95': 's132_nrf52_4.0.0',
-    '0x98': 's132_nrf52_4.0.2',
-    '0x99': 's132_nrf52_4.0.3',
-    '0x9E': 's132_nrf52_4.0.4',
-    '0x9F': 's132_nrf52_4.0.5',
-    '0x9D': 's132_nrf52_5.0.0',
-    '0xA5': 's132_nrf52_5.1.0',
-    '0xA8': 's132_nrf52_6.0.0',
-    '0xAF': 's132_nrf52_6.1.0',
-    '0xA9': 's140_nrf52_6.0.0',
-    '0xAE': 's140_nrf52_6.1.0',
-    '0x103': 's112_nrf52_7.2.0',
-    '0x101': 's132_nrf52_7.2.0',
-    '0x100': 's140_nrf52_7.2.0',
+    "0xA7": "s112_nrf51_6.0.0",
+    "0x67": "s130_nrf51_1.0.0",
+    "0x80": "s130_nrf51_2.0.0",
+    "0x87": "s130_nrf51_2.0.1",
+    "0x81": "s132_nrf52_2.0.0",
+    "0x88": "s132_nrf52_2.0.1",
+    "0x8C": "s132_nrf52_3.0.0",
+    "0x91": "s132_nrf52_3.1.0",
+    "0x95": "s132_nrf52_4.0.0",
+    "0x98": "s132_nrf52_4.0.2",
+    "0x99": "s132_nrf52_4.0.3",
+    "0x9E": "s132_nrf52_4.0.4",
+    "0x9F": "s132_nrf52_4.0.5",
+    "0x9D": "s132_nrf52_5.0.0",
+    "0xA5": "s132_nrf52_5.1.0",
+    "0xA8": "s132_nrf52_6.0.0",
+    "0xAF": "s132_nrf52_6.1.0",
+    "0xA9": "s140_nrf52_6.0.0",
+    "0xAE": "s140_nrf52_6.1.0",
+    "0x103": "s112_nrf52_7.2.0",
+    "0x101": "s132_nrf52_7.2.0",
+    "0x100": "s140_nrf52_7.2.0",
 };
 
 /**

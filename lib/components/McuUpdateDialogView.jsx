@@ -34,13 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import Alert from 'react-bootstrap/Alert';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
-import ProgressBar from 'react-bootstrap/ProgressBar';
+import React from "react";
+import Alert from "react-bootstrap/Alert";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
+import ProgressBar from "react-bootstrap/ProgressBar";
+import PropTypes from "prop-types";
 
 const McuUpdateDialogView = ({
     isVisible,
@@ -87,7 +87,7 @@ const McuUpdateDialogView = ({
                             write.
                         </p>
                         <p>
-                            Make sure the device is in{' '}
+                            Make sure the device is in{" "}
                             <strong>MCUboot mode</strong>.
                         </p>
                     </Alert>
@@ -106,14 +106,14 @@ const McuUpdateDialogView = ({
                 )}
                 {isWritingSucceed && (
                     <Alert variant="success">
-                        Completed successfully in {progressDuration / 1000}{' '}
+                        Completed successfully in {progressDuration / 1000}{" "}
                         seconds.
                     </Alert>
                 )}
                 {isWritingFail && (
                     <Alert variant="danger">
                         {errorMsg ||
-                            'Failed. Check the log below for more details...'}
+                            "Failed. Check the log below for more details..."}
                     </Alert>
                 )}
             </Form.Group>
@@ -156,7 +156,7 @@ McuUpdateDialogView.propTypes = {
 };
 
 McuUpdateDialogView.defaultProps = {
-    mcubootFwPath: '',
+    mcubootFwPath: "",
 };
 
 export default McuUpdateDialogView;

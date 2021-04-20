@@ -34,14 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
+import PropTypes from "prop-types";
 
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-
-import { hexpad2 } from '../util/hexpad';
+import { hexpad2 } from "../util/hexpad";
 
 export default class UserInputDialogView extends React.Component {
     constructor(props) {
@@ -51,13 +50,13 @@ export default class UserInputDialogView extends React.Component {
         this.state = {
             selectedValue: null,
             customChecked: false,
-            customValue: '',
+            customValue: "",
             isValidInput: false,
         };
     }
 
     onSelectChoice(choice) {
-        if (choice === 'Custom') {
+        if (choice === "Custom") {
             this.setState({
                 customChecked: true,
             });
@@ -71,9 +70,9 @@ export default class UserInputDialogView extends React.Component {
     }
 
     onInputChanged(event) {
-        let value = event.target.value || '';
-        value = value !== '0' ? value : '';
-        value = value.includes('0x')
+        let value = event.target.value || "";
+        value = value !== "0" ? value : "";
+        value = value.includes("0x")
             ? `0x${value.slice(2).toUpperCase()}`
             : `0x${value.toUpperCase()}`;
         this.setState({
@@ -115,14 +114,14 @@ export default class UserInputDialogView extends React.Component {
                             type="radio"
                             key="Custom"
                             name="radioGroup"
-                            onClick={() => this.onSelectChoice('Custom')}
+                            onClick={() => this.onSelectChoice("Custom")}
                             checked={customChecked}
                         >
                             <Form.Control
                                 id="sdControlsText"
                                 type="text"
                                 value={customValue}
-                                onFocus={() => this.onSelectChoice('Custom')}
+                                onFocus={() => this.onSelectChoice("Custom")}
                                 onChange={this.onInputChanged}
                                 placeholder="Custom SoftDevice ID"
                             />
@@ -157,6 +156,6 @@ UserInputDialogView.propTypes = {
 
 UserInputDialogView.defaultProps = {
     isVisible: false,
-    message: '',
+    message: "",
     choices: {},
 };
