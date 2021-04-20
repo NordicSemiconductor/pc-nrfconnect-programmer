@@ -34,13 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from "react";
-import Alert from "react-bootstrap/Alert";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
-import ProgressBar from "react-bootstrap/ProgressBar";
-import PropTypes from "prop-types";
+import React from 'react';
+import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import PropTypes from 'prop-types';
 
 class ModemUpdateDialogView extends React.Component {
     constructor(props) {
@@ -80,17 +80,17 @@ class ModemUpdateDialogView extends React.Component {
             clearInterval(this.intervalId);
         }
         const { timer } = this.state;
-        let progressStepStatus = "";
+        let progressStepStatus = '';
         progressStepStatus =
-            progressStep === 1 ? ": App firmware update" : progressStepStatus;
+            progressStep === 1 ? ': App firmware update' : progressStepStatus;
         progressStepStatus =
-            progressStep === 2 ? ": Modem firmware update" : progressStepStatus;
+            progressStep === 2 ? ': Modem firmware update' : progressStepStatus;
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">
                 <Modal.Header>
                     <Modal.Title className="modem-dialog-title">
                         Modem DFU
-                        {isMcuboot && " via MCUboot"}
+                        {isMcuboot && ' via MCUboot'}
                     </Modal.Title>
                     {isWriting && (
                         <span className="mdi mdi-refresh icon-spin" />
@@ -103,7 +103,7 @@ class ModemUpdateDialogView extends React.Component {
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>
-                            {!isMcuboot && "Status"}
+                            {!isMcuboot && 'Status'}
                             {isMcuboot &&
                                 `Step ${progressStep}/2${progressStepStatus}`}
                         </Form.Label>
@@ -132,7 +132,7 @@ class ModemUpdateDialogView extends React.Component {
                                         proceed to write.
                                     </p>
                                     <p>
-                                        Make sure the device is in{" "}
+                                        Make sure the device is in{' '}
                                         <strong>MCUboot mode</strong>.
                                     </p>
                                 </Alert>
@@ -145,7 +145,7 @@ class ModemUpdateDialogView extends React.Component {
                         {isWritingFail && !isWriting && (
                             <Alert variant="danger">
                                 {errorMsg ||
-                                    "Failed. Check the log below for more details..."}
+                                    'Failed. Check the log below for more details...'}
                             </Alert>
                         )}
                     </Form.Group>

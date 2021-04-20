@@ -34,10 +34,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from "react";
-import Alert from "react-bootstrap/Alert";
-import { List } from "immutable";
-import PropTypes from "prop-types";
+import React from 'react';
+import Alert from 'react-bootstrap/Alert';
+import { List } from 'immutable';
+import PropTypes from 'prop-types';
 
 const combineWarnings = (
     targetWarningStrings,

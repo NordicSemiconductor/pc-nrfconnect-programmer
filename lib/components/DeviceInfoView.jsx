@@ -34,10 +34,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import { CommunicationType } from "../util/devices";
+import { CommunicationType } from '../util/devices';
 
 const DeviceInfoView = ({
     serialNumber,
@@ -72,7 +72,7 @@ const DeviceInfoView = ({
         {targetType === CommunicationType.JLINK && (
             <div>
                 <h5>Device memory is loaded?</h5>
-                <p>{isMemLoaded ? "Yes" : "No"}</p>
+                <p>{isMemLoaded ? 'Yes' : 'No'}</p>
             </div>
         )}
     </div>

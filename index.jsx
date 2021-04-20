@@ -34,19 +34,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from "react";
-import { logger } from "nrfconnect/core";
+import React from 'react';
+import { logger } from 'nrfconnect/core';
 
-import { openFile } from "./lib/actions/fileActions";
-import { loadSettings } from "./lib/actions/settingsActions";
-import { getLibVersions, openDevice } from "./lib/actions/targetActions";
-import AppMainView from "./lib/containers/appMainView";
-import ControlPanel from "./lib/containers/controlPanel";
-import appReducer from "./lib/reducers";
-import { hexpad2, hexToKiB } from "./lib/util/hexpad";
-import portPath from "./lib/util/portPath";
+import { openFile } from './lib/actions/fileActions';
+import { loadSettings } from './lib/actions/settingsActions';
+import { getLibVersions, openDevice } from './lib/actions/targetActions';
+import AppMainView from './lib/containers/appMainView';
+import ControlPanel from './lib/containers/controlPanel';
+import appReducer from './lib/reducers';
+import { hexpad2, hexToKiB } from './lib/util/hexpad';
+import portPath from './lib/util/portPath';
 
-import "./resources/css/index.scss";
+import './resources/css/index.scss';
 
 let detectedDevices = [];
 let currentDeviceInfo;
@@ -68,7 +68,7 @@ export default {
         dispatch(loadSettings());
         document.body.ondragover = event => {
             const ev = event;
-            ev.dataTransfer.dropEffect = "copy";
+            ev.dataTransfer.dropEffect = 'copy';
             ev.preventDefault();
         };
 
@@ -95,7 +95,7 @@ export default {
     ),
 
     mapDeviceSelectorState: (state, props) => ({
-        portIndicatorStatus: state.app.target.port !== null ? "on" : "off",
+        portIndicatorStatus: state.app.target.port !== null ? 'on' : 'off',
         ...props,
     }),
 
@@ -105,22 +105,22 @@ export default {
         const { dispatch } = store;
 
         switch (action.type) {
-            case "DEVICE_SETUP_COMPLETE": {
+            case 'DEVICE_SETUP_COMPLETE': {
                 dispatch(openDevice(action.device));
                 break;
             }
 
-            case "DEVICE_DESELECTED": {
-                logger.info("Target device closed");
+            case 'DEVICE_DESELECTED': {
+                logger.info('Target device closed');
                 break;
             }
 
-            case "DEVICES_DETECTED": {
+            case 'DEVICES_DETECTED': {
                 detectedDevices = [...action.devices];
                 break;
             }
 
-            case "TARGET_INFO_KNOWN": {
+            case 'TARGET_INFO_KNOWN': {
                 currentDeviceInfo = { ...action.deviceInfo };
                 break;
             }
@@ -133,19 +133,19 @@ export default {
 
     decorateSystemReport: coreReport => {
         const report = [
-            "- Connected devices:",
+            '- Connected devices:',
             ...detectedDevices.map(
                 d =>
                     `    - ${portPath(d.serialport)}: ${d.serialNumber} ${
-                        d.boardVersion || ""
+                        d.boardVersion || ''
                     }`
             ),
-            "",
+            '',
         ];
         if (currentDeviceInfo) {
             const c = currentDeviceInfo;
             report.push(
-                "- Current device:",
+                '- Current device:',
                 `    - family:          ${c.family}`,
                 `    - type:            ${c.type}`,
                 `    - romBaseAddr:     ${hexpad2(c.romBaseAddr)}`,
@@ -161,9 +161,9 @@ export default {
                 `    - mbrBaseAddr:     ${hexpad2(c.mbrBaseAddr)}`,
                 `    - mbrParamsOffset: ${c.mbrParamsOffset}`,
                 `    - mbrSize:         ${c.mbrSize}`,
-                ""
+                ''
             );
         }
-        return coreReport.concat(report.join("\n"));
+        return coreReport.concat(report.join('\n'));
     },
 };

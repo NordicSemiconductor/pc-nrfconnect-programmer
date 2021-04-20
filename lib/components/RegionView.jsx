@@ -34,14 +34,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useRef, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Overlay from "react-bootstrap/Overlay";
-import Popover from "react-bootstrap/Popover";
-import PropTypes from "prop-types";
+import React, { useRef, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Overlay from 'react-bootstrap/Overlay';
+import Popover from 'react-bootstrap/Popover';
+import PropTypes from 'prop-types';
 
-import CoreInfoView from "./CoreInfoView";
-import RegionInfoView from "./RegionInfoView";
+import CoreInfoView from './CoreInfoView';
+import RegionInfoView from './RegionInfoView';
 
 const RegionView = ({
     width,
@@ -61,17 +61,17 @@ const RegionView = ({
         setTarget(event.target);
     };
 
-    const color = region ? region.color : "#d9e1e2";
+    const color = region ? region.color : '#d9e1e2';
     const fileNames = region ? region.fileNames : [];
 
-    let className = "region centering-container";
+    let className = 'region centering-container';
     className = striped ? `${className} striped` : className;
     className = active ? `${className} active striped` : className;
     className = hoverable ? `${className} hoverable` : className;
     className = fileNames.length > 1 ? `${className} crosses` : className;
 
     const containerNode = document.getElementsByClassName(
-        "core-main-layout"
+        'core-main-layout'
     )[0];
 
     return (
@@ -86,7 +86,7 @@ const RegionView = ({
             }}
         >
             <Overlay
-                trigger={["focus", "hover"]}
+                trigger={['focus', 'hover']}
                 placement="right"
                 target={target}
                 container={containerNode}

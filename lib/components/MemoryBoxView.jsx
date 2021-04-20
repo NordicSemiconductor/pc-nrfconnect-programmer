@@ -34,13 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useState } from "react";
-import Card from "react-bootstrap/Card";
-import Popover from "react-bootstrap/Popover";
-import PropTypes from "prop-types";
+import React, { useState } from 'react';
+import Card from 'react-bootstrap/Card';
+import Popover from 'react-bootstrap/Popover';
+import PropTypes from 'prop-types';
 
-import DeviceInfoView from "../containers/deviceInfoView";
-import MemoryView from "../containers/memoryView";
+import DeviceInfoView from '../containers/deviceInfoView';
+import MemoryView from '../containers/memoryView';
 
 const MemoryBoxView = ({
     title,
@@ -78,7 +78,7 @@ const MemoryBoxView = ({
                     <DeviceInfoView />
                 </Popover>
             )}
-            <Card.Body className={`panel-body ${isHolder && "empty"} stacked`}>
+            <Card.Body className={`panel-body ${isHolder && 'empty'} stacked`}>
                 {isHolder && (
                     <div className="memory-layout-container">
                         <h1>

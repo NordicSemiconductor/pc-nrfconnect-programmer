@@ -44,7 +44,7 @@
  * @returns {string} padded string
  */
 export const hexpad8 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, "0")}`;
+    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
 
 /**
  * Takes in an integer, returns a string
@@ -56,7 +56,7 @@ export const hexpad8 = (n: number): string =>
  * @returns {string} padded string
  */
 export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, "0")}`;
+    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
 
 /**
  * Takes in an integer, returns a string
@@ -68,7 +68,7 @@ export const hexpad4 = (n: number): string =>
  * @returns {string} padded string
  */
 export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, "0")}`;
+    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
 
 /**
  * Takes in an integer of the number in Byte and return the number in KiB

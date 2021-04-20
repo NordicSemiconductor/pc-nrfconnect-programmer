@@ -34,15 +34,15 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useRef, useState } from "react";
-import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Card from "react-bootstrap/Card";
-import Dropdown from "react-bootstrap/Dropdown";
-import Form from "react-bootstrap/Form";
-import Overlay from "react-bootstrap/Overlay";
-import Popover from "react-bootstrap/Popover";
-import PropTypes from "prop-types";
+import React, { useRef, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Card from 'react-bootstrap/Card';
+import Dropdown from 'react-bootstrap/Dropdown';
+import Form from 'react-bootstrap/Form';
+import Overlay from 'react-bootstrap/Overlay';
+import Popover from 'react-bootstrap/Popover';
+import PropTypes from 'prop-types';
 
 const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
     const [show, setShow] = useState(false);
@@ -65,7 +65,7 @@ const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
     };
 
     const containerNode = document.getElementsByClassName(
-        "core-main-layout"
+        'core-main-layout'
     )[0];
 
     return (

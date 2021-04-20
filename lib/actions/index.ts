@@ -1,11 +1,11 @@
-import { NrfConnectAction } from "pc-nrfconnect-shared";
-import { ThunkAction, ThunkDispatch } from "redux-thunk";
+import { NrfConnectAction } from 'pc-nrfconnect-shared';
+import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 
-import { State } from "../reducers/index";
+import { State } from '../reducers/index';
 import {
     Action as JLinkTargetAction,
     ActionType as JLinkTargetActionType,
-} from "./settingsActions";
+} from './settingsActions';
 
 /**
  * A union type of all the possible actions in the application.

@@ -36,17 +36,17 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import produce from "immer";
-import MemoryMap from "nrf-intel-hex";
-import SerialPort from "serialport";
+import produce from 'immer';
+import MemoryMap from 'nrf-intel-hex';
+import SerialPort from 'serialport';
 
-import * as fileActions from "../actions/fileActions";
-import * as targetActions from "../actions/targetActions";
+import * as fileActions from '../actions/fileActions';
+import * as targetActions from '../actions/targetActions';
 import {
     CommunicationType,
     DeviceDefinition,
     deviceDefinition,
-} from "../util/devices";
+} from '../util/devices';
 
 export interface TargetState {
     readonly targetType: CommunicationType;
@@ -91,12 +91,12 @@ const defaultState: TargetState = {
 export default (state = defaultState, action: any): TargetState =>
     produce<TargetState>(state, draft => {
         switch (action.type) {
-            case "DEVICE_SELECTED":
+            case 'DEVICE_SELECTED':
                 draft = { ...defaultState };
                 draft.serialNumber = action.device.serialNumber;
                 break;
 
-            case "DEVICE_DESELECTED":
+            case 'DEVICE_DESELECTED':
                 draft = defaultState;
                 break;
 
