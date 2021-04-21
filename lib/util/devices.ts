@@ -263,7 +263,13 @@ export const getDeviceDefinition = (type: string): DeviceDefinition =>
     };
 
 // Get device info by calling version command
-export const getDeviceInfoByUSB = ({ part, memory }) => {
+export const getDeviceInfoByUSB = ({
+    part,
+    memory,
+}: {
+    part: number;
+    memory: any;
+}) => {
     const deviceInfoByUsb = getDeviceDefinition(part.toString(16));
     const [core] = deviceInfoByUsb.cores;
     return {
