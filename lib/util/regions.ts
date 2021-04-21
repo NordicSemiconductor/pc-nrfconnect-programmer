@@ -63,7 +63,7 @@ export enum RegionPermission {
  * Definition of RegionName
  */
 export enum RegionName {
-    MBR_PARAMS = 'MBR Paramters',
+    MBR_PARAMS = 'MBR Parameters',
     MBR = 'MBR',
     MBR_OR_APP = 'MBR or Application',
     BOOTLOADER = 'Bootloader',

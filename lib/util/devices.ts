@@ -206,7 +206,7 @@ export const USBProductIds = [0x521f, 0xc00a, 0xcafe];
 /**
  * Supported USB MCUboot product IDs
  */
-export const MCUbootProductIds = [0x520f, 0x9100];
+export const McubootProductIds = [0x520f, 0x9100];
 
 /**
  * Supported JLink product IDs
@@ -217,43 +217,6 @@ export const JLinkProductIds = [
     ...range(0x1001, 0x101f),
 ];
 
-// const deviceFamilies = {};
-
-// const deviceModels = {};
-
-// Object.keys(nrfjprog).forEach(key => {
-//     if (/NRF\d+_FAMILY/.test(key)) {
-//         Object.assign(deviceFamilies, {
-//             [nrfjprog[key]]: key.split('_')[0].replace('NRF', 'nRF'),
-//         });
-//     }
-//     if (/NRF\d+_xx.*/.test(key)) {
-//         const family = `${key.slice(0, 5)}_FAMILY`;
-//         deviceModels[nrfjprog[family]] = deviceModels[nrfjprog[family]] || {};
-//         Object.assign(deviceModels[nrfjprog[family]], { [nrfjprog[key]]: key });
-//     }
-// });
-
-// // Device variants from jprog.
-// export const getDeviceModel = (family, type) => {
-//     if (family in deviceModels && type in deviceModels[family]) {
-//         return deviceModels[family][type];
-//     }
-
-//     return 'Unknown model';
-// };
-
-// export const getDeviceFamily = family => {
-//     if (family in deviceFamilies) {
-//         return deviceFamilies[family];
-//     }
-
-//     return 'Unknown family';
-// };
-
-// TODO: due to type defined in nrfjprog, the type in string
-// does not always match the type in number.
-// Update the function and enhance the logic
 export const getDeviceDefinition = (type: string): DeviceDefinition =>
     deviceDefinitions.find((device: DeviceDefinition) =>
         device?.type?.includes(type)
@@ -286,29 +249,12 @@ export const getDeviceInfoByUSB = ({
     };
 };
 
-// Get device info by calling nrf-devicie-lib-js
+// Get device info by calling nrf-device-lib-js
 export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
     const model = device.jlink.device_version;
     const family = device.jlink.device_family;
     logger.info(`Device family ${family}`);
     logger.info(`Device model ${model}`);
-
-    // let type;
-    // if (!model) {
-    //     type = 'Unknown';
-    //     logger.info(
-    //         'Device type is unknown. It may be a new version of product from Nordic Semiconductor.'
-    //     );
-    //     logger.info('Please check device list supported by nrfjprog.');
-    // } else {
-    //     type = model.split('_')[0].substring(3); // Get device type digits
-    //     type = parseInt(type, 10);
-    // }
-    // if (!family) {
-    //     family = 'Unknown';
-    //     logger.info('Device family is unknown. It is not supported.');
-    //     logger.info('Please check device list supported by nrfjprog.');
-    // }
 
     return {
         ...getDeviceDefinition(model),
