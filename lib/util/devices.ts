@@ -268,6 +268,7 @@ export const getDeviceInfoByUSB = ({
     memory,
 }: {
     part: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     memory: any;
 }) => {
     const deviceInfoByUsb = getDeviceDefinition(part.toString(16));
