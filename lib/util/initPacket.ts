@@ -34,27 +34,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Record } from 'immutable';
 import protobuf from 'protobufjs';
 
 import dfuCcProto from './dfu-cc';
 
 const root = protobuf.Root.fromJSON(dfuCcProto);
-
-export const InitPacket = new Record({
-    fwVersion: 0xffffffff,
-    hwVersion: null,
-    sdReq: null,
-    fwType: null,
-    sdSize: 0,
-    blSize: 0,
-    appSize: 0,
-    hashType: null,
-    hash: null,
-    isDebug: true,
-    signatureType: null,
-    signature: null,
-});
 
 export const OpCode = {
     RESET: 0,
@@ -81,8 +65,38 @@ export const SignatureType = {
     ED25519: 1,
 };
 
+export interface InitPacket {
+    fwVersion?: number;
+    hwVersion?: number;
+    sdReq?: number;
+    fwType?: number;
+    sdSize: number;
+    blSize: number;
+    appSize: number;
+    hashType: number;
+    hash?: [];
+    isDebug: boolean;
+    signatureType?: number;
+    signature?: [];
+}
+
+export const defaultInitPacket: InitPacket = {
+    fwVersion: 0xffffffff,
+    hwVersion: undefined,
+    sdReq: undefined,
+    fwType: undefined,
+    sdSize: 0,
+    blSize: 0,
+    appSize: 0,
+    hashType: HashType.NO_HASH,
+    hash: undefined,
+    isDebug: true,
+    signatureType: undefined,
+    signature: undefined,
+};
+
 // Create hash by using hash type and bytes
-function createHash(hashType, hashInput) {
+const createHash = (hashType: number, hashInput: []): protobuf.Message => {
     const hashMessage = root.lookupType('dfu.Hash');
     const hashPayload = {
         hashType,
@@ -91,10 +105,10 @@ function createHash(hashType, hashInput) {
     const hash = hashMessage.create(hashPayload);
 
     return hash;
-}
+};
 
 // Create reset command
-function createResetCommand(timeout) {
+const createResetCommand = (timeout: number): protobuf.Message => {
     const resetCommandMessage = root.lookupType('dfu.ResetCommand');
     const resetCommandPayload = {
         timeout,
@@ -102,22 +116,23 @@ function createResetCommand(timeout) {
     const resetCommand = resetCommandMessage.create(resetCommandPayload);
 
     return resetCommand;
-}
+};
 
 // Create init command
-function createInitCommand(
-    fwVersion,
-    hwVersion,
-    sdReq,
-    type,
-    sdSize,
-    blSize,
-    appSize,
-    hash,
-    isDebug = false,
-) {
+const createInitCommand = (
+    fwVersion: number | undefined,
+    hwVersion: number | undefined,
+    sdReq: number | undefined,
+    type: number | undefined,
+    sdSize: number | undefined,
+    blSize: number | undefined,
+    appSize: number | undefined,
+    hash: protobuf.Message | undefined,
+    isDebug = false
+): protobuf.Message => {
     const initCommandMessage = root.lookupType('dfu.InitCommand');
     const initCommandPayload = {
+        ...defaultInitPacket,
         fwVersion,
         hwVersion,
         sdReq,
@@ -130,10 +145,13 @@ function createInitCommand(
     };
 
     return initCommandMessage.create(initCommandPayload);
-}
+};
 
 // Create command
-function createCommand(opCode, commandInput) {
+const createCommand = (
+    opCode: number,
+    commandInput: protobuf.Message
+): protobuf.Message => {
     const commandMessage = root.lookupType('dfu.Command');
     const commandPayload = {
         opCode,
@@ -142,10 +160,14 @@ function createCommand(opCode, commandInput) {
     const command = commandMessage.create(commandPayload);
 
     return command;
-}
+};
 
 // Create signed command
-function createSignedCommand(command, signatureType, signature) {
+const createSignedCommand = (
+    command: protobuf.Message,
+    signatureType: number,
+    signature: []
+): protobuf.Message => {
     const signedCommandMessage = root.lookupType('dfu.SignedCommand');
     const signedCommandPayload = {
         command,
@@ -155,10 +177,13 @@ function createSignedCommand(command, signatureType, signature) {
     const signedCommand = signedCommandMessage.create(signedCommandPayload);
 
     return signedCommand;
-}
+};
 
 // Create packet
-function createPacket(command, isSigned) {
+const createPacket = (
+    command: protobuf.Message,
+    isSigned: boolean
+): protobuf.Message => {
     const packetPayload = {
         [isSigned ? 'signedCommand' : 'command']: command,
     };
@@ -166,19 +191,26 @@ function createPacket(command, isSigned) {
     const packet = packetMessage.create(packetPayload);
 
     return packet;
-}
+};
 
 // Convert protocol buffer message to buffer
-function messageToBuffer(type, message) {
+const messageToBuffer = (
+    type: string,
+    message: protobuf.Message
+): Uint8Array => {
     if (!message) {
-        return undefined;
+        throw Error('The message to be converted is undefined.');
     }
 
-    const dfuMessage = root.lookup(`dfu.${type}`);
+    const dfuMessage = root.lookup(`dfu.${type}`) as protobuf.Type;
+    if (!dfuMessage) {
+        throw Error('DFU type not found.');
+    }
+
     const buffer = dfuMessage.encode(message).finish();
 
     return buffer;
-}
+};
 
 /**
  * Create reset command packet
@@ -187,41 +219,43 @@ function messageToBuffer(type, message) {
  * @param {Integer} signatureType   the type of signature
  * @param {Array}   signature       the signature in bytes
  *
- * @returns {Object} reset command packet
+ * @returns {protobuf.Message | undefined} reset command packet
  */
-export function createResetPacket(timeout, signatureType, signature) {
-    try {
-        // Check input parameters
-        if (timeout === undefined) {
-            throw new Error('Timeout is not set');
-        }
-
-        // It checks both null and undefined here
-        if ((signatureType == null && signature != null)
-            || (signatureType != null && signature == null)) {
-            throw new Error('Either signature type or signature is not set');
-        }
-
-        // Create reset command
-        const resetCommand = createResetCommand(timeout);
-        let isSigned = false;
-        let command = createCommand(OpCode.RESET, resetCommand);
-
-        // Create signed command if it is signed
-        // It checks both null and undefined here
-        if (signatureType != null && signature != null) {
-            isSigned = true;
-            command = createSignedCommand(command, signatureType, signature);
-        }
-
-        // Create packet
-        const packet = createPacket(command, isSigned);
-
-        return packet;
-    } catch (err) {
-        return undefined;
+export const createResetPacket = (
+    timeout: number,
+    signatureType: number,
+    signature: []
+): protobuf.Message => {
+    // Check input parameters
+    if (timeout === undefined) {
+        throw new Error('Timeout is not set');
     }
-}
+
+    // It checks both null and undefined here
+    if (
+        (signatureType == null && signature != null) ||
+        (signatureType != null && signature == null)
+    ) {
+        throw new Error('Either signature type or signature is not set');
+    }
+
+    // Create reset command
+    const resetCommand = createResetCommand(timeout);
+    let isSigned = false;
+    let command = createCommand(OpCode.RESET, resetCommand);
+
+    // Create signed command if it is signed
+    // It checks both null and undefined here
+    if (signatureType != null && signature != null) {
+        isSigned = true;
+        command = createSignedCommand(command, signatureType, signature);
+    }
+
+    // Create packet
+    const packet = createPacket(command, isSigned);
+
+    return packet;
+};
 
 /**
  * Create reset command buffer
@@ -230,14 +264,18 @@ export function createResetPacket(timeout, signatureType, signature) {
  * @param {Integer} signatureType   the type of signature
  * @param {Array}   signature       the signature in bytes
  *
- * @returns {Buffer} converted from reset command packet
+ * @returns {Uint8Array} converted from reset command packet
  */
-export function createResetPacketBuffer(timeout, signatureType, signature) {
+export const createResetPacketBuffer = (
+    timeout: number,
+    signatureType: number,
+    signature: []
+): Uint8Array => {
     const packet = createResetPacket(timeout, signatureType, signature);
     const buffer = messageToBuffer('Packet', packet);
 
     return buffer;
-}
+};
 
 /**
  * Create init command packet
@@ -255,66 +293,64 @@ export function createResetPacketBuffer(timeout, signatureType, signature) {
  * @param {SignatureType}   signatureType   the type of signature
  * @param {Array}           signature       the signature in bytes
  *
- * @returns {Object} init command packet
+ * @returns {protobuf.Message} init command packet
  */
-export function createInitPacket(
-    fwVersion,
-    hwVersion,
-    sdReq,
-    fwType,
-    sdSize,
-    blSize,
-    appSize,
-    hashType,
-    hash,
-    isDebug,
-    signatureType,
-    signature,
-) {
-    try {
-        // It checks both null and undefined here
-        if ((signatureType == null && signature != null)
-            || (signatureType != null && signature == null)) {
-            throw new Error('Either signature type or signature is not set');
-        }
-
-        // Create init command
-        const hashInput = createHash(hashType, hash);
-        const initCommand = createInitCommand(
-            fwVersion,
-            hwVersion,
-            sdReq,
-            fwType,
-            sdSize,
-            blSize,
-            appSize,
-            hashInput,
-            isDebug,
-        );
-        let command = createCommand(OpCode.INIT, initCommand);
-        let isSigned = false;
-
-        // Create signed command if it is signed
-        if (signatureType != null && signature != null) {
-            command = createSignedCommand(command, signatureType, signature);
-            isSigned = true;
-        }
-
-        // Create packet
-        const packet = createPacket(command, isSigned);
-
-        return packet;
-    } catch (err) {
-        return undefined;
+export const createInitPacket = (
+    fwVersion: number | undefined,
+    hwVersion: number | undefined,
+    sdReq: number | undefined,
+    fwType: number | undefined,
+    sdSize: number | undefined,
+    blSize: number | undefined,
+    appSize: number | undefined,
+    hashType: number | undefined,
+    hash: [] | undefined,
+    isDebug: boolean,
+    signatureType: number | undefined,
+    signature: [] | undefined
+): protobuf.Message => {
+    // It checks both null and undefined here
+    if (
+        (signatureType == null && signature != null) ||
+        (signatureType != null && signature == null)
+    ) {
+        throw new Error('Either signature type or signature is not set');
     }
-}
+
+    // Create init command
+    const hashInput = createHash(hashType || HashType.NO_HASH, hash || []);
+    const initCommand = createInitCommand(
+        fwVersion,
+        hwVersion,
+        sdReq,
+        fwType,
+        sdSize,
+        blSize,
+        appSize,
+        hashInput,
+        isDebug
+    );
+    let command = createCommand(OpCode.INIT, initCommand);
+    let isSigned = false;
+
+    // Create signed command if it is signed
+    if (signatureType != null && signature != null) {
+        command = createSignedCommand(command, signatureType, signature);
+        isSigned = true;
+    }
+
+    // Create packet
+    const packet = createPacket(command, isSigned);
+
+    return packet;
+};
 
 /**
  * Create init command buffer
  *
  * @param {Integer}         fwVersion       the firmware version
  * @param {Integer}         hwVersion       the hardware version
- * @param {Array}           sdReq           the softdevcie requirements
+ * @param {Array}           sdReq           the softdevice requirements
  * @param {FwType}          fwType          the firmware type
  * @param {Integer}         sdSize          the size of softdevice
  * @param {Integer}         blSize          the size of bootloader
@@ -325,22 +361,22 @@ export function createInitPacket(
  * @param {SignatureType}   signatureType   the type of signature
  * @param {Array}           signature       the signature in bytes
  *
- * @returns {Buffer} converted from init command packet
+ * @returns {Uint8Array} converted from init command packet
  */
-export function createInitPacketBuffer(
-    fwVersion,
-    hwVersion,
-    sdReq,
-    fwType,
-    sdSize,
-    blSize,
-    appSize,
-    hashType,
-    hash,
-    isDebug,
-    signatureType,
-    signature,
-) {
+export const createInitPacketBuffer = (
+    fwVersion: number,
+    hwVersion: number,
+    sdReq: number,
+    fwType: number,
+    sdSize: number,
+    blSize: number,
+    appSize: number,
+    hashType: number,
+    hash: [],
+    isDebug: boolean,
+    signatureType: number,
+    signature: []
+): Uint8Array => {
     const packet = createInitPacket(
         fwVersion,
         hwVersion,
@@ -353,21 +389,23 @@ export function createInitPacketBuffer(
         hash,
         isDebug,
         signatureType,
-        signature,
+        signature
     );
     const buffer = messageToBuffer('Packet', packet);
 
     return buffer;
-}
+};
 
 /**
  * Create init command packet Uint8Array
  *
- * @param {InitPacket} packetParams the InitPacket which carries all infomations
+ * @param {InitPacket} packetParams the InitPacket which carries all information
  *
  * @returns {Uint8Array} converted from init command packet buffer
  */
-export function createInitPacketUint8Array(packetParams) {
+export const createInitPacketUint8Array = (
+    packetParams: InitPacket
+): Uint8Array => {
     const packet = createInitPacket(
         packetParams.fwVersion,
         packetParams.hwVersion,
@@ -380,9 +418,9 @@ export function createInitPacketUint8Array(packetParams) {
         packetParams.hash,
         packetParams.isDebug,
         packetParams.signatureType,
-        packetParams.signature,
+        packetParams.signature
     );
     const buffer = messageToBuffer('Packet', packet);
 
     return new Uint8Array(buffer);
-}
+};
