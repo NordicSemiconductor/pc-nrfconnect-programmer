@@ -330,7 +330,12 @@ export const getSoftDeviceRegion = (
             memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ||
             undefined;
         if (softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER) {
-            const regionSize = softdeviceMagicNumber - SOFTDEVICE_MAGIC_START;
+            let regionSize = 0;
+            memMap.forEach((bytes, addr) => {
+                if (address >= addr && address < addr + bytes.length) {
+                    regionSize = bytes.length;
+                }
+            });
             const region: Region = {
                 ...defaultRegion,
                 name: RegionName.SOFTDEVICE,
@@ -501,8 +506,8 @@ export const getRegionsFromOverlaps = (
 ): Region[] => {
     const memMap = MemoryMap.flattenOverlaps(overlaps);
     const memRegions = getMemoryRegions(memMap, coreInfo);
-    const sdRegion = memRegions.find(r => r.name === RegionName.SOFTDEVICE);
     const blRegion = memRegions.find(r => r.name === RegionName.BOOTLOADER);
+    const sdRegion = memRegions.find(r => r.name === RegionName.SOFTDEVICE);
     let regions: Region[] = [];
     let region;
     overlaps.forEach((overlap, startAddress) => {
@@ -567,6 +572,7 @@ export const getRegionsFromOverlaps = (
 
         // If SoftDevice exists but not Bootloader
         // the regions above SoftDevice are Applications
+
         if (
             sdRegion &&
             !blRegion &&

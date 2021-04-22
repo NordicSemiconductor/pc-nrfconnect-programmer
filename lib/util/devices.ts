@@ -309,14 +309,10 @@ export const getDeviceFromNrfdl = (
     serialNumber: string
 ): Promise<nrfdl.Device> =>
     new Promise((resolve, reject) => {
-        console.log(nrfdl);
-        console.log(context);
         nrfdl.enumerate(context).then(devices => {
-            console.log(devices);
             // This is not needed when nrf-device-lib-js is integrated in device selector
             // eslint-disable-next-line no-restricted-syntax
             for (const device of devices) {
-                console.log(device.serialnumber);
                 if (device.serialnumber === serialNumber) {
                     return resolve(device);
                 }
