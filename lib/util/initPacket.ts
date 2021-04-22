@@ -34,6 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import MemoryMap from 'nrf-intel-hex';
 import protobuf from 'protobufjs';
 
 import dfuCcProto from './dfu-cc';
@@ -94,6 +95,12 @@ export const defaultInitPacket: InitPacket = {
     signatureType: undefined,
     signature: undefined,
 };
+
+export interface DfuImage {
+    name: string;
+    initPacket: InitPacket;
+    firmwareImage: MemoryMap;
+}
 
 // Create hash by using hash type and bytes
 const createHash = (hashType: number, hashInput: []): protobuf.Message => {
