@@ -47,6 +47,7 @@ import {
     DeviceDefinition,
     deviceDefinition,
 } from '../util/devices';
+import { Region } from '../util/regions';
 
 export interface TargetState {
     readonly targetType: CommunicationType;
@@ -54,7 +55,7 @@ export interface TargetState {
     readonly serialNumber?: string;
     readonly deviceInfo?: DeviceDefinition;
     readonly memMap?: MemoryMap;
-    readonly regions?: any[]; // TODO: Define region
+    readonly regions?: Region[]; // TODO: Define region
     readonly warnings?: string[];
     readonly writtenAddress?: number;
     readonly dfuImages?: any[]; // TODO: Define image
