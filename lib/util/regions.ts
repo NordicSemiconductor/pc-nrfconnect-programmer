@@ -46,7 +46,7 @@ const SOFTDEVICE_MAGIC_START = 0x1000;
 const SOFTDEVICE_MAGIC_END = 0x10000;
 const SOFTDEVICE_MAGIC_NUMBER = 0x51b1e5db;
 const SOFTDEVICE_MAGIC_OFFSET = 0x4;
-const SOFTDEVICE_FWID_OFFSET = 0xc;
+const SOFTDEVICE_FW_ID_OFFSET = 0xc;
 const SOFTDEVICE_ID_OFFSET = 0x10;
 const SOFTDEVICE_VERSION_OFFSET = 0x14;
 
@@ -372,10 +372,20 @@ export const getSoftDeviceId = (
         const softdeviceMagicNumber =
             memMap.getUint32(address + SOFTDEVICE_MAGIC_OFFSET, true) ||
             undefined;
-        if (softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER) {
-            fwId = softdeviceMagicNumber & 0x0000ffff;
+        const softdeviceFwIdBit = memMap.getUint32(
+            address + SOFTDEVICE_FW_ID_OFFSET,
+            true
+        );
+        if (
+            softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER &&
+            softdeviceFwIdBit
+        ) {
+            fwId = softdeviceFwIdBit & 0x0000ffff;
         }
     }
+    console.log('###################');
+    console.log(hexpad2(fwId));
+    console.log('###################');
     return fwId;
 };
 
@@ -391,74 +401,75 @@ export const logSoftDeviceRegion = (
     memMap: MemoryMap,
     coreInfo: CoreDefinition
 ) => {
+    logger.info('Detecting SoftDevice info...');
     const { pageSize } = coreInfo;
-    const softdeviceMagicNumber = memMap.getUint32(
-        SOFTDEVICE_MAGIC_START + SOFTDEVICE_MAGIC_OFFSET,
-        true
-    );
     for (
         let address = SOFTDEVICE_MAGIC_START;
         address < SOFTDEVICE_MAGIC_END;
         address += pageSize
     ) {
-        if (softdeviceMagicNumber !== SOFTDEVICE_MAGIC_NUMBER) return;
-
-        const infoBlockSizeBit = memMap.getUint32(address, true);
-        const infoBlockSize = infoBlockSizeBit
-            ? infoBlockSizeBit & 0x000000ff
-            : undefined;
-
-        const fwIdBit = memMap.getUint32(
-            address + SOFTDEVICE_FWID_OFFSET,
+        const softdeviceMagicNumber = memMap.getUint32(
+            address + SOFTDEVICE_MAGIC_OFFSET,
             true
         );
-        const fwId: number = fwIdBit ? fwIdBit & 0x0000ffff : 0;
-        if (fwId === 0) {
-            logger.info('SoftDevice Id not found');
-            return;
-        }
+        if (softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER) {
+            const infoBlockSizeBit = memMap.getUint32(address, true);
+            const infoBlockSize = infoBlockSizeBit
+                ? infoBlockSizeBit & 0x000000ff
+                : undefined;
 
-        if (infoBlockSize && infoBlockSize >= 0x18) {
-            const softDeviceId = memMap.getUint32(
-                address + SOFTDEVICE_ID_OFFSET,
+            const fwIdBit = memMap.getUint32(
+                address + SOFTDEVICE_FW_ID_OFFSET,
                 true
             );
-            const softDeviceVersion = memMap.getUint32(
-                address + SOFTDEVICE_VERSION_OFFSET,
-                true
-            );
-            if (softDeviceVersion === 0) {
-                logger.info(
-                    `SoftDevice detected, id ${hexpad2(
-                        fwId
-                    )} (S${softDeviceId} prerelease)`
-                );
+            const fwId: number = fwIdBit ? fwIdBit & 0x0000ffff : 0;
+            if (fwId === 0) {
+                logger.info('SoftDevice Id not found');
                 return;
             }
-            if (softDeviceVersion) {
-                const softDeviceVersionMajor = Math.floor(
-                    (softDeviceVersion / 1000000) % 1000
+
+            if (infoBlockSize && infoBlockSize >= 0x18) {
+                const softDeviceId = memMap.getUint32(
+                    address + SOFTDEVICE_ID_OFFSET,
+                    true
                 );
-                const softDeviceVersionMinor = Math.floor(
-                    (softDeviceVersion / 1000) % 1000
+                const softDeviceVersion = memMap.getUint32(
+                    address + SOFTDEVICE_VERSION_OFFSET,
+                    true
                 );
-                const softDeviceVersionPatch = softDeviceVersion % 1000;
+                if (softDeviceVersion === 0) {
+                    logger.info(
+                        `SoftDevice detected, id ${hexpad2(
+                            fwId
+                        )} (S${softDeviceId} prerelease)`
+                    );
+                    return;
+                }
+                if (softDeviceVersion) {
+                    const softDeviceVersionMajor = Math.floor(
+                        (softDeviceVersion / 1000000) % 1000
+                    );
+                    const softDeviceVersionMinor = Math.floor(
+                        (softDeviceVersion / 1000) % 1000
+                    );
+                    const softDeviceVersionPatch = softDeviceVersion % 1000;
+                    logger.info(
+                        `SoftDevice detected, id ${hexpad2(
+                            fwId
+                        )} (S${softDeviceId} v${softDeviceVersionMajor}.${softDeviceVersionMinor}.${softDeviceVersionPatch})`
+                    );
+                }
+            }
+            if (knownSoftDevices[fwId]) {
                 logger.info(
-                    `SoftDevice detected, id ${hexpad2(
-                        fwId
-                    )} (S${softDeviceId} v${softDeviceVersionMajor}.${softDeviceVersionMinor}.${softDeviceVersionPatch})`
+                    `SoftDevice detected, id ${hexpad2(fwId)} (${
+                        knownSoftDevices[fwId]
+                    })`
                 );
             }
-        }
-        if (knownSoftDevices[fwId]) {
-            logger.info(
-                `SoftDevice detected, id ${hexpad2(fwId)} (${
-                    knownSoftDevices[fwId]
-                })`
-            );
-        }
 
-        logger.info(`SoftDevice detected, id ${hexpad2(fwId)}`);
+            logger.info(`SoftDevice detected, id ${hexpad2(fwId)}`);
+        }
     }
 };
 
