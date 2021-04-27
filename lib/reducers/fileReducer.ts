@@ -64,9 +64,10 @@ export default (state = defaultState, action: any): FileState =>
     produce<FileState>(state, draft => {
         switch (action.type) {
             case fileActions.FILES_EMPTY:
-                draft = { ...defaultState };
-                draft.mruFiles = state.mruFiles;
-                break;
+                return {
+                    ...defaultState,
+                    mruFiles: state.mruFiles,
+                };
 
             case fileActions.FILE_PARSE:
                 draft.memMaps = action.memMaps;
