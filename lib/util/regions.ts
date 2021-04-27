@@ -383,9 +383,7 @@ export const getSoftDeviceId = (
             fwId = softdeviceFwIdBit & 0x0000ffff;
         }
     }
-    console.log('###################');
-    console.log(hexpad2(fwId));
-    console.log('###################');
+
     return fwId;
 };
 
