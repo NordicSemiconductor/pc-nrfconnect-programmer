@@ -399,7 +399,6 @@ export const logSoftDeviceRegion = (
     memMap: MemoryMap,
     coreInfo: CoreDefinition
 ) => {
-    logger.info('Detecting SoftDevice info...');
     const { pageSize } = coreInfo;
     for (
         let address = SOFTDEVICE_MAGIC_START;
@@ -456,6 +455,7 @@ export const logSoftDeviceRegion = (
                             fwId
                         )} (S${softDeviceId} v${softDeviceVersionMajor}.${softDeviceVersionMinor}.${softDeviceVersionPatch})`
                     );
+                    return;
                 }
             }
             if (knownSoftDevices[fwId]) {
@@ -464,6 +464,7 @@ export const logSoftDeviceRegion = (
                         knownSoftDevices[fwId]
                     })`
                 );
+                return;
             }
 
             logger.info(`SoftDevice detected, id ${hexpad2(fwId)}`);
