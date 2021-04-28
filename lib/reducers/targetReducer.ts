@@ -93,13 +93,15 @@ export default (state = defaultState, action: any): TargetState =>
     produce<TargetState>(state, draft => {
         switch (action.type) {
             case 'DEVICE_SELECTED':
-                draft = { ...defaultState };
-                draft.serialNumber = action.device.serialNumber;
-                break;
+                return {
+                    ...defaultState,
+                    serialNumber: action.device.serialNumber,
+                };
 
             case 'DEVICE_DESELECTED':
-                draft = defaultState;
-                break;
+                return {
+                    ...defaultState,
+                };
 
             case targetActions.TARGET_TYPE_KNOWN:
                 draft.targetType = action.targetType;
