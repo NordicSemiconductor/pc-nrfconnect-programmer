@@ -1,6 +1,6 @@
 ---
 name: Custom issue template
-about: Report bugs and feedback in DevZone
+about: Please report bugs and feedback in DevZone
 title: ''
 labels: ''
 assignees: ''
