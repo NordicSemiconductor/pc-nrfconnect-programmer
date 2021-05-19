@@ -1,3 +1,7 @@
+## Version 1.4.9
+### Updates
+* Add APPPROTECT support for nRF52 family
+
 ## Version 1.4.8
 ### Updates
 * Add APPPROTECT support
