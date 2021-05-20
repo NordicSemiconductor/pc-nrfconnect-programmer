@@ -51,6 +51,8 @@
     "electron-store": "^1.2.0"
   },
   "bundledDependencies": [
-    "electron-store"
+    "electron-store",
+    "immutable",
+    "redux"
   ]
 }
