@@ -35,10 +35,10 @@
  */
 
 import React, { useState } from 'react';
-
 import Card from 'react-bootstrap/Card';
 import Popover from 'react-bootstrap/Popover';
 import PropTypes from 'prop-types';
+
 import DeviceInfoView from '../containers/deviceInfoView';
 import MemoryView from '../containers/memoryView';
 

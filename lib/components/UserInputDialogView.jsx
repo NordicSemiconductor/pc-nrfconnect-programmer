@@ -35,11 +35,10 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
-
-import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import PropTypes from 'prop-types';
 
 import { hexpad2 } from '../util/hexpad';
 
@@ -85,12 +84,8 @@ export default class UserInputDialogView extends React.Component {
 
     render() {
         const { isVisible, message, choices, onOk, onCancel } = this.props;
-        const {
-            selectedValue,
-            isValidInput,
-            customChecked,
-            customValue,
-        } = this.state;
+        const { selectedValue, isValidInput, customChecked, customValue } =
+            this.state;
 
         return (
             <Modal show={isVisible} onHide={this.onCancel} backdrop="static">

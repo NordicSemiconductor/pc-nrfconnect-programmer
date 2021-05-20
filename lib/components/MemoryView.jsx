@@ -35,8 +35,9 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { List } from 'immutable';
+import PropTypes from 'prop-types';
+
 import CoreView from './CoreView';
 
 const allocateCores = (cores, regions) =>

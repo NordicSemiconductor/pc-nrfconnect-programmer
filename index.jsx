@@ -34,10 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import './resources/css/index.scss';
-
-import { logger } from 'nrfconnect/core';
 import React from 'react';
+import { logger } from 'nrfconnect/core';
 
 import { openFile } from './lib/actions/fileActions';
 import { loadSettings } from './lib/actions/settingsActions';
@@ -45,9 +43,11 @@ import { openDevice } from './lib/actions/targetActions';
 import AppMainView from './lib/containers/appMainView';
 import ControlPanel from './lib/containers/controlPanel';
 import appReducer from './lib/reducers';
-import { hexToKiB, hexpad2 } from './lib/util/hexpad';
+import { hexpad2, hexToKiB } from './lib/util/hexpad';
 import logJprogVersion from './lib/util/logJprogVersion';
 import portPath from './lib/util/portPath';
+
+import './resources/css/index.scss';
 
 let detectedDevices = [];
 let currentDeviceInfo;
@@ -83,17 +83,19 @@ export default {
         logJprogVersion();
     },
 
-    decorateMainView: MainView => () => (
-        <MainView cssClass="main-view">
-            <AppMainView />
-        </MainView>
-    ),
+    decorateMainView: MainView => () =>
+        (
+            <MainView cssClass="main-view">
+                <AppMainView />
+            </MainView>
+        ),
 
-    decorateSidePanel: SidePanel => () => (
-        <SidePanel cssClass="side-panel">
-            <ControlPanel />
-        </SidePanel>
-    ),
+    decorateSidePanel: SidePanel => () =>
+        (
+            <SidePanel cssClass="side-panel">
+                <ControlPanel />
+            </SidePanel>
+        ),
 
     mapDeviceSelectorState: (state, props) => ({
         portIndicatorStatus: state.app.target.port !== null ? 'on' : 'off',
