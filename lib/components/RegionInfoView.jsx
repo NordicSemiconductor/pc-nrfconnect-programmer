@@ -35,8 +35,9 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { basename } from 'path';
+import PropTypes from 'prop-types';
+
 import { hexpad8 } from '../util/hexpad';
 
 const RegionInfoView = ({ name, startAddress, regionSize, fileNames }) => (
