@@ -45,7 +45,8 @@
     "protobufjs": "^6.8.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-redux": "7.2.0"
+    "react-redux": "7.2.0",
+    "redux": "^4.1.0"
   },
   "dependencies": {
     "electron-store": "^1.2.0"
@@ -54,5 +55,9 @@
     "electron-store",
     "immutable",
     "redux"
-  ]
+  ],
+  "eslintConfig": {
+    "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc.json"
+  },
+  "prettier": "./node_modules/pc-nrfconnect-shared/config/prettier.config.js"
 }
