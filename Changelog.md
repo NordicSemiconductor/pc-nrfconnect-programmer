@@ -1,14 +1,18 @@
+## Version 1.4.10
+### Updates
+* Updated firmware to support modem DFU for Thingy:91 v1.6.0
+
 ## Version 1.4.9
 ### Updates
-* Add APPPROTECT support for nRF52 family
+* Added APPPROTECT support for nRF52 family
 
 ## Version 1.4.8
 ### Updates
-* Add APPPROTECT support
+* Added APPPROTECT support
 
 ## Version 1.4.7
 ### Updates
-* Add USB PID of OpenThread devices
+* Added USB PID of OpenThread devices
 
 ## Version 1.4.6
 ## Updates
