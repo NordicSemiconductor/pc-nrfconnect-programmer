@@ -1,6 +1,7 @@
 ## Version 1.4.10
 ### Updates
 * Updated firmware to support modem DFU for Thingy:91 v1.6.0
+* Updated firmware to enhance APPPROTECT feature
 
 ## Version 1.4.9
 ### Updates
