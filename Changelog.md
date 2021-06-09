@@ -1,3 +1,8 @@
+## Version 1.4.11
+### Fixes
+* Fixed programming with external debugger
+Note, programming a protected SoC via external debugger is not supported
+
 ## Version 1.4.10
 ### Updates
 * Updated firmware to support modem DFU for Thingy:91 v1.6.0
