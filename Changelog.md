@@ -1,7 +1,7 @@
 ## Version 1.4.11
 ### Fixes
-* Fixed programming with external debugger
-Note, programming a protected SoC via external debugger is not supported
+* Fixed programming with external debugger.
+Note, programming a protected SoC via external debugger is not supported.
 
 ## Version 1.4.10
 ### Updates
