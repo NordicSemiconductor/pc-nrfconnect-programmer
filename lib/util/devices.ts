@@ -39,7 +39,7 @@ import nrfdl, {
     DeviceCoreInfo,
     DeviceFamily,
     ProtectionStatus,
-} from 'nrf-device-lib-js';
+} from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 
 import range from './range';
@@ -101,11 +101,11 @@ export const deviceDefinition: DeviceDefinition = {
 };
 
 /**
- * Some information cannot be fetch by nrf-device-lib-js
+ * Some information cannot be fetch by @nordicsemiconductor/nrf-device-lib-js
  * Define the default values here
  */
 const deviceDefinitions: DeviceDefinition[] = [
-    // nRF52840 dongle cannot fetch info by nrf-device-lib-js
+    // nRF52840 dongle cannot fetch info by @nordicsemiconductor/nrf-device-lib-js
     {
         ...deviceDefinition,
         family: 'nRF52',
@@ -249,7 +249,7 @@ export const getDeviceInfoByUSB = ({
     };
 };
 
-// Get device info by calling nrf-device-lib-js
+// Get device info by calling @nordicsemiconductor/nrf-device-lib-js
 export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
     const model = device.jlink.device_version;
     const family = device.jlink.device_family;
@@ -299,7 +299,7 @@ export const addCoreToDeviceInfo = (
 export const context = nrfdl.createContext();
 
 /**
- * Uses `nrf-device-lib-js` to fetch the attached device with the * given `serialNumber`,
+ * Uses `@nordicsemiconductor/nrf-device-lib-js` to fetch the attached device with the * given `serialNumber`,
  * if it exists.
  *
  * @param {string} serialNumber The serial number of the device to return.
@@ -310,7 +310,7 @@ export const getDeviceFromNrfdl = (
 ): Promise<nrfdl.Device> =>
     new Promise((resolve, reject) => {
         nrfdl.enumerate(context).then(devices => {
-            // This is not needed when nrf-device-lib-js is integrated in device selector
+            // This is not needed when @nordicsemiconductor/nrf-device-lib-js is integrated in device selector
             // eslint-disable-next-line no-restricted-syntax
             for (const device of devices) {
                 if (device.serialnumber === serialNumber) {

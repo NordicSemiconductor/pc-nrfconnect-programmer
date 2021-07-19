@@ -42,7 +42,7 @@
         "babel-loader": "^7.1.2",
         "babel-plugin-transform-async-to-generator": "^6.24.1",
         "immutable": "^3.8.2",
-        "nrf-device-lib-js": "^0.3.9",
+        "@nordicsemiconductor/nrf-device-lib-js": "^0.3.9",
         "nrf-intel-hex": "^1.2.0",
         "pc-nrf-dfu-js": "^0.2.10",
         "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#semver:^4.21.0",
