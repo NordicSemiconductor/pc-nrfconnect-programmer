@@ -36,13 +36,12 @@
 
 import React from 'react';
 import Alert from 'react-bootstrap/Alert';
-import { List } from 'immutable';
 import PropTypes from 'prop-types';
 
 const combineWarnings = (
-    targetWarningStrings,
-    fileWarningStrings,
-    userWarningStrings
+    targetWarningStrings: string[],
+    fileWarningStrings: string[],
+    userWarningStrings: string[]
 ) =>
     targetWarningStrings
         .concat(fileWarningStrings)
@@ -54,11 +53,17 @@ const combineWarnings = (
             </Alert>
         ));
 
+interface WarningViewProps {
+    targetWarningStrings: string[];
+    fileWarningStrings: string[];
+    userWarningStrings: string[];
+};
+
 const WarningView = ({
     targetWarningStrings,
     fileWarningStrings,
     userWarningStrings,
-}) => (
+}: WarningViewProps) => (
     <div className="warning-view">
         {combineWarnings(
             targetWarningStrings,
@@ -69,9 +74,9 @@ const WarningView = ({
 );
 
 WarningView.propTypes = {
-    targetWarningStrings: PropTypes.objectOf(List).isRequired,
-    fileWarningStrings: PropTypes.objectOf(List).isRequired,
-    userWarningStrings: PropTypes.objectOf(List).isRequired,
+    targetWarningStrings: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fileWarningStrings: PropTypes.arrayOf(PropTypes.string).isRequired,
+    userWarningStrings: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default WarningView;

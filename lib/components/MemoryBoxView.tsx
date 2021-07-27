@@ -42,6 +42,15 @@ import PropTypes from 'prop-types';
 import DeviceInfoView from '../containers/deviceInfoView';
 import MemoryView from '../containers/memoryView';
 
+interface MemoryBoxViewProps {
+    title: string;
+    description?: string;
+    iconName?: string;
+    isHolder?: boolean;
+    isTarget?: boolean;
+    isFile?: boolean;
+};
+
 const MemoryBoxView = ({
     title,
     description,
@@ -49,7 +58,7 @@ const MemoryBoxView = ({
     isHolder,
     isTarget,
     isFile,
-}) => {
+}: MemoryBoxViewProps) => {
     const [showOverlay, setShowOverlay] = useState(false);
 
     return (

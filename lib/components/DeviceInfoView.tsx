@@ -37,7 +37,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { CommunicationType } from '../util/devices';
+import { CommunicationType, DeviceDefinition } from '../util/devices';
+
+interface DeviceInfoViewProps {
+    deviceInfo: DeviceDefinition;
+    isMemLoaded: boolean;
+    port?: string;
+    serialNumber: string;
+    targetType: number;
+};
 
 const DeviceInfoView = ({
     serialNumber,
@@ -45,7 +53,7 @@ const DeviceInfoView = ({
     targetType,
     deviceInfo,
     isMemLoaded,
-}) => (
+}: DeviceInfoViewProps) => (
     <div className="memory-details">
         {serialNumber && (
             <div>

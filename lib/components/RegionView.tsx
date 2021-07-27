@@ -42,6 +42,18 @@ import PropTypes from 'prop-types';
 
 import CoreInfoView from './CoreInfoView';
 import RegionInfoView from './RegionInfoView';
+import { Region } from '../util/regions';
+import { CoreDefinition } from '../util/devices';
+
+interface RegionViewProps {
+    removeFile: (filePath: string) => void;
+    width: number;
+    active?: boolean;
+    striped?: boolean;
+    hoverable?: boolean;
+    region: Region;
+    core: CoreDefinition;
+};
 
 const RegionView = ({
     width,
@@ -51,12 +63,12 @@ const RegionView = ({
     region,
     core,
     removeFile,
-}) => {
+}: RegionViewProps) => {
     const [show, setShow] = useState(false);
-    const [target, setTarget] = useState(null);
+    const [target, setTarget] = useState<DOMContainer<HTMLElement>>();
     const ref = useRef(null);
 
-    const toggleShow = event => {
+    const toggleShow = (event: React.PointerEvent<HTMLDivElement>) => {
         setShow(!show);
         setTarget(event.target);
     };

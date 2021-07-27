@@ -35,54 +35,47 @@
  */
 
 import React from 'react';
-import { basename } from 'path';
 import PropTypes from 'prop-types';
 
 import { hexpad8 } from '../util/hexpad';
 
-const RegionInfoView = ({ name, startAddress, regionSize, fileNames }) => (
+const hexpad9 = (x: number) => hexpad8(x || '');
+
+interface CoreInfoViewProps {
+    name: string;
+    romBaseAddr: number;
+    romSize: number;    
+}
+
+const CoreInfoView = ({ name, romBaseAddr, romSize }: CoreInfoViewProps) => (
     <>
         {name && (
             <div>
-                <h5>Region name</h5>
+                <h5>Core name</h5>
                 <p>{name}</p>
-            </div>
-        )}
-        {fileNames.length > 0 && (
-            <div className="files">
-                <h5>
-                    {fileNames.length > 1 ? 'Overlapping files!' : 'File name'}
-                </h5>
-                <p>
-                    {fileNames.map((fileName, index) => (
-                        <span key={`${index + 1}`}>{basename(fileName)}</span>
-                    ))}
-                </p>
             </div>
         )}
         <div>
             <h5>Address range</h5>
             <p>
-                {hexpad8(startAddress)} &mdash;{' '}
-                {hexpad8(startAddress + regionSize - 1)}
+                {hexpad9(romBaseAddr)} &mdash; {hexpad9(romBaseAddr + romSize)}
             </p>
         </div>
         <div>
             <h5>Size</h5>
-            <p>{regionSize} bytes</p>
+            <p>{romSize} bytes</p>
         </div>
     </>
 );
 
-RegionInfoView.propTypes = {
+CoreInfoView.propTypes = {
     name: PropTypes.string,
-    startAddress: PropTypes.number.isRequired,
-    regionSize: PropTypes.number.isRequired,
-    fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+    romBaseAddr: PropTypes.number.isRequired,
+    romSize: PropTypes.number.isRequired,
 };
 
-RegionInfoView.defaultProps = {
+CoreInfoView.defaultProps = {
     name: null,
 };
 
-export default RegionInfoView;
+export default CoreInfoView;

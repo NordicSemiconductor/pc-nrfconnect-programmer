@@ -35,41 +35,61 @@
  */
 
 import React from 'react';
+import { basename } from 'path';
 import PropTypes from 'prop-types';
 
 import { hexpad8 } from '../util/hexpad';
 
-const hexpad9 = x => hexpad8(x || '');
+interface RegionInfoViewProps {
+    name?: string;
+    startAddress: number;
+    regionSize: number;
+    fileNames: string[];
+};
 
-const CoreInfoView = ({ name, romBaseAddr, romSize }) => (
+const RegionInfoView = ({ name, startAddress, regionSize, fileNames }: RegionInfoViewProps) => (
     <>
         {name && (
             <div>
-                <h5>Core name</h5>
+                <h5>Region name</h5>
                 <p>{name}</p>
+            </div>
+        )}
+        {fileNames.length > 0 && (
+            <div className="files">
+                <h5>
+                    {fileNames.length > 1 ? 'Overlapping files!' : 'File name'}
+                </h5>
+                <p>
+                    {fileNames.map((fileName, index) => (
+                        <span key={`${index + 1}`}>{basename(fileName)}</span>
+                    ))}
+                </p>
             </div>
         )}
         <div>
             <h5>Address range</h5>
             <p>
-                {hexpad9(romBaseAddr)} &mdash; {hexpad9(romBaseAddr + romSize)}
+                {hexpad8(startAddress)} &mdash;{' '}
+                {hexpad8(startAddress + regionSize - 1)}
             </p>
         </div>
         <div>
             <h5>Size</h5>
-            <p>{romSize} bytes</p>
+            <p>{regionSize} bytes</p>
         </div>
     </>
 );
 
-CoreInfoView.propTypes = {
+RegionInfoView.propTypes = {
     name: PropTypes.string,
-    romBaseAddr: PropTypes.number.isRequired,
-    romSize: PropTypes.number.isRequired,
+    startAddress: PropTypes.number.isRequired,
+    regionSize: PropTypes.number.isRequired,
+    fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-CoreInfoView.defaultProps = {
+RegionInfoView.defaultProps = {
     name: null,
 };
 
-export default CoreInfoView;
+export default RegionInfoView;

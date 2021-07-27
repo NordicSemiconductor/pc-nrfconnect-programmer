@@ -38,11 +38,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import RegionView from '../containers/regionView';
+import { CoreDefinition } from '../util/devices';
+import { Region } from '../util/regions';
 
-const CoreView = ({ core, active }) => {
+interface CoreWithRegions extends CoreDefinition {
+    regions: Region[];
+}
+
+interface CoreViewProps {
+    core: CoreWithRegions;
+    active: boolean;
+};
+
+const CoreView = ({ core, active }: CoreViewProps) => {
     const { regions, romSize, romBaseAddr } = core;
     const regionViews = [];
-    if (!regions || regions.size <= 0) {
+    if (!regions || regions.length <= 0) {
         return [<RegionView key={0} core={core} width={1} active={active} />];
     }
 

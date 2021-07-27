@@ -42,6 +42,22 @@ import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import PropTypes from 'prop-types';
 
+interface McuUpdateDialogViewProps {
+    isVisible: boolean;
+    isWriting: boolean;
+    isWritingSucceed: boolean;
+    isWritingFail: boolean;
+    isFirmwareValid: boolean;
+    errorMsg: string;
+    mcubootFwPath?: string;
+    progressMsg: string;
+    progressPercentage: number;
+    progressDuration: number;
+    onOk: () => void;
+    onCancel: () => void;
+};
+
+
 const McuUpdateDialogView = ({
     isVisible,
     isWriting,
@@ -55,7 +71,7 @@ const McuUpdateDialogView = ({
     progressDuration,
     onOk,
     onCancel,
-}) => (
+}: McuUpdateDialogViewProps) => (
     <Modal show={isVisible} onHide={onCancel} backdrop="static">
         <Modal.Header>
             <Modal.Title className="modem-dialog-title">

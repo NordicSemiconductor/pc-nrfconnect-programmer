@@ -42,24 +42,32 @@ import MemoryBoxView from '../containers/memoryBoxView';
 import ModemUpdateDialogView from '../containers/modemUpdateDialogView';
 import UserInputDialogView from '../containers/userInputDialogView';
 import WarningView from '../containers/warningView';
+import { DeviceDefinition } from '../util/devices';
+import { FileState } from '../reducers/fileReducer';
+import { TargetState } from '../reducers/targetReducer';
 
-function getTargetTitle(serialNumber, deviceInfo) {
+function getTargetTitle(serialNumber: string | undefined, deviceInfo: DeviceDefinition | undefined) {
     if (serialNumber) {
-        return deviceInfo.type !== 'Unknown'
-            ? deviceInfo.type
+        return deviceInfo?.type !== 'Unknown'
+            ? deviceInfo?.type
             : deviceInfo.family;
     }
     return undefined;
 }
 
-function hasFileContent(file) {
+function hasFileContent(file: FileState) {
     return Object.keys(file.loaded).length > 0;
+}
+
+interface AppMainViewProps {
+    file: FileState;
+    target: TargetState;
 }
 
 const AppMainView = ({
     file,
     target: { serialNumber, deviceInfo, regions },
-}) => (
+}: AppMainViewProps) => (
     <div className="app-main-view">
         <WarningView />
         <div className="memory-box-container">
