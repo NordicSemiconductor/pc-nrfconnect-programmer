@@ -43,7 +43,7 @@
  *
  * @returns {string} padded string
  */
-export const hexpad8 = (n: number): string =>
+export const hexpad8 = (n: number | string): string =>
     `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
 
 /**
