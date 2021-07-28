@@ -39,6 +39,7 @@ import nrfdl, {
     DeviceCoreInfo,
     DeviceFamily,
     ProtectionStatus,
+    Device
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 
@@ -260,7 +261,7 @@ export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
         ...getDeviceDefinition(model),
         family,
         cores: [],
-    };
+    } as DeviceDefinition;
 };
 
 /**
@@ -294,7 +295,7 @@ export const addCoreToDeviceInfo = (
             ...inputCoreInfo,
         },
     ],
-});
+} as DeviceDefinition);
 
 export const context = nrfdl.createContext();
 
@@ -309,7 +310,7 @@ export const getDeviceFromNrfdl = (
     serialNumber: string
 ): Promise<nrfdl.Device> =>
     new Promise((resolve, reject) => {
-        nrfdl.enumerate(context).then(devices => {
+        nrfdl.enumerate(context).then((devices: Array<Device>) => {
             // This is not needed when @nordicsemiconductor/nrf-device-lib-js is integrated in device selector
             // eslint-disable-next-line no-restricted-syntax
             for (const device of devices) {
