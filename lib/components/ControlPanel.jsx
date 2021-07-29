@@ -63,9 +63,8 @@ const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
         setShow(false);
     };
 
-    const containerNode = document.getElementsByClassName(
-        'core-main-layout'
-    )[0];
+    const containerNode =
+        document.getElementsByClassName('core-main-layout')[0];
 
     return (
         <>

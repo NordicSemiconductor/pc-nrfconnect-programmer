@@ -34,9 +34,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Serialport } from 'pc-nrfconnect-shared';
-
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 export const MCUBOOT_DFU_NOT_STARTED = 'Not started.';
 export const MCUBOOT_DFU_STARTING = 'Starting...';
@@ -48,15 +47,15 @@ export interface McubootState {
     isWriting: boolean;
     isWritingSucceed: boolean;
     isWritingFail: boolean;
-    port: Serialport | null,
-    port2: Serialport | null,
+    port: Serialport | null;
+    port2: Serialport | null;
     progressMsg: string;
     progressPercentage: number;
     progressDuration: number;
     errorMsg: string;
 }
 
-const initialState : McubootState = {
+const initialState: McubootState = {
     isFirmwareValid: false,
     isMcuboot: false,
     isReady: false,
@@ -74,13 +73,13 @@ const initialState : McubootState = {
 interface MCUBootPortKnownPayload {
     port: Serialport | null;
     port2: Serialport | null;
-};
+}
 
 interface MCUBootProcessUpdatePayload {
     message: string;
     percentage: number;
     duration: number;
-};
+}
 
 const mcubootSlice = createSlice({
     name: 'mcuboot',
@@ -89,16 +88,22 @@ const mcubootSlice = createSlice({
         mcubootKnown(state, action: PayloadAction<boolean>) {
             state.isMcuboot = action.payload;
         },
-        mcubootPortKnown(state, action: PayloadAction<MCUBootPortKnownPayload>) {  
+        mcubootPortKnown(
+            state,
+            action: PayloadAction<MCUBootPortKnownPayload>
+        ) {
             state.port = action.payload.port;
             state.port2 = action.payload.port2;
         },
-        mcubootProcessUpdate(state, action: PayloadAction<MCUBootProcessUpdatePayload>) {                
+        mcubootProcessUpdate(
+            state,
+            action: PayloadAction<MCUBootProcessUpdatePayload>
+        ) {
             state.progressMsg = action.payload.message;
             state.progressPercentage = action.payload.percentage;
             state.progressDuration = action.payload.duration;
         },
-        mcubootWritingReady(state) {                
+        mcubootWritingReady(state) {
             state.progressMsg = MCUBOOT_DFU_NOT_STARTED;
             state.isWriting = false;
             state.isWritingSucceed = false;
@@ -106,10 +111,10 @@ const mcubootSlice = createSlice({
             state.isReady = true;
             state.errorMsg = '';
         },
-        mcubootWritingClose(state) {                
+        mcubootWritingClose(state) {
             state.isReady = false;
         },
-        mcubootWritingStart(state) {            
+        mcubootWritingStart(state) {
             state.isWritingSucceed = false;
             state.isWritingFail = false;
             state.isWriting = true;
@@ -117,11 +122,11 @@ const mcubootSlice = createSlice({
         mcubootWritingEnd(state) {
             state.isWriting = false;
         },
-        mcubootWritingSucceed(state) {                
+        mcubootWritingSucceed(state) {
             state.isWritingSucceed = true;
             state.isWriting = false;
         },
-        mcubootWritingFail(state, action: PayloadAction<string>) {                
+        mcubootWritingFail(state, action: PayloadAction<string>) {
             state.isWritingFail = true;
             state.isWriting = false;
             state.errorMsg = action.payload;
@@ -131,8 +136,8 @@ const mcubootSlice = createSlice({
         },
     },
     extraReducers: {
-        'DEVICE_SELECTED': () => ({...initialState})
-    }
+        DEVICE_SELECTED: () => ({ ...initialState }),
+    },
 });
 
 export default mcubootSlice.reducer;
@@ -150,7 +155,7 @@ const {
     mcubootFirmwareValid,
 } = mcubootSlice.actions;
 
-//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
 export {
     mcubootKnown,
@@ -163,4 +168,4 @@ export {
     mcubootWritingSucceed,
     mcubootWritingFail,
     mcubootFirmwareValid,
-}
+};

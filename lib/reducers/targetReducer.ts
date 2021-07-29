@@ -38,7 +38,6 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
-import { Device } from 'pc-nrfconnect-shared';
 import SerialPort from 'serialport';
 
 import {
@@ -116,11 +115,17 @@ const targetSlice = createSlice({
         targetInfoKnown(state, action: PayloadAction<DeviceDefinition>) {
             state.deviceInfo = action.payload;
         },
-        targetPortChanged(state, action: PayloadAction<TargetPortChangedPayload>) {
+        targetPortChanged(
+            state,
+            action: PayloadAction<TargetPortChangedPayload>
+        ) {
             state.serialNumber = action.payload.serialNumber;
             state.port = action.payload.path;
         },
-        targetContentsKnown(state, action: PayloadAction<TargetContentsKnownPayload>) {
+        targetContentsKnown(
+            state,
+            action: PayloadAction<TargetContentsKnownPayload>
+        ) {
             state.memMap = action.payload.targetMemMap;
             state.isMemLoaded = action.payload.isMemLoaded;
         },
@@ -159,18 +164,19 @@ const targetSlice = createSlice({
         },
     },
     extraReducers: {
-        'DEVICE_SELECTED': (_, action) => {
+        DEVICE_SELECTED: (_, action) => {
             return {
                 ...initialState,
                 serialNumber: action.device.serialNumber,
-        }},
-        'DEVICE_DESELECTED': () => ({...initialState}),
+            };
+        },
+        DEVICE_DESELECTED: () => ({ ...initialState }),
         // @ts-expect-error in TypeScript, this would need to be [counter.actions.increment.type]
-        [filesEmpty]: (state) => {
+        [filesEmpty]: state => {
             state.writtenAddress = 0;
         },
         // @ts-expect-error in TypeScript, this would need to be [counter.actions.increment.type]
-        [fileParse]: (state) => {
+        [fileParse]: state => {
             state.writtenAddress = 0;
         },
     },
@@ -195,7 +201,7 @@ const {
     loadingEnd,
 } = targetSlice.actions;
 
-//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
 export {
     targetTypeKnown,
@@ -213,4 +219,3 @@ export {
     loadingStart,
     loadingEnd,
 };
-    

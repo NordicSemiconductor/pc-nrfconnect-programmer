@@ -42,11 +42,14 @@ import MemoryBoxView from '../containers/memoryBoxView';
 import ModemUpdateDialogView from '../containers/modemUpdateDialogView';
 import UserInputDialogView from '../containers/userInputDialogView';
 import WarningView from '../containers/warningView';
-import { DeviceDefinition } from '../util/devices';
 import { FileState } from '../reducers/fileReducer';
 import { TargetState } from '../reducers/targetReducer';
+import { DeviceDefinition } from '../util/devices';
 
-function getTargetTitle(serialNumber: string | undefined, deviceInfo: DeviceDefinition | undefined) {
+function getTargetTitle(
+    serialNumber: string | undefined,
+    deviceInfo: DeviceDefinition | undefined
+) {
     if (serialNumber) {
         return deviceInfo?.type !== 'Unknown'
             ? deviceInfo?.type

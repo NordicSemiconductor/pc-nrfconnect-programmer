@@ -35,8 +35,8 @@
  */
 
 import { logger } from 'nrfconnect/core';
-import { TDispatch } from '../reducers';
 
+import { TDispatch } from '../reducers';
 import {
     userInputCancelled,
     userInputReceived,
@@ -45,7 +45,11 @@ import {
 
 let userInputCallback: ((input?: string) => void) | undefined;
 
-export function getUserInput(dispatch: TDispatch, message: string, choices: {}) {
+export function getUserInput(
+    dispatch: TDispatch,
+    message: string,
+    choices: {}
+) {
     return new Promise((resolve, reject) => {
         userInputCallback = input => {
             if (input) {
@@ -54,7 +58,7 @@ export function getUserInput(dispatch: TDispatch, message: string, choices: {}) 
                 reject(new Error('Cancelled by user.'));
             }
         };
-        dispatch(userInputRequired({message, choices}));
+        dispatch(userInputRequired({ message, choices }));
     });
 }
 

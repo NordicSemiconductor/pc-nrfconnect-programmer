@@ -37,9 +37,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import CoreView from './CoreView';
-import { Region } from '../util/regions';
 import { CoreDefinition } from '../util/devices';
+import { Region } from '../util/regions';
+import CoreView from './CoreView';
 
 const allocateCores = (cores: CoreDefinition[], regions: Region[]) =>
     cores.map(core => ({
@@ -51,7 +51,11 @@ const allocateCores = (cores: CoreDefinition[], regions: Region[]) =>
         ),
     }));
 
-const convertCoresToViews = (targetCores: CoreDefinition[], regions: Region[], active: boolean) =>
+const convertCoresToViews = (
+    targetCores: CoreDefinition[],
+    regions: Region[],
+    active: boolean
+) =>
     allocateCores(targetCores, regions)
         .sort((a, b) => b.romBaseAddr - a.romBaseAddr)
         .map(c => <CoreView core={c} active={active} />);
@@ -67,7 +71,7 @@ interface MemoryViewProps {
     refreshEnabled: boolean;
     targetFamily: string;
     targetCores: CoreDefinition[];
-};
+}
 
 const MemoryView = ({
     regions,

@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const MODEM_DFU_NOT_STARTED = 'Not started.';
 export const MODEM_DFU_STARTING = 'Starting...';
@@ -46,14 +46,14 @@ export interface ModemState {
     isWritingSucceed: boolean;
     isWritingFail: boolean;
     modemFwName: string;
-    progressMsg: string,
+    progressMsg: string;
     progressPercentage: number;
     progressDuration: number;
     progressStep: number;
     errorMsg: string;
 }
 
-const initialState : ModemState = {
+const initialState: ModemState = {
     isModem: false,
     isReady: false,
     isWriting: false,
@@ -72,7 +72,7 @@ interface ModemProcessUpdatePayload {
     percentage?: number;
     duration?: number;
     step?: number;
-};
+}
 
 const modemSlice = createSlice({
     name: 'modem',
@@ -81,7 +81,10 @@ const modemSlice = createSlice({
         modemKnown(state, action: PayloadAction<boolean>) {
             state.isModem = action.payload;
         },
-        modemProcessUpdate(state, action: PayloadAction<ModemProcessUpdatePayload>) {
+        modemProcessUpdate(
+            state,
+            action: PayloadAction<ModemProcessUpdatePayload>
+        ) {
             state.progressMsg = action.payload.message;
             state.progressPercentage = action.payload.percentage ?? 0;
             state.progressDuration = action.payload.duration ?? 0;
@@ -115,7 +118,7 @@ const modemSlice = createSlice({
             state.errorMsg = action.payload;
         },
     },
-})
+});
 
 export default modemSlice.reducer;
 
@@ -130,7 +133,7 @@ const {
     modemWritingFail,
 } = modemSlice.actions;
 
-//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
 export {
     modemKnown,
@@ -141,4 +144,4 @@ export {
     modemWritingEnd,
     modemWritingSucceed,
     modemWritingFail,
-}
+};

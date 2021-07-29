@@ -34,13 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface SettingsState {
     autoRead: boolean;
-};
+}
 
-const initialState : SettingsState = {
+const initialState: SettingsState = {
     autoRead: false,
 };
 
@@ -48,7 +48,7 @@ const settingsSlice = createSlice({
     name: 'settings',
     initialState,
     reducers: {
-        settingsLoad(state, action: PayloadAction<boolean>) {
+        settingsLoad(state, action: PayloadAction<boolean>) {
             state.autoRead = action.payload;
         },
         toggleAutoRead(state) {
@@ -59,14 +59,8 @@ const settingsSlice = createSlice({
 
 export default settingsSlice.reducer;
 
-const {
-    settingsLoad,
-    toggleAutoRead,
-} = settingsSlice.actions;
+const { settingsLoad, toggleAutoRead } = settingsSlice.actions;
 
-//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
-export {
-    settingsLoad,
-    toggleAutoRead,
-};
+export { settingsLoad, toggleAutoRead };

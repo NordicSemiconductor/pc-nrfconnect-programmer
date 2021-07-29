@@ -44,7 +44,7 @@ const hexpad9 = (x: number) => hexpad8(x || '');
 interface CoreInfoViewProps {
     name: string;
     romBaseAddr: number;
-    romSize: number;    
+    romSize: number;
 }
 
 const CoreInfoView = ({ name, romBaseAddr, romSize }: CoreInfoViewProps) => (

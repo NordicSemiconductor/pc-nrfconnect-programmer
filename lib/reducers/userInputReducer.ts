@@ -41,9 +41,9 @@ export interface UserInputState {
     // eslint-disable-next-line @typescript-eslint/ban-types
     choices: {};
     isRequired: boolean;
-};
+}
 
-const initialState : UserInputState = {
+const initialState: UserInputState = {
     message: null,
     choices: {},
     isRequired: false,
@@ -58,32 +58,28 @@ const userInputSlice = createSlice({
     name: 'userInput',
     initialState,
     reducers: {
-        userInputRequired(state, action: PayloadAction<UserInputRequiredPayload>) {
+        userInputRequired(
+            state,
+            action: PayloadAction<UserInputRequiredPayload>
+        ) {
             state.isRequired = true;
             state.message = action.payload.message;
             state.choices = action.payload.choices;
         },
         userInputReceived() {
-            return { ...initialState } ;
+            return { ...initialState };
         },
         userInputCancelled() {
-            return { ...initialState }
+            return { ...initialState };
         },
     },
 });
 
 export default userInputSlice.reducer;
 
-const {
-    userInputRequired,
-    userInputReceived,
-    userInputCancelled,
-} = userInputSlice.actions;
+const { userInputRequired, userInputReceived, userInputCancelled } =
+    userInputSlice.actions;
 
-//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
-export {
-    userInputRequired,
-    userInputReceived,
-    userInputCancelled,
-};
+export { userInputRequired, userInputReceived, userInputCancelled };

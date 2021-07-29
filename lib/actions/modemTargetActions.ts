@@ -37,16 +37,16 @@
 import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import { logger } from 'nrfconnect/core';
-import { RootState, TDispatch } from '../reducers';
 
+import { RootState, TDispatch } from '../reducers';
 import {
+    MODEM_DFU_STARTING,
     modemProcessUpdate,
     modemWritingClose,
     modemWritingFail,
     modemWritingReady,
     modemWritingStart,
     modemWritingSucceed,
-    MODEM_DFU_STARTING,
 } from '../reducers/modemReducer';
 import { context, getDeviceFromNrfdl } from '../util/devices';
 
@@ -95,10 +95,12 @@ export function programDfuModem(serialNumber: string, fileName: string) {
             }
         };
 
-        const progressCallback = ({ progressJson: progress }: nrfdl.Progress) => {
+        const progressCallback = ({
+            progressJson: progress,
+        }: nrfdl.Progress) => {
             console.log(progress);
             const message = `${progress.operation} (${progress.progress_percentage})`;
-            dispatch(modemProcessUpdate({message: message}));
+            dispatch(modemProcessUpdate({ message }));
         };
 
         try {
@@ -128,7 +130,7 @@ export const performMcuUpdate =
 export const performUpdate =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(modemWritingStart());
-        dispatch(modemProcessUpdate({message: MODEM_DFU_STARTING}));
+        dispatch(modemProcessUpdate({ message: MODEM_DFU_STARTING }));
         logger.info('Modem DFU starts to write...');
 
         const { modemFwName: fileName } = getState().app.modem;

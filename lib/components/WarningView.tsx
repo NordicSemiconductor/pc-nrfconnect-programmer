@@ -57,7 +57,7 @@ interface WarningViewProps {
     targetWarningStrings: string[];
     fileWarningStrings: string[];
     userWarningStrings: string[];
-};
+}
 
 const WarningView = ({
     targetWarningStrings,

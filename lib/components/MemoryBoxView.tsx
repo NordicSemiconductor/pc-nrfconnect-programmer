@@ -49,7 +49,7 @@ interface MemoryBoxViewProps {
     isHolder?: boolean;
     isTarget?: boolean;
     isFile?: boolean;
-};
+}
 
 const MemoryBoxView = ({
     title,

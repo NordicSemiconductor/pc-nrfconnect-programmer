@@ -82,17 +82,19 @@ export default {
         getLibVersions();
     },
 
-    decorateMainView: MainView => () => (
-        <MainView cssClass="main-view">
-            <AppMainView />
-        </MainView>
-    ),
+    decorateMainView: MainView => () =>
+        (
+            <MainView cssClass="main-view">
+                <AppMainView />
+            </MainView>
+        ),
 
-    decorateSidePanel: SidePanel => () => (
-        <SidePanel cssClass="side-panel">
-            <ControlPanel />
-        </SidePanel>
-    ),
+    decorateSidePanel: SidePanel => () =>
+        (
+            <SidePanel cssClass="side-panel">
+                <ControlPanel />
+            </SidePanel>
+        ),
 
     mapDeviceSelectorState: (state, props) => ({
         portIndicatorStatus: state.app.target.port !== null ? 'on' : 'off',

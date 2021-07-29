@@ -35,11 +35,11 @@
  */
 
 import nrfdl, {
+    Device,
     DeviceCore,
     DeviceCoreInfo,
     DeviceFamily,
     ProtectionStatus,
-    Device
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 
@@ -277,25 +277,26 @@ export const addCoreToDeviceInfo = (
     deviceInfo: DeviceDefinition,
     inputCoreInfo: DeviceCoreInfo,
     coreName: string
-) => ({
-    ...deviceInfo,
-    cores: [
-        ...deviceInfo.cores,
-        {
-            ...defaultCore,
-            name: coreName,
-            coreNumber: deviceInfo.cores.length,
-            romBaseAddr: inputCoreInfo.codeAddress,
-            romSize: inputCoreInfo.codeSize,
-            ramSize: inputCoreInfo.RAMSize,
-            pageSize: inputCoreInfo.codePageSize,
-            // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
-            // uicrBaseAddr: inputCoreInfo.uicrAddress,
-            uicrSize: inputCoreInfo.codePageSize,
-            ...inputCoreInfo,
-        },
-    ],
-} as DeviceDefinition);
+) =>
+    ({
+        ...deviceInfo,
+        cores: [
+            ...deviceInfo.cores,
+            {
+                ...defaultCore,
+                name: coreName,
+                coreNumber: deviceInfo.cores.length,
+                romBaseAddr: inputCoreInfo.codeAddress,
+                romSize: inputCoreInfo.codeSize,
+                ramSize: inputCoreInfo.RAMSize,
+                pageSize: inputCoreInfo.codePageSize,
+                // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
+                // uicrBaseAddr: inputCoreInfo.uicrAddress,
+                uicrSize: inputCoreInfo.codePageSize,
+                ...inputCoreInfo,
+            },
+        ],
+    } as DeviceDefinition);
 
 export const context = nrfdl.createContext();
 

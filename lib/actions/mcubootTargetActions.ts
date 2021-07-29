@@ -36,11 +36,24 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl, { Device, SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl, {
+    Device,
+    SerialPort,
+} from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
-import { RootState, TDispatch } from '../reducers';
 
-import { mcubootFirmwareValid, mcubootKnown, mcubootPortKnown, mcubootProcessUpdate, mcubootWritingClose, mcubootWritingFail, mcubootWritingReady, mcubootWritingStart, mcubootWritingSucceed } from '../reducers/mcubootReducer';
+import { RootState, TDispatch } from '../reducers';
+import {
+    mcubootFirmwareValid,
+    mcubootKnown,
+    mcubootPortKnown,
+    mcubootProcessUpdate,
+    mcubootWritingClose,
+    mcubootWritingFail,
+    mcubootWritingReady,
+    mcubootWritingStart,
+    mcubootWritingSucceed,
+} from '../reducers/mcubootReducer';
 import { modemKnown } from '../reducers/modemReducer';
 import {
     loadingEnd,
@@ -95,13 +108,18 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     const serialports = Object.keys(selectedDevice)
         .filter(s => s.startsWith('serialport'))
         .map(s => selectedDevice[s]);
-    dispatch(targetTypeKnown({targetType: CommunicationType.MCUBOOT, isRecoverable: false}));
+    dispatch(
+        targetTypeKnown({
+            targetType: CommunicationType.MCUBOOT,
+            isRecoverable: false,
+        })
+    );
     dispatch(mcubootKnown(true));
     dispatch(modemKnown(true));
     dispatch(
         mcubootPortKnown({
             port: portPath(pickSerialPort(serialports)),
-            port2: portPath(pickSerialPort2(serialports))
+            port2: portPath(pickSerialPort2(serialports)),
         })
     );
     dispatch(updateTargetWritable());
@@ -118,7 +136,7 @@ export const toggleMcuboot =
             dispatch(mcubootPortKnown(null));
         } else {
             dispatch(mcubootKnown(true));
-            dispatch(mcubootPortKnown({port: port}));
+            dispatch(mcubootPortKnown({ port }));
         }
 
         dispatch(updateTargetWritable());
@@ -132,36 +150,37 @@ export const prepareUpdate =
         dispatch(mcubootWritingReady(fileName));
     };
 
-export const canWrite = () => (dispatch: TDispatch, getState: () => RootState) => {
-    // Disable write button
-    dispatch(targetWritableKnown(false));
-    dispatch(targetWarningRemove());
+export const canWrite =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        // Disable write button
+        dispatch(targetWritableKnown(false));
+        dispatch(targetWarningRemove());
 
-    // Check if mcu firmware is detected.
-    // If not, then return.
-    const { mcubootFilePath, regions } = getState().app.file;
-    if (!mcubootFilePath) {
-        return;
-    }
+        // Check if mcu firmware is detected.
+        // If not, then return.
+        const { mcubootFilePath, regions } = getState().app.file;
+        if (!mcubootFilePath) {
+            return;
+        }
 
-    // Check if target is MCU target.
-    // If not, then return.
-    const { isMcuboot } = getState().app.mcuboot;
-    if (!isMcuboot) {
-        return;
-    }
+        // Check if target is MCU target.
+        // If not, then return.
+        const { isMcuboot } = getState().app.mcuboot;
+        if (!isMcuboot) {
+            return;
+        }
 
-    // Check if region starting at 0x0 is detected for Thingy91
-    if (regions.find(r => r.startAddress === 0)) {
-        dispatch(mcubootFirmwareValid(false));
-    } else {
-        dispatch(mcubootFirmwareValid(true));
-    }
+        // Check if region starting at 0x0 is detected for Thingy91
+        if (regions.find(r => r.startAddress === 0)) {
+            dispatch(mcubootFirmwareValid(false));
+        } else {
+            dispatch(mcubootFirmwareValid(true));
+        }
 
-    // Enable write button if all above items have been checked
-    dispatch(targetWarningRemove());
-    dispatch(targetWritableKnown(true));
-};
+        // Enable write button if all above items have been checked
+        dispatch(targetWarningRemove());
+        dispatch(targetWritableKnown(true));
+    };
 
 export const performUpdate =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
@@ -172,13 +191,15 @@ export const performUpdate =
             `Writing ${mcubootFilePath} to device ${serialNumber || ''}`
         );
 
-        const progressCallback = ({ progressJson: progress }: nrfdl.Progress) => {
+        const progressCallback = ({
+            progressJson: progress,
+        }: nrfdl.Progress) => {
             let dfuProcess;
             try {
                 dfuProcess = JSON.parse(progress.process);
             } catch (e) {
                 dispatch(
-                    mcubootProcessUpdate({ 
+                    mcubootProcessUpdate({
                         message: progress.process,
                         percentage: totalPercentage,
                         duration: totalDuration,

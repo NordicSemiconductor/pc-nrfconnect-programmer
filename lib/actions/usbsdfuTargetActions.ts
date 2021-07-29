@@ -36,7 +36,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl, { Error, Device } from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl, { Device, Error } from '@nordicsemiconductor/nrf-device-lib-js';
 import AdmZip from 'adm-zip';
 import Crypto from 'crypto';
 import { detachAndWaitFor, dfuTrigger } from 'nrf-device-setup';
@@ -49,10 +49,23 @@ import {
 import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
 import tmp from 'tmp';
-import { RootState, TDispatch } from '../reducers';
-import { dfuImagesUpdate, loadingEnd, targetInfoKnown, targetPortChanged, targetRegionsKnown, targetTypeKnown, targetWritableKnown, writingEnd, writingStart } from '../reducers/targetReducer';
-import { targetWarningRemove, userWarningRemove } from '../reducers/warningReducer';
 
+import { RootState, TDispatch } from '../reducers';
+import {
+    dfuImagesUpdate,
+    loadingEnd,
+    targetInfoKnown,
+    targetPortChanged,
+    targetRegionsKnown,
+    targetTypeKnown,
+    targetWritableKnown,
+    writingEnd,
+    writingStart,
+} from '../reducers/targetReducer';
+import {
+    targetWarningRemove,
+    userWarningRemove,
+} from '../reducers/warningReducer';
 import {
     CommunicationType,
     context,
@@ -79,7 +92,7 @@ function createDfuZip(dfuImages: initPacket.DfuImage[]) {
     return new Promise(resolve => {
         const data = createDfuDataFromImages(dfuImages);
         const zip = new AdmZip();
-        const manifest = {application: {}, softdevice: {}};
+        const manifest = { application: {}, softdevice: {} };
 
         if (data.application) {
             manifest.application = {
@@ -164,132 +177,149 @@ const defaultDfuImage: initPacket.DfuImage = {
 };
 
 // Display some information about a devkit. Called on a devkit connection.
-const loadDeviceInfo = (selectedDevice: Device) => async (dispatch: TDispatch) => {
-    // const serialportPath = portPath(selectedDevice.serialport);
-    dispatch(targetWarningRemove());
-    dispatch(
-        targetTypeKnown({targetType: CommunicationType.USBSDFU, isRecoverable: false})
-    );
-    logger.info(
-        'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target through USB SDFU protocol'
-    );
+const loadDeviceInfo =
+    (selectedDevice: Device) => async (dispatch: TDispatch) => {
+        // const serialportPath = portPath(selectedDevice.serialport);
+        dispatch(targetWarningRemove());
+        dispatch(
+            targetTypeKnown({
+                targetType: CommunicationType.USBSDFU,
+                isRecoverable: false,
+            })
+        );
+        logger.info(
+            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target through USB SDFU protocol'
+        );
 
-    const device = await getDeviceFromNrfdl(selectedDevice.serialNumber);
+        const device = await getDeviceFromNrfdl(selectedDevice.serialNumber);
 
-    try {
-        // const { hardwareVersion, firmwareVersions } = await getDeviceVersions(
-        //     serialportPath
-        // );
-        const hardwareVersion = {
-            part: 337984,
-            variant: 1094796080,
-            memory: { romSize: 1048576, ramSize: 262144, romPageSize: 4096 },
-        };
-        const fwInfo: nrfdl.FWInfo.ReadResult = await nrfdl.readFwInfo(context, device.id);
-        const deviceInfoOrigin = getDeviceInfoByUSB(hardwareVersion);
-        dispatch(targetInfoKnown(deviceInfoOrigin));
-
-        const appCoreNumber = 0;
-        const coreInfo = deviceInfoOrigin.cores[appCoreNumber];
-
-        let regions: Region[] = [];
-
-        // Add FICR to regions
-        if (coreInfo.ficrBaseAddr) {
-            regions = [
-                ...regions,
-                {
-                    ...defaultRegion,
-                    name: 'FICR',
-                    version: 0,
-                    startAddress: coreInfo.ficrBaseAddr,
-                    regionSize: coreInfo.ficrSize,
-                    permission: RegionPermission.NONE,
+        try {
+            // const { hardwareVersion, firmwareVersions } = await getDeviceVersions(
+            //     serialportPath
+            // );
+            const hardwareVersion = {
+                part: 337984,
+                variant: 1094796080,
+                memory: {
+                    romSize: 1048576,
+                    ramSize: 262144,
+                    romPageSize: 4096,
                 },
-            ];
+            };
+            const fwInfo: nrfdl.FWInfo.ReadResult = await nrfdl.readFwInfo(
+                context,
+                device.id
+            );
+            const deviceInfoOrigin = getDeviceInfoByUSB(hardwareVersion);
+            dispatch(targetInfoKnown(deviceInfoOrigin));
+
+            const appCoreNumber = 0;
+            const coreInfo = deviceInfoOrigin.cores[appCoreNumber];
+
+            let regions: Region[] = [];
+
+            // Add FICR to regions
+            if (coreInfo.ficrBaseAddr) {
+                regions = [
+                    ...regions,
+                    {
+                        ...defaultRegion,
+                        name: 'FICR',
+                        version: 0,
+                        startAddress: coreInfo.ficrBaseAddr,
+                        regionSize: coreInfo.ficrSize,
+                        permission: RegionPermission.NONE,
+                    },
+                ];
+            }
+
+            // Add UICR to regions
+            if (coreInfo.uicrBaseAddr) {
+                regions = [
+                    ...regions,
+                    {
+                        ...defaultRegion,
+                        name: 'UICR',
+                        version: 0,
+                        startAddress: coreInfo.uicrBaseAddr,
+                        regionSize: coreInfo.uicrSize,
+                        permission: RegionPermission.NONE,
+                    },
+                ];
+            }
+
+            // Add MBR to regions
+            if (coreInfo.uicrBaseAddr) {
+                regions = [
+                    ...regions,
+                    {
+                        ...defaultRegion,
+                        name: 'MBR',
+                        version: 0,
+                        startAddress: coreInfo.mbrBaseAddr,
+                        regionSize: coreInfo.mbrSize,
+                        color: RegionColor.MBR,
+                        permission: RegionPermission.NONE,
+                    },
+                ];
+            }
+
+            // Add bootloader, softDevice, applications to regions
+            const { image_info_list: imageInfoList } = fwInfo;
+            imageInfoList.forEach((image: nrfdl.FWInfo.Image) => {
+                const {
+                    image_type: imageType,
+                    image_location: imageLocation,
+                    version,
+                } = image;
+                const startAddress = imageLocation.address;
+                const regionSize =
+                    imageType === nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE
+                        ? imageLocation.size - 0x1000
+                        : imageLocation.size;
+                if (regionSize === 0) return;
+
+                const regionName =
+                    {
+                        [nrfdl.NRFDL_IMAGE_TYPE_BOOTLOADER]:
+                            RegionName.BOOTLOADER,
+                        [nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE]:
+                            RegionName.SOFTDEVICE,
+                        [nrfdl.NRFDL_IMAGE_TYPE_APPLICATION]:
+                            RegionName.APPLICATION,
+                    }[imageType] || RegionName.NONE;
+                const color =
+                    {
+                        [nrfdl.NRFDL_IMAGE_TYPE_BOOTLOADER]:
+                            RegionColor.BOOTLOADER,
+                        [nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE]:
+                            RegionColor.SOFTDEVICE,
+                        [nrfdl.NRFDL_IMAGE_TYPE_APPLICATION]:
+                            RegionColor.APPLICATION,
+                    }[imageType] || RegionColor.NONE;
+                regions = [
+                    ...regions,
+                    {
+                        ...defaultRegion,
+                        name: regionName,
+                        version: version.incremental,
+                        startAddress,
+                        regionSize,
+                        color,
+                    },
+                ];
+            });
+
+            dispatch(targetRegionsKnown(regions));
+            dispatch(fileActions.updateFileRegions());
+            dispatch(targetActions.updateTargetWritable());
+            dispatch(loadingEnd());
+        } catch (versionError) {
+            logger.error(
+                `Error when fetching device versions: ${versionError}`
+            );
         }
-
-        // Add UICR to regions
-        if (coreInfo.uicrBaseAddr) {
-            regions = [
-                ...regions,
-                {
-                    ...defaultRegion,
-                    name: 'UICR',
-                    version: 0,
-                    startAddress: coreInfo.uicrBaseAddr,
-                    regionSize: coreInfo.uicrSize,
-                    permission: RegionPermission.NONE,
-                },
-            ];
-        }
-
-        // Add MBR to regions
-        if (coreInfo.uicrBaseAddr) {
-            regions = [
-                ...regions,
-                {
-                    ...defaultRegion,
-                    name: 'MBR',
-                    version: 0,
-                    startAddress: coreInfo.mbrBaseAddr,
-                    regionSize: coreInfo.mbrSize,
-                    color: RegionColor.MBR,
-                    permission: RegionPermission.NONE,
-                },
-            ];
-        }
-
-        // Add bootloader, softDevice, applications to regions
-        const { image_info_list: imageInfoList } = fwInfo;
-        imageInfoList.forEach((image: nrfdl.FWInfo.Image) => {
-            const {
-                image_type: imageType,
-                image_location: imageLocation,
-                version,
-            } = image;
-            const startAddress = imageLocation.address;
-            const regionSize =
-                imageType === nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE
-                    ? imageLocation.size - 0x1000
-                    : imageLocation.size;
-            if (regionSize === 0) return;
-
-            const regionName =
-                {
-                    [nrfdl.NRFDL_IMAGE_TYPE_BOOTLOADER]: RegionName.BOOTLOADER,
-                    [nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE]: RegionName.SOFTDEVICE,
-                    [nrfdl.NRFDL_IMAGE_TYPE_APPLICATION]:
-                        RegionName.APPLICATION,
-                }[imageType] || RegionName.NONE;
-            const color =
-                {
-                    [nrfdl.NRFDL_IMAGE_TYPE_BOOTLOADER]: RegionColor.BOOTLOADER,
-                    [nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE]: RegionColor.SOFTDEVICE,
-                    [nrfdl.NRFDL_IMAGE_TYPE_APPLICATION]:
-                        RegionColor.APPLICATION,
-                }[imageType] || RegionColor.NONE;
-            regions = [
-                ...regions,
-                {
-                    ...defaultRegion,
-                    name: regionName,
-                    version: version.incremental,
-                    startAddress,
-                    regionSize,
-                    color,
-                },
-            ];
-        });
-
-        dispatch(targetRegionsKnown(regions));
-        dispatch(fileActions.updateFileRegions());
-        dispatch(targetActions.updateTargetWritable());
-        dispatch(loadingEnd());
-    } catch (versionError) {
-        logger.error(`Error when fetching device versions: ${versionError}`);
-    }
-};
+    };
 
 // Open device and return promise
 export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) =>
@@ -312,7 +342,7 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) =>
                         dispatch(
                             targetPortChanged({
                                 serialNumber: newDevice.serialNumber,
-                                path: portPath(newDevice.serialport)
+                                path: portPath(newDevice.serialport),
                             })
                         );
                         dispatch(startWatchingDevices());
@@ -442,7 +472,11 @@ function calculateSHA512Hash(image: MemoryMap) {
 }
 
 // Update firmware image and its length
-function handleImage(image: initPacket.DfuImage, regions: Region[], memMap: MemoryMap) {
+function handleImage(
+    image: initPacket.DfuImage,
+    regions: Region[],
+    memMap: MemoryMap
+) {
     if (!image.initPacket) {
         throw new Error('Init packet was not created.');
     }
@@ -491,7 +525,11 @@ function handleHwVersion(image: initPacket.DfuImage, hwVersion: number) {
 }
 
 // Update SoftDevice required version
-function handleSdReq(image: initPacket.DfuImage, fileMemMap: MemoryMap, deviceInfo: DeviceDefinition) {
+function handleSdReq(
+    image: initPacket.DfuImage,
+    fileMemMap: MemoryMap,
+    deviceInfo: DeviceDefinition
+) {
     // If sdReq is already set, then do not handle it.
     if (image.initPacket.sdReq && image.initPacket.sdReq.length > 0) {
         return image;
@@ -540,13 +578,13 @@ function handleUserInput(imageInput: initPacket.DfuImage) {
             }
         }
         image = sdReq
-            ? {
+            ? ({
                   ...image,
                   initPacket: {
                       ...image.initPacket,
                       sdReq: [sdReq],
                   },
-              } as initPacket.DfuImage
+              } as initPacket.DfuImage)
             : image;
 
         return image;

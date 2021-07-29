@@ -40,9 +40,9 @@ export interface WarningState {
     fileWarnings: string[];
     targetWarnings: string[];
     userWarnings: string[];
-};
+}
 
-const initialState : WarningState = {
+const initialState: WarningState = {
     fileWarnings: [],
     targetWarnings: [],
     userWarnings: [],
@@ -71,14 +71,14 @@ const warningSlice = createSlice({
             state.userWarnings = [];
         },
         allWarningRemove() {
-            return {...initialState };
+            return { ...initialState };
         },
     },
     extraReducers: {
-        'DEVICE_SELECTED': (state) => {
+        DEVICE_SELECTED: state => {
             state.targetWarnings = [];
             state.userWarnings = [];
-        }
+        },
     },
 });
 
@@ -94,7 +94,7 @@ const {
     allWarningRemove,
 } = warningSlice.actions;
 
-//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
 export {
     fileWarningAdd,

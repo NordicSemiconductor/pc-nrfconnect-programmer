@@ -35,8 +35,8 @@
  */
 
 import Store from 'electron-store';
-import { RootState, TDispatch } from '../reducers';
 
+import { RootState, TDispatch } from '../reducers';
 import {
     settingsLoad,
     toggleAutoRead as toggleAutoReadAction,

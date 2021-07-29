@@ -55,8 +55,7 @@ interface McuUpdateDialogViewProps {
     progressDuration: number;
     onOk: () => void;
     onCancel: () => void;
-};
-
+}
 
 const McuUpdateDialogView = ({
     isVisible,

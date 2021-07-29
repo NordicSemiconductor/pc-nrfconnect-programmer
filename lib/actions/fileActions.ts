@@ -43,8 +43,8 @@ import MemoryMap from 'nrf-intel-hex';
 import { logger } from 'nrfconnect/core';
 import { Stats } from 'original-fs';
 import { basename } from 'path';
-import { RootState, TDispatch } from '../reducers';
 
+import { RootState, TDispatch } from '../reducers';
 import {
     fileParse,
     fileRegionNamesKnown,
@@ -76,50 +76,51 @@ export const errorDialogShowAction = (error: any) => ({
 });
 
 // Update core info when file actions happen and not when the device is selected
-const updateCoreInfo = () => (dispatch: TDispatch, getState: () => RootState) => {
-    const { target, file } = getState().app;
-    const { family, type } = target.deviceInfo;
+const updateCoreInfo =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        const { target, file } = getState().app;
+        const { family, type } = target.deviceInfo;
 
-    // If device is selected, device family and device type will not be null
-    // and so will not assume target cores by file regions.
-    if (family || type) {
-        return;
-    }
+        // If device is selected, device family and device type will not be null
+        // and so will not assume target cores by file regions.
+        if (family || type) {
+            return;
+        }
 
-    // Display multiple cores if at least one of the regions matches
-    // the requirements of nRF5340
-    const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
-    const startAddresses = [...overlaps.keys()];
-    const { cores } = getDeviceDefinition('nRF5340');
-    const networkCore = cores[1];
-    const { romBaseAddr: netwrokRomBaseAddr, romSize: networkRomSize } =
-        networkCore;
-    if (
-        startAddresses.find(
-            s =>
-                s >= netwrokRomBaseAddr &&
-                s <= netwrokRomBaseAddr + networkRomSize
-        )
-    ) {
-        dispatch(
-            targetInfoKnown({
-                ...deviceDefinition,
-                cores: [
-                    {
-                        ...cores[0],
-                        romBaseAddr: 0x0,
-                        romSize: 0x100000, // 1 MB
-                    },
-                    {
-                        ...cores[1],
-                        romBaseAddr: 0x1000000,
-                        romSize: 0x40000, // 256 KB
-                    },
-                ],
-            })
-        );
-    }
-};
+        // Display multiple cores if at least one of the regions matches
+        // the requirements of nRF5340
+        const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
+        const startAddresses = [...overlaps.keys()];
+        const { cores } = getDeviceDefinition('nRF5340');
+        const networkCore = cores[1];
+        const { romBaseAddr: netwrokRomBaseAddr, romSize: networkRomSize } =
+            networkCore;
+        if (
+            startAddresses.find(
+                s =>
+                    s >= netwrokRomBaseAddr &&
+                    s <= netwrokRomBaseAddr + networkRomSize
+            )
+        ) {
+            dispatch(
+                targetInfoKnown({
+                    ...deviceDefinition,
+                    cores: [
+                        {
+                            ...cores[0],
+                            romBaseAddr: 0x0,
+                            romSize: 0x100000, // 1 MB
+                        },
+                        {
+                            ...cores[1],
+                            romBaseAddr: 0x1000000,
+                            romSize: 0x40000, // 256 KB
+                        },
+                    ],
+                })
+            );
+        }
+    };
 
 const updateDetectedRegionNames =
     () => (dispatch: TDispatch, getState: () => RootState) => {
@@ -311,23 +312,24 @@ export const removeFile =
         const newMemMaps = memMaps.filter(element => element[0] !== filePath);
         delete newLoaded[filePath];
 
-        dispatch(fileParse({loaded: newLoaded, memMaps: newMemMaps}));
+        dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
         dispatch(updateFileRegions());
         dispatch(updateTargetWritable());
     };
 
-export const closeFiles = () => (dispatch: TDispatch, getState: () => RootState) => {
-    dispatch(fileWarningRemove());
-    dispatch(filesEmpty());
-    dispatch(updateFileRegions());
+export const closeFiles =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        dispatch(fileWarningRemove());
+        dispatch(filesEmpty());
+        dispatch(updateFileRegions());
 
-    // Initialize the state of deviceInfo if no device is selected
-    if (!getState().app.target.deviceInfo.type) {
-        dispatch(targetInfoKnown(deviceDefinition));
-    }
-    dispatch(updateTargetWritable());
-};
+        // Initialize the state of deviceInfo if no device is selected
+        if (!getState().app.target.deviceInfo.type) {
+            dispatch(targetInfoKnown(deviceDefinition));
+        }
+        dispatch(updateTargetWritable());
+    };
 
 export const loadMruFiles = () => (dispatch: TDispatch) => {
     const files = persistentStore.get('mruFiles', []);
@@ -352,7 +354,8 @@ const addMruFile = (filename: string) => {
 };
 
 const parseOneFile =
-    (filePath: string) => async (dispatch: TDispatch, getState: () => RootState) => {
+    (filePath: string) =>
+    async (dispatch: TDispatch, getState: () => RootState) => {
         const { loaded, memMaps } = getState().app.file;
         if (loaded[filePath]) {
             return;
@@ -410,7 +413,7 @@ const parseOneFile =
             },
         };
         const newMemMaps = [...memMaps, [filePath, memMap]];
-        dispatch(fileParse({loaded: newLoaded, memMaps: newMemMaps}));
+        dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
         dispatch(updateFileRegions());
         dispatch(updateTargetWritable());

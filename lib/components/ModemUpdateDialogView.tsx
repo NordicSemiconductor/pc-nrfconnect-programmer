@@ -55,7 +55,7 @@ interface ModemUpdateDialogViewProps {
     onOk: () => void;
     onCancel: () => void;
     isMcuboot: boolean;
-};
+}
 
 const ModemUpdateDialogView = ({
     isVisible,
@@ -86,7 +86,6 @@ const ModemUpdateDialogView = ({
         onOk();
     }
 
-
     if (intervalId.current && (isWritingSucceed || isWritingFail)) {
         clearInterval(intervalId.current);
     }
@@ -103,9 +102,7 @@ const ModemUpdateDialogView = ({
                     Modem DFU
                     {isMcuboot && ' via MCUboot'}
                 </Modal.Title>
-                {isWriting && (
-                    <span className="mdi mdi-refresh icon-spin" />
-                )}
+                {isWriting && <span className="mdi mdi-refresh icon-spin" />}
             </Modal.Header>
             <Modal.Body>
                 <Form.Group>
@@ -182,7 +179,7 @@ const ModemUpdateDialogView = ({
             </Modal.Footer>
         </Modal>
     );
-}
+};
 
 ModemUpdateDialogView.propTypes = {
     isVisible: PropTypes.bool.isRequired,

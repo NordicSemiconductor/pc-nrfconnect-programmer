@@ -39,8 +39,8 @@
 import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 import { Device } from 'pc-nrfconnect-shared';
-import { RootState, TDispatch } from '../reducers';
 
+import { RootState, TDispatch } from '../reducers';
 import {
     loadingStart,
     targetPortChanged,
@@ -75,21 +75,21 @@ export const getLibVersions = async () => {
 
         // Get nrf-device-lib version
         const nrfdlVersion = versions.find(
-            (v: nrfdl.ModuleVersion)  => v.moduleName === 'nrfdl'
+            (v: nrfdl.ModuleVersion) => v.moduleName === 'nrfdl'
         ).version;
         const nrfdlVersionString = `${nrfdlVersion.major}.${nrfdlVersion.minor}.${nrfdlVersion.patch}`;
         logger.info('Using nrf-device-lib version', nrfdlVersionString);
 
         // Get nrfjprog dll version
         const nrfjprogVersion = versions.find(
-            (v: nrfdl.ModuleVersion)  => v.moduleName === 'nrfjprog_dll'
+            (v: nrfdl.ModuleVersion) => v.moduleName === 'nrfjprog_dll'
         ).version;
         const nrfjprogVersionString = `${nrfjprogVersion.major}.${nrfjprogVersion.minor}.${nrfjprogVersion.patch}`;
         logger.info('Using nrfjprog dll version', nrfjprogVersionString);
 
         // Get jLink dll version
         const jlinkVersion = versions.find(
-            (v: nrfdl.ModuleVersion)  => v.moduleName === 'jlink_dll'
+            (v: nrfdl.ModuleVersion) => v.moduleName === 'jlink_dll'
         ).version;
         logger.info('Using JLink version', jlinkVersion);
     } catch (error) {
@@ -106,8 +106,8 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
 
     dispatch(
         targetPortChanged({
-            serialNumber: serialNumber,
-            path: serialport ? portPath(serialport) : null
+            serialNumber,
+            path: serialport ? portPath(serialport) : null,
         })
     );
 

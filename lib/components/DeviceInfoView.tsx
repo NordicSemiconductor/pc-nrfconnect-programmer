@@ -45,7 +45,7 @@ interface DeviceInfoViewProps {
     port?: string;
     serialNumber: string;
     targetType: number;
-};
+}
 
 const DeviceInfoView = ({
     serialNumber,

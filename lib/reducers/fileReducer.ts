@@ -36,9 +36,9 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Region } from '../util/regions';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import { Region } from '../util/regions';
 
 export interface FileState {
     detectedRegionNames: Set<string>;
@@ -62,7 +62,7 @@ const initialState: FileState = {
 interface FileParsePayload {
     memMaps: [];
     loaded: {};
-};
+}
 
 const fileSlice = createSlice({
     name: 'file',
@@ -72,7 +72,7 @@ const fileSlice = createSlice({
             return {
                 ...initialState,
                 mruFiles: state.mruFiles,
-            }
+            };
         },
         fileParse(state, action: PayloadAction<FileParsePayload>) {
             state.memMaps = action.payload.memMaps;
@@ -85,7 +85,7 @@ const fileSlice = createSlice({
             state.detectedRegionNames = action.payload;
         },
 
-        mruFilesLoadSuccess(state, action: PayloadAction<string[]>) {
+        mruFilesLoadSuccess(state, action: PayloadAction<string[]>) {
             state.mruFiles = action.payload || [];
         },
 
@@ -106,7 +106,7 @@ const {
     mcubootFileKnown,
 } = fileSlice.actions;
 
-//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
 export {
     filesEmpty,

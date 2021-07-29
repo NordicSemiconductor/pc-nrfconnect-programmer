@@ -36,14 +36,18 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl, { Device, DeviceCore, Error } from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl, {
+    Device,
+    DeviceCore,
+    Error,
+} from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import fs from 'fs';
 import MemoryMap, { MemoryBlocks } from 'nrf-intel-hex';
 import { logger } from 'pc-nrfconnect-shared';
+
 import { RootState, TDispatch } from '../reducers';
 import { modemKnown } from '../reducers/modemReducer';
-
 import {
     erasingEnd,
     erasingStart,
@@ -94,7 +98,12 @@ export const loadDeviceInfo =
     async (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(loadingStart());
         dispatch(targetWarningRemove());
-        dispatch(targetTypeKnown({targetType: CommunicationType.JLINK, isRecoverable: true}));
+        dispatch(
+            targetTypeKnown({
+                targetType: CommunicationType.JLINK,
+                isRecoverable: true,
+            })
+        );
         logger.info(
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target throught JLink'
         );
@@ -104,9 +113,7 @@ export const loadDeviceInfo =
         let deviceInfo = getDeviceInfoByJlink(device);
 
         // Update modem target info according to detected device info
-        dispatch(
-            modemKnown(device.jlink.device_family.includes('NRF91'))
-        );
+        dispatch(modemKnown(device.jlink.device_family.includes('NRF91')));
 
         // By default readback protection is none
         let protectionStatus = nrfdl.NRFDL_PROTECTION_STATUS_NONE;
@@ -194,7 +201,12 @@ export const loadDeviceInfo =
                 logger.error(`getDeviceMemMap: ${error.message}`);
                 return;
             }
-            dispatch(targetContentsKnown({targetMemMap: mergedMemMap, isMemLoaded: isMemLoaded}));
+            dispatch(
+                targetContentsKnown({
+                    targetMemMap: mergedMemMap,
+                    isMemLoaded,
+                })
+            );
             dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
         }
 
@@ -217,7 +229,11 @@ const logDeviceInfo = (device: Device) => {
 
 // Get device memory map by calling nrf-device-lib and reading the entire non-volatile memory
 // const getDeviceMemMap = async (serialNumber, coreInfo, fullRead = true) => {
-const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition, readAll = true) => {
+const getDeviceMemMap = async (
+    deviceId: number,
+    coreInfo: CoreDefinition,
+    readAll = true
+) => {
     if (!readAll) return undefined;
     const result = await new Promise(resolve => {
         nrfdl.firmwareRead(
@@ -254,43 +270,47 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition, readA
 // able to press the "program" button.
 // There are also instances where the UICR can be erased and overwritten, but
 // unfortunately the casuistics are just too complex.
-export const canWrite = () => (dispatch: TDispatch, getState: () => RootState) => {
-    // TODO: get the UICR address from the target definition. This value
-    // works for nRF51s and nRF52s, but other targets might use a different one!!!
-    const appState = getState().app;
-    const { isErased, isMemLoaded } = appState.target;
-    const { isMcuboot } = appState.mcuboot;
-    const { memMaps: fileMemMaps, mcubootFilePath } = appState.file;
+export const canWrite =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        // TODO: get the UICR address from the target definition. This value
+        // works for nRF51s and nRF52s, but other targets might use a different one!!!
+        const appState = getState().app;
+        const { isErased, isMemLoaded } = appState.target;
+        const { isMcuboot } = appState.mcuboot;
+        const { memMaps: fileMemMaps, mcubootFilePath } = appState.file;
 
-    // If MCU is enabled and MCU firmware is detected
-    if (isMcuboot && mcubootFilePath) {
+        // If MCU is enabled and MCU firmware is detected
+        if (isMcuboot && mcubootFilePath) {
+            dispatch(targetWritableKnown(true));
+            return;
+        }
+
+        // If the device has been erased or the memory has been loaded and firmware is selected
+        if ((!isErased && !isMemLoaded) || !fileMemMaps.length) {
+            dispatch(targetWritableKnown(false));
+            return;
+        }
         dispatch(targetWritableKnown(true));
-        return;
-    }
-
-    // If the device has been erased or the memory has been loaded and firmware is selected
-    if ((!isErased && !isMemLoaded) || !fileMemMaps.length) {
-        dispatch(targetWritableKnown(false));
-        return;
-    }
-    dispatch(targetWritableKnown(true));
-};
+    };
 
 // Update infos of the target regions
-const updateTargetRegions = (memMap: Uint8Array, deviceInfo: DeviceDefinition) => (dispatch: TDispatch) => {
-    const memMaps: MemoryBlocks = [['', memMap]];
-    const regions = getTargetRegions(memMaps, deviceInfo);
+const updateTargetRegions =
+    (memMap: Uint8Array, deviceInfo: DeviceDefinition) =>
+    (dispatch: TDispatch) => {
+        const memMaps: MemoryBlocks = [['', memMap]];
+        const regions = getTargetRegions(memMaps, deviceInfo);
 
-    dispatch(targetRegionsKnown(regions));
-    dispatch(updateFileAppRegions());
-};
+        dispatch(targetRegionsKnown(regions));
+        dispatch(updateFileAppRegions());
+    };
 
 // Read device flash memory
-export const read = () => async (dispatch: TDispatch, getState: () => RootState) => {
-    dispatch(loadingStart());
-    const { serialNumber } = getState().app.target;
-    await dispatch(loadDeviceInfo(serialNumber, true));
-};
+export const read =
+    () => async (dispatch: TDispatch, getState: () => RootState) => {
+        dispatch(loadingStart());
+        const { serialNumber } = getState().app.target;
+        await dispatch(loadDeviceInfo(serialNumber, true));
+    };
 
 // Call nrfprog.recover() to recover one core
 export const recoverOneCore =
@@ -322,7 +342,8 @@ export const recoverOneCore =
 
 // Recover all cores one by one
 export const recover =
-    (willEraseAndWrite: boolean) => async (dispatch: TDispatch, getState: () => RootState) => {
+    (willEraseAndWrite: boolean) =>
+    async (dispatch: TDispatch, getState: () => RootState) => {
         const {
             serialNumber,
             deviceInfo: { cores },
@@ -345,7 +366,11 @@ export const recover =
     };
 
 // Sends a HEX string to jprog.program()
-const writeHex = async (serialNumber: string, coreInfo: CoreDefinition, hexFileString: string) => {
+const writeHex = async (
+    serialNumber: string,
+    coreInfo: CoreDefinition,
+    hexFileString: string
+) => {
     logger.info(
         'Writing hex file with @nordicsemiconductor/nrf-device-lib-js.'
     );
@@ -379,7 +404,8 @@ const writeHex = async (serialNumber: string, coreInfo: CoreDefinition, hexFileS
 };
 
 export const writeOneCore =
-    (core: CoreDefinition) => async (dispatch: TDispatch, getState: () => RootState) => {
+    (core: CoreDefinition) =>
+    async (dispatch: TDispatch, getState: () => RootState) => {
         logger.info(`Writing procedure starts for core${core.coreNumber}`);
         dispatch(writingStart());
         const {
@@ -431,23 +457,24 @@ export const writeOneCore =
 
 // Does some sanity checks, joins the loaded HEX files, flattens overlaps,
 // paginates the result to fit flash pages, and calls writeHex()
-export const write = () => async (dispatch: TDispatch, getState: () => RootState) => {
-    const {
-        serialNumber,
-        deviceInfo: { cores },
-    } = getState().app.target;
-    const results: unknown[] = [];
-    const argsArray = cores.map(c => [c]);
-    return sequence(
-        (...args) => dispatch(writeOneCore(...args)),
-        results,
-        argsArray
-    ).then(async () => {
-        await dispatch(loadDeviceInfo(serialNumber));
-        dispatch(writingEnd());
-        dispatch(updateTargetWritable());
-    });
-};
+export const write =
+    () => async (dispatch: TDispatch, getState: () => RootState) => {
+        const {
+            serialNumber,
+            deviceInfo: { cores },
+        } = getState().app.target;
+        const results: unknown[] = [];
+        const argsArray = cores.map(c => [c]);
+        return sequence(
+            (...args) => dispatch(writeOneCore(...args)),
+            results,
+            argsArray
+        ).then(async () => {
+            await dispatch(loadDeviceInfo(serialNumber));
+            dispatch(writingEnd());
+            dispatch(updateTargetWritable());
+        });
+    };
 
 // Erase all on device and write file to it.
 export const recoverAndWrite = () => (dispatch: TDispatch) =>

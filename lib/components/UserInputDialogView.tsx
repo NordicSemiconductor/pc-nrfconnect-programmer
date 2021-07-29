@@ -45,12 +45,18 @@ import { hexpad2 } from '../util/hexpad';
 interface UserInputDialogViewProps {
     isVisible?: boolean;
     message?: string;
-    choices: Record<string, string>,
+    choices: Record<string, string>;
     onOk: (input?: string) => void;
     onCancel: () => void;
-};
+}
 
-const UserInputDialogView = ({isVisible, message, choices, onOk, onCancel}: UserInputDialogViewProps) => {
+const UserInputDialogView = ({
+    isVisible,
+    message,
+    choices,
+    onOk,
+    onCancel,
+}: UserInputDialogViewProps) => {
     const [selectedValue, setSelectedValue] = useState<string>();
     const [customChecked, setCustomChecked] = useState<boolean>(false);
     const [customValue, setCustomValue] = useState<string>('');
@@ -72,9 +78,9 @@ const UserInputDialogView = ({isVisible, message, choices, onOk, onCancel}: User
         value = value.includes('0x')
             ? `0x${value.slice(2).toUpperCase()}`
             : `0x${value.toUpperCase()}`;
-            setSelectedValue(value);
-            setCustomValue(value);
-            setIsValidInput(!Number.isNaN(parseInt(value, 16)));
+        setSelectedValue(value);
+        setCustomValue(value);
+        setIsValidInput(!Number.isNaN(parseInt(value, 16)));
     }
 
     return (
@@ -129,7 +135,7 @@ const UserInputDialogView = ({isVisible, message, choices, onOk, onCancel}: User
             </Modal.Footer>
         </Modal>
     );
-}
+};
 
 UserInputDialogView.propTypes = {
     isVisible: PropTypes.bool,

@@ -48,7 +48,7 @@ interface CoreWithRegions extends CoreDefinition {
 interface CoreViewProps {
     core: CoreWithRegions;
     active: boolean;
-};
+}
 
 const CoreView = ({ core, active }: CoreViewProps) => {
     const { regions, romSize, romBaseAddr } = core;

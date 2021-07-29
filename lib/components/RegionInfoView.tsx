@@ -45,9 +45,14 @@ interface RegionInfoViewProps {
     startAddress: number;
     regionSize: number;
     fileNames: string[];
-};
+}
 
-const RegionInfoView = ({ name, startAddress, regionSize, fileNames }: RegionInfoViewProps) => (
+const RegionInfoView = ({
+    name,
+    startAddress,
+    regionSize,
+    fileNames,
+}: RegionInfoViewProps) => (
     <>
         {name && (
             <div>

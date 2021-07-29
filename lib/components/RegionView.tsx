@@ -40,10 +40,10 @@ import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import PropTypes from 'prop-types';
 
+import { CoreDefinition } from '../util/devices';
+import { Region } from '../util/regions';
 import CoreInfoView from './CoreInfoView';
 import RegionInfoView from './RegionInfoView';
-import { Region } from '../util/regions';
-import { CoreDefinition } from '../util/devices';
 
 interface RegionViewProps {
     removeFile: (filePath: string) => void;
@@ -53,7 +53,7 @@ interface RegionViewProps {
     hoverable?: boolean;
     region: Region;
     core: CoreDefinition;
-};
+}
 
 const RegionView = ({
     width,
@@ -82,9 +82,8 @@ const RegionView = ({
     className = hoverable ? `${className} hoverable` : className;
     className = fileNames.length > 1 ? `${className} crosses` : className;
 
-    const containerNode = document.getElementsByClassName(
-        'core-main-layout'
-    )[0];
+    const containerNode =
+        document.getElementsByClassName('core-main-layout')[0];
 
     return (
         <div
