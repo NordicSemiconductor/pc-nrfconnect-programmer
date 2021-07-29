@@ -69,7 +69,7 @@ export const SignatureType = {
 export interface InitPacket {
     fwVersion?: number;
     hwVersion?: number;
-    sdReq?: number;
+    sdReq?: number | number[];
     fwType?: number;
     sdSize: number;
     blSize: number;
