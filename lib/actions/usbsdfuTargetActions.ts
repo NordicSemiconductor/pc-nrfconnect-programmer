@@ -36,9 +36,9 @@
 
 /* eslint-disable import/no-cycle */
 
+import nrfdl, { Error, Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import AdmZip from 'adm-zip';
 import Crypto from 'crypto';
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { detachAndWaitFor, dfuTrigger } from 'nrf-device-setup';
 import MemoryMap from 'nrf-intel-hex';
 import {
@@ -49,10 +49,14 @@ import {
 import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
 import tmp from 'tmp';
+import { RootState, TDispatch } from '../reducers';
+import { dfuImagesUpdate, loadingEnd, targetInfoKnown, targetPortChanged, targetRegionsKnown, targetTypeKnown, targetWritableKnown, writingEnd, writingStart } from '../reducers/targetReducer';
+import { targetWarningRemove, userWarningRemove } from '../reducers/warningReducer';
 
 import {
     CommunicationType,
     context,
+    DeviceDefinition,
     getDeviceFromNrfdl,
     getDeviceInfoByUSB,
     NordicFwIds,
@@ -62,6 +66,7 @@ import portPath from '../util/portPath';
 import {
     defaultRegion,
     getSoftDeviceId,
+    Region,
     RegionColor,
     RegionName,
     RegionPermission,
@@ -69,13 +74,12 @@ import {
 import * as fileActions from './fileActions';
 import * as targetActions from './targetActions';
 import * as userInputActions from './userInputActions';
-import * as warningActions from './warningActions';
 
-function createDfuZip(dfuImages) {
+function createDfuZip(dfuImages: initPacket.DfuImage[]) {
     return new Promise(resolve => {
         const data = createDfuDataFromImages(dfuImages);
         const zip = new AdmZip();
-        const manifest = {};
+        const manifest = {application: {}, softdevice: {}};
 
         if (data.application) {
             manifest.application = {
@@ -103,14 +107,14 @@ function createDfuZip(dfuImages) {
     });
 }
 
-async function createDfuZipBuffer(dfuImages) {
+async function createDfuZipBuffer(dfuImages: initPacket.DfuImage[]) {
     const zip = await createDfuZip(dfuImages);
     const buffer = zip.toBuffer();
     return buffer;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function createDfuZipFile(dfuImages) {
+async function createDfuZipFile(dfuImages: initPacket.DfuImage[]) {
     const zip = await createDfuZip(dfuImages);
     const { name: tmpPath } = tmp.dirSync();
     const zipPath = path.join(tmpPath, 'dfu_pkg.zip');
@@ -125,8 +129,8 @@ async function createDfuZipFile(dfuImages) {
     return zipPath;
 }
 
-function createDfuDataFromImages(dfuImages) {
-    const extract = image => ({
+function createDfuDataFromImages(dfuImages: initPacket.DfuImage[]) {
+    const extract = (image: initPacket.DfuImage) => ({
         bin: image.firmwareImage,
         dat: initPacket.createInitPacketBuffer(
             image.initPacket.fwVersion,
@@ -153,18 +157,18 @@ function createDfuDataFromImages(dfuImages) {
     };
 }
 
-const defaultDfuImage = {
+const defaultDfuImage: initPacket.DfuImage = {
     name: undefined,
     initPacket: initPacket.defaultInitPacket,
     firmwareImage: undefined,
 };
 
 // Display some information about a devkit. Called on a devkit connection.
-const loadDeviceInfo = selectedDevice => async dispatch => {
+const loadDeviceInfo = (selectedDevice: Device) => async (dispatch: TDispatch) => {
     // const serialportPath = portPath(selectedDevice.serialport);
-    dispatch(warningActions.targetWarningRemoveAction());
+    dispatch(targetWarningRemove());
     dispatch(
-        targetActions.targetTypeKnownAction(CommunicationType.USBSDFU, false)
+        targetTypeKnown({targetType: CommunicationType.USBSDFU, isRecoverable: false})
     );
     logger.info(
         'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target through USB SDFU protocol'
@@ -181,14 +185,14 @@ const loadDeviceInfo = selectedDevice => async dispatch => {
             variant: 1094796080,
             memory: { romSize: 1048576, ramSize: 262144, romPageSize: 4096 },
         };
-        const fwInfo = await nrfdl.readFwInfo(context, device.id);
+        const fwInfo: nrfdl.FWInfo.ReadResult = await nrfdl.readFwInfo(context, device.id);
         const deviceInfoOrigin = getDeviceInfoByUSB(hardwareVersion);
-        dispatch(targetActions.targetInfoKnownAction(deviceInfoOrigin));
+        dispatch(targetInfoKnown(deviceInfoOrigin));
 
         const appCoreNumber = 0;
         const coreInfo = deviceInfoOrigin.cores[appCoreNumber];
 
-        let regions = [];
+        let regions: Region[] = [];
 
         // Add FICR to regions
         if (coreInfo.ficrBaseAddr) {
@@ -238,7 +242,7 @@ const loadDeviceInfo = selectedDevice => async dispatch => {
 
         // Add bootloader, softDevice, applications to regions
         const { image_info_list: imageInfoList } = fwInfo;
-        imageInfoList.forEach(image => {
+        imageInfoList.forEach((image: nrfdl.FWInfo.Image) => {
             const {
                 image_type: imageType,
                 image_location: imageLocation,
@@ -278,24 +282,23 @@ const loadDeviceInfo = selectedDevice => async dispatch => {
             ];
         });
 
-        dispatch(targetActions.targetRegionsKnownAction(regions));
+        dispatch(targetRegionsKnown(regions));
         dispatch(fileActions.updateFileRegions());
         dispatch(targetActions.updateTargetWritable());
-        dispatch(targetActions.loadingEndAction());
+        dispatch(loadingEnd());
     } catch (versionError) {
         logger.error(`Error when fetching device versions: ${versionError}`);
     }
 };
 
 // Open device and return promise
-export const openDevice = selectedDevice => dispatch =>
+export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) =>
     Promise.resolve(selectedDevice)
         .then(device => {
             if (device && device.usb) {
                 const usbdev = device.usb.device;
-                const interfaceNumber = dfuTrigger.getDFUInterfaceNumber(
-                    usbdev
-                );
+                const interfaceNumber =
+                    dfuTrigger.getDFUInterfaceNumber(usbdev);
                 if (interfaceNumber >= 0) {
                     logger.info(
                         'DFU trigger interface found, changing to bootloader...'
@@ -305,12 +308,12 @@ export const openDevice = selectedDevice => dispatch =>
                         usbdev,
                         interfaceNumber,
                         selectedDevice.serialNumber
-                    ).then(newDevice => {
+                    ).then((newDevice: Device) => {
                         dispatch(
-                            targetActions.targetPortChangedAction(
-                                newDevice.serialNumber,
-                                portPath(newDevice.serialport)
-                            )
+                            targetPortChanged({
+                                serialNumber: newDevice.serialNumber,
+                                path: portPath(newDevice.serialport)
+                            })
                         );
                         dispatch(startWatchingDevices());
                         return newDevice;
@@ -329,7 +332,7 @@ export const openDevice = selectedDevice => dispatch =>
 
 // Reset device to Application mode
 export function resetDevice() {
-    return async (dispatch, getState) => {
+    return async (getState: () => RootState) => {
         const { serialNumber } = getState().app.target;
         const serialUsbTransport = new DfuTransportUsbSerial(serialNumber);
         return serialUsbTransport.abort();
@@ -345,12 +348,12 @@ export function resetDevice() {
 }
 
 // Create DFU image by given region name and firmware type
-function createDfuImage(regionName, fwType) {
+function createDfuImage(regionName: string, fwType: number) {
     const initPacketInUse = {
         ...initPacket.defaultInitPacket,
         fwType,
     };
-    const dfuImage = {
+    const dfuImage: initPacket.DfuImage = {
         ...defaultDfuImage,
         name: regionName,
         initPacket: initPacketInUse,
@@ -360,8 +363,8 @@ function createDfuImage(regionName, fwType) {
 
 // Create DFU image list by given detected region names
 function createDfuImages() {
-    let dfuImages = [];
-    return (dispatch, getState) => {
+    let dfuImages: initPacket.DfuImage[] = [];
+    return (dispatch: TDispatch, getState: () => RootState) => {
         getState().app.file.detectedRegionNames.forEach(regionName => {
             switch (regionName) {
                 case RegionName.BOOTLOADER:
@@ -395,16 +398,16 @@ function createDfuImages() {
                     break;
             }
         });
-        dispatch(targetActions.dfuImagesUpdateAction(dfuImages));
+        dispatch(dfuImagesUpdate(dfuImages));
     };
 }
 
 // Check if the files can be written to the target device
 export function canWrite() {
-    return (dispatch, getState) => {
+    return (dispatch: TDispatch, getState: () => RootState) => {
         // Disable write button
-        dispatch(targetActions.targetWritableKnownAction(false));
-        dispatch(warningActions.targetWarningRemoveAction());
+        dispatch(targetWritableKnown(false));
+        dispatch(targetWarningRemove());
 
         // Check if there are writable regions.
         // If not, then return.
@@ -419,27 +422,27 @@ export function canWrite() {
         }
 
         // Enable write button if all above items have been checked
-        dispatch(warningActions.targetWarningRemoveAction());
-        dispatch(targetActions.targetWritableKnownAction(true));
+        dispatch(targetWarningRemove());
+        dispatch(targetWritableKnown(true));
     };
 }
 
 // Calculate hash 256
-function calculateSHA256Hash(image) {
+function calculateSHA256Hash(image: MemoryMap) {
     const digest = Crypto.createHash('sha256');
     digest.update(image);
     return Buffer.from(digest.digest().reverse());
 }
 
 // Calculate hash 512
-function calculateSHA512Hash(image) {
+function calculateSHA512Hash(image: MemoryMap) {
     const digest = Crypto.createHash('sha512');
     digest.update(image);
     return Buffer.from(digest.digest().reverse());
 }
 
 // Update firmware image and its length
-function handleImage(image, regions, memMap) {
+function handleImage(image: initPacket.DfuImage, regions: Region[], memMap: MemoryMap) {
     if (!image.initPacket) {
         throw new Error('Init packet was not created.');
     }
@@ -477,7 +480,7 @@ function handleImage(image, regions, memMap) {
 }
 
 // Update hardware version
-function handleHwVersion(image, hwVersion) {
+function handleHwVersion(image: initPacket.DfuImage, hwVersion: number) {
     return {
         ...image,
         initPacket: {
@@ -488,7 +491,7 @@ function handleHwVersion(image, hwVersion) {
 }
 
 // Update SoftDevice required version
-function handleSdReq(image, fileMemMap, deviceInfo) {
+function handleSdReq(image: initPacket.DfuImage, fileMemMap: MemoryMap, deviceInfo: DeviceDefinition) {
     // If sdReq is already set, then do not handle it.
     if (image.initPacket.sdReq && image.initPacket.sdReq.length > 0) {
         return image;
@@ -518,8 +521,8 @@ function handleSdReq(image, fileMemMap, deviceInfo) {
 }
 
 // Update init packet with user input
-function handleUserInput(imageInput) {
-    return async dispatch => {
+function handleUserInput(imageInput: initPacket.DfuImage) {
+    return async (dispatch: TDispatch) => {
         let image = imageInput;
         let sdReq;
 
@@ -543,7 +546,7 @@ function handleUserInput(imageInput) {
                       ...image.initPacket,
                       sdReq: [sdReq],
                   },
-              }
+              } as initPacket.DfuImage
             : image;
 
         return image;
@@ -551,7 +554,7 @@ function handleUserInput(imageInput) {
 }
 
 // Update calculated hash regarding to the DFU image
-function handleHash(image, hashType) {
+function handleHash(image: initPacket.DfuImage, hashType: number) {
     let hash;
     switch (hashType) {
         case initPacket.HashType.NO_HASH:
@@ -587,9 +590,9 @@ function handleHash(image, hashType) {
 
 // Write files to target device
 export function write() {
-    return async (dispatch, getState) => {
-        dispatch(warningActions.targetWarningRemoveAction());
-        dispatch(warningActions.userWarningRemoveAction());
+    return async (dispatch: TDispatch, getState: () => RootState) => {
+        dispatch(targetWarningRemove());
+        dispatch(userWarningRemove());
         dispatch(fileActions.updateFileBlRegion());
         dispatch(fileActions.updateFileAppRegions());
         dispatch(createDfuImages());
@@ -615,11 +618,11 @@ export function write() {
         dfuImages = await Promise.all(
             dfuImages.map(async image => dispatch(await handleUserInput(image)))
         );
-        dispatch(targetActions.dfuImagesUpdateAction(dfuImages));
+        dispatch(dfuImagesUpdate(dfuImages));
 
         // Start writing after handling images since user may cancel userInput
         logger.info('Performing DFU. This may take a few seconds');
-        dispatch(targetActions.writingStartAction());
+        dispatch(writingStart());
 
         // Stop watching devices during the DFU
         dispatch(stopWatchingDevices());
@@ -628,7 +631,7 @@ export function write() {
         const { id: deviceId } = await getDeviceFromNrfdl(serialNumber);
         const zipBuffer = await createDfuZipBuffer(dfuImages);
 
-        let prevPercentage;
+        let prevPercentage: number;
 
         nrfdl.firmwareProgram(
             context,
@@ -636,7 +639,7 @@ export function write() {
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_SDFU_ZIP',
             zipBuffer,
-            err => {
+            (err: Error) => {
                 if (err) {
                     if (
                         err.error_code ===
@@ -655,9 +658,9 @@ export function write() {
                     );
                 }
                 dispatch(startWatchingDevices());
-                dispatch(targetActions.writingEndAction());
+                dispatch(writingEnd());
             },
-            ({ progressJson: progress }) => {
+            ({ progressJson: progress }: nrfdl.Progress) => {
                 // Don't repeat percentage steps that have already been logged.
                 if (prevPercentage !== progress.progress_percentage) {
                     const status = `${progress.message.replace('.', ':')} ${

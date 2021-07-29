@@ -35,38 +35,28 @@
  */
 
 import Store from 'electron-store';
+import { RootState, TDispatch } from '../reducers';
+
+import {
+    settingsLoad,
+    toggleAutoRead as toggleAutoReadAction,
+} from '../reducers/settingsReducer';
 
 const persistentStore = new Store({ name: 'nrf-programmer' });
 
-export const SETTINGS_LOAD = 'SETTINGS_LOAD';
-export const TOGGLE_AUTO_READ = 'TOGGLE_AUTO_READ';
-
-export function settingsLoadAction(settings) {
-    return {
-        type: SETTINGS_LOAD,
-        settings,
-    };
-}
-
-export function toggleAutoReadAction() {
-    return {
-        type: TOGGLE_AUTO_READ,
-    };
-}
-
 export function loadSettings() {
-    return dispatch => {
+    return (dispatch: TDispatch) => {
         const settings = persistentStore.get('settings') || {};
         if (!settings.autoRead) {
             settings.autoRead = false;
         }
         persistentStore.set('settings', settings);
-        dispatch(settingsLoadAction(settings));
+        dispatch(settingsLoad(settings));
     };
 }
 
 export function toggleAutoRead() {
-    return (dispatch, getState) => {
+    return (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(toggleAutoReadAction());
 
         // Do not use async functions above，

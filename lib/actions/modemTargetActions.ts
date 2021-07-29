@@ -34,89 +34,47 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { remote } from 'electron';
 import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
+import { remote } from 'electron';
 import { logger } from 'nrfconnect/core';
+import { RootState, TDispatch } from '../reducers';
 
+import {
+    modemProcessUpdate,
+    modemWritingClose,
+    modemWritingFail,
+    modemWritingReady,
+    modemWritingStart,
+    modemWritingSucceed,
+    MODEM_DFU_STARTING,
+} from '../reducers/modemReducer';
 import { context, getDeviceFromNrfdl } from '../util/devices';
 
-export const MODEM_KNOWN = 'MODEM_KNOWN';
-export const MODEM_PROCESS_UPDATE = 'MODEM_PROCESS_UPDATE';
-export const MODEM_WRITING_CLOSE = 'MODEM_WRITING_CLOSE';
-export const MODEM_WRITING_END = 'MODEM_WRITING_END';
-export const MODEM_WRITING_FAIL = 'MODEM_WRITING_FAIL';
-export const MODEM_WRITING_READY = 'MODEM_WRITING_READY';
-export const MODEM_WRITING_START = 'MODEM_WRITING_START';
-export const MODEM_WRITING_SUCCEED = 'MODEM_WRITING_SUCCEED';
-
-export const MODEM_DFU_NOT_STARTED = 'Not started.';
-export const MODEM_DFU_STARTING = 'Starting...';
-
-export const modemKnownAction = isModem => ({
-    type: MODEM_KNOWN,
-    isModem,
-});
-
-export const processUpdateAction = (
-    message,
-    percentage = 0,
-    duration = 0,
-    step = 0
-) => ({
-    type: MODEM_PROCESS_UPDATE,
-    message,
-    percentage,
-    duration,
-    step,
-});
-
-export const writingReadyAction = fileName => ({
-    type: MODEM_WRITING_READY,
-    fileName,
-});
-
-export const writingCloseAction = () => ({
-    type: MODEM_WRITING_CLOSE,
-});
-
-export const writingStartAction = () => ({
-    type: MODEM_WRITING_START,
-});
-
-export const writingSucceedAction = () => ({
-    type: MODEM_WRITING_SUCCEED,
-});
-
-export const writingFailAction = errorMsg => ({
-    type: MODEM_WRITING_FAIL,
-    errorMsg,
-});
-
-export const selectModemFirmware = () => dispatch => {
-    const dialogOptions = {
+export const selectModemFirmware = () => (dispatch: TDispatch) => {
+    const dialogOptions: Electron.OpenDialogOptions = {
         title: 'Select a modem firmware zip file',
         filters: [{ name: 'Modem firmware zip file', extensions: ['zip'] }],
         properties: ['openFile'],
     };
     remote.dialog.showOpenDialog(dialogOptions).then(({ filePaths }) => {
         if (filePaths && filePaths.length > 0) {
-            dispatch(writingReadyAction(filePaths[0]));
+            dispatch(modemWritingReady(filePaths[0]));
         }
     });
 };
 
-export const cancelUpdate = () => dispatch => {
-    dispatch(writingCloseAction());
+export const cancelUpdate = () => (dispatch: TDispatch) => {
+    dispatch(modemWritingClose());
 };
 
-export function programDfuModem(serialNumber, fileName) {
-    return async dispatch => {
+export function programDfuModem(serialNumber: string, fileName: string) {
+    return async (dispatch: TDispatch) => {
         const successCallback = () => {
             logger.info('Modem DFU completed successfully!');
-            dispatch(writingSucceedAction());
+            dispatch(modemWritingSucceed());
         };
 
-        const errorCallback = err => {
+        const errorCallback = (err: any) => {
             if (err) {
                 console.error(err);
                 logger.error(`Modem DFU failed with error: ${err}`);
@@ -133,14 +91,14 @@ export function programDfuModem(serialNumber, fileName) {
                     errorMsg =
                         'Please make sure that the device is in MCUboot mode and try again.';
                 }
-                dispatch(writingFailAction(errorMsg));
+                dispatch(modemWritingFail(errorMsg));
             }
         };
 
-        const progressCallback = ({ progressJson: progress }) => {
+        const progressCallback = ({ progressJson: progress }: nrfdl.Progress) => {
             console.log(progress);
             const message = `${progress.operation} (${progress.progress_percentage})`;
-            dispatch(processUpdateAction(message));
+            dispatch(modemProcessUpdate({message: message}));
         };
 
         try {
@@ -161,23 +119,25 @@ export function programDfuModem(serialNumber, fileName) {
     };
 }
 
-export const performMcuUpdate = fileName => (dispatch, getState) => {
-    const { serialNumber } = getState().app.target;
-    dispatch(programDfuModem(serialNumber, fileName));
-};
+export const performMcuUpdate =
+    (fileName: string) => (dispatch: TDispatch, getState: () => RootState) => {
+        const { serialNumber } = getState().app.target;
+        dispatch(programDfuModem(serialNumber ?? '', fileName));
+    };
 
-export const performUpdate = () => (dispatch, getState) => {
-    dispatch(writingStartAction());
-    dispatch(processUpdateAction(MODEM_DFU_STARTING));
-    logger.info('Modem DFU starts to write...');
+export const performUpdate =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        dispatch(modemWritingStart());
+        dispatch(modemProcessUpdate({message: MODEM_DFU_STARTING}));
+        logger.info('Modem DFU starts to write...');
 
-    const { modemFwName: fileName } = getState().app.modem;
-    const serialNumber = Number(getState().app.target.serialNumber);
-    logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
+        const { modemFwName: fileName } = getState().app.modem;
+        const serialNumber = Number(getState().app.target.serialNumber);
+        logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
 
-    if (getState().app.mcuboot.isMcuboot) {
-        dispatch(performMcuUpdate(fileName));
-    } else {
-        dispatch(programDfuModem(`000${serialNumber}`, fileName));
-    }
-};
+        if (getState().app.mcuboot.isMcuboot) {
+            dispatch(performMcuUpdate(fileName));
+        } else {
+            dispatch(programDfuModem(`000${serialNumber}`, fileName));
+        }
+    };

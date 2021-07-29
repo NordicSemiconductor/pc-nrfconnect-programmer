@@ -35,34 +35,17 @@
  */
 
 import { logger } from 'nrfconnect/core';
+import { TDispatch } from '../reducers';
 
-export const USER_INPUT_REQUIRED = 'USER_INPUT_REQUIRED';
-export const USER_INPUT_RECEIVED = 'USER_INPUT_RECEIVED';
-export const USER_INPUT_CANCELLED = 'USER_INPUT_CANCELLED';
+import {
+    userInputCancelled,
+    userInputReceived,
+    userInputRequired,
+} from '../reducers/userInputReducer';
 
-let userInputCallback;
+let userInputCallback: ((input?: string) => void) | undefined;
 
-export function userInputRequiredAction(message, choices = []) {
-    return {
-        type: USER_INPUT_REQUIRED,
-        message,
-        choices,
-    };
-}
-
-export function userInputReceivedAction() {
-    return {
-        type: USER_INPUT_RECEIVED,
-    };
-}
-
-export function userInputCancelledAction() {
-    return {
-        type: USER_INPUT_CANCELLED,
-    };
-}
-
-export function getUserInput(dispatch, message, choices) {
+export function getUserInput(dispatch: TDispatch, message: string, choices: {}) {
     return new Promise((resolve, reject) => {
         userInputCallback = input => {
             if (input) {
@@ -71,13 +54,13 @@ export function getUserInput(dispatch, message, choices) {
                 reject(new Error('Cancelled by user.'));
             }
         };
-        dispatch(userInputRequiredAction(message, choices));
+        dispatch(userInputRequired({message, choices}));
     });
 }
 
-export function receiveUserInput(input) {
-    return dispatch => {
-        dispatch(userInputReceivedAction());
+export function receiveUserInput(input?: string) {
+    return (dispatch: TDispatch) => {
+        dispatch(userInputReceived());
         if (userInputCallback) {
             userInputCallback(input);
             userInputCallback = undefined;
@@ -88,8 +71,8 @@ export function receiveUserInput(input) {
 }
 
 export function cancelUserInput() {
-    return dispatch => {
+    return (dispatch: TDispatch) => {
         logger.info('User input has been cancelled.');
-        dispatch(userInputCancelledAction());
+        dispatch(userInputCancelled());
     };
 }

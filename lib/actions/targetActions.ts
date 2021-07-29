@@ -38,7 +38,14 @@
 
 import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
+import { Device } from 'pc-nrfconnect-shared';
+import { RootState, TDispatch } from '../reducers';
 
+import {
+    loadingStart,
+    targetPortChanged,
+    targetWritableKnown,
+} from '../reducers/targetReducer';
 import {
     CommunicationType,
     context,
@@ -52,108 +59,38 @@ import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
-export const DFU_IMAGES_UPDATE = 'DFU_IMAGES_UPDATE';
-export const ERASING_END = 'ERASING_END';
-export const ERASING_START = 'ERASING_START';
-export const LOADING_END = 'LOADING_END';
-export const LOADING_START = 'LOADING_START';
-export const TARGET_CONTENTS_KNOWN = 'TARGET_CONTENTS_KNOWN';
-export const TARGET_INFO_KNOWN = 'TARGET_INFO_KNOWN';
-export const TARGET_PORT_CHANGED = 'TARGET_PORT_CHANGED';
-export const TARGET_REGIONS_KNOWN = 'TARGET_REGIONS_KNOWN';
-export const TARGET_TYPE_KNOWN = 'TARGET_TYPE_KNOWN';
-export const TARGET_WRITABLE_KNOWN = 'TARGET_WRITABLE_KNOWN';
-export const WRITING_END = 'WRITING_END';
-export const WRITING_START = 'WRITING_START';
-
-export const targetTypeKnownAction = (targetType, isRecoverable) => ({
-    type: TARGET_TYPE_KNOWN,
-    targetType,
-    isRecoverable,
-});
-
-export const targetInfoKnownAction = deviceInfo => ({
-    type: TARGET_INFO_KNOWN,
-    deviceInfo,
-});
-
-export const targetContentsKnownAction = (targetMemMap, isMemLoaded) => ({
-    type: TARGET_CONTENTS_KNOWN,
-    targetMemMap,
-    isMemLoaded,
-});
-
-export const targetRegionsKnownAction = regions => ({
-    type: TARGET_REGIONS_KNOWN,
-    regions,
-});
-
-export const targetWritableKnownAction = isWritable => ({
-    type: TARGET_WRITABLE_KNOWN,
-    isWritable,
-});
-
-export const targetPortChangedAction = (serialNumber, path) => ({
-    type: TARGET_PORT_CHANGED,
-    serialNumber,
-    path,
-});
-
-export const dfuImagesUpdateAction = dfuImages => ({
-    type: DFU_IMAGES_UPDATE,
-    dfuImages,
-});
-
-export const writingStartAction = () => ({
-    type: WRITING_START,
-});
-
-export const writingEndAction = () => ({
-    type: WRITING_END,
-});
-
-export const erasingStartAction = () => ({
-    type: ERASING_START,
-});
-
-export const erasingEndAction = () => ({
-    type: ERASING_END,
-});
-
-export const loadingStartAction = () => ({
-    type: LOADING_START,
-});
-
-export const loadingEndAction = () => ({
-    type: LOADING_END,
-});
-
 export const getLibVersions = async () => {
     try {
         const versions = await nrfdl.getModuleVersions(context);
 
         // Get @nordicsemiconductor/nrf-device-lib-js version
-        const nrfdlJsVersion = versions.find(v => v.moduleName === 'nrfdl-js')
-            .version;
+        const nrfdlJsVersion = versions.find(
+            (v: nrfdl.ModuleVersion) => v.moduleName === 'nrfdl-js'
+        ).version;
         const nrfdlJsVersionString = `${nrfdlJsVersion.major}.${nrfdlJsVersion.minor}.${nrfdlJsVersion.patch}`;
-        logger.info('Using @nordicsemiconductor/nrf-device-lib-js version', nrfdlJsVersionString);
+        logger.info(
+            'Using @nordicsemiconductor/nrf-device-lib-js version',
+            nrfdlJsVersionString
+        );
 
         // Get nrf-device-lib version
-        const nrfdlVersion = versions.find(v => v.moduleName === 'nrfdl')
-            .version;
+        const nrfdlVersion = versions.find(
+            (v: nrfdl.ModuleVersion)  => v.moduleName === 'nrfdl'
+        ).version;
         const nrfdlVersionString = `${nrfdlVersion.major}.${nrfdlVersion.minor}.${nrfdlVersion.patch}`;
         logger.info('Using nrf-device-lib version', nrfdlVersionString);
 
         // Get nrfjprog dll version
         const nrfjprogVersion = versions.find(
-            v => v.moduleName === 'nrfjprog_dll'
+            (v: nrfdl.ModuleVersion)  => v.moduleName === 'nrfjprog_dll'
         ).version;
         const nrfjprogVersionString = `${nrfjprogVersion.major}.${nrfjprogVersion.minor}.${nrfjprogVersion.patch}`;
         logger.info('Using nrfjprog dll version', nrfjprogVersionString);
 
         // Get jLink dll version
-        const jlinkVersion = versions.find(v => v.moduleName === 'jlink_dll')
-            .version;
+        const jlinkVersion = versions.find(
+            (v: nrfdl.ModuleVersion)  => v.moduleName === 'jlink_dll'
+        ).version;
         logger.info('Using JLink version', jlinkVersion);
     } catch (error) {
         logger.error(
@@ -162,16 +99,16 @@ export const getLibVersions = async () => {
     }
 };
 
-export const openDevice = device => dispatch => {
-    dispatch(loadingStartAction());
+export const openDevice = (device: Device) => (dispatch: TDispatch) => {
+    dispatch(loadingStart());
 
     const { serialNumber, serialport } = device;
 
     dispatch(
-        targetPortChangedAction(
-            serialNumber,
-            serialport ? portPath(serialport) : null
-        )
+        targetPortChanged({
+            serialNumber: serialNumber,
+            path: serialport ? portPath(serialport) : null
+        })
     );
 
     if (device.traits.includes('jlink')) {
@@ -220,23 +157,24 @@ export const openDevice = device => dispatch => {
     }
 };
 
-export const updateTargetWritable = () => (dispatch, getState) => {
-    switch (getState().app.target.targetType) {
-        case CommunicationType.JLINK:
-            dispatch(jlinkTargetActions.canWrite());
-            break;
-        case CommunicationType.USBSDFU:
-            dispatch(usbsdfuTargetActions.canWrite());
-            break;
-        case CommunicationType.MCUBOOT:
-            dispatch(mcubootTargetActions.canWrite());
-            break;
-        default:
-            dispatch(targetWritableKnownAction(false));
-    }
-};
+export const updateTargetWritable =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        switch (getState().app.target.targetType) {
+            case CommunicationType.JLINK:
+                dispatch(jlinkTargetActions.canWrite());
+                break;
+            case CommunicationType.USBSDFU:
+                dispatch(usbsdfuTargetActions.canWrite());
+                break;
+            case CommunicationType.MCUBOOT:
+                dispatch(mcubootTargetActions.canWrite());
+                break;
+            default:
+                dispatch(targetWritableKnown(false));
+        }
+    };
 
-export const write = () => (dispatch, getState) => {
+export const write = () => (dispatch: TDispatch, getState: () => RootState) => {
     // Refresh all files in case that some files have been updated right before write action.
     dispatch(refreshAllFiles());
 
