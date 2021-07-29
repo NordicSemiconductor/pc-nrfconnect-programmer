@@ -36,18 +36,19 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import produce from 'immer';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
+import { Device } from 'pc-nrfconnect-shared';
 import SerialPort from 'serialport';
 
-import * as fileActions from '../actions/fileActions';
-import * as targetActions from '../actions/targetActions';
 import {
     CommunicationType,
     DeviceDefinition,
     deviceDefinition,
 } from '../util/devices';
+import { DfuImage } from '../util/initPacket';
 import { Region } from '../util/regions';
+import { fileParse, filesEmpty } from './fileReducer';
 
 export interface TargetState {
     readonly targetType: CommunicationType;
@@ -58,7 +59,7 @@ export interface TargetState {
     readonly regions?: Region[]; // TODO: Define region
     readonly warnings?: string[];
     readonly writtenAddress?: number;
-    readonly dfuImages?: any[]; // TODO: Define image
+    readonly dfuImages?: DfuImage[]; // TODO: Define image
     readonly isMemLoaded: boolean;
     readonly isWritable: boolean;
     readonly isRecoverable: boolean;
@@ -69,7 +70,7 @@ export interface TargetState {
     readonly isProtected: boolean;
 }
 
-const defaultState: TargetState = {
+const initialState: TargetState = {
     targetType: CommunicationType.UNKNOWN,
     port: undefined,
     serialNumber: undefined,
@@ -89,90 +90,127 @@ const defaultState: TargetState = {
     isProtected: false,
 };
 
-export default (state = defaultState, action: any): TargetState =>
-    produce<TargetState>(state, draft => {
-        switch (action.type) {
-            case 'DEVICE_SELECTED':
-                return {
-                    ...defaultState,
-                    serialNumber: action.device.serialNumber,
-                };
+interface TargetTypeKnownPayload {
+    targetType: CommunicationType;
+    isRecoverable: boolean;
+}
 
-            case 'DEVICE_DESELECTED':
-                return {
-                    ...defaultState,
-                };
+interface TargetPortChangedPayload {
+    serialNumber: string;
+    path: SerialPort;
+}
 
-            case targetActions.TARGET_TYPE_KNOWN:
-                draft.targetType = action.targetType;
-                draft.isRecoverable = action.isRecoverable;
-                break;
+interface TargetContentsKnownPayload {
+    targetMemMap: MemoryMap;
+    isMemLoaded: boolean;
+}
 
-            case targetActions.TARGET_INFO_KNOWN:
-                draft.deviceInfo = action.deviceInfo;
-                break;
+const targetSlice = createSlice({
+    name: 'target',
+    initialState,
+    reducers: {
+        targetTypeKnown(state, action: PayloadAction<TargetTypeKnownPayload>) {
+            state.targetType = action.payload.targetType;
+            state.isRecoverable = action.payload.isRecoverable;
+        },
+        targetInfoKnown(state, action: PayloadAction<DeviceDefinition>) {
+            state.deviceInfo = action.payload;
+        },
+        targetPortChanged(state, action: PayloadAction<TargetPortChangedPayload>) {
+            state.serialNumber = action.payload.serialNumber;
+            state.port = action.payload.path;
+        },
+        targetContentsKnown(state, action: PayloadAction<TargetContentsKnownPayload>) {
+            state.memMap = action.payload.targetMemMap;
+            state.isMemLoaded = action.payload.isMemLoaded;
+        },
+        targetRegionsKnown(state, action: PayloadAction<Region[]>) {
+            state.regions = action.payload;
+        },
+        targetWritableKnown(state, action: PayloadAction<boolean>) {
+            state.isWritable = action.payload;
+        },
+        dfuImagesUpdate(state, action: PayloadAction<any[]>) {
+            state.dfuImages = action.payload;
+        },
+        writeProgress(state, action: PayloadAction<number>) {
+            state.writtenAddress = action.payload;
+            state.isWriting = true;
+        },
+        writingStart(state) {
+            state.isWriting = true;
+            state.isErased = false;
+        },
+        writingEnd(state) {
+            state.isWriting = false;
+        },
+        erasingStart(state) {
+            state.isErasing = true;
+        },
+        erasingEnd(state) {
+            state.isErasing = false;
+            state.isErased = true;
+        },
+        loadingStart(state) {
+            state.isLoading = true;
+        },
+        loadingEnd(state) {
+            state.isLoading = false;
+        },
+    },
+    extraReducers: {
+        'DEVICE_SELECTED': (_, action) => {
+            return {
+                ...initialState,
+                serialNumber: action.device.serialNumber,
+        }},
+        'DEVICE_DESELECTED': () => ({...initialState}),
+        // @ts-expect-error in TypeScript, this would need to be [counter.actions.increment.type]
+        [filesEmpty]: (state) => {
+            state.writtenAddress = 0;
+        },
+        // @ts-expect-error in TypeScript, this would need to be [counter.actions.increment.type]
+        [fileParse]: (state) => {
+            state.writtenAddress = 0;
+        },
+    },
+});
 
-            case targetActions.TARGET_PORT_CHANGED:
-                draft.serialNumber = action.serialNumber;
-                draft.port = action.path;
-                break;
+export default targetSlice.reducer;
 
-            case targetActions.TARGET_CONTENTS_KNOWN:
-                draft.memMap = action.targetMemMap;
-                draft.isMemLoaded = action.isMemLoaded;
-                break;
+const {
+    targetTypeKnown,
+    targetInfoKnown,
+    targetPortChanged,
+    targetContentsKnown,
+    targetRegionsKnown,
+    targetWritableKnown,
+    dfuImagesUpdate,
+    writeProgress,
+    writingStart,
+    writingEnd,
+    erasingStart,
+    erasingEnd,
+    loadingStart,
+    loadingEnd,
+} = targetSlice.actions;
 
-            case targetActions.TARGET_REGIONS_KNOWN:
-                draft.regions = action.regions;
-                break;
+//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
-            case targetActions.TARGET_WRITABLE_KNOWN:
-                draft.isWritable = action.isWritable;
-                break;
-
-            case targetActions.DFU_IMAGES_UPDATE:
-                draft.dfuImages = action.dfuImages;
-                break;
-
-            case fileActions.FILES_EMPTY:
-                draft.writtenAddress = 0;
-                break;
-
-            case fileActions.FILE_PARSE:
-                draft.writtenAddress = 0;
-                break;
-
-            case targetActions.WRITE_PROGRESS:
-                draft.writtenAddress = action.address;
-                draft.isWriting = true;
-                break;
-
-            case targetActions.WRITING_START:
-                draft.isWriting = true;
-                draft.isErased = false;
-                break;
-
-            case targetActions.WRITING_END:
-                draft.isWriting = false;
-                break;
-
-            case targetActions.ERASING_START:
-                draft.isErasing = true;
-                break;
-
-            case targetActions.ERASING_END:
-                draft.isErasing = false;
-                draft.isErased = true;
-                break;
-
-            case targetActions.LOADING_START:
-                draft.isLoading = true;
-                break;
-
-            case targetActions.LOADING_END:
-                draft.isLoading = false;
-                break;
-
-            default:
-        }
-    });
+export {
+    targetTypeKnown,
+    targetInfoKnown,
+    targetPortChanged,
+    targetContentsKnown,
+    targetRegionsKnown,
+    targetWritableKnown,
+    dfuImagesUpdate,
+    writeProgress,
+    writingStart,
+    writingEnd,
+    erasingStart,
+    erasingEnd,
+    loadingStart,
+    loadingEnd,
+};
+    

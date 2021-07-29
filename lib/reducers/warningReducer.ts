@@ -34,29 +34,74 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Record } from 'immutable';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import * as userInputActions from '../actions/userInputActions';
+export interface WarningState {
+    fileWarnings: string[];
+    targetWarnings: string[];
+    userWarnings: string[];
+};
 
-const InitialState = new Record({
-    message: null,
-    choices: {},
-    isRequired: false,
+const initialState : WarningState = {
+    fileWarnings: [],
+    targetWarnings: [],
+    userWarnings: [],
+};
+
+const warningSlice = createSlice({
+    name: 'warning',
+    initialState,
+    reducers: {
+        fileWarningAdd(state, action: PayloadAction<string>) {
+            state.fileWarnings = [...state.fileWarnings, action.payload];
+        },
+        fileWarningRemove(state) {
+            state.fileWarnings = [];
+        },
+        targetWarningAdd(state, action: PayloadAction<string>) {
+            state.targetWarnings = [...state.targetWarnings, action.payload];
+        },
+        targetWarningRemove(state) {
+            state.targetWarnings = [];
+        },
+        userWarningAdd(state, action: PayloadAction<string>) {
+            state.userWarnings = [...state.userWarnings, action.payload];
+        },
+        userWarningRemove(state) {
+            state.userWarnings = [];
+        },
+        allWarningRemove() {
+            return {...initialState };
+        },
+    },
+    extraReducers: {
+        'DEVICE_SELECTED': (state) => {
+            state.targetWarnings = [];
+            state.userWarnings = [];
+        }
+    },
 });
 
-export default function target(state = new InitialState(), action) {
-    switch (action.type) {
-        case userInputActions.USER_INPUT_REQUIRED:
-            return state
-                .set('isRequired', true)
-                .set('message', action.message)
-                .set('choices', action.choices);
+export default warningSlice.reducer;
 
-        case userInputActions.USER_INPUT_RECEIVED:
-        case userInputActions.USER_INPUT_CANCELLED:
-            return new InitialState();
+const {
+    fileWarningAdd,
+    fileWarningRemove,
+    targetWarningAdd,
+    targetWarningRemove,
+    userWarningAdd,
+    userWarningRemove,
+    allWarningRemove,
+} = warningSlice.actions;
 
-        default:
-    }
-    return state;
-}
+//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+
+export {
+    fileWarningAdd,
+    fileWarningRemove,
+    targetWarningAdd,
+    targetWarningRemove,
+    userWarningAdd,
+    userWarningRemove,
+    allWarningRemove,
+};

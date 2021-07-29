@@ -36,10 +36,9 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import produce from 'immer';
-
-import * as fileActions from '../actions/fileActions';
 import { Region } from '../util/regions';
+
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 export interface FileState {
     detectedRegionNames: Set<string>;
@@ -51,7 +50,7 @@ export interface FileState {
     regions: Region[];
 }
 
-const defaultState: FileState = {
+const initialState: FileState = {
     detectedRegionNames: new Set<string>(),
     loaded: {},
     mcubootFilePath: undefined,
@@ -60,36 +59,60 @@ const defaultState: FileState = {
     regions: [],
 };
 
-export default (state = defaultState, action: any): FileState =>
-    produce<FileState>(state, draft => {
-        switch (action.type) {
-            case fileActions.FILES_EMPTY:
-                return {
-                    ...defaultState,
-                    mruFiles: state.mruFiles,
-                };
+interface FileParsePayload {
+    memMaps: [];
+    loaded: {};
+};
 
-            case fileActions.FILE_PARSE:
-                draft.memMaps = action.memMaps;
-                draft.loaded = action.loaded;
-                break;
+const fileSlice = createSlice({
+    name: 'file',
+    initialState,
+    reducers: {
+        filesEmpty(state) {
+            return {
+                ...initialState,
+                mruFiles: state.mruFiles,
+            }
+        },
+        fileParse(state, action: PayloadAction<FileParsePayload>) {
+            state.memMaps = action.payload.memMaps;
+            state.loaded = action.payload.loaded;
+        },
+        fileRegionsKnown(state, action: PayloadAction<Region[]>) {
+            state.regions = action.payload;
+        },
+        fileRegionNamesKnown(state, action: PayloadAction<Set<string>>) {
+            state.detectedRegionNames = action.payload;
+        },
 
-            case fileActions.FILE_REGIONS_KNOWN:
-                draft.regions = action.regions;
-                break;
+        mruFilesLoadSuccess(state, action: PayloadAction<string[]>) {
+            state.mruFiles = action.payload || [];
+        },
 
-            case fileActions.FILE_REGION_NAMES_KNOWN:
-                draft.detectedRegionNames = action.detectedRegionNames;
-                break;
+        mcubootFileKnown(state, action: PayloadAction<string>) {
+            state.mcubootFilePath = action.payload;
+        },
+    },
+});
 
-            case fileActions.MRU_FILES_LOAD_SUCCESS:
-                draft.mruFiles = action.files || [];
-                break;
+export default fileSlice.reducer;
 
-            case fileActions.MCUBOOT_FILE_KNOWN:
-                draft.mcubootFilePath = action.filePath;
-                break;
+const {
+    filesEmpty,
+    fileParse,
+    fileRegionsKnown,
+    fileRegionNamesKnown,
+    mruFilesLoadSuccess,
+    mcubootFileKnown,
+} = fileSlice.actions;
 
-            default:
-        }
-    });
+//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+
+export {
+    filesEmpty,
+    fileParse,
+    fileRegionsKnown,
+    fileRegionNamesKnown,
+    mruFilesLoadSuccess,
+    mcubootFileKnown,
+};

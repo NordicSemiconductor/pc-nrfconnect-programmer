@@ -34,46 +34,56 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { List, Record } from 'immutable';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import * as warningActions from '../actions/warningActions';
+export interface UserInputState {
+    message: string | null;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    choices: {};
+    isRequired: boolean;
+};
 
-const InitialState = new Record({
-    fileWarnings: new List(),
-    targetWarnings: new List(),
-    userWarnings: new List(),
+const initialState : UserInputState = {
+    message: null,
+    choices: {},
+    isRequired: false,
+};
+
+interface UserInputRequiredPayload {
+    message: string | null;
+    choices: {};
+}
+
+const userInputSlice = createSlice({
+    name: 'userInput',
+    initialState,
+    reducers: {
+        userInputRequired(state, action: PayloadAction<UserInputRequiredPayload>) {
+            state.isRequired = true;
+            state.message = action.payload.message;
+            state.choices = action.payload.choices;
+        },
+        userInputReceived() {
+            return { ...initialState } ;
+        },
+        userInputCancelled() {
+            return { ...initialState }
+        },
+    },
 });
 
-export default function target(state = new InitialState(), action) {
-    switch (action.type) {
-        case 'DEVICE_SELECTED':
-            return state
-                .set('targetWarnings', new List())
-                .set('userWarnings', new List());
+export default userInputSlice.reducer;
 
-        case warningActions.FILE_WARNING_ADD:
-            return state.set('fileWarnings', action.warnings);
+const {
+    userInputRequired,
+    userInputReceived,
+    userInputCancelled,
+} = userInputSlice.actions;
 
-        case warningActions.FILE_WARNING_REMOVE:
-            return state.set('fileWarnings', new List());
+//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
 
-        case warningActions.TARGET_WARNING_ADD:
-            return state.set('targetWarnings', action.warnings);
-
-        case warningActions.TARGET_WARNING_REMOVE:
-            return state.set('targetWarnings', new List());
-
-        case warningActions.USER_WARNING_ADD:
-            return state.set('userWarnings', action.warnings);
-
-        case warningActions.USER_WARNING_REMOVE:
-            return state.set('userWarnings', new List());
-
-        case warningActions.ALL_WARNING_REMOVE:
-            return new InitialState();
-
-        default:
-    }
-
-    return state;
-}
+export {
+    userInputRequired,
+    userInputReceived,
+    userInputCancelled,
+};

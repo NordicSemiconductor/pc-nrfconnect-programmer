@@ -34,21 +34,39 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Record } from 'immutable';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { SETTINGS_LOAD, TOGGLE_AUTO_READ } from '../actions/settingsActions';
+export interface SettingsState {
+    autoRead: boolean;
+};
 
-const InitialState = new Record({
+const initialState : SettingsState = {
     autoRead: false,
+};
+
+const settingsSlice = createSlice({
+    name: 'settings',
+    initialState,
+    reducers: {
+        settingsLoad(state, action: PayloadAction<boolean>) {
+            state.autoRead = action.payload;
+        },
+        toggleAutoRead(state) {
+            state.autoRead = !state.autoRead;
+        },
+    },
 });
 
-export default function target(state = new InitialState(), action) {
-    switch (action.type) {
-        case SETTINGS_LOAD:
-            return state.set('autoRead', action.settings.autoRead);
-        case TOGGLE_AUTO_READ:
-            return state.set('autoRead', !state.autoRead);
-        default:
-    }
-    return state;
-}
+export default settingsSlice.reducer;
+
+const {
+    settingsLoad,
+    toggleAutoRead,
+} = settingsSlice.actions;
+
+//const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+
+export {
+    settingsLoad,
+    toggleAutoRead,
+};
