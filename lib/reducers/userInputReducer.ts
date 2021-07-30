@@ -36,6 +36,8 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { RootState } from './types';
+
 export interface UserInputState {
     message: string | null;
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -80,6 +82,9 @@ export default userInputSlice.reducer;
 const { userInputRequired, userInputReceived, userInputCancelled } =
     userInputSlice.actions;
 
-// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+export const getIsRequired = (state: RootState) =>
+    state.app.userInput.isRequired;
+export const getMessage = (state: RootState) => state.app.userInput.message;
+export const getChoices = (state: RootState) => state.app.userInput.choices;
 
 export { userInputRequired, userInputReceived, userInputCancelled };

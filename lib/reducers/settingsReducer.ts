@@ -36,6 +36,8 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { RootState } from './types';
+
 export interface SettingsState {
     autoRead: boolean;
 }
@@ -61,6 +63,6 @@ export default settingsSlice.reducer;
 
 const { settingsLoad, toggleAutoRead } = settingsSlice.actions;
 
-// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+export const getAutoRead = (state: RootState) => state.app.settings.autoRead;
 
 export { settingsLoad, toggleAutoRead };

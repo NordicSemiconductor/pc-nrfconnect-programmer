@@ -36,6 +36,8 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { RootState } from './types';
+
 export interface WarningState {
     fileWarnings: string[];
     targetWarnings: string[];
@@ -94,7 +96,12 @@ const {
     allWarningRemove,
 } = warningSlice.actions;
 
-// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+export const getUserWarnings = (state: RootState) =>
+    state.app.warning.userWarnings;
+export const getFileWarnings = (state: RootState) =>
+    state.app.warning.fileWarnings;
+export const getTargetWarnings = (state: RootState) =>
+    state.app.warning.targetWarnings;
 
 export {
     fileWarningAdd,

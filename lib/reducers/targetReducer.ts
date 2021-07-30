@@ -48,6 +48,7 @@ import {
 import { DfuImage } from '../util/initPacket';
 import { Region } from '../util/regions';
 import { fileParse, filesEmpty } from './fileReducer';
+import { RootState } from './types';
 
 export interface TargetState {
     readonly targetType: CommunicationType;
@@ -201,7 +202,32 @@ const {
     loadingEnd,
 } = targetSlice.actions;
 
-// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+export const getPort = (state: RootState) => state.app.target.port;
+export const getTargetType = (state: RootState) => state.app.target.targetType;
+export const getIsReady = (state: RootState) =>
+    !state.app.target.isLoading &&
+    !state.app.target.isWriting &&
+    !state.app.target.isErasing;
+export const getIsMemLoaded = (state: RootState) =>
+    state.app.target.isMemLoaded;
+export const getIsRecoverable = (state: RootState) =>
+    state.app.target.isRecoverable;
+export const getIsWritable = (state: RootState) => state.app.target.isWritable;
+export const getDeviceInfo = (state: RootState) => state.app.target.deviceInfo;
+export const getRegions = (state: RootState) => state.app.target.regions;
+export const getSerialNumber = (state: RootState) =>
+    state.app.target.serialNumber;
+export const getIsWriting = (state: RootState) => state.app.target.isWriting;
+export const getIsErasing = (state: RootState) => state.app.target.isErasing;
+export const getIsLoading = (state: RootState) => state.app.target.isLoading;
+export const getIsProtected = (state: RootState) =>
+    state.app.target.isProtected;
+export const getRefreshEnabled = (state: RootState) =>
+    state.app.target.targetType === CommunicationType.JLINK &&
+    !state.app.target.isMemLoaded &&
+    !state.app.target.isLoading &&
+    !state.app.target.isWriting &&
+    !state.app.target.isErasing;
 
 export {
     targetTypeKnown,

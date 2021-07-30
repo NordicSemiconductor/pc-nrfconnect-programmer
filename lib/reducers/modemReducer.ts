@@ -36,6 +36,8 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { RootState } from './types';
+
 export const MODEM_DFU_NOT_STARTED = 'Not started.';
 export const MODEM_DFU_STARTING = 'Starting...';
 
@@ -133,7 +135,20 @@ const {
     modemWritingFail,
 } = modemSlice.actions;
 
-// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+export const getIsModem = (state: RootState) => state.app.modem.isModem;
+export const getIsWriting = (state: RootState) => state.app.modem.isWriting;
+export const getIsReady = (state: RootState) => state.app.modem.isReady;
+export const getProgressPercentage = (state: RootState) =>
+    state.app.modem.progressPercentage;
+export const getProgressMsg = (state: RootState) => state.app.modem.progressMsg;
+export const getProgressStep = (state: RootState) =>
+    state.app.modem.progressStep;
+export const getErrorMsg = (state: RootState) => state.app.modem.errorMsg;
+export const getIsWritingFail = (state: RootState) =>
+    state.app.modem.isWritingFail;
+export const getIsWritingSucceed = (state: RootState) =>
+    state.app.modem.isWritingSucceed;
+export const getModemFwName = (state: RootState) => state.app.modem.modemFwName;
 
 export {
     modemKnown,

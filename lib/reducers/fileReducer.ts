@@ -39,6 +39,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { Region } from '../util/regions';
+import { RootState } from './types';
 
 export interface FileState {
     detectedRegionNames: Set<string>;
@@ -106,7 +107,10 @@ const {
     mcubootFileKnown,
 } = fileSlice.actions;
 
-// const getSerialNumber = (state: RootState) => state.app.device.serialNumber;
+export const getLoaded = (state: RootState) => state.app.file.loaded;
+export const getMruFiles = (state: RootState) => state.app.file.mruFiles;
+export const getMcubootFilePath = (state: RootState) =>
+    state.app.file.mcubootFilePath;
 
 export {
     filesEmpty,
