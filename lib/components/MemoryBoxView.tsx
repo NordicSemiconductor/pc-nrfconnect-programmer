@@ -48,7 +48,6 @@ interface MemoryBoxViewProps {
     iconName?: string;
     isHolder?: boolean;
     isTarget?: boolean;
-    isFile?: boolean;
 }
 
 const MemoryBoxView = ({
@@ -57,7 +56,6 @@ const MemoryBoxView = ({
     iconName,
     isHolder,
     isTarget,
-    isFile,
 }: MemoryBoxViewProps) => {
     const [showOverlay, setShowOverlay] = useState(false);
 
@@ -96,9 +94,7 @@ const MemoryBoxView = ({
                         <p>{description}</p>
                     </div>
                 )}
-                {!isHolder && (
-                    <MemoryView isTarget={isTarget} isFile={isFile} />
-                )}
+                {!isHolder && <MemoryView isTarget={isTarget as boolean} />}
             </Card.Body>
         </Card>
     );
@@ -110,7 +106,6 @@ MemoryBoxView.propTypes = {
     iconName: PropTypes.string,
     isHolder: PropTypes.bool,
     isTarget: PropTypes.bool,
-    isFile: PropTypes.bool,
 };
 
 MemoryBoxView.defaultProps = {
@@ -118,7 +113,6 @@ MemoryBoxView.defaultProps = {
     iconName: null,
     isHolder: false,
     isTarget: false,
-    isFile: false,
 };
 
 export default MemoryBoxView;

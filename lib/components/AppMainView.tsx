@@ -86,7 +86,6 @@ const AppMainView = () => {
                     description="Drag & drop one or more HEX files here"
                     iconName="mdi mdi-folder-open"
                     isHolder={!hasFileContent(loaded)}
-                    isFile={hasFileContent(loaded)}
                 />
             </div>
             <UserInputDialogView />
