@@ -35,16 +35,16 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
-import McuUpdateDialogView from '../containers/mcuUpdateDialogView';
-import MemoryBoxView from '../containers/memoryBoxView';
-import ModemUpdateDialogView from '../containers/modemUpdateDialogView';
-import UserInputDialogView from '../containers/userInputDialogView';
-import WarningView from '../containers/warningView';
-import { FileState } from '../reducers/fileReducer';
-import { TargetState } from '../reducers/targetReducer';
+import { getLoaded } from '../reducers/fileReducer';
+import { getDeviceInfo, getSerialNumber } from '../reducers/targetReducer';
 import { DeviceDefinition } from '../util/devices';
+import McuUpdateDialogView from './McuUpdateDialogView';
+import MemoryBoxView from './MemoryBoxView';
+import ModemUpdateDialogView from './ModemUpdateDialogView';
+import UserInputDialogView from './UserInputDialogView';
+import WarningView from './WarningView';
 
 function getTargetTitle(
     serialNumber: string | undefined,
@@ -58,54 +58,42 @@ function getTargetTitle(
     return undefined;
 }
 
-function hasFileContent(file: FileState) {
-    return Object.keys(file.loaded).length > 0;
+function hasFileContent(loaded: {}) {
+    return Object.keys(loaded).length > 0;
 }
 
-interface AppMainViewProps {
-    file: FileState;
-    target: TargetState;
-}
+const AppMainView = () => {
+    const loaded = useSelector(getLoaded);
+    const serialNumber = useSelector(getSerialNumber);
+    const deviceInfo = useSelector(getDeviceInfo);
 
-const AppMainView = ({
-    file,
-    target: { serialNumber, deviceInfo, regions },
-}: AppMainViewProps) => (
-    <div className="app-main-view">
-        <WarningView />
-        <div className="memory-box-container">
-            <MemoryBoxView
-                title={
-                    getTargetTitle(serialNumber, deviceInfo) ||
-                    'Device memory layout'
-                }
-                description="Connect a device to display memory contents"
-                iconName="appicon-chip"
-                regions={regions}
-                isHolder={!serialNumber}
-                isTarget={!!serialNumber}
-            />
-            <MemoryBoxView
-                title="File memory layout"
-                description="Drag & drop one or more HEX files here"
-                iconName="mdi mdi-folder-open"
-                isHolder={!hasFileContent(file)}
-                isFile={hasFileContent(file)}
-            />
+    return (
+        <div className="app-main-view">
+            <WarningView />
+            <div className="memory-box-container">
+                <MemoryBoxView
+                    title={
+                        getTargetTitle(serialNumber, deviceInfo) ||
+                        'Device memory layout'
+                    }
+                    description="Connect a device to display memory contents"
+                    iconName="appicon-chip"
+                    isHolder={!serialNumber}
+                    isTarget={!!serialNumber}
+                />
+                <MemoryBoxView
+                    title="File memory layout"
+                    description="Drag & drop one or more HEX files here"
+                    iconName="mdi mdi-folder-open"
+                    isHolder={!hasFileContent(loaded)}
+                    isFile={hasFileContent(loaded)}
+                />
+            </div>
+            <UserInputDialogView />
+            <ModemUpdateDialogView />
+            <McuUpdateDialogView />
         </div>
-        <UserInputDialogView />
-        <ModemUpdateDialogView />
-        <McuUpdateDialogView />
-    </div>
-);
-
-AppMainView.propTypes = {
-    file: PropTypes.shape({}).isRequired,
-    target: PropTypes.shape({
-        serialNumber: PropTypes.string,
-        deviceInfo: PropTypes.object,
-        regions: PropTypes.array,
-    }).isRequired,
+    );
 };
 
 export default AppMainView;

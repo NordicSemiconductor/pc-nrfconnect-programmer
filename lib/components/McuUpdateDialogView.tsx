@@ -40,138 +40,122 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 
-interface McuUpdateDialogViewProps {
-    isVisible: boolean;
-    isWriting: boolean;
-    isWritingSucceed: boolean;
-    isWritingFail: boolean;
-    isFirmwareValid: boolean;
-    errorMsg: string;
-    mcubootFwPath?: string;
-    progressMsg: string;
-    progressPercentage: number;
-    progressDuration: number;
-    onOk: () => void;
-    onCancel: () => void;
-}
+import { cancelUpdate, performUpdate } from '../actions/mcubootTargetActions';
+import { getMcubootFilePath } from '../reducers/fileReducer';
+import {
+    getErrorMsg,
+    getIsFirmwareValid,
+    getIsReady,
+    getIsWriting,
+    getIsWritingFail,
+    getIsWritingSucceed,
+    getProgressDuration,
+    getProgressMsg,
+    getProgressPercentage,
+} from '../reducers/mcubootReducer';
 
-const McuUpdateDialogView = ({
-    isVisible,
-    isWriting,
-    isWritingSucceed,
-    isWritingFail,
-    isFirmwareValid,
-    errorMsg,
-    mcubootFwPath,
-    progressMsg,
-    progressPercentage,
-    progressDuration,
-    onOk,
-    onCancel,
-}: McuUpdateDialogViewProps) => (
-    <Modal show={isVisible} onHide={onCancel} backdrop="static">
-        <Modal.Header>
-            <Modal.Title className="modem-dialog-title">
-                MCUboot DFU
-            </Modal.Title>
-            {isWriting && <span className="mdi mdi-refresh icon-spin" />}
-        </Modal.Header>
-        <Modal.Body>
-            <Form.Group>
-                <Form.Label>Firmware</Form.Label>
-                <div>{mcubootFwPath}</div>
-            </Form.Group>
-            <Form.Group>
-                <Form.Label>Status</Form.Label>
-                <div>{progressMsg}</div>
-                <ProgressBar
-                    hidden={!isWriting}
-                    animated
-                    now={progressPercentage}
-                    label={`${progressPercentage}%`}
-                />
-            </Form.Group>
-            <Form.Group>
-                {!isWriting && !isWritingSucceed && !isWritingFail && (
-                    <Alert variant="warning">
-                        <p>You are now programming via MCUboot.</p>
-                        <p>
-                            The device will be recovered if you proceed to
-                            write.
-                        </p>
-                        <p>
-                            Make sure the device is in{' '}
-                            <strong>MCUboot mode</strong>.
-                        </p>
-                    </Alert>
+const McuUpdateDialogView = () => {
+    const errorMsg = useSelector(getErrorMsg);
+    const isVisible = useSelector(getIsReady);
+    const isWriting = useSelector(getIsWriting);
+    const isWritingFail = useSelector(getIsWritingFail);
+    const isWritingSucceed = useSelector(getIsWritingSucceed);
+    const isFirmwareValid = useSelector(getIsFirmwareValid);
+    const mcubootFwPath = useSelector(getMcubootFilePath);
+    const progressDuration = useSelector(getProgressDuration);
+    const progressMsg = useSelector(getProgressMsg);
+    const progressPercentage = useSelector(getProgressPercentage);
+
+    const dispatch = useDispatch();
+    const onOk = () => dispatch(performUpdate);
+    const onCancel = () => dispatch(cancelUpdate);
+
+    return (
+        <Modal show={isVisible} onHide={onCancel} backdrop="static">
+            <Modal.Header>
+                <Modal.Title className="modem-dialog-title">
+                    MCUboot DFU
+                </Modal.Title>
+                {isWriting && <span className="mdi mdi-refresh icon-spin" />}
+            </Modal.Header>
+            <Modal.Body>
+                <Form.Group>
+                    <Form.Label>Firmware</Form.Label>
+                    <div>{mcubootFwPath}</div>
+                </Form.Group>
+                <Form.Group>
+                    <Form.Label>Status</Form.Label>
+                    <div>{progressMsg}</div>
+                    <ProgressBar
+                        hidden={!isWriting}
+                        animated
+                        now={progressPercentage}
+                        label={`${progressPercentage}%`}
+                    />
+                </Form.Group>
+                <Form.Group>
+                    {!isWriting && !isWritingSucceed && !isWritingFail && (
+                        <Alert variant="warning">
+                            <p>You are now programming via MCUboot.</p>
+                            <p>
+                                The device will be recovered if you proceed to
+                                write.
+                            </p>
+                            <p>
+                                Make sure the device is in{' '}
+                                <strong>MCUboot mode</strong>.
+                            </p>
+                        </Alert>
+                    )}
+                    {!isFirmwareValid && (
+                        <Alert variant="warning">
+                            The selected HEX file appears to be invalid for
+                            Thingy:91 MCUboot DFU.
+                        </Alert>
+                    )}
+                    {!isFirmwareValid && (
+                        <Alert variant="warning">
+                            The selected HEX file appears to be invalid for
+                            Thingy:91 MCUboot DFU.
+                        </Alert>
+                    )}
+                    {isWritingSucceed && (
+                        <Alert variant="success">
+                            Completed successfully in {progressDuration / 1000}{' '}
+                            seconds.
+                        </Alert>
+                    )}
+                    {isWritingFail && (
+                        <Alert variant="danger">
+                            {errorMsg ||
+                                'Failed. Check the log below for more details...'}
+                        </Alert>
+                    )}
+                </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+                {!isWritingSucceed && (
+                    <Button
+                        variant="primary"
+                        className="core-btn"
+                        onClick={onOk}
+                        disabled={isWriting}
+                    >
+                        Write
+                    </Button>
                 )}
-                {!isFirmwareValid && (
-                    <Alert variant="warning">
-                        The selected HEX file appears to be invalid for
-                        Thingy:91 MCUboot DFU.
-                    </Alert>
-                )}
-                {!isFirmwareValid && (
-                    <Alert variant="warning">
-                        The selected HEX file appears to be invalid for
-                        Thingy:91 MCUboot DFU.
-                    </Alert>
-                )}
-                {isWritingSucceed && (
-                    <Alert variant="success">
-                        Completed successfully in {progressDuration / 1000}{' '}
-                        seconds.
-                    </Alert>
-                )}
-                {isWritingFail && (
-                    <Alert variant="danger">
-                        {errorMsg ||
-                            'Failed. Check the log below for more details...'}
-                    </Alert>
-                )}
-            </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-            {!isWritingSucceed && (
                 <Button
-                    variant="primary"
                     className="core-btn"
-                    onClick={onOk}
+                    onClick={onCancel}
                     disabled={isWriting}
                 >
-                    Write
+                    Close
                 </Button>
-            )}
-            <Button
-                className="core-btn"
-                onClick={onCancel}
-                disabled={isWriting}
-            >
-                Close
-            </Button>
-        </Modal.Footer>
-    </Modal>
-);
-
-McuUpdateDialogView.propTypes = {
-    isVisible: PropTypes.bool.isRequired,
-    isWriting: PropTypes.bool.isRequired,
-    isWritingSucceed: PropTypes.bool.isRequired,
-    isWritingFail: PropTypes.bool.isRequired,
-    isFirmwareValid: PropTypes.bool.isRequired,
-    errorMsg: PropTypes.string.isRequired,
-    mcubootFwPath: PropTypes.string,
-    progressMsg: PropTypes.string.isRequired,
-    progressPercentage: PropTypes.number.isRequired,
-    progressDuration: PropTypes.number.isRequired,
-    onOk: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-};
-
-McuUpdateDialogView.defaultProps = {
-    mcubootFwPath: '',
+            </Modal.Footer>
+        </Modal>
+    );
 };
 
 export default McuUpdateDialogView;

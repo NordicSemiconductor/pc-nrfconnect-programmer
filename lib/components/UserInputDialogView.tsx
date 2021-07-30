@@ -38,29 +38,29 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { cancelUserInput, receiveUserInput } from '../actions/userInputActions';
+import {
+    getChoices,
+    getIsRequired,
+    getMessage,
+} from '../reducers/userInputReducer';
 import { hexpad2 } from '../util/hexpad';
 
-interface UserInputDialogViewProps {
-    isVisible?: boolean;
-    message?: string;
-    choices: Record<string, string>;
-    onOk: (input?: string) => void;
-    onCancel: () => void;
-}
-
-const UserInputDialogView = ({
-    isVisible,
-    message,
-    choices,
-    onOk,
-    onCancel,
-}: UserInputDialogViewProps) => {
+const UserInputDialogView = () => {
     const [selectedValue, setSelectedValue] = useState<string>();
     const [customChecked, setCustomChecked] = useState<boolean>(false);
     const [customValue, setCustomValue] = useState<string>('');
     const [isValidInput, setIsValidInput] = useState<boolean>(false);
+
+    const isVisible = useSelector(getIsRequired);
+    const message = useSelector(getMessage);
+    const choices = useSelector(getChoices);
+
+    const dispatch = useDispatch();
+    const onOk = (input: string) => dispatch(receiveUserInput(input));
+    const onCancel = () => dispatch(cancelUserInput);
 
     function onSelectChoice(choice: string) {
         if (choice === 'Custom') {
@@ -135,20 +135,6 @@ const UserInputDialogView = ({
             </Modal.Footer>
         </Modal>
     );
-};
-
-UserInputDialogView.propTypes = {
-    isVisible: PropTypes.bool,
-    message: PropTypes.string,
-    choices: PropTypes.shape({}),
-    onOk: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-};
-
-UserInputDialogView.defaultProps = {
-    isVisible: false,
-    message: '',
-    choices: {},
 };
 
 export default UserInputDialogView;

@@ -37,9 +37,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import RegionView from '../containers/regionView';
 import { CoreDefinition } from '../util/devices';
 import { Region } from '../util/regions';
+import RegionView from './RegionView';
 
 interface CoreWithRegions extends CoreDefinition {
     regions: Region[];

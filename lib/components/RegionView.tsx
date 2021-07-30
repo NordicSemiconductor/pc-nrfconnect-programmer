@@ -38,15 +38,16 @@ import React, { useRef, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import * as fileActions from '../actions/fileActions';
 import { CoreDefinition } from '../util/devices';
 import { Region } from '../util/regions';
 import CoreInfoView from './CoreInfoView';
 import RegionInfoView from './RegionInfoView';
 
 interface RegionViewProps {
-    removeFile: (filePath: string) => void;
     width: number;
     active?: boolean;
     striped?: boolean;
@@ -62,11 +63,14 @@ const RegionView = ({
     hoverable,
     region,
     core,
-    removeFile,
 }: RegionViewProps) => {
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState<DOMContainer<HTMLElement>>();
     const ref = useRef(null);
+
+    const dispatch = useDispatch();
+    const removeFile = (filePath: string) =>
+        dispatch(fileActions.removeFile(filePath));
 
     const toggleShow = (event: React.PointerEvent<HTMLDivElement>) => {
         setShow(!show);
@@ -137,7 +141,6 @@ const RegionView = ({
 };
 
 RegionView.propTypes = {
-    removeFile: PropTypes.func.isRequired,
     width: PropTypes.number.isRequired,
     active: PropTypes.bool,
     striped: PropTypes.bool,

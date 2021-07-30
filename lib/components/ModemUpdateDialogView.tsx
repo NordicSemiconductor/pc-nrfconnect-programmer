@@ -40,38 +40,39 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 
-interface ModemUpdateDialogViewProps {
-    isVisible: boolean;
-    isWriting: boolean;
-    isWritingSucceed: boolean;
-    isWritingFail: boolean;
-    errorMsg: string;
-    modemFwName: string;
-    progressMsg: string;
-    progressPercentage: number;
-    progressStep: number;
-    onOk: () => void;
-    onCancel: () => void;
-    isMcuboot: boolean;
-}
+import { cancelUpdate, performUpdate } from '../actions/modemTargetActions';
+import { getIsMcuboot } from '../reducers/mcubootReducer';
+import {
+    getErrorMsg,
+    getIsReady,
+    getIsWriting,
+    getIsWritingFail,
+    getIsWritingSucceed,
+    getModemFwName,
+    getProgressMsg,
+    getProgressPercentage,
+    getProgressStep,
+} from '../reducers/modemReducer';
 
-const ModemUpdateDialogView = ({
-    isVisible,
-    isWriting,
-    isWritingSucceed,
-    isWritingFail,
-    errorMsg,
-    modemFwName,
-    progressMsg,
-    progressPercentage,
-    progressStep,
-    onOk,
-    onCancel,
-    isMcuboot,
-}: ModemUpdateDialogViewProps) => {
+const ModemUpdateDialogView = () => {
     const [timer, setTimer] = useState(0);
+
+    const isVisible = useSelector(getIsReady);
+    const isWriting = useSelector(getIsWriting);
+    const isWritingSucceed = useSelector(getIsWritingSucceed);
+    const isWritingFail = useSelector(getIsWritingFail);
+    const modemFwName = useSelector(getModemFwName);
+    const progressMsg = useSelector(getProgressMsg);
+    const progressPercentage = useSelector(getProgressPercentage);
+    const progressStep = useSelector(getProgressStep);
+    const errorMsg = useSelector(getErrorMsg);
+    const isMcuboot = useSelector(getIsMcuboot);
+
+    const dispatch = useDispatch();
+    const onOk = () => dispatch(performUpdate);
+    const onCancel = () => dispatch(cancelUpdate);
 
     const intervalId = useRef<NodeJS.Timeout>();
 
@@ -179,21 +180,6 @@ const ModemUpdateDialogView = ({
             </Modal.Footer>
         </Modal>
     );
-};
-
-ModemUpdateDialogView.propTypes = {
-    isVisible: PropTypes.bool.isRequired,
-    isWriting: PropTypes.bool.isRequired,
-    isWritingSucceed: PropTypes.bool.isRequired,
-    isWritingFail: PropTypes.bool.isRequired,
-    errorMsg: PropTypes.string.isRequired,
-    modemFwName: PropTypes.string.isRequired,
-    progressMsg: PropTypes.string.isRequired,
-    progressPercentage: PropTypes.number.isRequired,
-    progressStep: PropTypes.number.isRequired,
-    onOk: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
-    isMcuboot: PropTypes.bool.isRequired,
 };
 
 ModemUpdateDialogView.defaultProps = {};

@@ -36,7 +36,13 @@
 
 import React from 'react';
 import Alert from 'react-bootstrap/Alert';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+
+import {
+    getFileWarnings,
+    getTargetWarnings,
+    getUserWarnings,
+} from '../reducers/warningReducer';
 
 const combineWarnings = (
     targetWarningStrings: string[],
@@ -53,30 +59,20 @@ const combineWarnings = (
             </Alert>
         ));
 
-interface WarningViewProps {
-    targetWarningStrings: string[];
-    fileWarningStrings: string[];
-    userWarningStrings: string[];
-}
+const WarningView = () => {
+    const targetWarningStrings = useSelector(getTargetWarnings);
+    const fileWarningStrings = useSelector(getFileWarnings);
+    const userWarningStrings = useSelector(getUserWarnings);
 
-const WarningView = ({
-    targetWarningStrings,
-    fileWarningStrings,
-    userWarningStrings,
-}: WarningViewProps) => (
-    <div className="warning-view">
-        {combineWarnings(
-            targetWarningStrings,
-            fileWarningStrings,
-            userWarningStrings
-        )}
-    </div>
-);
-
-WarningView.propTypes = {
-    targetWarningStrings: PropTypes.arrayOf(PropTypes.string).isRequired,
-    fileWarningStrings: PropTypes.arrayOf(PropTypes.string).isRequired,
-    userWarningStrings: PropTypes.arrayOf(PropTypes.string).isRequired,
+    return (
+        <div className="warning-view">
+            {combineWarnings(
+                targetWarningStrings,
+                fileWarningStrings,
+                userWarningStrings
+            )}
+        </div>
+    );
 };
 
 export default WarningView;

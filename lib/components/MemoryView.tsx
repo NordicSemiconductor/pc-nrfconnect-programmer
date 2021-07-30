@@ -33,10 +33,19 @@
  * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 import React from 'react';
+import { useSelector } from 'react-redux';
+import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import PropTypes from 'prop-types';
 
+import { getIsMcuboot } from '../reducers/mcubootReducer';
+import {
+    getDeviceInfo,
+    getIsErasing,
+    getIsLoading,
+    getIsWriting,
+    getRefreshEnabled,
+} from '../reducers/targetReducer';
 import { CoreDefinition } from '../util/devices';
 import { Region } from '../util/regions';
 import CoreView from './CoreView';
@@ -61,29 +70,21 @@ const convertCoresToViews = (
         .map(c => <CoreView core={c} active={active} />);
 
 interface MemoryViewProps {
-    regions: Region[];
     isTarget: boolean;
-    isMcuboot: boolean;
-    isWriting: boolean;
-    isErasing: boolean;
-    isLoading: boolean;
-    isProtected: boolean;
-    refreshEnabled: boolean;
-    targetFamily: string;
-    targetCores: CoreDefinition[];
 }
 
-const MemoryView = ({
-    regions,
-    isTarget,
-    isMcuboot,
-    isWriting,
-    isErasing,
-    isLoading,
-    isProtected,
-    refreshEnabled,
-    targetCores,
-}: MemoryViewProps) => {
+const MemoryView = ({ isTarget }: MemoryViewProps) => {
+    const regions = isTarget ? target.regions : file.regions;
+    const isMcuboot = useSelector(getIsMcuboot);
+    const isWriting = useSelector(getIsWriting);
+    const isErasing = useSelector(getIsErasing);
+    const isLoading = useSelector(getIsLoading);
+    const isProtected = !!useSelector(getDeviceInfo)?.cores.find(
+        c => c.protectionStatus !== nrfdl.NRFDL_PROTECTION_STATUS_NONE
+    );
+    const refreshEnabled = useSelector(getRefreshEnabled);
+    const targetCores = useSelector(getDeviceInfo)?.cores;
+
     const placeHolder =
         isTarget && isLoading
             ? // When it is target and during loading, show something.
@@ -139,16 +140,7 @@ const MemoryView = ({
 };
 
 MemoryView.propTypes = {
-    regions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     isTarget: PropTypes.bool.isRequired,
-    isMcuboot: PropTypes.bool.isRequired,
-    isWriting: PropTypes.bool.isRequired,
-    isErasing: PropTypes.bool.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-    isProtected: PropTypes.bool.isRequired,
-    refreshEnabled: PropTypes.bool.isRequired,
-    targetFamily: PropTypes.string.isRequired,
-    targetCores: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 };
 
 export default MemoryView;
