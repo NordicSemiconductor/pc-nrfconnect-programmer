@@ -34,24 +34,28 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { combineReducers } from 'redux';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { NrfConnectState } from 'pc-nrfconnect-shared';
 
-import file from './fileReducer';
-import mcuboot from './mcubootReducer';
-import modem from './modemReducer';
-import settings from './settingsReducer';
-import target from './targetReducer';
-import userInput from './userInputReducer';
-import warning from './warningReducer';
+import { FileState } from './fileReducer';
+import { McubootState } from './mcubootReducer';
+import { ModemState } from './modemReducer';
+import { SettingsState } from './settingsReducer';
+import { TargetState } from './targetReducer';
+import { UserInputState } from './userInputReducer';
+import { WarningState } from './warningReducer';
 
-const rootReducer = combineReducers({
-    file,
-    modem,
-    mcuboot,
-    settings,
-    target,
-    userInput,
-    warning,
-});
+interface AppState {
+    // AppState {
+    file: FileState;
+    mcuboot: McubootState;
+    modem: ModemState;
+    settings: SettingsState;
+    target: TargetState;
+    userInput: UserInputState;
+    warning: WarningState;
+}
 
-export default rootReducer;
+export type RootState = NrfConnectState<AppState>;
+
+export type TDispatch = ThunkDispatch<RootState, null, AnyAction>;
