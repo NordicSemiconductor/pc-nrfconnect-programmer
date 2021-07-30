@@ -122,8 +122,8 @@ export default {
                 break;
             }
 
-            case 'TARGET_INFO_KNOWN': {
-                currentDeviceInfo = { ...action.deviceInfo };
+            case targetInfoKnown.type: {
+                currentDeviceInfo = { ...action.payload };
                 break;
             }
 
