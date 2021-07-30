@@ -46,6 +46,7 @@ import {
     getIsWriting,
     getRefreshEnabled,
 } from '../reducers/targetReducer';
+import { RootState } from '../reducers/types';
 import { CoreDefinition } from '../util/devices';
 import { Region } from '../util/regions';
 import CoreView from './CoreView';
@@ -74,7 +75,9 @@ interface MemoryViewProps {
 }
 
 const MemoryView = ({ isTarget }: MemoryViewProps) => {
-    const regions = isTarget ? target.regions : file.regions;
+    const regions = useSelector((state: RootState) =>
+        isTarget ? state.app.target.regions : state.app.file.regions
+    );
     const isMcuboot = useSelector(getIsMcuboot);
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
