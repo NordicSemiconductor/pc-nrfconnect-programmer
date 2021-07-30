@@ -133,7 +133,7 @@ export const toggleMcuboot =
 
         if (isMcuboot) {
             dispatch(mcubootKnown(false));
-            dispatch(mcubootPortKnown(null));
+            dispatch(mcubootPortKnown({}));
         } else {
             dispatch(mcubootKnown(true));
             dispatch(mcubootPortKnown({ port }));
@@ -250,7 +250,7 @@ export const performUpdate =
         dispatch(mcubootWritingStart());
 
         try {
-            const device = await getDeviceFromNrfdl(serialNumber);
+            const device = await getDeviceFromNrfdl(serialNumber as string);
             console.log(device);
             nrfdl.firmwareProgram(
                 context,

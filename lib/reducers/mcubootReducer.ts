@@ -35,7 +35,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Serialport } from 'pc-nrfconnect-shared';
+
 import { RootState } from './types';
 
 export const MCUBOOT_DFU_NOT_STARTED = 'Not started.';
@@ -48,8 +48,8 @@ export interface McubootState {
     isWriting: boolean;
     isWritingSucceed: boolean;
     isWritingFail: boolean;
-    port: Serialport | null;
-    port2: Serialport | null;
+    port?: string;
+    port2?: string;
     progressMsg: string;
     progressPercentage: number;
     progressDuration: number;
@@ -63,8 +63,8 @@ const initialState: McubootState = {
     isWriting: false,
     isWritingSucceed: false,
     isWritingFail: false,
-    port: null,
-    port2: null,
+    port: undefined,
+    port2: undefined,
     progressMsg: MCUBOOT_DFU_NOT_STARTED,
     progressPercentage: 0,
     progressDuration: 0,
@@ -72,8 +72,8 @@ const initialState: McubootState = {
 };
 
 interface MCUBootPortKnownPayload {
-    port: Serialport | null;
-    port2: Serialport | null;
+    port?: string;
+    port2?: string;
 }
 
 interface MCUBootProcessUpdatePayload {

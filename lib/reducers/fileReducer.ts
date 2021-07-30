@@ -37,6 +37,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import MemoryMap from 'nrf-intel-hex';
 
 import { Region } from '../util/regions';
 import { RootState } from './types';
@@ -46,7 +47,7 @@ export interface FileState {
     // eslint-disable-next-line @typescript-eslint/ban-types
     loaded: {};
     mcubootFilePath?: string;
-    memMaps: [];
+    memMaps: MemoryMap[];
     mruFiles: string[];
     regions: Region[];
 }
@@ -61,7 +62,7 @@ const initialState: FileState = {
 };
 
 interface FileParsePayload {
-    memMaps: [];
+    memMaps: MemoryMap[];
     loaded: {};
 }
 
@@ -90,7 +91,7 @@ const fileSlice = createSlice({
             state.mruFiles = action.payload || [];
         },
 
-        mcubootFileKnown(state, action: PayloadAction<string>) {
+        mcubootFileKnown(state, action: PayloadAction<string | undefined>) {
             state.mcubootFilePath = action.payload;
         },
     },

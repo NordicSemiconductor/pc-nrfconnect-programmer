@@ -36,7 +36,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl, { Serialport } from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 import { Device } from 'pc-nrfconnect-shared';
 
@@ -107,7 +107,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     dispatch(
         targetPortChanged({
             serialNumber,
-            path: serialport ? portPath(serialport) : null,
+            path: serialport ? portPath(serialport) : undefined,
         })
     );
 
@@ -120,7 +120,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         return;
     }
 
-    const { vendorId, productId } = serialport;
+    const { vendorId, productId } = serialport as Serialport;
     const vid = parseInt(vendorId.toString(16), 16);
     const pid = parseInt(productId.toString(16), 16);
     if (vid === VendorId.NORDIC_SEMICONDUCTOR) {

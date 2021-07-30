@@ -79,7 +79,7 @@ export const errorDialogShowAction = (error: any) => ({
 const updateCoreInfo =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         const { target, file } = getState().app;
-        const { family, type } = target.deviceInfo;
+        const { family, type } = { ...target.deviceInfo };
 
         // If device is selected, device family and device type will not be null
         // and so will not assume target cores by file regions.
@@ -150,12 +150,12 @@ export const updateFileAppRegions =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         let fileRegions = getState().app.file.regions;
         const targetRegions = getState().app.target.regions;
-        const targetBootloaderRegion = targetRegions.find(
+        const targetBootloaderRegion = targetRegions?.find(
             r => r.name === RegionName.BOOTLOADER
         );
 
-        let appStartAddress: number;
-        let appEndAddress: number;
+        let appStartAddress: number | undefined;
+        let appEndAddress: number | undefined;
         fileRegions.forEach(r => {
             // Detect the start address of all applications
             if (
@@ -209,7 +209,7 @@ export const updateFileAppRegions =
 export const updateFileBlRegion =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         let fileRegions = getState().app.file.regions;
-        const { cores } = getState().app.target.deviceInfo;
+        const { cores } = { ...getState().app.target.deviceInfo };
         const blRegions = fileRegions.filter(
             r => r.name === RegionName.BOOTLOADER
         );
@@ -219,9 +219,9 @@ export const updateFileBlRegion =
 
         blRegions.forEach(b => {
             let blRegion = b;
-            let blEndAddress: number;
+            let blEndAddress: number | undefined;
             const blStartAddress = blRegion.startAddress;
-            const core = cores.find(
+            const core = cores?.find(
                 c =>
                     blStartAddress >= c.romBaseAddr &&
                     blStartAddress < c.romBaseAddr + c.romSize
@@ -230,7 +230,7 @@ export const updateFileBlRegion =
                 if (
                     r.name === RegionName.NONE &&
                     r.startAddress > blRegion.startAddress &&
-                    r.startAddress + r.regionSize < core.romSize &&
+                    r.startAddress + r.regionSize < (core?.romSize as number) &&
                     (!blEndAddress || blEndAddress <= r.startAddress)
                 ) {
                     blEndAddress = r.startAddress + r.regionSize;
@@ -265,7 +265,7 @@ export const updateFileRegions =
         const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
 
         let regions: Region[] = [];
-        getState().app.target.deviceInfo.cores.forEach(c => {
+        target.deviceInfo?.cores.forEach(c => {
             regions = [...regions, ...getFileRegions(file.memMaps, c)];
         });
 
@@ -280,7 +280,9 @@ export const updateFileRegions =
         const outsideFlashBlocks: string[] = [];
         overlaps.forEach((overlap, startAddress) => {
             const endAddress = startAddress + overlap[0][1].length;
-            const { uicrBaseAddr, romSize, pageSize } = target.deviceInfo;
+            const { uicrBaseAddr, romSize, pageSize } = {
+                ...target.deviceInfo,
+            };
             if (
                 (startAddress < uicrBaseAddr && endAddress > romSize) ||
                 (startAddress >= uicrBaseAddr &&
@@ -325,7 +327,7 @@ export const closeFiles =
         dispatch(updateFileRegions());
 
         // Initialize the state of deviceInfo if no device is selected
-        if (!getState().app.target.deviceInfo.type) {
+        if (!getState().app.target.deviceInfo?.type) {
             dispatch(targetInfoKnown(deviceDefinition));
         }
         dispatch(updateTargetWritable());
@@ -340,7 +342,7 @@ const removeMruFile = (filename: string) => {
     const files = persistentStore.get('mruFiles', []);
     persistentStore.set(
         'mruFiles',
-        files.filter(file => file !== filename)
+        files.filter((file: string) => file !== filename)
     );
 };
 
@@ -412,7 +414,7 @@ const parseOneFile =
                 memMap,
             },
         };
-        const newMemMaps = [...memMaps, [filePath, memMap]];
+        const newMemMaps = [...memMaps, [filePath, memMap]] as MemoryMap[];
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
         dispatch(updateFileRegions());
@@ -420,12 +422,12 @@ const parseOneFile =
     };
 
 export const openFile =
-    (filename: string, ...rest: string[]) =>
-    async (dispatch: TDispatch) => {
-        if (filename) {
-            dispatch(mcubootFileKnown(null));
-            await dispatch(parseOneFile(filename));
-            return dispatch(openFile(...rest));
+    (...params: string[]) =>
+    async (dispatch: TDispatch): Promise<unknown> => {
+        if (params[0]) {
+            dispatch(mcubootFileKnown(undefined));
+            await dispatch(parseOneFile(params[0]));
+            return dispatch(openFile(...params.slice(1)));
         }
         return dispatch(loadMruFiles());
     };

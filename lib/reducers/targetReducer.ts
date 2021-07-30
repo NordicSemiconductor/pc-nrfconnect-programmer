@@ -38,7 +38,6 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
-import SerialPort from 'serialport';
 
 import {
     CommunicationType,
@@ -52,7 +51,7 @@ import { RootState } from './types';
 
 export interface TargetState {
     readonly targetType: CommunicationType;
-    readonly port?: SerialPort;
+    readonly port?: string;
     readonly serialNumber?: string;
     readonly deviceInfo?: DeviceDefinition;
     readonly memMap?: MemoryMap;
@@ -97,7 +96,7 @@ interface TargetTypeKnownPayload {
 
 interface TargetPortChangedPayload {
     serialNumber: string;
-    path: SerialPort;
+    path?: string;
 }
 
 interface TargetContentsKnownPayload {

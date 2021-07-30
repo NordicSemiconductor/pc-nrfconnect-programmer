@@ -69,7 +69,7 @@ export const SignatureType = {
 export interface InitPacket {
     fwVersion?: number;
     hwVersion?: number;
-    sdReq?: number | number[];
+    sdReq?: number[];
     fwType?: number;
     sdSize: number;
     blSize: number;
@@ -99,7 +99,7 @@ export const defaultInitPacket: InitPacket = {
 export interface DfuImage {
     name: string;
     initPacket: InitPacket;
-    firmwareImage: MemoryMap;
+    firmwareImage?: MemoryMap;
 }
 
 // Create hash by using hash type and bytes

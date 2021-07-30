@@ -4,7 +4,8 @@
 declare module "nrf-intel-hex" {
     export type MemoryBlocks =
         | { [x: number]: Uint8Array }
-        | [number, Uint8Array][];
+        | [number, Uint8Array][]
+        | [string, Uint8Array][];
 
     export type Overlap = [string, Uint8Array][];
     export type Overlaps = Map<number, Overlap>;

@@ -180,7 +180,7 @@ export const loadDeviceInfo =
             );
         } else {
             let memMap;
-            let mergedMemMap = new MemoryMap();
+            let mergedMemMap;
             let isMemLoaded = false;
             const readAll =
                 !eraseAndWrite &&
@@ -258,7 +258,7 @@ const getDeviceMemMap = async (
                 : 'NRFDL_DEVICE_CORE_APPLICATION'
         );
     });
-    return result;
+    return result as MemoryMap;
 };
 
 // Check if the files can be written to the target device
@@ -293,7 +293,7 @@ export const canWrite =
         dispatch(targetWritableKnown(true));
     };
 
-// Update infos of the target regions
+// To fix: Update memMap type. Uint8Array or MemoryMap?
 const updateTargetRegions =
     (memMap: Uint8Array, deviceInfo: DeviceDefinition) =>
     (dispatch: TDispatch) => {
@@ -309,7 +309,7 @@ export const read =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(loadingStart());
         const { serialNumber } = getState().app.target;
-        await dispatch(loadDeviceInfo(serialNumber, true));
+        await dispatch(loadDeviceInfo(serialNumber as string, true));
     };
 
 // Call nrfprog.recover() to recover one core
@@ -349,7 +349,7 @@ export const recover =
             deviceInfo: { cores },
         } = getState().app.target;
         const { id: deviceId } = await getDeviceFromNrfdl(
-            formatSerialNumber(parseInt(serialNumber, 10))
+            formatSerialNumber(parseInt(serialNumber as string, 10))
         );
         const results: unknown[] = [];
         const argsArray = cores.map((c: CoreDefinition) => [deviceId, c]);
@@ -360,7 +360,9 @@ export const recover =
             results,
             argsArray
         );
-        dispatch(loadDeviceInfo(serialNumber, false, willEraseAndWrite));
+        dispatch(
+            loadDeviceInfo(serialNumber as string, false, willEraseAndWrite)
+        );
         dispatch(erasingEnd());
         logger.info('Device recovery completed.');
     };
@@ -413,7 +415,7 @@ export const writeOneCore =
             file: { memMaps },
         } = getState().app;
         const { pageSize, uicrBaseAddr } = core;
-        const serialNumberWithCore = `${parseInt(serialNumber, 10)}:${
+        const serialNumberWithCore = `${parseInt(serialNumber as string, 10)}:${
             core.coreNumber
         }`;
 
@@ -470,7 +472,7 @@ export const write =
             results,
             argsArray
         ).then(async () => {
-            await dispatch(loadDeviceInfo(serialNumber));
+            await dispatch(loadDeviceInfo(serialNumber as string));
             dispatch(writingEnd());
             dispatch(updateTargetWritable());
         });
