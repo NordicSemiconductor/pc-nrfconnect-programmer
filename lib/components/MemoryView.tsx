@@ -83,7 +83,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
         c => c.protectionStatus !== nrfdl.NRFDL_PROTECTION_STATUS_NONE
     );
     const refreshEnabled = useSelector(getRefreshEnabled);
-    const targetCores = useSelector(getDeviceInfo)?.cores;
+    const targetCores = useSelector(getDeviceInfo)?.cores as CoreDefinition[];
 
     const placeHolder =
         isTarget && isLoading
