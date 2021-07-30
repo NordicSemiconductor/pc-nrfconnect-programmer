@@ -49,7 +49,7 @@ import {
 import { hexpad2 } from '../util/hexpad';
 
 const UserInputDialogView = () => {
-    const [selectedValue, setSelectedValue] = useState<string>();
+    const [selectedValue, setSelectedValue] = useState<string>('');
     const [customChecked, setCustomChecked] = useState<boolean>(false);
     const [customValue, setCustomValue] = useState<string>('');
     const [isValidInput, setIsValidInput] = useState<boolean>(false);
