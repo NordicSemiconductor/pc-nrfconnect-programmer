@@ -42,7 +42,6 @@ import nrfdl, {
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 
-import { RootState, TDispatch } from '../reducers';
 import {
     mcubootFirmwareValid,
     mcubootKnown,
@@ -60,6 +59,7 @@ import {
     targetTypeKnown,
     targetWritableKnown,
 } from '../reducers/targetReducer';
+import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
 import {
     CommunicationType,

@@ -36,11 +36,11 @@
 
 import Store from 'electron-store';
 
-import { RootState, TDispatch } from '../reducers';
 import {
     settingsLoad,
     toggleAutoRead as toggleAutoReadAction,
 } from '../reducers/settingsReducer';
+import { RootState, TDispatch } from '../reducers/types';
 
 const persistentStore = new Store({ name: 'nrf-programmer' });
 

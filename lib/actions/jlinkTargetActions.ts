@@ -46,7 +46,6 @@ import fs from 'fs';
 import MemoryMap, { MemoryBlocks } from 'nrf-intel-hex';
 import { logger } from 'pc-nrfconnect-shared';
 
-import { RootState, TDispatch } from '../reducers';
 import { modemKnown } from '../reducers/modemReducer';
 import {
     erasingEnd,
@@ -61,6 +60,7 @@ import {
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
+import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
 import {
     addCoreToDeviceInfo,

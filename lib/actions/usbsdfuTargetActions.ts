@@ -50,7 +50,6 @@ import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
 import tmp from 'tmp';
 
-import { RootState, TDispatch } from '../reducers';
 import {
     dfuImagesUpdate,
     loadingEnd,
@@ -62,6 +61,7 @@ import {
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
+import { RootState, TDispatch } from '../reducers/types';
 import {
     targetWarningRemove,
     userWarningRemove,

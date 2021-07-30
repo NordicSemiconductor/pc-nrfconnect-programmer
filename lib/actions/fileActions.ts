@@ -44,7 +44,6 @@ import { logger } from 'nrfconnect/core';
 import { Stats } from 'original-fs';
 import { basename } from 'path';
 
-import { RootState, TDispatch } from '../reducers';
 import {
     fileParse,
     fileRegionNamesKnown,
@@ -54,6 +53,7 @@ import {
     mruFilesLoadSuccess,
 } from '../reducers/fileReducer';
 import { targetInfoKnown } from '../reducers/targetReducer';
+import { RootState, TDispatch } from '../reducers/types';
 import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
 import { deviceDefinition, getDeviceDefinition } from '../util/devices';
 import { hexpad8 } from '../util/hexpad';

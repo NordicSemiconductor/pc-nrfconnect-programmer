@@ -38,7 +38,6 @@ import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import { logger } from 'nrfconnect/core';
 
-import { RootState, TDispatch } from '../reducers';
 import {
     MODEM_DFU_STARTING,
     modemProcessUpdate,
@@ -48,6 +47,7 @@ import {
     modemWritingStart,
     modemWritingSucceed,
 } from '../reducers/modemReducer';
+import { RootState, TDispatch } from '../reducers/types';
 import { context, getDeviceFromNrfdl } from '../util/devices';
 
 export const selectModemFirmware = () => (dispatch: TDispatch) => {

@@ -40,12 +40,12 @@ import nrfdl, { Serialport } from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 import { Device } from 'pc-nrfconnect-shared';
 
-import { RootState, TDispatch } from '../reducers';
 import {
     loadingStart,
     targetPortChanged,
     targetWritableKnown,
 } from '../reducers/targetReducer';
+import { RootState, TDispatch } from '../reducers/types';
 import {
     CommunicationType,
     context,
