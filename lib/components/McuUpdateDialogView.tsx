@@ -69,7 +69,6 @@ const McuUpdateDialogView = () => {
     const progressPercentage = useSelector(getProgressPercentage);
 
     const dispatch = useDispatch();
-    const onOk = () => dispatch(performUpdate());
     const onCancel = () => dispatch(cancelUpdate());
 
     return (
@@ -140,7 +139,7 @@ const McuUpdateDialogView = () => {
                     <Button
                         variant="primary"
                         className="core-btn"
-                        onClick={onOk}
+                        onClick={() => dispatch(performUpdate())}
                         disabled={isWriting}
                     >
                         Write

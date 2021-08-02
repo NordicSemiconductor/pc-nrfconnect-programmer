@@ -71,7 +71,6 @@ const ModemUpdateDialogView = () => {
     const isMcuboot = useSelector(getIsMcuboot);
 
     const dispatch = useDispatch();
-    const onOk = () => dispatch(performUpdate());
     const onCancel = () => dispatch(cancelUpdate());
 
     const intervalId = useRef<NodeJS.Timeout>();
@@ -84,7 +83,7 @@ const ModemUpdateDialogView = () => {
         intervalId.current = setInterval(() => {
             setTimer(timer + 1);
         }, 1000);
-        onOk();
+        dispatch(performUpdate());
     }
 
     if (intervalId.current && (isWritingSucceed || isWritingFail)) {

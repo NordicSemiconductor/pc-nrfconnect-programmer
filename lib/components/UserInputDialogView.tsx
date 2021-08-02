@@ -59,7 +59,6 @@ const UserInputDialogView = () => {
     const choices = useSelector(getChoices);
 
     const dispatch = useDispatch();
-    const onOk = (input: string) => dispatch(receiveUserInput(input));
     const onCancel = () => dispatch(cancelUserInput());
 
     function onSelectChoice(choice: string) {
@@ -125,7 +124,7 @@ const UserInputDialogView = () => {
                     variant="primary"
                     className="core-btn"
                     disabled={!isValidInput}
-                    onClick={() => onOk(selectedValue)}
+                    onClick={() => dispatch(receiveUserInput(selectedValue))}
                 >
                     OK
                 </Button>
