@@ -50,8 +50,8 @@ const settingsSlice = createSlice({
     name: 'settings',
     initialState,
     reducers: {
-        settingsLoad(state, action: PayloadAction<boolean>) {
-            state.autoRead = action.payload;
+        settingsLoad(state, action: PayloadAction<SettingsState>) {
+            state.autoRead = action.payload.autoRead;
         },
         toggleAutoRead(state) {
             state.autoRead = !state.autoRead;
