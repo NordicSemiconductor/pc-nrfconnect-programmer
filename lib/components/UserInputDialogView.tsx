@@ -60,7 +60,7 @@ const UserInputDialogView = () => {
 
     const dispatch = useDispatch();
     const onOk = (input: string) => dispatch(receiveUserInput(input));
-    const onCancel = () => dispatch(cancelUserInput);
+    const onCancel = () => dispatch(cancelUserInput());
 
     function onSelectChoice(choice: string) {
         if (choice === 'Custom') {

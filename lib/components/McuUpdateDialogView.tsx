@@ -69,8 +69,8 @@ const McuUpdateDialogView = () => {
     const progressPercentage = useSelector(getProgressPercentage);
 
     const dispatch = useDispatch();
-    const onOk = () => dispatch(performUpdate);
-    const onCancel = () => dispatch(cancelUpdate);
+    const onOk = () => dispatch(performUpdate());
+    const onCancel = () => dispatch(cancelUpdate());
 
     return (
         <Modal show={isVisible} onHide={onCancel} backdrop="static">
