@@ -1,39 +1,39 @@
-## Version 1.4.11
+## 1.4.11
 ### Fixes
 * Fixed programming with external debugger.
 Note, programming a protected SoC via external debugger is not supported.
 
-## Version 1.4.10
+## 1.4.10
 ### Updates
 * Updated firmware to support modem DFU for Thingy:91 v1.6.0
 * Updated firmware to enhance APPPROTECT feature
 
-## Version 1.4.9
+## 1.4.9
 ### Updates
 * Added APPPROTECT support for nRF52 family
 
-## Version 1.4.8
+## 1.4.8
 ### Updates
 * Added APPPROTECT support
 
-## Version 1.4.7
+## 1.4.7
 ### Updates
 * Added USB PID of OpenThread devices
 
-## Version 1.4.6
+## 1.4.6
 ## Updates
 * Updated according to changes of Electron dialog API
 
-## Version 1.4.5
+## 1.4.5
 ## Updates
 * Updated logic behind enabling of write button
 * Added warning for Thingy:91 DFU when invalid file is detected
 
-## Version 1.4.4
+## 1.4.4
 ## Bugfixes
 * Fixed modem DFU for Thingy91 by increasing timeout between MCUboot DFU and modem UART DFU
 
-## Version 1.4.3
+## 1.4.3
 ## Updates
 * Added support for nRF52805
 ## Bugfixes
@@ -44,15 +44,15 @@ For older versions, please use a debugger to program.
 * Fixed communication failure for nRF5340 development kit
 * Removed warning for nRF9160 communication failure
 
-## Version 1.4.2
+## 1.4.2
 ## Bugfixes
 * Added warning for nRF9160 communication failure
 
-## Version 1.4.1
+## 1.4.1
 ## Bugfixes
 * Fixed modem dfu hex file not committed in resources
 
-## Version 1.4.0
+## 1.4.0
 ## New feature
 * Added support for nRF52820
 * Added support for modem UART DFU
@@ -60,29 +60,29 @@ For older versions, please use a debugger to program.
 ## Bugfixes
 * Fixed end address for regions displayed
 
-## Version 1.3.1
+## 1.3.1
 ## Bugfixes
 * Fixed programming of nRF51 devices with UICR #156
 
-## Version 1.3.0
+## 1.3.0
 ### New features
 * Supported nRF53 series
 * Supported nRF52833
 * Supported MCUboot DFU
 
-## Version 1.2.3
+## 1.2.3
 ### Bugfixes
 * Fixed cropping of most recently used files dropdown #142
 
-## Version 1.2.2
+## 1.2.2
 ### Bugfixes
 * Fixed UICR handling that caused double reset failure #133
 
-## Version 1.2.0
+## 1.2.0
 ### Updates
 * Updated to React Bootstrap 4
 
-## Version 1.1.0
+## 1.1.0
 ### New features
 * Added modem DFU support
 * Added list of devices and details of current device to system report
