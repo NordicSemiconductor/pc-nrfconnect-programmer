@@ -62,7 +62,7 @@ For older versions, please use a debugger to program.
 
 ## 1.3.1 - 2019-11-18
 ### Bugfixes
-* Fixed programming of nRF51 devices with UICR #156
+* Fixed programming of nRF51 devices with UICR
 
 ## 1.3.0 - 2019-11-14
 ### New features
@@ -72,11 +72,11 @@ For older versions, please use a debugger to program.
 
 ## 1.2.3 - 2019-08-30
 ### Bugfixes
-* Fixed cropping of most recently used files dropdown #142
+* Fixed cropping of most recently used files dropdown
 
 ## 1.2.2 - 2019-08-30
 ### Bugfixes
-* Fixed UICR handling that caused double reset failure #133
+* Fixed UICR handling that caused double reset failure
 
 ## 1.2.0 - 2019-07-03
 ### Updates
