@@ -21,22 +21,22 @@ Note, programming a protected SoC via external debugger is not supported.
 * Added USB PID of OpenThread devices
 
 ## 1.4.6 - 2020-10-21
-## Updates
+### Updates
 * Updated according to changes of Electron dialog API
 
 ## 1.4.5 - 2020-10-21
-## Updates
+### Updates
 * Updated logic behind enabling of write button
 * Added warning for Thingy:91 DFU when invalid file is detected
 
 ## 1.4.4 - 2020-09-02
-## Bugfixes
+### Bugfixes
 * Fixed modem DFU for Thingy91 by increasing timeout between MCUboot DFU and modem UART DFU
 
 ## 1.4.3 - 2020-07-08
-## Updates
+### Updates
 * Added support for nRF52805
-## Bugfixes
+### Bugfixes
 * Fixed MCUboot DFU for nRF52840 on Thingy91 for Linux and macOS
 * Fixed MCUboot DFU for nRF52840 on Thingy91 for Windows.
 Note, the fix is valid for Thingy91 v1.0.2 and newer.
@@ -45,23 +45,23 @@ For older versions, please use a debugger to program.
 * Removed warning for nRF9160 communication failure
 
 ## 1.4.2 - 2020-07-08
-## Bugfixes
+### Bugfixes
 * Added warning for nRF9160 communication failure
 
 ## 1.4.1 - 2020-07-08
-## Bugfixes
+### Bugfixes
 * Fixed modem dfu hex file not committed in resources
 
 ## 1.4.0 - 2020-07-08
-## New feature
+### New feature
 * Added support for nRF52820
 * Added support for modem UART DFU
 
-## Bugfixes
+### Bugfixes
 * Fixed end address for regions displayed
 
 ## 1.3.1 - 2019-11-18
-## Bugfixes
+### Bugfixes
 * Fixed programming of nRF51 devices with UICR #156
 
 ## 1.3.0 - 2019-11-14
