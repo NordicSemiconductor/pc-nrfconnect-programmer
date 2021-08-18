@@ -10,7 +10,6 @@ steps:
 - script: |
     set -o errexit -o pipefail
     npm ci
-    npm run lint-init
     npm run lint
     npm run build
     npm pack
