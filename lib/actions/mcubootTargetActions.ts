@@ -191,6 +191,10 @@ export const performUpdate =
             `Writing ${mcubootFilePath} to device ${serialNumber || ''}`
         );
 
+        let totalPercentage = 0;
+        let totalDuration = 0;
+        let progressMsg = '';
+
         const progressCallback = ({
             progressJson: progress,
         }: nrfdl.Progress) => {
