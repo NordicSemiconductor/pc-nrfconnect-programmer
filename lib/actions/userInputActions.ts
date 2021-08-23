@@ -48,7 +48,7 @@ let userInputCallback: ((input?: string) => void) | undefined;
 export function getUserInput(
     dispatch: TDispatch,
     message: string,
-    choices: {}
+    choices: Record<string, string>
 ) {
     return new Promise((resolve, reject) => {
         userInputCallback = input => {
