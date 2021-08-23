@@ -54,7 +54,7 @@
     },
     "dependencies": {
         "adm-zip": "^0.5.2",
-        "electron-store": "^1.2.0"
+        "electron-store": "5.1.1"
     },
     "bundledDependencies": [
         "electron-store"
