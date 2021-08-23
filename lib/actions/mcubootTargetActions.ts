@@ -218,11 +218,11 @@ export const performUpdate =
 
                 progressMsg = dfuProcess.message || progressMsg;
                 dispatch(
-                    processUpdateAction(
-                        progressMsg,
-                        totalPercentage,
-                        totalDuration
-                    )
+                    mcubootProcessUpdate({
+                        message: progressMsg,
+                        percentage: totalPercentage,
+                        duration: totalDuration,
+                    })
                 );
             }
         };
