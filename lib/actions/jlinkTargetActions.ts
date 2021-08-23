@@ -414,7 +414,7 @@ export const writeOneCore =
             target: { serialNumber },
             file: { memMaps },
         } = getState().app;
-        const { pageSize, uicrBaseAddr } = core;
+        const { pageSize } = core;
         const serialNumberWithCore = `${parseInt(serialNumber as string, 10)}:${
             core.coreNumber
         }`;
