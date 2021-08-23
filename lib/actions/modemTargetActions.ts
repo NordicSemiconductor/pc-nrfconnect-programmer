@@ -114,7 +114,7 @@ export function programDfuModem(serialNumber: string, fileName: string) {
                 'NRFDL_FW_NRF91_MODEM',
                 fileName,
                 successCallback,
-                console.log
+                progressCallback
             );
         } catch (e) {
             errorCallback(e);
