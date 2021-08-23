@@ -69,6 +69,7 @@ const persistentStore = new Store({ name: 'nrf-programmer' });
 
 export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const errorDialogShowAction = (error: any) => ({
     type: ERROR_DIALOG_SHOW,
     message: error.message || error,

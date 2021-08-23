@@ -223,6 +223,7 @@ export const performUpdate =
             }
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errorCallback = (error: any) => {
             if (error) {
                 let errorMsg = error.message || error;
