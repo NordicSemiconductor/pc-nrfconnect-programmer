@@ -35,6 +35,7 @@
  */
 
 import nrfdl, {
+    Device,
     DeviceCore,
     DeviceCoreInfo,
     DeviceFamily,
@@ -260,7 +261,7 @@ export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
         ...getDeviceDefinition(model),
         family,
         cores: [],
-    };
+    } as DeviceDefinition;
 };
 
 /**
@@ -276,25 +277,26 @@ export const addCoreToDeviceInfo = (
     deviceInfo: DeviceDefinition,
     inputCoreInfo: DeviceCoreInfo,
     coreName: string
-) => ({
-    ...deviceInfo,
-    cores: [
-        ...deviceInfo.cores,
-        {
-            ...defaultCore,
-            name: coreName,
-            coreNumber: deviceInfo.cores.length,
-            romBaseAddr: inputCoreInfo.codeAddress,
-            romSize: inputCoreInfo.codeSize,
-            ramSize: inputCoreInfo.RAMSize,
-            pageSize: inputCoreInfo.codePageSize,
-            // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
-            // uicrBaseAddr: inputCoreInfo.uicrAddress,
-            uicrSize: inputCoreInfo.codePageSize,
-            ...inputCoreInfo,
-        },
-    ],
-});
+) =>
+    ({
+        ...deviceInfo,
+        cores: [
+            ...deviceInfo.cores,
+            {
+                ...defaultCore,
+                name: coreName,
+                coreNumber: deviceInfo.cores.length,
+                romBaseAddr: inputCoreInfo.codeAddress,
+                romSize: inputCoreInfo.codeSize,
+                ramSize: inputCoreInfo.RAMSize,
+                pageSize: inputCoreInfo.codePageSize,
+                // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
+                // uicrBaseAddr: inputCoreInfo.uicrAddress,
+                uicrSize: inputCoreInfo.codePageSize,
+                ...inputCoreInfo,
+            },
+        ],
+    } as DeviceDefinition);
 
 export const context = nrfdl.createContext();
 
@@ -309,7 +311,7 @@ export const getDeviceFromNrfdl = (
     serialNumber: string
 ): Promise<nrfdl.Device> =>
     new Promise((resolve, reject) => {
-        nrfdl.enumerate(context).then(devices => {
+        nrfdl.enumerate(context).then((devices: Array<Device>) => {
             // This is not needed when @nordicsemiconductor/nrf-device-lib-js is integrated in device selector
             // eslint-disable-next-line no-restricted-syntax
             for (const device of devices) {

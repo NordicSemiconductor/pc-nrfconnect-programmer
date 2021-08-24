@@ -34,56 +34,57 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 8 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad8 = (n: number | string): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
+import React from 'react';
+import { useSelector } from 'react-redux';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+import {
+    getDeviceInfo,
+    getIsMemLoaded,
+    getPort,
+    getSerialNumber,
+    getTargetType,
+} from '../reducers/targetReducer';
+import { CommunicationType } from '../util/devices';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 2 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+const DeviceInfoView = () => {
+    const serialNumber = useSelector(getSerialNumber);
+    const port = useSelector(getPort);
+    const targetType = useSelector(getTargetType);
+    const deviceInfo = useSelector(getDeviceInfo);
+    const isMemLoaded = useSelector(getIsMemLoaded);
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
+    return (
+        <div className="memory-details">
+            {serialNumber && (
+                <div>
+                    <h5>Serial Number</h5>
+                    <p>{serialNumber}</p>
+                </div>
+            )}
+            {port && (
+                <div>
+                    <h5>Port</h5>
+                    <p>{port}</p>
+                </div>
+            )}
+            <div>
+                <h5>Communication Type</h5>
+                <p>{targetType}</p>
+            </div>
+            {deviceInfo && deviceInfo.cores && (
+                <div>
+                    <h5>Core Number</h5>
+                    <p>{deviceInfo.cores.length}</p>
+                </div>
+            )}
+            {targetType === CommunicationType.JLINK && (
+                <div>
+                    <h5>Device memory is loaded?</h5>
+                    <p>{isMemLoaded ? 'Yes' : 'No'}</p>
+                </div>
+            )}
+        </div>
+    );
+};
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
+export default DeviceInfoView;

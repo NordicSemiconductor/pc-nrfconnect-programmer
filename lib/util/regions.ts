@@ -69,6 +69,7 @@ export enum RegionName {
     BOOTLOADER = 'Bootloader',
     SOFTDEVICE = 'SoftDevice',
     APPLICATION = 'Application',
+    FICR = 'FICR',
     UICR = 'UICR',
     NONE = 'N/A',
 }
@@ -92,6 +93,7 @@ export enum RegionColor {
  */
 export interface Region {
     name: RegionName;
+    version: number;
     startAddress: number;
     regionSize: number;
     color: RegionColor;

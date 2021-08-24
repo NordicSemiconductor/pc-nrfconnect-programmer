@@ -34,96 +34,81 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import MemoryMap from 'nrf-intel-hex';
 
-import { Region } from '../util/regions';
 import { RootState } from './types';
 
-type Loaded = {
-    filename: string;
-    loadTime: Date;
-    modTime: Date;
-    memMap: MemoryMap;
-};
-
-export interface FileState {
-    detectedRegionNames: Set<string>;
-    loaded: Record<string, Loaded>;
-    mcubootFilePath?: string;
-    memMaps: MemoryMap[];
-    mruFiles: string[];
-    regions: Region[];
+export interface WarningState {
+    fileWarnings: string[];
+    targetWarnings: string[];
+    userWarnings: string[];
 }
 
-const initialState: FileState = {
-    detectedRegionNames: new Set<string>(),
-    loaded: {},
-    mcubootFilePath: undefined,
-    memMaps: [],
-    mruFiles: [],
-    regions: [],
+const initialState: WarningState = {
+    fileWarnings: [],
+    targetWarnings: [],
+    userWarnings: [],
 };
 
-interface FileParsePayload {
-    memMaps: MemoryMap[];
-    loaded: Record<string, Loaded>;
-}
-
-const fileSlice = createSlice({
-    name: 'file',
+const warningSlice = createSlice({
+    name: 'warning',
     initialState,
     reducers: {
-        filesEmpty(state) {
-            return {
-                ...initialState,
-                mruFiles: state.mruFiles,
-            };
+        fileWarningAdd(state, action: PayloadAction<string>) {
+            state.fileWarnings = [...state.fileWarnings, action.payload];
         },
-        fileParse(state, action: PayloadAction<FileParsePayload>) {
-            state.memMaps = action.payload.memMaps;
-            state.loaded = action.payload.loaded;
+        fileWarningRemove(state) {
+            state.fileWarnings = [];
         },
-        fileRegionsKnown(state, action: PayloadAction<Region[]>) {
-            state.regions = action.payload;
+        targetWarningAdd(state, action: PayloadAction<string>) {
+            state.targetWarnings = [...state.targetWarnings, action.payload];
         },
-        fileRegionNamesKnown(state, action: PayloadAction<Set<string>>) {
-            state.detectedRegionNames = action.payload;
+        targetWarningRemove(state) {
+            state.targetWarnings = [];
         },
-
-        mruFilesLoadSuccess(state, action: PayloadAction<string[]>) {
-            state.mruFiles = action.payload || [];
+        userWarningAdd(state, action: PayloadAction<string>) {
+            state.userWarnings = [...state.userWarnings, action.payload];
         },
-
-        mcubootFileKnown(state, action: PayloadAction<string | undefined>) {
-            state.mcubootFilePath = action.payload;
+        userWarningRemove(state) {
+            state.userWarnings = [];
+        },
+        allWarningRemove() {
+            return { ...initialState };
+        },
+    },
+    extraReducers: {
+        DEVICE_SELECTED: state => {
+            state.targetWarnings = [];
+            state.userWarnings = [];
         },
     },
 });
 
-export default fileSlice.reducer;
+export default warningSlice.reducer;
 
 const {
-    filesEmpty,
-    fileParse,
-    fileRegionsKnown,
-    fileRegionNamesKnown,
-    mruFilesLoadSuccess,
-    mcubootFileKnown,
-} = fileSlice.actions;
+    fileWarningAdd,
+    fileWarningRemove,
+    targetWarningAdd,
+    targetWarningRemove,
+    userWarningAdd,
+    userWarningRemove,
+    allWarningRemove,
+} = warningSlice.actions;
 
-export const getLoaded = (state: RootState) => state.app.file.loaded;
-export const getMruFiles = (state: RootState) => state.app.file.mruFiles;
-export const getMcubootFilePath = (state: RootState) =>
-    state.app.file.mcubootFilePath;
+export const getUserWarnings = (state: RootState) =>
+    state.app.warning.userWarnings;
+export const getFileWarnings = (state: RootState) =>
+    state.app.warning.fileWarnings;
+export const getTargetWarnings = (state: RootState) =>
+    state.app.warning.targetWarnings;
 
 export {
-    filesEmpty,
-    fileParse,
-    fileRegionsKnown,
-    fileRegionNamesKnown,
-    mruFilesLoadSuccess,
-    mcubootFileKnown,
+    fileWarningAdd,
+    fileWarningRemove,
+    targetWarningAdd,
+    targetWarningRemove,
+    userWarningAdd,
+    userWarningRemove,
+    allWarningRemove,
 };

@@ -42,11 +42,40 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
+import { useDispatch, useSelector } from 'react-redux';
+import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import PropTypes from 'prop-types';
 
-const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
+import * as fileActions from '../actions/fileActions';
+import * as jlinkTargetActions from '../actions/jlinkTargetActions';
+import * as mcubootTargetActions from '../actions/mcubootTargetActions';
+import * as modemTargetActions from '../actions/modemTargetActions';
+import * as settingsActions from '../actions/settingsActions';
+import * as targetActions from '../actions/targetActions';
+import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
+import { getMruFiles } from '../reducers/fileReducer';
+import { getIsMcuboot } from '../reducers/mcubootReducer';
+import { getIsModem } from '../reducers/modemReducer';
+import { getAutoRead } from '../reducers/settingsReducer';
+import {
+    getDeviceInfo,
+    getIsMemLoaded,
+    getIsReady,
+    getIsRecoverable,
+    getIsWritable,
+    getRegions,
+    getTargetType,
+} from '../reducers/targetReducer';
+import { CommunicationType } from '../util/devices';
+
+const Mru = ({ mruFiles }) => {
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
+
+    const dispatch = useDispatch();
+    const openFile = filename => dispatch(fileActions.openFile(filename));
+    const openFileDialog = () => dispatch(fileActions.openFileDialog());
+    const onToggleFileList = () => dispatch(fileActions.loadMruFiles());
 
     const onClick = event => {
         onToggleFileList();
@@ -63,9 +92,8 @@ const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
         setShow(false);
     };
 
-    const containerNode = document.getElementsByClassName(
-        'core-main-layout'
-    )[0];
+    const containerNode =
+        document.getElementsByClassName('core-main-layout')[0];
 
     return (
         <>
@@ -112,196 +140,165 @@ const Mru = ({ onToggleFileList, openFileDialog, openFile, mruFiles }) => {
 };
 
 Mru.propTypes = {
-    openFile: PropTypes.func.isRequired,
-    onToggleFileList: PropTypes.func.isRequired,
-    openFileDialog: PropTypes.func.isRequired,
     mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-const ControlPanel = ({
-    autoRead,
-    closeFiles,
-    fileRegionSize,
-    isJLink,
-    isMcuboot,
-    isModem,
-    isUsbSerial,
-    isProtected,
-    mruFiles,
-    onToggleFileList,
-    openFile,
-    openFileDialog,
-    performJLinkRead,
-    performModemUpdate,
-    performRecover,
-    performRecoverAndWrite,
-    performReset,
-    performSaveAsFile,
-    performWrite,
-    refreshAllFiles,
-    targetIsMemLoaded,
-    targetIsReady,
-    targetIsRecoverable,
-    targetIsWritable,
-    toggleAutoRead,
-    toggleMcuboot,
-}) => (
-    <div className="control-panel">
-        <Card>
-            <Card.Header>File</Card.Header>
-            <Card.Body>
-                <ButtonGroup vertical>
-                    <Mru
-                        openFile={openFile}
-                        openFileDialog={openFileDialog}
-                        mruFiles={mruFiles}
-                        onToggleFileList={onToggleFileList}
-                    />
-                    <Button onClick={refreshAllFiles}>
-                        <span className="mdi mdi-refresh" />
-                        Reload files
-                    </Button>
-                    <Button onClick={closeFiles}>
-                        <span className="mdi mdi-minus-circle" />
-                        Clear files
-                    </Button>
-                </ButtonGroup>
-            </Card.Body>
-        </Card>
-        <Card>
-            <Card.Header>Device</Card.Header>
-            <Card.Body>
-                <ButtonGroup vertical>
-                    <Button
-                        key="performRecover"
-                        onClick={performRecover}
-                        disabled={
-                            isMcuboot ||
-                            !isJLink ||
-                            !targetIsReady ||
-                            !targetIsRecoverable
-                        }
-                    >
-                        <span className="mdi mdi-eraser" />
-                        Erase all
-                    </Button>
-                    <Button
-                        key="performRecoverAndWrite"
-                        onClick={performRecoverAndWrite}
-                        disabled={
-                            isMcuboot ||
-                            !isJLink ||
-                            !targetIsReady ||
-                            !fileRegionSize ||
-                            !(targetIsRecoverable && mruFiles.length)
-                        }
-                    >
-                        <span className="mdi mdi-pencil" />
-                        Erase & write
-                    </Button>
-                    <Button
-                        key="performSaveAsFile"
-                        onClick={performSaveAsFile}
-                        disabled={!isJLink || !targetIsMemLoaded}
-                    >
-                        <span className="mdi mdi-floppy" />
-                        Save as file
-                    </Button>
-                    <Button
-                        key="performReset"
-                        onClick={performReset}
-                        disabled={!isUsbSerial || !targetIsReady}
-                    >
-                        <span className="mdi mdi-record" />
-                        Reset
-                    </Button>
-                    <Button
-                        key="performWrite"
-                        onClick={performWrite}
-                        disabled={!targetIsReady || !targetIsWritable}
-                    >
-                        <span className="mdi mdi-pencil" />
-                        Write
-                    </Button>
-                    <Button
-                        key="performJLinkRead"
-                        onClick={performJLinkRead}
-                        disabled={
-                            isMcuboot ||
-                            !isJLink ||
-                            !targetIsReady ||
-                            isProtected
-                        }
-                    >
-                        <span className="mdi mdi-refresh" />
-                        Read
-                    </Button>
-                </ButtonGroup>
-                <Form.Group controlId="formBasicChecbox">
-                    <Form.Check
-                        type="checkbox"
-                        id="auto-read-memory-checkbox"
-                        className="last-checkbox"
-                        onChange={e => toggleAutoRead(e.target.checked)}
-                        checked={autoRead}
-                        label="Auto read memory"
-                    />
-                    <Form.Check
-                        type="checkbox"
-                        id="toggle-mcuboot-checkbox"
-                        className="last-checkbox"
-                        onChange={e => toggleMcuboot(e.target.checked)}
-                        checked={isMcuboot}
-                        label="Enable MCUboot"
-                    />
-                </Form.Group>
-            </Card.Body>
-        </Card>
-        <Card>
-            <Card.Header>Cellular Modem</Card.Header>
-            <Card.Body>
-                <ButtonGroup vertical>
-                    <Button
-                        key="performModemUpdate"
-                        onClick={performModemUpdate}
-                        disabled={!isModem || !targetIsReady}
-                    >
-                        <span className="mdi mdi-pencil" />
-                        Update modem
-                    </Button>
-                </ButtonGroup>
-            </Card.Body>
-        </Card>
-    </div>
-);
+const ControlPanel = () => {
+    const fileRegionSize = useSelector(getRegions).length;
+    const mruFiles = useSelector(getMruFiles);
+    const autoRead = useSelector(getAutoRead);
+    const targetIsWritable = useSelector(getIsWritable);
+    const targetIsRecoverable = useSelector(getIsRecoverable);
+    const targetIsMemLoaded = useSelector(getIsMemLoaded);
+    const isProtected = !!useSelector(getDeviceInfo).cores.find(
+        c => c.protectionStatus !== nrfdl.NRFDL_PROTECTION_STATUS_NONE
+    );
+    const targetIsReady = useSelector(getIsReady);
+    const isJLink = useSelector(getTargetType) === CommunicationType.JLINK;
+    const isUsbSerial =
+        useSelector(getTargetType) === CommunicationType.USBSDFU;
+    const isModem = useSelector(getIsModem);
+    const isMcuboot = useSelector(getIsMcuboot);
 
-ControlPanel.propTypes = {
-    autoRead: PropTypes.bool.isRequired,
-    closeFiles: PropTypes.func.isRequired,
-    fileRegionSize: PropTypes.number.isRequired,
-    isJLink: PropTypes.bool.isRequired,
-    isMcuboot: PropTypes.bool.isRequired,
-    isModem: PropTypes.bool.isRequired,
-    isUsbSerial: PropTypes.bool.isRequired,
-    isProtected: PropTypes.bool.isRequired,
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
-    onToggleFileList: PropTypes.func.isRequired,
-    openFile: PropTypes.func.isRequired,
-    openFileDialog: PropTypes.func.isRequired,
-    performJLinkRead: PropTypes.func.isRequired,
-    performModemUpdate: PropTypes.func.isRequired,
-    performRecover: PropTypes.func.isRequired,
-    performRecoverAndWrite: PropTypes.func.isRequired,
-    performReset: PropTypes.func.isRequired,
-    performSaveAsFile: PropTypes.func.isRequired,
-    performWrite: PropTypes.func.isRequired,
-    refreshAllFiles: PropTypes.func.isRequired,
-    targetIsMemLoaded: PropTypes.bool.isRequired,
-    targetIsReady: PropTypes.bool.isRequired,
-    targetIsRecoverable: PropTypes.bool.isRequired,
-    targetIsWritable: PropTypes.bool.isRequired,
-    toggleAutoRead: PropTypes.func.isRequired,
-    toggleMcuboot: PropTypes.func.isRequired,
+    const dispatch = useDispatch();
+    const closeFiles = () => dispatch(fileActions.closeFiles());
+    const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
+    const toggleAutoRead = () => dispatch(settingsActions.toggleAutoRead());
+    const toggleMcuboot = () => dispatch(mcubootTargetActions.toggleMcuboot());
+    const performRecover = () => dispatch(jlinkTargetActions.recover());
+    const performRecoverAndWrite = () =>
+        dispatch(jlinkTargetActions.recoverAndWrite());
+    const performSaveAsFile = () => dispatch(jlinkTargetActions.saveAsFile());
+    const performJLinkRead = () => dispatch(jlinkTargetActions.read());
+    const performReset = () => dispatch(usbsdfuTargetActions.resetDevice());
+    const performWrite = () => dispatch(targetActions.write());
+    const performModemUpdate = () =>
+        dispatch(modemTargetActions.selectModemFirmware());
+
+    return (
+        <div className="control-panel">
+            <Card>
+                <Card.Header>File</Card.Header>
+                <Card.Body>
+                    <ButtonGroup vertical>
+                        <Mru mruFiles={mruFiles} />
+                        <Button onClick={refreshAllFiles}>
+                            <span className="mdi mdi-refresh" />
+                            Reload files
+                        </Button>
+                        <Button onClick={closeFiles}>
+                            <span className="mdi mdi-minus-circle" />
+                            Clear files
+                        </Button>
+                    </ButtonGroup>
+                </Card.Body>
+            </Card>
+            <Card>
+                <Card.Header>Device</Card.Header>
+                <Card.Body>
+                    <ButtonGroup vertical>
+                        <Button
+                            key="performRecover"
+                            onClick={performRecover}
+                            disabled={
+                                isMcuboot ||
+                                !isJLink ||
+                                !targetIsReady ||
+                                !targetIsRecoverable
+                            }
+                        >
+                            <span className="mdi mdi-eraser" />
+                            Erase all
+                        </Button>
+                        <Button
+                            key="performRecoverAndWrite"
+                            onClick={performRecoverAndWrite}
+                            disabled={
+                                isMcuboot ||
+                                !isJLink ||
+                                !targetIsReady ||
+                                !fileRegionSize ||
+                                !(targetIsRecoverable && mruFiles.length)
+                            }
+                        >
+                            <span className="mdi mdi-pencil" />
+                            Erase & write
+                        </Button>
+                        <Button
+                            key="performSaveAsFile"
+                            onClick={performSaveAsFile}
+                            disabled={!isJLink || !targetIsMemLoaded}
+                        >
+                            <span className="mdi mdi-floppy" />
+                            Save as file
+                        </Button>
+                        <Button
+                            key="performReset"
+                            onClick={performReset}
+                            disabled={!isUsbSerial || !targetIsReady}
+                        >
+                            <span className="mdi mdi-record" />
+                            Reset
+                        </Button>
+                        <Button
+                            key="performWrite"
+                            onClick={performWrite}
+                            disabled={!targetIsReady || !targetIsWritable}
+                        >
+                            <span className="mdi mdi-pencil" />
+                            Write
+                        </Button>
+                        <Button
+                            key="performJLinkRead"
+                            onClick={performJLinkRead}
+                            disabled={
+                                isMcuboot ||
+                                !isJLink ||
+                                !targetIsReady ||
+                                isProtected
+                            }
+                        >
+                            <span className="mdi mdi-refresh" />
+                            Read
+                        </Button>
+                    </ButtonGroup>
+                    <Form.Group controlId="formBasicChecbox">
+                        <Form.Check
+                            type="checkbox"
+                            id="auto-read-memory-checkbox"
+                            className="last-checkbox"
+                            onChange={e => toggleAutoRead(e.target.checked)}
+                            checked={autoRead}
+                            label="Auto read memory"
+                        />
+                        <Form.Check
+                            type="checkbox"
+                            id="toggle-mcuboot-checkbox"
+                            className="last-checkbox"
+                            onChange={e => toggleMcuboot(e.target.checked)}
+                            checked={isMcuboot}
+                            label="Enable MCUboot"
+                        />
+                    </Form.Group>
+                </Card.Body>
+            </Card>
+            <Card>
+                <Card.Header>Cellular Modem</Card.Header>
+                <Card.Body>
+                    <ButtonGroup vertical>
+                        <Button
+                            key="performModemUpdate"
+                            onClick={performModemUpdate}
+                            disabled={!isModem || !targetIsReady}
+                        >
+                            <span className="mdi mdi-pencil" />
+                            Update modem
+                        </Button>
+                    </ButtonGroup>
+                </Card.Body>
+            </Card>
+        </div>
+    );
 };
 
 export default ControlPanel;

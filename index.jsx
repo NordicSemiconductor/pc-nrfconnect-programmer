@@ -40,9 +40,10 @@ import { logger } from 'nrfconnect/core';
 import { openFile } from './lib/actions/fileActions';
 import { loadSettings } from './lib/actions/settingsActions';
 import { getLibVersions, openDevice } from './lib/actions/targetActions';
-import AppMainView from './lib/containers/appMainView';
-import ControlPanel from './lib/containers/controlPanel';
+import AppMainView from './lib/components/AppMainView';
+import ControlPanel from './lib/components/ControlPanel';
 import appReducer from './lib/reducers';
+import { targetInfoKnown } from './lib/reducers/targetReducer';
 import { hexpad2, hexToKiB } from './lib/util/hexpad';
 import portPath from './lib/util/portPath';
 
@@ -82,17 +83,19 @@ export default {
         getLibVersions();
     },
 
-    decorateMainView: MainView => () => (
-        <MainView cssClass="main-view">
-            <AppMainView />
-        </MainView>
-    ),
+    decorateMainView: MainView => () =>
+        (
+            <MainView cssClass="main-view">
+                <AppMainView />
+            </MainView>
+        ),
 
-    decorateSidePanel: SidePanel => () => (
-        <SidePanel cssClass="side-panel">
-            <ControlPanel />
-        </SidePanel>
-    ),
+    decorateSidePanel: SidePanel => () =>
+        (
+            <SidePanel cssClass="side-panel">
+                <ControlPanel />
+            </SidePanel>
+        ),
 
     mapDeviceSelectorState: (state, props) => ({
         portIndicatorStatus: state.app.target.port !== null ? 'on' : 'off',
@@ -120,8 +123,8 @@ export default {
                 break;
             }
 
-            case 'TARGET_INFO_KNOWN': {
-                currentDeviceInfo = { ...action.deviceInfo };
+            case targetInfoKnown.type: {
+                currentDeviceInfo = { ...action.payload };
                 break;
             }
 

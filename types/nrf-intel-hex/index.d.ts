@@ -4,7 +4,8 @@
 declare module "nrf-intel-hex" {
     export type MemoryBlocks =
         | { [x: number]: Uint8Array }
-        | [number, Uint8Array][];
+        | [number, Uint8Array][]
+        | [string, Uint8Array][];
 
     export type Overlap = [string, Uint8Array][];
     export type Overlaps = Map<number, Overlap>;
@@ -18,7 +19,7 @@ declare module "nrf-intel-hex" {
             memoryBlock: MemoryBlocks
         ): Overlaps;
 
-        public fromHex(hexText: string, maxBlockSize: number): MemoryMap;
+        static fromHex(hexText: string, maxBlockSize?: number): MemoryMap;
 
         public join(maxBlockSize: number): MemoryMap;
 
@@ -33,7 +34,7 @@ declare module "nrf-intel-hex" {
 
         public clone(): MemoryMap;
 
-        public fromPaddedUint8Array(
+        static fromPaddedUint8Array(
             bytes: Uint8Array,
             padByte?: number,
             minPadLength?: number
@@ -45,7 +46,7 @@ declare module "nrf-intel-hex" {
             address: number,
             length: number,
             padByte?: number
-        ): MemoryMap;
+        ): Uint8Array;
 
         public contains(memMap: MemoryMap): boolean;
     }

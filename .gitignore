@@ -4,5 +4,3 @@ jest.json
 .idea/
 .vscode/
 .DS_Store
-.eslintrc
-prettier.config.js

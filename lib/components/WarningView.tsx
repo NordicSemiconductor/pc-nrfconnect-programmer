@@ -34,56 +34,45 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 8 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad8 = (n: number | string): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
+import React from 'react';
+import Alert from 'react-bootstrap/Alert';
+import { useSelector } from 'react-redux';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+import {
+    getFileWarnings,
+    getTargetWarnings,
+    getUserWarnings,
+} from '../reducers/warningReducer';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 2 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+const combineWarnings = (
+    targetWarningStrings: string[],
+    fileWarningStrings: string[],
+    userWarningStrings: string[]
+) =>
+    targetWarningStrings
+        .concat(fileWarningStrings)
+        .concat(userWarningStrings)
+        .map((s, index) => (
+            <Alert variant="danger" key={`warning-${index + 1}`}>
+                <span className="mdi mdi-alert" />
+                {s}
+            </Alert>
+        ));
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
+const WarningView = () => {
+    const targetWarningStrings = useSelector(getTargetWarnings);
+    const fileWarningStrings = useSelector(getFileWarnings);
+    const userWarningStrings = useSelector(getUserWarnings);
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
+    return (
+        <div className="warning-view">
+            {combineWarnings(
+                targetWarningStrings,
+                fileWarningStrings,
+                userWarningStrings
+            )}
+        </div>
+    );
+};
+
+export default WarningView;

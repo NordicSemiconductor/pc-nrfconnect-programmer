@@ -34,56 +34,67 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 8 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad8 = (n: number | string): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
+import React from 'react';
+import { basename } from 'path';
+import PropTypes from 'prop-types';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+import { hexpad8 } from '../util/hexpad';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 2 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+interface RegionInfoViewProps {
+    name?: string;
+    startAddress: number;
+    regionSize: number;
+    fileNames: string[];
+}
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
+const RegionInfoView = ({
+    name,
+    startAddress,
+    regionSize,
+    fileNames,
+}: RegionInfoViewProps) => (
+    <>
+        {name && (
+            <div>
+                <h5>Region name</h5>
+                <p>{name}</p>
+            </div>
+        )}
+        {fileNames.length > 0 && (
+            <div className="files">
+                <h5>
+                    {fileNames.length > 1 ? 'Overlapping files!' : 'File name'}
+                </h5>
+                <p>
+                    {fileNames.map((fileName, index) => (
+                        <span key={`${index + 1}`}>{basename(fileName)}</span>
+                    ))}
+                </p>
+            </div>
+        )}
+        <div>
+            <h5>Address range</h5>
+            <p>
+                {hexpad8(startAddress)} &mdash;{' '}
+                {hexpad8(startAddress + regionSize - 1)}
+            </p>
+        </div>
+        <div>
+            <h5>Size</h5>
+            <p>{regionSize} bytes</p>
+        </div>
+    </>
+);
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
+RegionInfoView.propTypes = {
+    name: PropTypes.string,
+    startAddress: PropTypes.number.isRequired,
+    regionSize: PropTypes.number.isRequired,
+    fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
+
+RegionInfoView.defaultProps = {
+    name: null,
+};
+
+export default RegionInfoView;

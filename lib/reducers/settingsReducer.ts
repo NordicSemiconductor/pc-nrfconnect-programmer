@@ -34,56 +34,35 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 8 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad8 = (n: number | string): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+import { RootState } from './types';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 2 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+export interface SettingsState {
+    autoRead: boolean;
+}
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
+const initialState: SettingsState = {
+    autoRead: false,
+};
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
+const settingsSlice = createSlice({
+    name: 'settings',
+    initialState,
+    reducers: {
+        settingsLoad(state, action: PayloadAction<SettingsState>) {
+            state.autoRead = action.payload.autoRead;
+        },
+        toggleAutoRead(state) {
+            state.autoRead = !state.autoRead;
+        },
+    },
+});
+
+export default settingsSlice.reducer;
+
+const { settingsLoad, toggleAutoRead } = settingsSlice.actions;
+
+export const getAutoRead = (state: RootState) => state.app.settings.autoRead;
+
+export { settingsLoad, toggleAutoRead };

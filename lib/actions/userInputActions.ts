@@ -34,56 +34,49 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 8 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad8 = (n: number | string): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
+import { logger } from 'nrfconnect/core';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+import { TDispatch } from '../reducers';
+import {
+    userInputCancelled,
+    userInputReceived,
+    userInputRequired,
+} from '../reducers/userInputReducer';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 2 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+let userInputCallback: ((input?: string) => void) | undefined;
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
+export function getUserInput(
+    dispatch: TDispatch,
+    message: string,
+    choices: Record<string, string>
+) {
+    return new Promise((resolve, reject) => {
+        userInputCallback = input => {
+            if (input) {
+                resolve(input);
+            } else {
+                reject(new Error('Cancelled by user.'));
+            }
+        };
+        dispatch(userInputRequired({ message, choices }));
+    });
+}
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
+export function receiveUserInput(input?: string) {
+    return (dispatch: TDispatch) => {
+        dispatch(userInputReceived());
+        if (userInputCallback) {
+            userInputCallback(input);
+            userInputCallback = undefined;
+        } else {
+            logger.error('Received user input, but no callback exists.');
+        }
+    };
+}
+
+export function cancelUserInput() {
+    return (dispatch: TDispatch) => {
+        logger.info('User input has been cancelled.');
+        dispatch(userInputCancelled());
+    };
+}

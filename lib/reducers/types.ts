@@ -34,56 +34,28 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 8 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad8 = (n: number | string): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { NrfConnectState } from 'pc-nrfconnect-shared';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+import { FileState } from './fileReducer';
+import { McubootState } from './mcubootReducer';
+import { ModemState } from './modemReducer';
+import { SettingsState } from './settingsReducer';
+import { TargetState } from './targetReducer';
+import { UserInputState } from './userInputReducer';
+import { WarningState } from './warningReducer';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 2 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+interface AppState {
+    // AppState {
+    file: FileState;
+    mcuboot: McubootState;
+    modem: ModemState;
+    settings: SettingsState;
+    target: TargetState;
+    userInput: UserInputState;
+    warning: WarningState;
+}
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
+export type RootState = NrfConnectState<AppState>;
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
+export type TDispatch = ThunkDispatch<RootState, null, AnyAction>;

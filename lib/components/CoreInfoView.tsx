@@ -34,56 +34,48 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 8 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad8 = (n: number | string): string =>
-    `0x${n.toString(16).toUpperCase().padStart(8, '0')}`;
+import React from 'react';
+import PropTypes from 'prop-types';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+import { hexpad8 } from '../util/hexpad';
 
-/**
- * Takes in an integer, returns a string
- * representing that integer as a string of 2 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad2 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
+const hexpad9 = (x: number) => hexpad8(x || '');
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
+interface CoreInfoViewProps {
+    name: string;
+    romBaseAddr: number;
+    romSize: number;
+}
 
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
+const CoreInfoView = ({ name, romBaseAddr, romSize }: CoreInfoViewProps) => (
+    <>
+        {name && (
+            <div>
+                <h5>Core name</h5>
+                <p>{name}</p>
+            </div>
+        )}
+        <div>
+            <h5>Address range</h5>
+            <p>
+                {hexpad9(romBaseAddr)} &mdash; {hexpad9(romBaseAddr + romSize)}
+            </p>
+        </div>
+        <div>
+            <h5>Size</h5>
+            <p>{romSize} bytes</p>
+        </div>
+    </>
+);
+
+CoreInfoView.propTypes = {
+    name: PropTypes.string,
+    romBaseAddr: PropTypes.number.isRequired,
+    romSize: PropTypes.number.isRequired,
+};
+
+CoreInfoView.defaultProps = {
+    name: null,
+};
+
+export default CoreInfoView;
