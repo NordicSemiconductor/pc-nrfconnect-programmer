@@ -74,6 +74,7 @@ export function programDfuModem(serialNumber: string, fileName: string) {
             dispatch(modemWritingSucceed());
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errorCallback = (err: any) => {
             if (err) {
                 console.error(err);
@@ -113,7 +114,7 @@ export function programDfuModem(serialNumber: string, fileName: string) {
                 'NRFDL_FW_NRF91_MODEM',
                 fileName,
                 successCallback,
-                console.log
+                progressCallback
             );
         } catch (e) {
             errorCallback(e);

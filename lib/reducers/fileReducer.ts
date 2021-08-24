@@ -42,10 +42,16 @@ import MemoryMap from 'nrf-intel-hex';
 import { Region } from '../util/regions';
 import { RootState } from './types';
 
+type Loaded = {
+    filename: string;
+    loadTime: Date;
+    modTime: Date;
+    memMap: MemoryMap;
+};
+
 export interface FileState {
     detectedRegionNames: Set<string>;
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    loaded: {};
+    loaded: Record<string, Loaded>;
     mcubootFilePath?: string;
     memMaps: MemoryMap[];
     mruFiles: string[];
@@ -63,7 +69,7 @@ const initialState: FileState = {
 
 interface FileParsePayload {
     memMaps: MemoryMap[];
-    loaded: {};
+    loaded: Record<string, Loaded>;
 }
 
 const fileSlice = createSlice({

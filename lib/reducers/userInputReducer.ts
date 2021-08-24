@@ -40,8 +40,7 @@ import { RootState } from './types';
 
 export interface UserInputState {
     message: string | null;
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    choices: {};
+    choices: Record<string, string>;
     isRequired: boolean;
 }
 
@@ -53,7 +52,7 @@ const initialState: UserInputState = {
 
 interface UserInputRequiredPayload {
     message: string | null;
-    choices: {};
+    choices: Record<string, string>;
 }
 
 const userInputSlice = createSlice({

@@ -38,10 +38,9 @@
 
 import electron from 'electron';
 import Store from 'electron-store';
-import { readFile, stat, statSync } from 'fs';
+import { readFile, stat, Stats, statSync } from 'fs';
 import MemoryMap from 'nrf-intel-hex';
 import { logger } from 'nrfconnect/core';
-import { Stats } from 'original-fs';
 import { basename } from 'path';
 
 import {
@@ -70,6 +69,7 @@ const persistentStore = new Store({ name: 'nrf-programmer' });
 
 export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const errorDialogShowAction = (error: any) => ({
     type: ERROR_DIALOG_SHOW,
     message: error.message || error,

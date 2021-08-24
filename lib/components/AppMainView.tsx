@@ -58,7 +58,7 @@ function getTargetTitle(
     return undefined;
 }
 
-function hasFileContent(loaded: {}) {
+function hasFileContent(loaded: Record<string, unknown>) {
     return Object.keys(loaded).length > 0;
 }
 
