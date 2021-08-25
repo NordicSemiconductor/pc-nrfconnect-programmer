@@ -40,8 +40,8 @@ import electron from 'electron';
 import Store from 'electron-store';
 import { readFile, stat, Stats, statSync } from 'fs';
 import MemoryMap from 'nrf-intel-hex';
-import { logger } from 'nrfconnect/core';
 import { basename } from 'path';
+import { logger } from 'pc-nrfconnect-shared';
 
 import {
     fileParse,

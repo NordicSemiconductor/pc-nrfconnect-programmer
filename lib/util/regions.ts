@@ -37,7 +37,7 @@
 /* eslint-disable no-bitwise */
 
 import MemoryMap, { MemoryBlocks, Overlaps } from 'nrf-intel-hex';
-import { logger } from 'nrfconnect/core';
+import { logger } from 'pc-nrfconnect-shared';
 
 import { CoreDefinition, DeviceDefinition } from './devices';
 import { hexpad2 } from './hexpad';

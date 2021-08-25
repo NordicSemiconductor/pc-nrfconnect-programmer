@@ -36,7 +36,7 @@
 
 import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
-import { logger } from 'nrfconnect/core';
+import { logger } from 'pc-nrfconnect-shared';
 
 import {
     MODEM_DFU_STARTING,

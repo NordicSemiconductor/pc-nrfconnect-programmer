@@ -41,7 +41,7 @@ import nrfdl, {
     DeviceFamily,
     ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
-import { logger } from 'nrfconnect/core';
+import { logger } from 'pc-nrfconnect-shared';
 
 import range from './range';
 

@@ -37,8 +37,7 @@
 /* eslint-disable import/no-cycle */
 
 import { Serialport } from '@nordicsemiconductor/nrf-device-lib-js';
-import { logger } from 'nrfconnect/core';
-import { Device } from 'pc-nrfconnect-shared';
+import { Device, logger } from 'pc-nrfconnect-shared';
 
 import {
     loadingStart,

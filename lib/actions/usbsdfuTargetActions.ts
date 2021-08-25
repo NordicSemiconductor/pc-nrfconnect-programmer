@@ -41,9 +41,9 @@ import AdmZip from 'adm-zip';
 import Crypto from 'crypto';
 import { detachAndWaitFor, dfuTrigger } from 'nrf-device-setup';
 import MemoryMap from 'nrf-intel-hex';
-import { logger } from 'nrfconnect/core';
 import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
+import { logger } from 'pc-nrfconnect-shared';
 import tmp from 'tmp';
 
 import {
