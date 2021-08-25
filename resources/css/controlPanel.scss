@@ -37,8 +37,9 @@
 $labelHeight: 12px;
 
 .control-panel {
-    height: 100%;
-    width: 100%;
+    // Adjust for the old styled control panel in the new styled side panel
+    padding-top: 10px;
+    margin: 0 -8px;
 
     .card {
         margin-bottom: 16px;

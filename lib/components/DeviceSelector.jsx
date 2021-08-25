@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -34,21 +34,33 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
-import { App } from 'pc-nrfconnect-shared';
+import { connect } from 'react-redux';
+import { DeviceSelector, logger } from 'pc-nrfconnect-shared';
 
-import AppMainView from './lib/components/AppMainView';
-import ControlPanel from './lib/components/ControlPanel';
-import DeviceSelector from './lib/components/DeviceSelector';
-import appReducer from './lib/reducers';
+import { openDevice } from '../actions/targetActions';
 
-import './resources/css/index.scss';
+const deviceListing = {
+    nordicUsb: true,
+    serialport: true,
+    jlink: true,
+};
 
-export default () => (
-    <App
-        appReducer={appReducer}
-        deviceSelect={<DeviceSelector />}
-        sidePanel={<ControlPanel />}
-        panes={[{ name: 'Programmer', Main: AppMainView }]}
-    />
-);
+const deviceSetup = {
+    needSerialport: true,
+};
+
+const mapState = () => ({
+    deviceListing,
+    deviceSetup,
+});
+
+const mapDispatch = dispatch => ({
+    onDeviceIsReady: device => {
+        dispatch(openDevice(device));
+    },
+    onDeviceDeselected: () => {
+        logger.info('Target device closed.');
+    },
+});
+
+export default connect(mapState, mapDispatch)(DeviceSelector);

@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Card from 'react-bootstrap/Card';
@@ -68,7 +68,43 @@ import {
 } from '../reducers/targetReducer';
 import { CommunicationType } from '../util/devices';
 
+const useRegisterDragEvents = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        const onDragover = event => {
+            const ev = event;
+            ev.dataTransfer.dropEffect = 'copy';
+            ev.preventDefault();
+        };
+
+        const onDrop = event => {
+            Array.from(event.dataTransfer.files).forEach(i => {
+                dispatch(fileActions.openFile(i.path));
+            });
+            event.preventDefault();
+        };
+
+        document.body.addEventListener('drop', onDrop);
+        document.body.addEventListener('dragover', onDragover);
+
+        return () => {
+            document.body.removeEventListener('drop', onDrop);
+            document.body.removeEventListener('dragover', onDragover);
+        };
+    }, [dispatch]);
+};
+
+const useLoadSettingsInitially = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(settingsActions.loadSettings());
+    }, [dispatch]);
+};
+
 const Mru = ({ mruFiles }) => {
+    useRegisterDragEvents();
+    useLoadSettingsInitially();
+
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
 
