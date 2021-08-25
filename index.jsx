@@ -39,7 +39,7 @@ import { logger } from 'nrfconnect/core';
 
 import { openFile } from './lib/actions/fileActions';
 import { loadSettings } from './lib/actions/settingsActions';
-import { getLibVersions, openDevice } from './lib/actions/targetActions';
+import { openDevice } from './lib/actions/targetActions';
 import AppMainView from './lib/components/AppMainView';
 import ControlPanel from './lib/components/ControlPanel';
 import appReducer from './lib/reducers';
@@ -79,8 +79,6 @@ export default {
             });
             event.preventDefault();
         };
-
-        getLibVersions();
     },
 
     decorateMainView: MainView => () =>

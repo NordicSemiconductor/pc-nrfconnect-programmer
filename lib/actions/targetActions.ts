@@ -36,7 +36,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl, { Serialport } from '@nordicsemiconductor/nrf-device-lib-js';
+import { Serialport } from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from 'nrfconnect/core';
 import { Device } from 'pc-nrfconnect-shared';
 
@@ -48,7 +48,6 @@ import {
 import { RootState, TDispatch } from '../reducers/types';
 import {
     CommunicationType,
-    context,
     McubootProductIds,
     USBProductIds,
     VendorId,
@@ -58,46 +57,6 @@ import { refreshAllFiles } from './fileActions';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
-
-export const getLibVersions = async () => {
-    try {
-        const versions = await nrfdl.getModuleVersions(context);
-
-        // Get @nordicsemiconductor/nrf-device-lib-js version
-        const nrfdlJsVersion = versions.find(
-            (v: nrfdl.ModuleVersion) => v.moduleName === 'nrfdl-js'
-        ).version;
-        const nrfdlJsVersionString = `${nrfdlJsVersion.major}.${nrfdlJsVersion.minor}.${nrfdlJsVersion.patch}`;
-        logger.info(
-            'Using @nordicsemiconductor/nrf-device-lib-js version',
-            nrfdlJsVersionString
-        );
-
-        // Get nrf-device-lib version
-        const nrfdlVersion = versions.find(
-            (v: nrfdl.ModuleVersion) => v.moduleName === 'nrfdl'
-        ).version;
-        const nrfdlVersionString = `${nrfdlVersion.major}.${nrfdlVersion.minor}.${nrfdlVersion.patch}`;
-        logger.info('Using nrf-device-lib version', nrfdlVersionString);
-
-        // Get nrfjprog dll version
-        const nrfjprogVersion = versions.find(
-            (v: nrfdl.ModuleVersion) => v.moduleName === 'nrfjprog_dll'
-        ).version;
-        const nrfjprogVersionString = `${nrfjprogVersion.major}.${nrfjprogVersion.minor}.${nrfjprogVersion.patch}`;
-        logger.info('Using nrfjprog dll version', nrfjprogVersionString);
-
-        // Get jLink dll version
-        const jlinkVersion = versions.find(
-            (v: nrfdl.ModuleVersion) => v.moduleName === 'jlink_dll'
-        ).version;
-        logger.info('Using JLink version', jlinkVersion);
-    } catch (error) {
-        logger.error(
-            `Failed to get the library versions: ${error.message || error}`
-        );
-    }
-};
 
 export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     dispatch(loadingStart());
