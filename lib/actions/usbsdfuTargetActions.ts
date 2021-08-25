@@ -41,11 +41,7 @@ import AdmZip from 'adm-zip';
 import Crypto from 'crypto';
 import { detachAndWaitFor, dfuTrigger } from 'nrf-device-setup';
 import MemoryMap from 'nrf-intel-hex';
-import {
-    logger,
-    startWatchingDevices,
-    stopWatchingDevices,
-} from 'nrfconnect/core';
+import { logger } from 'nrfconnect/core';
 import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
 import tmp from 'tmp';
@@ -333,7 +329,8 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) =>
                     logger.info(
                         'DFU trigger interface found, changing to bootloader...'
                     );
-                    dispatch(stopWatchingDevices());
+                    // Unsure whether this can be removed with nrf-device-lib
+                    // dispatch(stopWatchingDevices());
                     return detachAndWaitFor(
                         usbdev,
                         interfaceNumber,
@@ -345,7 +342,8 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) =>
                                 path: portPath(newDevice.serialport),
                             })
                         );
-                        dispatch(startWatchingDevices());
+                        // Unsure whether this can be removed with nrf-device-lib
+                        // dispatch(startWatchingDevices());
                         return newDevice;
                     });
                 }
@@ -664,8 +662,9 @@ export function write() {
         logger.info('Performing DFU. This may take a few seconds');
         dispatch(writingStart());
 
+        // Unsure whether this can be removed with nrf-device-lib
         // Stop watching devices during the DFU
-        dispatch(stopWatchingDevices());
+        // dispatch(stopWatchingDevices());
 
         const { serialNumber } = getState().app.target;
         const { id: deviceId } = await getDeviceFromNrfdl(
@@ -699,7 +698,8 @@ export function write() {
                         'All dfu images have been written to the target device'
                     );
                 }
-                dispatch(startWatchingDevices());
+                // Unsure whether this can be removed with nrf-device-lib
+                // dispatch(startWatchingDevices());
                 dispatch(writingEnd());
             },
             ({ progressJson: progress }: nrfdl.Progress) => {
