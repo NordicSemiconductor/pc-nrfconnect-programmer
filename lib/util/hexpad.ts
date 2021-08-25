@@ -48,18 +48,6 @@ export const hexpad8 = (n: number | string): string =>
 
 /**
  * Takes in an integer, returns a string
- * representing that integer as a string of 4 hexadecimal
- * numbers prepended by '0x'.
- *
- * @param {number} n the number to be operated
- *
- * @returns {string} padded string
- */
-export const hexpad4 = (n: number): string =>
-    `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
-
-/**
- * Takes in an integer, returns a string
  * representing that integer as a string of 2 hexadecimal
  * numbers prepended by '0x'.
  *
@@ -69,21 +57,3 @@ export const hexpad4 = (n: number): string =>
  */
 export const hexpad2 = (n: number): string =>
     `0x${n.toString(16).toUpperCase().padStart(2, '0')}`;
-
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in KiB
- */
-export const hexToKiB = (n: number): string => `${n / 1024} KiB`;
-
-/**
- * Takes in an integer of the number in Byte and return the number in KiB
- *
- * @param {number} n the number in Byte
- *
- * @returns {string} the number in MiB
- */
-export const hexToMiB = (n: number) => `${n / 1024 / 1024} MiB`;
