@@ -69,11 +69,11 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         })
     );
 
-    if (device.traits.includes('jlink')) {
-        dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
+    if (device.traits['jlink']) {
+        dispatch(jlinkTargetActions.loadDeviceInfo(device));
         return;
     }
-    if (device.traits.includes('nordicUsb')) {
+    if (device.traits['nordicUsb']) {
         dispatch(usbsdfuTargetActions.openDevice(device));
         return;
     }

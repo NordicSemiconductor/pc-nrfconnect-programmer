@@ -94,7 +94,7 @@ export const formatSerialNumber = (serialNumber: string | number) => {
 // Display some information about a DevKit. Called on a DevKit connection.
 // This also triggers reading the whole memory contents of the device.
 export const loadDeviceInfo =
-    (serialNumber: string, fullRead = false, eraseAndWrite = false) =>
+    (device: Device, fullRead = false, eraseAndWrite = false) =>
     async (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(loadingStart());
         dispatch(targetWarningRemove());
@@ -108,7 +108,6 @@ export const loadDeviceInfo =
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target throught JLink'
         );
 
-        const device = await getDeviceFromNrfdl(serialNumber);
         logDeviceInfo(device);
         let deviceInfo = getDeviceInfoByJlink(device);
 
@@ -216,12 +215,12 @@ export const loadDeviceInfo =
 
 const logDeviceInfo = (device: Device) => {
     const {
-        jlink_ob_firmware_version: jlinkOBFwVersion,
-        device_family: deviceFamily,
-        device_version: deviceVersion,
-        board_version: boardVersion,
+        jlinkObFirmwareVersion,
+        deviceFamily,
+        deviceVersion,
+        boardVersion,
     } = device.jlink;
-    logger.info('JLink OB firmware version', jlinkOBFwVersion);
+    logger.info('JLink OB firmware version', jlinkObFirmwareVersion);
     logger.info('Device family', deviceFamily);
     logger.info('Device version', deviceVersion);
     logger.info('Board version', boardVersion);
