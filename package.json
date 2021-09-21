@@ -54,7 +54,8 @@
     },
     "dependencies": {
         "adm-zip": "^0.5.2",
-        "electron-store": "5.1.1"
+        "electron-store": "5.1.1",
+        "react-timer-hook": "^3.0.5"
     },
     "bundledDependencies": [
         "electron-store"

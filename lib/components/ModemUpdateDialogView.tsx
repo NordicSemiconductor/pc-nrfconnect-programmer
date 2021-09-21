@@ -34,13 +34,14 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
+import { useStopwatch } from 'react-timer-hook';
 
 import { cancelUpdate, performUpdate } from '../actions/modemTargetActions';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
@@ -57,8 +58,6 @@ import {
 } from '../reducers/modemReducer';
 
 const ModemUpdateDialogView = () => {
-    const [timer, setTimer] = useState(0);
-
     const isVisible = useSelector(getIsReady);
     const isWriting = useSelector(getIsWriting);
     const isWritingSucceed = useSelector(getIsWritingSucceed);
@@ -73,22 +72,19 @@ const ModemUpdateDialogView = () => {
     const dispatch = useDispatch();
     const onCancel = () => dispatch(cancelUpdate());
 
-    const intervalId = useRef<NodeJS.Timeout>();
+    const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
+        useStopwatch({ autoStart: true });
 
-    function onWriteStart() {
-        setTimer(0);
-        if (intervalId.current) {
-            clearInterval(intervalId.current);
-        }
-        intervalId.current = setInterval(() => {
-            setTimer(timer + 1);
-        }, 1000);
+    const onWriteStart = () => {
+        reset();
+        start();
         dispatch(performUpdate());
+    };
+
+    if (isRunning && (isWritingSucceed || isWritingFail)) {
+        pause();
     }
 
-    if (intervalId.current && (isWritingSucceed || isWritingFail)) {
-        clearInterval(intervalId.current);
-    }
     let progressStepStatus = '';
     progressStepStatus =
         progressStep === 1 ? ': App firmware update' : progressStepStatus;
@@ -147,7 +143,14 @@ const ModemUpdateDialogView = () => {
                         )}
                     {isWritingSucceed && !isWriting && (
                         <Alert variant="success">
-                            Completed successfully in {timer} seconds.
+                            Completed successfully in
+                            {` ${
+                                days * 24 * 60 * 60 +
+                                hours * 60 * 60 +
+                                minutes * 60 +
+                                seconds
+                            } `}
+                            seconds.
                         </Alert>
                     )}
                     {isWritingFail && !isWriting && (

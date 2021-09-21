@@ -129,10 +129,17 @@ export const performUpdate =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(modemWritingStart());
         dispatch(modemProcessUpdate({ message: MODEM_DFU_STARTING }));
-        logger.info('Modem DFU starts to write...');
 
         const { modemFwName: fileName } = getState().app.modem;
         const { serialNumber } = getState().app.target;
+
+        if (!serialNumber) {
+            logger.error(
+                'Modem DFU does not start due to missing serialNumber'
+            );
+            return;
+        }
+        logger.info('Modem DFU starts to write...');
         logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
 
         if (getState().app.mcuboot.isMcuboot) {
