@@ -202,7 +202,7 @@ const loadDeviceInfo =
                 },
             };
             const fwInfo: nrfdl.FWInfo.ReadResult = await nrfdl.readFwInfo(
-                context,
+                getDeviceLibContext(),
                 device.id
             );
             const deviceInfoOrigin = getDeviceInfoByUSB(hardwareVersion);
@@ -674,7 +674,7 @@ export function write() {
         let prevPercentage: number;
 
         nrfdl.firmwareProgram(
-            context,
+            getDeviceLibContext(),
             deviceId,
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_SDFU_ZIP',

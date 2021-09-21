@@ -258,7 +258,7 @@ export const performUpdate =
             const device = await getDeviceFromNrfdl(serialNumber as string);
             console.log(device);
             nrfdl.firmwareProgram(
-                context,
+                getDeviceLibContext(),
                 device.id,
                 'NRFDL_FW_FILE',
                 'NRFDL_FW_MCUBOOT',

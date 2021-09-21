@@ -36,7 +36,7 @@
 
 import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
-import { logger } from 'pc-nrfconnect-shared';
+import { getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
 
 import {
     MODEM_DFU_STARTING,
@@ -48,7 +48,6 @@ import {
     modemWritingSucceed,
 } from '../reducers/modemReducer';
 import { RootState, TDispatch } from '../reducers/types';
-import { context, getDeviceFromNrfdl } from '../util/devices';
 
 export const selectModemFirmware = () => (dispatch: TDispatch) => {
     const dialogOptions: Electron.OpenDialogOptions = {
@@ -68,7 +67,7 @@ export const cancelUpdate = () => (dispatch: TDispatch) => {
 };
 
 export function programDfuModem(serialNumber: string, fileName: string) {
-    return async (dispatch: TDispatch) => {
+    return async (dispatch: TDispatch, getState: () => RootState) => {
         const successCallback = () => {
             logger.info('Modem DFU completed successfully!');
             dispatch(modemWritingSucceed());
@@ -77,7 +76,6 @@ export function programDfuModem(serialNumber: string, fileName: string) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const errorCallback = (err: any) => {
             if (err) {
-                console.error(err);
                 logger.error(`Modem DFU failed with error: ${err}`);
                 let errorMsg = err.message || err;
                 if (err.message.includes('0x4')) {
@@ -99,16 +97,15 @@ export function programDfuModem(serialNumber: string, fileName: string) {
         const progressCallback = ({
             progressJson: progress,
         }: nrfdl.Progress) => {
-            console.log(progress);
-            const message = `${progress.operation} (${progress.progress_percentage})`;
+            const message = `${progress.operation} ${progress.progressPercentage}%`;
             dispatch(modemProcessUpdate({ message }));
         };
 
         try {
-            const device = await getDeviceFromNrfdl(serialNumber);
-            console.log(device);
+            const { devices } = getState().device;
+            const device = devices[serialNumber];
             nrfdl.firmwareProgram(
-                context,
+                getDeviceLibContext(),
                 device.id,
                 'NRFDL_FW_FILE',
                 'NRFDL_FW_NRF91_MODEM',
@@ -135,12 +132,12 @@ export const performUpdate =
         logger.info('Modem DFU starts to write...');
 
         const { modemFwName: fileName } = getState().app.modem;
-        const serialNumber = Number(getState().app.target.serialNumber);
+        const { serialNumber } = getState().app.target;
         logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
 
         if (getState().app.mcuboot.isMcuboot) {
             dispatch(performMcuUpdate(fileName));
         } else {
-            dispatch(programDfuModem(`000${serialNumber}`, fileName));
+            dispatch(programDfuModem(serialNumber, fileName));
         }
     };
