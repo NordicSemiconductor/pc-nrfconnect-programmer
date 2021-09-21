@@ -44,7 +44,7 @@ import nrfdl, {
 import { remote } from 'electron';
 import fs from 'fs';
 import MemoryMap, { MemoryBlocks } from 'nrf-intel-hex';
-import { logger } from 'pc-nrfconnect-shared';
+import { getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
 
 import { modemKnown } from '../reducers/modemReducer';
 import {
@@ -65,7 +65,6 @@ import { targetWarningRemove } from '../reducers/warningReducer';
 import {
     addCoreToDeviceInfo,
     CommunicationType,
-    context,
     CoreDefinition,
     DeviceDefinition,
     getDeviceFromNrfdl,
@@ -105,21 +104,24 @@ export const loadDeviceInfo =
             })
         );
         logger.info(
-            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target throught JLink'
+            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via JLink'
         );
 
         logDeviceInfo(device);
         let deviceInfo = getDeviceInfoByJlink(device);
 
         // Update modem target info according to detected device info
-        dispatch(modemKnown(device.jlink.device_family.includes('NRF91')));
+        dispatch(modemKnown(device.jlink.deviceFamily.includes('NRF91')));
 
         // By default readback protection is none
         let protectionStatus = nrfdl.NRFDL_PROTECTION_STATUS_NONE;
 
         try {
             protectionStatus = (
-                await nrfdl.deviceControlGetProtectionStatus(context, device.id)
+                await nrfdl.deviceControlGetProtectionStatus(
+                    getDeviceLibContext(),
+                    device.id
+                )
             ).protection_status;
         } catch (error) {
             logger.error('Error while getting readback protection');
@@ -129,10 +131,13 @@ export const loadDeviceInfo =
 
         let coreName = 'Application';
 
-        let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(context, device.id);
+        let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
+            getDeviceLibContext(),
+            device.id
+        );
         deviceCoreInfo = { ...deviceCoreInfo, protectionStatus };
         deviceInfo = addCoreToDeviceInfo(deviceInfo, deviceCoreInfo, coreName);
-        const isFamilyNrf53 = device.jlink.device_family.includes('NRF53');
+        const isFamilyNrf53 = device.jlink.deviceFamily.includes('NRF53');
 
         // Since nRF53 family is dual core devices
         // It needs an additional check for readback protection on network core
@@ -140,14 +145,14 @@ export const loadDeviceInfo =
             coreName = 'Network';
             const coreNameConstant = 'NRFDL_DEVICE_CORE_NETWORK';
             deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
-                context,
+                getDeviceLibContext(),
                 device.id,
                 'NRFDL_DEVICE_CORE_NETWORK'
             );
             try {
                 protectionStatus = (
                     await nrfdl.deviceControlGetProtectionStatus(
-                        context,
+                        getDeviceLibContext(),
                         device.id,
                         coreNameConstant
                     )
@@ -236,7 +241,7 @@ const getDeviceMemMap = async (
     if (!readAll) return undefined;
     const result = await new Promise(resolve => {
         nrfdl.firmwareRead(
-            context,
+            getDeviceLibContext(),
             deviceId,
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_INTEL_HEX',
@@ -327,7 +332,7 @@ export const recoverOneCore =
 
         try {
             await nrfdl.firmwareErase(
-                context,
+                getDeviceLibContext(),
                 deviceId,
                 coreInfo.name === 'Network'
                     ? 'NRFDL_DEVICE_CORE_NETWORK'
@@ -381,7 +386,7 @@ const writeHex = async (
     );
 
     nrfdl.firmwareProgram(
-        context,
+        getDeviceLibContext(),
         deviceId,
         'NRFDL_FW_BUFFER',
         'NRFDL_FW_INTEL_HEX',

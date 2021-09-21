@@ -41,7 +41,6 @@ import nrfdl, {
     DeviceFamily,
     ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
-import { logger } from 'pc-nrfconnect-shared';
 
 import range from './range';
 
@@ -252,10 +251,8 @@ export const getDeviceInfoByUSB = ({
 
 // Get device info by calling @nordicsemiconductor/nrf-device-lib-js
 export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
-    const model = device.jlink.device_version;
-    const family = device.jlink.device_family;
-    logger.info(`Device family ${family}`);
-    logger.info(`Device model ${model}`);
+    const model = device.jlink.deviceVersion;
+    const family = device.jlink.deviceFamily;
 
     return {
         ...getDeviceDefinition(model),
