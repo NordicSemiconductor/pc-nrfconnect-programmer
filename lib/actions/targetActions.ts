@@ -36,8 +36,8 @@
 
 /* eslint-disable import/no-cycle */
 
-import { Serialport } from '@nordicsemiconductor/nrf-device-lib-js';
-import { Device, logger } from 'pc-nrfconnect-shared';
+import { Device, SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
+import { logger } from 'pc-nrfconnect-shared';
 
 import {
     loadingStart,
@@ -59,6 +59,7 @@ import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
 export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     dispatch(loadingStart());
+    console.log(device);
 
     const { serialNumber, serialport } = device;
 
@@ -69,16 +70,16 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         })
     );
 
-    if (device.traits['jlink']) {
+    if (device.traits.jlink) {
         dispatch(jlinkTargetActions.loadDeviceInfo(device));
         return;
     }
-    if (device.traits['nordicUsb']) {
+    if (device.traits.nordicUsb) {
         dispatch(usbsdfuTargetActions.openDevice(device));
         return;
     }
 
-    const { vendorId, productId } = serialport as Serialport;
+    const { vendorId, productId } = serialport as unknown as SerialPort;
     const vid = parseInt(vendorId.toString(16), 16);
     const pid = parseInt(productId.toString(16), 16);
     if (vid === VendorId.NORDIC_SEMICONDUCTOR) {
