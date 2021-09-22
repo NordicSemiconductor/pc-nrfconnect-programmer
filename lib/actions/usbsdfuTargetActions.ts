@@ -39,7 +39,7 @@
 import nrfdl, { Device, Error } from '@nordicsemiconductor/nrf-device-lib-js';
 import AdmZip from 'adm-zip';
 import Crypto from 'crypto';
-import { detachAndWaitFor, dfuTrigger } from 'nrf-device-setup';
+// import { detachAndWaitFor, dfuTrigger } from 'nrf-device-setup';
 import MemoryMap from 'nrf-intel-hex';
 import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
@@ -321,33 +321,33 @@ const loadDeviceInfo =
 export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) =>
     Promise.resolve(selectedDevice)
         .then(device => {
-            if (device && device.usb) {
-                const usbdev = device.usb.device;
-                const interfaceNumber =
-                    dfuTrigger.getDFUInterfaceNumber(usbdev);
-                if (interfaceNumber >= 0) {
-                    logger.info(
-                        'DFU trigger interface found, changing to bootloader...'
-                    );
-                    // Unsure whether this can be removed with nrf-device-lib
-                    // dispatch(stopWatchingDevices());
-                    return detachAndWaitFor(
-                        usbdev,
-                        interfaceNumber,
-                        selectedDevice.serialNumber
-                    ).then((newDevice: Device) => {
-                        dispatch(
-                            targetPortChanged({
-                                serialNumber: newDevice.serialNumber,
-                                path: portPath(newDevice.serialport),
-                            })
-                        );
-                        // Unsure whether this can be removed with nrf-device-lib
-                        // dispatch(startWatchingDevices());
-                        return newDevice;
-                    });
-                }
-            }
+            // if (device && device.usb) {
+            //     const usbdev = device.usb.device;
+            //     const interfaceNumber =
+            //         dfuTrigger.getDFUInterfaceNumber(usbdev);
+            //     if (interfaceNumber >= 0) {
+            //         logger.info(
+            //             'DFU trigger interface found, changing to bootloader...'
+            //         );
+            //         // Unsure whether this can be removed with nrf-device-lib
+            //         // dispatch(stopWatchingDevices());
+            //         return detachAndWaitFor(
+            //             usbdev,
+            //             interfaceNumber,
+            //             selectedDevice.serialNumber
+            //         ).then((newDevice: Device) => {
+            //             dispatch(
+            //                 targetPortChanged({
+            //                     serialNumber: newDevice.serialNumber,
+            //                     path: portPath(newDevice.serialport),
+            //                 })
+            //             );
+            //             // Unsure whether this can be removed with nrf-device-lib
+            //             // dispatch(startWatchingDevices());
+            //             return newDevice;
+            //         });
+            //     }
+            // }
             return device;
         })
         .then(device => dispatch(loadDeviceInfo(device)))
