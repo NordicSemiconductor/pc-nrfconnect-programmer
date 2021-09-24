@@ -73,7 +73,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     );
 
     if (device.traits.jlink) {
-        dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
+        dispatch(jlinkTargetActions.openDevice(device));
         return;
     }
     if (device.traits.mcuboot) {
@@ -100,7 +100,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         }
     }
     if (vid === VendorId.SEGGER) {
-        dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
+        dispatch(jlinkTargetActions.openDevice());
         return;
     }
 

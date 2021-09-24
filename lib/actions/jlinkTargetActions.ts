@@ -92,9 +92,11 @@ export const formatSerialNumber = (serialNumber: string | number) => {
 
 // Display some information about a DevKit. Called on a DevKit connection.
 // This also triggers reading the whole memory contents of the device.
-export const loadDeviceInfo =
+export const openDevice =
     (device: Device, fullRead = false, eraseAndWrite = false) =>
     async (dispatch: TDispatch, getState: () => RootState) => {
+        if (!device) logger.error('Error when open device');
+
         dispatch(loadingStart());
         dispatch(targetWarningRemove());
         dispatch(
@@ -114,6 +116,7 @@ export const loadDeviceInfo =
         dispatch(modemKnown(device.jlink.deviceFamily.includes('NRF91')));
 
         // By default readback protection is none
+        // TODO: fix type in nrfdl
         let protectionStatus = nrfdl.NRFDL_PROTECTION_STATUS_NONE;
 
         try {
@@ -131,6 +134,7 @@ export const loadDeviceInfo =
 
         let coreName = 'Application';
 
+        // TODO: fix type in nrfdl
         let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
             getDeviceLibContext(),
             device.id
@@ -144,6 +148,7 @@ export const loadDeviceInfo =
         if (isFamilyNrf53) {
             coreName = 'Network';
             const coreNameConstant = 'NRFDL_DEVICE_CORE_NETWORK';
+            // TODO: fix type in nrfdl
             deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
                 getDeviceLibContext(),
                 device.id,
@@ -312,8 +317,7 @@ const updateTargetRegions =
 export const read =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(loadingStart());
-        const { serialNumber } = getState().app.target;
-        await dispatch(loadDeviceInfo(serialNumber as string, true));
+        await dispatch(openDevice(device, true));
     };
 
 // Call nrfprog.recover() to recover one core

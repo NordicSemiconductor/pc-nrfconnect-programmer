@@ -99,7 +99,8 @@ export function programDfuModem(fileName: string) {
 
         const progressCallback = ({
             progressJson: progress,
-        }: nrfdl.Progress) => {
+        }: nrfdl.Progress.CallbackParameters) => {
+            // TODO: Fix type in nrfdl
             const message = `${progress.operation} ${progress.progressPercentage}%`;
             dispatch(modemProcessUpdate({ message }));
         };
