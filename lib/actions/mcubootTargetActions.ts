@@ -105,9 +105,7 @@ export const pickSerialPort2 = (serialports: Array<SerialPort>) => {
 };
 
 export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
-    const serialports = Object.keys(selectedDevice)
-        .filter(s => s.startsWith('serialport'))
-        .map(s => selectedDevice[s]);
+    const { serialPorts } = selectedDevice;
     dispatch(
         targetTypeKnown({
             targetType: CommunicationType.MCUBOOT,
@@ -118,8 +116,8 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     dispatch(modemKnown(true));
     dispatch(
         mcubootPortKnown({
-            port: portPath(pickSerialPort(serialports)),
-            port2: portPath(pickSerialPort2(serialports)),
+            port: portPath(pickSerialPort(serialPorts)),
+            port2: portPath(pickSerialPort2(serialPorts)),
         })
     );
     dispatch(updateTargetWritable());

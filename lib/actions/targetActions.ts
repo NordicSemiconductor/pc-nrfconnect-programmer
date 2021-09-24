@@ -41,6 +41,7 @@ import { logger } from 'pc-nrfconnect-shared';
 
 import {
     loadingStart,
+    targetDeviceKnown,
     targetPortChanged,
     targetWritableKnown,
 } from '../reducers/targetReducer';
@@ -59,6 +60,7 @@ import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
 export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     dispatch(loadingStart());
+    dispatch(targetDeviceKnown(device));
 
     const { serialNumber, serialPorts } = device;
     const serialport = serialPorts[0];
