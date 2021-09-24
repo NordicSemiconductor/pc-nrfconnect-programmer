@@ -41,6 +41,7 @@ import { logger } from 'pc-nrfconnect-shared';
 
 import {
     loadingStart,
+    targetDeviceKnown,
     targetPortChanged,
     targetWritableKnown,
 } from '../reducers/targetReducer';
@@ -59,9 +60,10 @@ import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
 export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     dispatch(loadingStart());
-    console.log(device);
+    dispatch(targetDeviceKnown(device));
 
-    const { serialNumber, serialport } = device;
+    const { serialNumber, serialPorts } = device;
+    const serialport = serialPorts[0];
 
     dispatch(
         targetPortChanged({
@@ -71,7 +73,11 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     );
 
     if (device.traits.jlink) {
-        dispatch(jlinkTargetActions.loadDeviceInfo(device));
+        dispatch(jlinkTargetActions.loadDeviceInfo(serialNumber));
+        return;
+    }
+    if (device.traits.mcuboot) {
+        dispatch(mcubootTargetActions.openDevice(device));
         return;
     }
     if (device.traits.nordicUsb) {
@@ -79,15 +85,16 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         return;
     }
 
-    const { vendorId, productId } = serialport as unknown as SerialPort;
-    const vid = parseInt(vendorId.toString(16), 16);
-    const pid = parseInt(productId.toString(16), 16);
+    const { vendorId, productId } = serialport as SerialPort;
+    const vid = vendorId ? parseInt(vendorId.toString(), 16) : null;
+    const pid = productId ? parseInt(productId.toString(), 16) : null;
+
     if (vid === VendorId.NORDIC_SEMICONDUCTOR) {
-        if (USBProductIds.includes(pid)) {
+        if (pid && USBProductIds.includes(pid)) {
             dispatch(usbsdfuTargetActions.openDevice(device));
             return;
         }
-        if (McubootProductIds.includes(pid)) {
+        if (pid && McubootProductIds.includes(pid)) {
             dispatch(mcubootTargetActions.openDevice(device));
             return;
         }

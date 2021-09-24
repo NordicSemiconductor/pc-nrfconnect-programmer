@@ -36,6 +36,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
 
@@ -54,6 +55,7 @@ export interface TargetState {
     readonly port?: string;
     readonly serialNumber?: string;
     readonly deviceInfo?: DeviceDefinition;
+    readonly device?: Device;
     readonly memMap?: MemoryMap;
     readonly regions?: Region[]; // TODO: Define region
     readonly warnings?: string[];
@@ -114,6 +116,9 @@ const targetSlice = createSlice({
         },
         targetInfoKnown(state, action: PayloadAction<DeviceDefinition>) {
             state.deviceInfo = action.payload;
+        },
+        targetDeviceKnown(state, action: PayloadAction<Device>) {
+            state.device = action.payload;
         },
         targetPortChanged(
             state,
@@ -187,6 +192,7 @@ export default targetSlice.reducer;
 const {
     targetTypeKnown,
     targetInfoKnown,
+    targetDeviceKnown,
     targetPortChanged,
     targetContentsKnown,
     targetRegionsKnown,
@@ -231,6 +237,7 @@ export const getRefreshEnabled = (state: RootState) =>
 export {
     targetTypeKnown,
     targetInfoKnown,
+    targetDeviceKnown,
     targetPortChanged,
     targetContentsKnown,
     targetRegionsKnown,

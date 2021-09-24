@@ -66,8 +66,11 @@ export const cancelUpdate = () => (dispatch: TDispatch) => {
     dispatch(modemWritingClose());
 };
 
-export function programDfuModem(serialNumber: string, fileName: string) {
+export function programDfuModem(fileName: string) {
     return async (dispatch: TDispatch, getState: () => RootState) => {
+        const { device } = getState().app.target;
+        if (!device) throw new Error('Device not found when updating modem');
+
         const successCallback = () => {
             logger.info('Modem DFU completed successfully!');
             dispatch(modemWritingSucceed());
@@ -102,8 +105,6 @@ export function programDfuModem(serialNumber: string, fileName: string) {
         };
 
         try {
-            const { devices } = getState().device;
-            const device = devices[serialNumber];
             nrfdl.firmwareProgram(
                 getDeviceLibContext(),
                 device.id,
@@ -119,11 +120,9 @@ export function programDfuModem(serialNumber: string, fileName: string) {
     };
 }
 
-export const performMcuUpdate =
-    (fileName: string) => (dispatch: TDispatch, getState: () => RootState) => {
-        const { serialNumber } = getState().app.target;
-        dispatch(programDfuModem(serialNumber ?? '', fileName));
-    };
+export const performMcuUpdate = (fileName: string) => (dispatch: TDispatch) => {
+    dispatch(programDfuModem(fileName));
+};
 
 export const performUpdate =
     () => (dispatch: TDispatch, getState: () => RootState) => {
@@ -145,6 +144,6 @@ export const performUpdate =
         if (getState().app.mcuboot.isMcuboot) {
             dispatch(performMcuUpdate(fileName));
         } else {
-            dispatch(programDfuModem(serialNumber, fileName));
+            dispatch(programDfuModem(fileName));
         }
     };
