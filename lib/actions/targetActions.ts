@@ -100,7 +100,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         }
     }
     if (vid === VendorId.SEGGER) {
-        dispatch(jlinkTargetActions.openDevice());
+        dispatch(jlinkTargetActions.openDevice(device));
         return;
     }
 
