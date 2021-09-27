@@ -48,6 +48,7 @@ import {
     sdfuOperations,
     startWatchingDevices,
     stopWatchingDevices,
+    waitForDevice,
 } from 'pc-nrfconnect-shared';
 import tmp from 'tmp';
 
@@ -234,8 +235,12 @@ const loadDeviceInfo = (device: Device) => async (dispatch: TDispatch) => {
         dispatch(fileActions.updateFileRegions());
         dispatch(targetActions.updateTargetWritable());
         dispatch(loadingEnd());
-    } catch (versionError) {
-        logger.error(`Error when fetching device versions: ${versionError}`);
+    } catch (versionError: Error) {
+        logger.error(
+            `Error when fetching device versions: ${
+                versionError.message || versionError
+            }`
+        );
     }
 };
 
@@ -509,12 +514,11 @@ function handleHash(image: initPacket.DfuImage, hashType: number) {
     } as initPacket.DfuImage;
 }
 
-/**
- * Operate DFU process with update all the images on the target device
- *
- * @param {} inputDfuImages
- */
-const operateDFU = async (deviceId: number, inputDfuImages) => {
+// Operate DFU process with update all the images on the target device
+const operateDFU = async (
+    deviceId: number,
+    inputDfuImages: initPacket.DfuImage[]
+) => {
     // const [dfuImage, ...restImages] = inputDfuImages;
     // const zipBuffer = await sdfuOperations.createDfuZipBuffer([dfuImage]);
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
@@ -611,17 +615,17 @@ export const write =
         logger.info('Performing DFU. This may take a few seconds');
         dispatch(writingStart());
 
-        // Unsure whether this can be removed with nrf-device-lib
-        // Stop watching devices during the DFU
         stopWatchingDevices();
         try {
             const { device } = getState().app.target;
             if (!device) throw Error(`Failed due to device not found`);
             await operateDFU(device.id, dfuImages);
+            dispatch(writingEnd());
+            startWatchingDevices();
+            const reconnectedDevice = await waitForDevice(device.serialNumber);
+            console.log(reconnectedDevice);
+            dispatch(targetActions.openDevice(reconnectedDevice));
         } catch (error) {
             logger.error(`Failed to write: ${error}`);
-        } finally {
-            startWatchingDevices();
-            dispatch(writingEnd());
         }
     };
