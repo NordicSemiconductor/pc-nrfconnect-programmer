@@ -37,13 +37,18 @@
 /* eslint-disable import/no-cycle */
 
 import nrfdl, { Device, Error } from '@nordicsemiconductor/nrf-device-lib-js';
-import AdmZip from 'adm-zip';
 import Crypto from 'crypto';
 import fs from 'fs';
 import MemoryMap from 'nrf-intel-hex';
 import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
-import { getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
+import {
+    getDeviceLibContext,
+    logger,
+    sdfuOperations,
+    startWatchingDevices,
+    stopWatchingDevices,
+} from 'pc-nrfconnect-shared';
 import tmp from 'tmp';
 
 import {
@@ -64,7 +69,6 @@ import {
 import {
     CommunicationType,
     DeviceDefinition,
-    getDeviceFromNrfdl,
     getDeviceInfoByUSB,
     NordicFwIds,
 } from '../util/devices';
@@ -81,47 +85,9 @@ import * as fileActions from './fileActions';
 import * as targetActions from './targetActions';
 import * as userInputActions from './userInputActions';
 
-function createDfuZip(dfuImages: initPacket.DfuImage[]) {
-    return new Promise(resolve => {
-        const data = createDfuDataFromImages(dfuImages);
-        const zip = new AdmZip();
-        const manifest = { application: {}, softdevice: {} };
-
-        if (data.application) {
-            manifest.application = {
-                bin_file: 'application.bin',
-                dat_file: 'application.dat',
-            };
-            zip.addFile('application.bin', data.application.bin);
-            zip.addFile('application.dat', data.application.dat);
-        }
-
-        if (data.softdevice) {
-            manifest.softdevice = {
-                bin_file: 'softdevice.bin',
-                dat_file: 'softdevice.dat',
-            };
-            zip.addFile('softdevice.bin', data.softdevice.bin);
-            zip.addFile('softdevice.dat', data.softdevice.dat);
-        }
-
-        const manifestJson = JSON.stringify({ manifest });
-        const manifestBuffer = Buffer.alloc(manifestJson.length, manifestJson);
-        zip.addFile('manifest.json', manifestBuffer);
-
-        resolve(zip);
-    });
-}
-
-async function createDfuZipBuffer(dfuImages: initPacket.DfuImage[]) {
-    const zip = await createDfuZip(dfuImages);
-    const buffer = zip.toBuffer();
-    return buffer;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function createDfuZipFile(dfuImages: initPacket.DfuImage[]) {
-    const zip = await createDfuZip(dfuImages);
+    const zip = await sdfuOperations.createDfuZip(dfuImages);
     const { name: tmpPath } = tmp.dirSync();
     const zipPath = path.join(tmpPath, 'dfu_pkg.zip');
 
@@ -133,34 +99,6 @@ async function createDfuZipFile(dfuImages: initPacket.DfuImage[]) {
     logger.info(`Created DFU zip file at ${zipPath}`);
 
     return zipPath;
-}
-
-function createDfuDataFromImages(dfuImages: initPacket.DfuImage[]) {
-    const extract = (image: initPacket.DfuImage) => ({
-        bin: image.firmwareImage,
-        dat: initPacket.createInitPacketBuffer(
-            image.initPacket.fwVersion as number,
-            image.initPacket.hwVersion as number,
-            image.initPacket.sdReq[0] as number,
-            image.initPacket.fwType as number,
-            image.initPacket.sdSize as number,
-            image.initPacket.blSize,
-            image.initPacket.appSize,
-            image.initPacket.hashType,
-            image.initPacket.hash as [],
-            image.initPacket.isDebug,
-            image.initPacket.signatureType as number,
-            image.initPacket.signature as []
-        ),
-    });
-
-    const application = dfuImages.find(i => i.name === 'Application');
-    const softdevice = dfuImages.find(i => i.name === 'SoftDevice');
-
-    return {
-        application: application && extract(application),
-        softdevice: softdevice && extract(softdevice),
-    };
 }
 
 const defaultDfuImage: initPacket.DfuImage = {
@@ -572,7 +510,68 @@ function handleHash(image: initPacket.DfuImage, hashType: number) {
 }
 
 /**
+ * Operate DFU process with update all the images on the target device
+ *
+ * @param {} inputDfuImages
+ */
+const operateDFU = async (deviceId: number, inputDfuImages) => {
+    // const [dfuImage, ...restImages] = inputDfuImages;
+    // const zipBuffer = await sdfuOperations.createDfuZipBuffer([dfuImage]);
+    const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
+
+    fs.writeFileSync('/tmp/sdfu.zip', zipBuffer);
+
+    let prevPercentage: number;
+
+    return new Promise(resolve =>
+        nrfdl.firmwareProgram(
+            getDeviceLibContext(),
+            deviceId,
+            'NRFDL_FW_BUFFER',
+            'NRFDL_FW_SDFU_ZIP',
+            zipBuffer,
+            (error?: Error) => {
+                if (error) {
+                    if (
+                        error.error_code ===
+                        nrfdl.NRFDL_ERR_SDFU_EXT_SD_VERSION_FAILURE
+                    ) {
+                        logger.error('Failed to write to the target device');
+                        logger.error(
+                            'The required SoftDevice version does not match'
+                        );
+                    } else {
+                        logger.error(error);
+                    }
+                    throw error;
+                } else {
+                    // if (restImages.length === 0) {
+                    logger.info(
+                        'All dfu images have been written to the target device'
+                    );
+                    resolve();
+                    // return;
+                    // }
+                    // return operateDFU(deviceId, restImages);
+                }
+            },
+            ({ progressJson: progress }: nrfdl.Progress) => {
+                // Don't repeat percentage steps that have already been logged.
+                if (prevPercentage !== progress.progress_percentage) {
+                    const status = `${progress.message.replace('.', ':')} ${
+                        progress.progress_percentage
+                    }%`;
+                    logger.info(status);
+                    prevPercentage = progress.progress_percentage;
+                }
+            }
+        )
+    );
+};
+
+/**
  * Write files to target device
+ *
  * @returns {Promise<void>} Resolved promise
  */
 export const write =
@@ -614,53 +613,15 @@ export const write =
 
         // Unsure whether this can be removed with nrf-device-lib
         // Stop watching devices during the DFU
-        // dispatch(stopWatchingDevices());
-
-        const zipBuffer = await createDfuZipBuffer(dfuImages);
-
-        fs.writeFileSync('/tmp/sdf.zip', zipBuffer);
-
-        let prevPercentage: number;
-        const { device } = getState().app.target;
-        if (!device) logger.error('Device not found');
-
-        nrfdl.firmwareProgram(
-            getDeviceLibContext(),
-            device.id,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_SDFU_ZIP',
-            zipBuffer,
-            (err?: Error) => {
-                if (err) {
-                    if (
-                        err.error_code ===
-                        nrfdl.NRFDL_ERR_SDFU_EXT_SD_VERSION_FAILURE
-                    ) {
-                        logger.error('Failed to write to the target device');
-                        logger.error(
-                            'The required SoftDevice version does not match'
-                        );
-                    } else {
-                        logger.error(err);
-                    }
-                } else {
-                    logger.info(
-                        'All dfu images have been written to the target device'
-                    );
-                }
-                // Unsure whether this can be removed with nrf-device-lib
-                // dispatch(startWatchingDevices());
-                dispatch(writingEnd());
-            },
-            ({ progressJson: progress }: nrfdl.Progress) => {
-                // Don't repeat percentage steps that have already been logged.
-                if (prevPercentage !== progress.progress_percentage) {
-                    const status = `${progress.message.replace('.', ':')} ${
-                        progress.progress_percentage
-                    }%`;
-                    logger.info(status);
-                    prevPercentage = progress.progress_percentage;
-                }
-            }
-        );
+        stopWatchingDevices();
+        try {
+            const { device } = getState().app.target;
+            if (!device) throw Error(`Failed due to device not found`);
+            await operateDFU(device.id, dfuImages);
+        } catch (error) {
+            logger.error(`Failed to write: ${error}`);
+        } finally {
+            startWatchingDevices();
+            dispatch(writingEnd());
+        }
     };
