@@ -129,7 +129,7 @@ const createResetCommand = (timeout: number): protobuf.Message => {
 const createInitCommand = (
     fwVersion: number | undefined,
     hwVersion: number | undefined,
-    sdReq: number | undefined,
+    sdReq: number[] | undefined,
     type: number | undefined,
     sdSize: number | undefined,
     blSize: number | undefined,
@@ -305,7 +305,7 @@ export const createResetPacketBuffer = (
 export const createInitPacket = (
     fwVersion: number | undefined,
     hwVersion: number | undefined,
-    sdReq: number | undefined,
+    sdReq: number[] | undefined,
     fwType: number | undefined,
     sdSize: number | undefined,
     blSize: number | undefined,
@@ -373,7 +373,7 @@ export const createInitPacket = (
 export const createInitPacketBuffer = (
     fwVersion: number,
     hwVersion: number,
-    sdReq: number,
+    sdReq: number[],
     fwType: number,
     sdSize: number,
     blSize: number,
