@@ -39,6 +39,7 @@
 import nrfdl, { Device, Error } from '@nordicsemiconductor/nrf-device-lib-js';
 import AdmZip from 'adm-zip';
 import Crypto from 'crypto';
+import fs from 'fs';
 import MemoryMap from 'nrf-intel-hex';
 import path from 'path';
 import { DfuTransportUsbSerial } from 'pc-nrf-dfu-js';
@@ -182,9 +183,6 @@ const loadDeviceInfo = (device: Device) => async (dispatch: TDispatch) => {
     );
 
     try {
-        // const { hardwareVersion, firmwareVersions } = await getDeviceVersions(
-        //     serialportPath
-        // );
         const hardwareVersion = {
             part: 337984,
             variant: 1094796080,
@@ -253,7 +251,6 @@ const loadDeviceInfo = (device: Device) => async (dispatch: TDispatch) => {
         }
 
         // Add bootloader, softDevice, applications to regions
-        console.log(fwInfo);
         const { imageInfoList } = fwInfo;
         imageInfoList.forEach((image: nrfdl.FWInfo.Image) => {
             // TODO: fix type in nrfdl
@@ -455,7 +452,7 @@ function handleImage(
         firmwareImage,
         initPacket: {
             ...image.initPacket,
-            [fwSizeStr]: firmwareImage.size,
+            [fwSizeStr]: firmwareImage.length,
             sdReq,
         },
     };
@@ -574,9 +571,12 @@ function handleHash(image: initPacket.DfuImage, hashType: number) {
     } as initPacket.DfuImage;
 }
 
-// Write files to target device
-export function write() {
-    return async (dispatch: TDispatch, getState: () => RootState) => {
+/**
+ * Write files to target device
+ * @returns {Promise<void>} Resolved promise
+ */
+export const write =
+    () => async (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(targetWarningRemove());
         dispatch(userWarningRemove());
         dispatch(fileActions.updateFileBlRegion());
@@ -616,21 +616,21 @@ export function write() {
         // Stop watching devices during the DFU
         // dispatch(stopWatchingDevices());
 
-        const { serialNumber } = getState().app.target;
-        const { id: deviceId } = await getDeviceFromNrfdl(
-            serialNumber as string
-        );
         const zipBuffer = await createDfuZipBuffer(dfuImages);
 
+        fs.writeFileSync('/tmp/sdf.zip', zipBuffer);
+
         let prevPercentage: number;
+        const { device } = getState().app.target;
+        if (!device) logger.error('Device not found');
 
         nrfdl.firmwareProgram(
             getDeviceLibContext(),
-            deviceId,
+            device.id,
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_SDFU_ZIP',
             zipBuffer,
-            (err: Error) => {
+            (err?: Error) => {
                 if (err) {
                     if (
                         err.error_code ===
@@ -664,4 +664,3 @@ export function write() {
             }
         );
     };
-}
