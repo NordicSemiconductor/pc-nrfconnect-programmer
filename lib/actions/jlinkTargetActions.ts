@@ -93,9 +93,10 @@ export const formatSerialNumber = (serialNumber: string | number) => {
 // Display some information about a DevKit. Called on a DevKit connection.
 // This also triggers reading the whole memory contents of the device.
 export const openDevice =
-    (device: Device, fullRead = false, eraseAndWrite = false) =>
+    (fullRead = false, eraseAndWrite = false) =>
     async (dispatch: TDispatch, getState: () => RootState) => {
-        if (!device) logger.error('Error when open device');
+        const { device } = getState().app.target;
+        if (!device) throw Error(`Failed to open: device not found`);
 
         dispatch(loadingStart());
         dispatch(targetWarningRemove());
@@ -245,6 +246,7 @@ const getDeviceMemMap = async (
 ) => {
     if (!readAll) return undefined;
     const result = await new Promise(resolve => {
+        logger.info(`Reading memory for ${coreInfo.name}`);
         nrfdl.firmwareRead(
             getDeviceLibContext(),
             deviceId,
@@ -317,7 +319,10 @@ const updateTargetRegions =
 export const read =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(loadingStart());
-        await dispatch(openDevice(device, true));
+        const { device } = getState().app.target;
+        if (!device)
+            throw Error(`Failed to read memory due to device not found`);
+        await dispatch(openDevice(true));
     };
 
 // Call nrfprog.recover() to recover one core
@@ -368,9 +373,8 @@ export const recover =
             results,
             argsArray
         );
-        dispatch(
-            loadDeviceInfo(serialNumber as string, false, willEraseAndWrite)
-        );
+
+        dispatch(openDevice(false, willEraseAndWrite));
         dispatch(erasingEnd());
         logger.info('Device recovery completed.');
     };
@@ -470,7 +474,6 @@ export const writeOneCore =
 export const write =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
         const {
-            serialNumber,
             deviceInfo: { cores },
         } = getState().app.target;
         const results: unknown[] = [];
@@ -480,7 +483,7 @@ export const write =
             results,
             argsArray
         ).then(async () => {
-            await dispatch(loadDeviceInfo(serialNumber as string));
+            await dispatch(openDevice());
             dispatch(writingEnd());
             dispatch(updateTargetWritable());
         });

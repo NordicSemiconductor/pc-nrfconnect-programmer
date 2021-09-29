@@ -618,7 +618,7 @@ export const write =
         stopWatchingDevices();
         try {
             const { device } = getState().app.target;
-            if (!device) throw Error(`Failed due to device not found`);
+            if (!device) throw Error(`Failed to write due to device not found`);
             await operateDFU(device.id, dfuImages);
             dispatch(writingEnd());
             startWatchingDevices();
