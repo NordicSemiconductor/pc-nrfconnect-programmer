@@ -40,12 +40,12 @@ import MemoryMap from 'nrf-intel-hex';
 import { CoreDefinition } from '../devices';
 import * as regions from '../regions';
 
-const mbrFile = 'lib/util/__tests__/hex/mbr_nrf52_2.3.0-2.alpha_mbr.hex';
+const mbrFile = 'src/util/__tests__/hex/mbr_nrf52_2.3.0-2.alpha_mbr.hex';
 const bootloaderFile =
-    'lib/util/__tests__/hex/dongle_bootloader_mbr_pca10056.hex';
+    'src/util/__tests__/hex/dongle_bootloader_mbr_pca10056.hex';
 const softDeviceFile =
-    'lib/util/__tests__/hex/s140_nrf52840_5.0.0-2.alpha_softdevice.hex';
-const twoAppFile = 'lib/util/__tests__/hex/app_two.hex';
+    'src/util/__tests__/hex/s140_nrf52840_5.0.0-2.alpha_softdevice.hex';
+const twoAppFile = 'src/util/__tests__/hex/app_two.hex';
 
 describe('get regions', () => {
     it('should read MBR region', () => {

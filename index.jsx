@@ -37,10 +37,10 @@
 import React from 'react';
 import { App } from 'pc-nrfconnect-shared';
 
-import AppMainView from './lib/components/AppMainView';
-import ControlPanel from './lib/components/ControlPanel';
-import DeviceSelector from './lib/components/DeviceSelector';
-import appReducer from './lib/reducers';
+import AppMainView from './src/components/AppMainView';
+import ControlPanel from './src/components/ControlPanel';
+import DeviceSelector from './src/components/DeviceSelector';
+import appReducer from './src/reducers';
 
 import './resources/css/index.scss';
 

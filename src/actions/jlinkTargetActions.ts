@@ -121,6 +121,7 @@ export const openDevice =
         let protectionStatus = nrfdl.NRFDL_PROTECTION_STATUS_NONE;
 
         try {
+            logger.info('Loading readback protection status');
             protectionStatus = (
                 await nrfdl.deviceControlGetProtectionStatus(
                     getDeviceLibContext(),
