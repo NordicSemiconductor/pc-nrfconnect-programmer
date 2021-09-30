@@ -56,6 +56,7 @@ import portPath from '../util/portPath';
 import { refreshAllFiles } from './fileActions';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
+import EventAction from './usageDataActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
 export const openDevice = (device: Device) => (dispatch: TDispatch) => {
@@ -73,15 +74,17 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     );
 
     if (device.traits.jlink) {
-        usageData.sendUsageData(EventActions.OPEN_DEVICE, '');
         dispatch(jlinkTargetActions.openDevice());
+        usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
         return;
     }
     if (device.traits.mcuboot) {
+        usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
         dispatch(mcubootTargetActions.openDevice(device));
         return;
     }
     if (device.traits.nordicUsb) {
+        usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicUsb');
         dispatch(usbsdfuTargetActions.openDevice(device));
         return;
     }
@@ -106,9 +109,9 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     }
 
     logger.error(
-        'Unsupported device. ' +
-            'The detected device could not be recognized as ' +
-            'neither JLink device nor Nordic USB device.'
+        `Unsupported device.
+            The detected device could not be recognized as
+            neither JLink device nor Nordic USB device.`
     );
     if (process.platform === 'linux') {
         logger.error(

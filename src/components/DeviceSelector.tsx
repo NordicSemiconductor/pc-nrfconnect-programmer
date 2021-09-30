@@ -46,7 +46,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { openDevice } from '../actions/targetActions';
-import EventActions from '../actions/usageDataActions';
+import EventAction from '../actions/usageDataActions';
 import { TDispatch } from '../reducers/types';
 
 const deviceListing: DeviceListing = {
@@ -69,7 +69,7 @@ const mapDispatch = (dispatch: TDispatch) => ({
         dispatch(openDevice(device as unknown as Device));
     },
     onDeviceDeselected: () => {
-        usageData.sendUsageData(EventActions.CLOSE_DEVICE, '');
+        usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
         logger.info('Target device closed.');
     },
 });

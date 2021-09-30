@@ -40,6 +40,7 @@
 
 enum EventAction {
     OPEN_DEVICE = 'Open device',
+    OPEN_JLINK_DEVICE = 'Open jlink device',
     CLOSE_DEVICE = 'Close device',
 }
 
