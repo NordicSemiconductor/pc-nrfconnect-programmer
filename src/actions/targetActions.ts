@@ -37,7 +37,7 @@
 /* eslint-disable import/no-cycle */
 
 import { Device, SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
-import { logger } from 'pc-nrfconnect-shared';
+import { logger, usageData } from 'pc-nrfconnect-shared';
 
 import {
     loadingStart,
@@ -73,6 +73,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     );
 
     if (device.traits.jlink) {
+        usageData.sendUsageData(EventActions.OPEN_DEVICE, '');
         dispatch(jlinkTargetActions.openDevice());
         return;
     }

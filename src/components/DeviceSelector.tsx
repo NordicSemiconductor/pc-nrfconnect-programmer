@@ -1,4 +1,4 @@
-/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -34,22 +34,44 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import React from 'react';
-import { App } from 'pc-nrfconnect-shared';
+import { connect } from 'react-redux';
+import { Device } from '@nordicsemiconductor/nrf-device-lib-js';
+import {
+    Device as SharedDevice,
+    DeviceListing,
+    DeviceSelector,
+    DeviceSetup,
+    logger,
+    usageData,
+} from 'pc-nrfconnect-shared';
 
-import AppMainView from './src/components/AppMainView';
-import ControlPanel from './src/components/ControlPanel';
-import DeviceSelector from './src/components/DeviceSelector';
-import appReducer from './src/reducers';
+import { openDevice } from '../actions/targetActions';
+import EventActions from '../actions/usageDataActions';
+import { TDispatch } from '../reducers/types';
 
-import './resources/css/index.scss';
+const deviceListing: DeviceListing = {
+    nordicUsb: true,
+    serialport: true,
+    jlink: true,
+};
 
-export default () => (
-    <App
-        reportUsageData
-        appReducer={appReducer}
-        deviceSelect={<DeviceSelector />}
-        sidePanel={<ControlPanel />}
-        panes={[{ name: 'Programmer', Main: AppMainView }]}
-    />
-);
+const deviceSetup: DeviceSetup = {
+    needSerialPort: true,
+};
+
+const mapState = () => ({
+    deviceListing,
+    deviceSetup,
+});
+
+const mapDispatch = (dispatch: TDispatch) => ({
+    onDeviceIsReady: (device: SharedDevice) => {
+        dispatch(openDevice(device as unknown as Device));
+    },
+    onDeviceDeselected: () => {
+        usageData.sendUsageData(EventActions.CLOSE_DEVICE, '');
+        logger.info('Target device closed.');
+    },
+});
+
+export default connect(mapState, mapDispatch)(DeviceSelector);

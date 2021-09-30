@@ -1,10 +1,10 @@
-/* Copyright (c) 2015 - 2017, Nordic Semiconductor ASA
+/* Copyright (c) 2015 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
  * Use in source and binary forms, redistribution in binary form only, with
  * or without modification, are permitted provided that the following conditions
- * are met:
+ * are met =
  *
  * 1. Redistributions in binary form, except as embedded into a Nordic
  *    Semiconductor ASA integrated circuit in a product or a software update for
@@ -34,33 +34,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { connect } from 'react-redux';
-import { DeviceSelector, logger } from 'pc-nrfconnect-shared';
+// The actions in this file are handled by the reducers in pc-nrfconnect-launcher or
+// pc-nrfconnect-shared, so we instead of defining them here, we really should import
+// them from there. But before we can correct this, we need to upgrade to a new version.
 
-import { openDevice } from '../actions/targetActions';
+enum EventAction {
+    OPEN_DEVICE = 'Open device',
+    CLOSE_DEVICE = 'Close device',
+}
 
-const deviceListing = {
-    nordicUsb: true,
-    serialport: true,
-    jlink: true,
-};
-
-const deviceSetup = {
-    needSerialport: true,
-};
-
-const mapState = () => ({
-    deviceListing,
-    deviceSetup,
-});
-
-const mapDispatch = dispatch => ({
-    onDeviceIsReady: device => {
-        dispatch(openDevice(device));
-    },
-    onDeviceDeselected: () => {
-        logger.info('Target device closed.');
-    },
-});
-
-export default connect(mapState, mapDispatch)(DeviceSelector);
+export default EventAction;
