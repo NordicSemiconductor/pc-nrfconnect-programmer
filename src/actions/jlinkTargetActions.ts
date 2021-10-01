@@ -38,7 +38,6 @@
 
 import nrfdl, {
     Device,
-    DeviceCore,
     Error as NrfdlError,
     FirmwareReadResult,
 } from '@nordicsemiconductor/nrf-device-lib-js';
@@ -266,15 +265,19 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) => {
     })) as MemoryMap;
 };
 
-// Check if the files can be written to the target device
-// The typical use case is having some HEX files that use the UICR, and a DevKit
-// that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
-// nRF SoC has readback protection enabled (and the loaded HEX files write the
-// readback-protected region).
-// In all those cases, this function will return false, and the user should not be
-// able to press the "program" button.
-// There are also instances where the UICR can be erased and overwritten, but
-// unfortunately the casuistics are just too complex.
+/**
+ * Check if the files can be written to the target device
+ * The typical use case is having some HEX files that use the UICR, and a DevKit
+ * that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
+ * nRF SoC has readback protection enabled (and the loaded HEX files write the
+ * readback-protected region).
+ * In all those cases, this function will return false, and the user should not be
+ * able to press the "program" button.
+ * There are also instances where the UICR can be erased and overwritten, but
+ * unfortunately the casuistics are just too complex.
+ *
+ * @returns {void}
+ */
 export const canWrite =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         // TODO: get the UICR address from the target definition. This value
@@ -316,11 +319,10 @@ const updateTargetRegions =
 export const read =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(loadingStart());
-        const { device, deviceInfo } = getState().app.target;
-        if (!device || !deviceInfo)
-            throw Error(
-                `Failed to read memory due to missing device information`
-            );
+        const { device: inputDevice, deviceInfo: inputDeviceInfo } =
+            getState().app.target;
+        const device = inputDevice as Device;
+        const deviceInfo = inputDeviceInfo as DeviceDefinition;
 
         // Read from the device
         if (
@@ -361,25 +363,23 @@ export const read =
         dispatch(loadingEnd());
     };
 
-// Call nrfprog.recover() to recover one core
+/**
+ * Recover one core
+ * @param {number} deviceId the Id of the device
+ * @param {CoreDefinition} coreInfo the information of each core
+ * @returns {void}
+ */
 export const recoverOneCore =
-    (deviceId: number, coreInfo: DeviceCore) => async (dispatch: TDispatch) => {
+    (deviceId: number, coreInfo: CoreDefinition) =>
+    async (dispatch: TDispatch) => {
         dispatch(erasingStart());
-
-        if (!deviceId) {
-            logger.error('Select a device before recovering');
-            return;
-        }
-
-        logger.info(
-            'Recovering device using @nordicsemiconductor/nrf-device-lib-js'
-        );
+        logger.info(`Recovering device: core ${coreInfo.name}`);
 
         try {
             await nrfdl.firmwareErase(
                 getDeviceLibContext(),
                 deviceId,
-                coreInfo.name === 'Network'
+                coreInfo.name === 'NRFDL_DEVICE_CORE_NETWORK'
                     ? 'NRFDL_DEVICE_CORE_NETWORK'
                     : 'NRFDL_DEVICE_CORE_APPLICATION'
             );
@@ -389,18 +389,19 @@ export const recoverOneCore =
         }
     };
 
-// Recover all cores one by one
+/**
+ * Recover all cores one by one
+ *
+ * @returns {void}
+ */
 export const recover =
-    (willEraseAndWrite: boolean) =>
-    async (dispatch: TDispatch, getState: () => RootState) => {
-        const {
-            serialNumber,
-            deviceInfo: { cores },
-        } = getState().app.target;
-        const { id: deviceId } = await getDeviceFromNrfdl(
-            formatSerialNumber(parseInt(serialNumber as string, 10))
-        );
+    () => async (dispatch: TDispatch, getState: () => RootState) => {
+        const { device: inputDevice, deviceInfo: inputDeviceInfo } =
+            getState().app.target;
+        const { id: deviceId } = inputDevice as Device;
+        const { cores } = inputDeviceInfo as DeviceDefinition;
         const results: unknown[] = [];
+
         const argsArray = cores.map((c: CoreDefinition) => [deviceId, c]);
         await sequence(
             (...args) => {
@@ -410,9 +411,11 @@ export const recover =
             argsArray
         );
 
-        dispatch(openDevice(false, willEraseAndWrite));
         dispatch(erasingEnd());
-        logger.info('Device recovery completed.');
+        logger.info('Device recovery completed');
+
+        const { autoRead } = getState().app.settings;
+        if (autoRead) read();
     };
 
 // Sends a HEX string to jprog.program()

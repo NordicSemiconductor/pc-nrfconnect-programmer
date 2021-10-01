@@ -35,10 +35,7 @@
  */
 
 import nrfdl, {
-    Device,
     DeviceCore,
-    DeviceCoreInfo,
-    DeviceFamily,
     ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 
@@ -294,33 +291,3 @@ export const addCoreToDeviceInfo = (
             },
         ],
     } as DeviceDefinition);
-
-export const context = nrfdl.createContext();
-
-/**
- * Uses `@nordicsemiconductor/nrf-device-lib-js` to fetch the attached device with the * given `serialNumber`,
- * if it exists.
- *
- * @param {string} serialNumber The serial number of the device to return.
- * @returns {Promise<nrfdl.Device>} A promise potentially containing the device info.
- */
-export const getDeviceFromNrfdl = (
-    serialNumber: string
-): Promise<nrfdl.Device> =>
-    new Promise((resolve, reject) => {
-        nrfdl.enumerate(context).then((devices: Array<Device>) => {
-            // This is not needed when @nordicsemiconductor/nrf-device-lib-js is integrated in device selector
-            // eslint-disable-next-line no-restricted-syntax
-            for (const device of devices) {
-                if (device.serialnumber === serialNumber) {
-                    return resolve(device);
-                }
-            }
-
-            return reject(
-                new Error(
-                    `No device found with serial number '${serialNumber}'`
-                )
-            );
-        });
-    });
