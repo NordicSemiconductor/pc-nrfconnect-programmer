@@ -67,7 +67,6 @@ import {
     CommunicationType,
     CoreDefinition,
     DeviceDefinition,
-    getDeviceFromNrfdl,
     getDeviceInfoByJlink,
 } from '../util/devices';
 import sequence from '../util/promise';
@@ -100,8 +99,8 @@ export const formatSerialNumber = (serialNumber: string | number) => {
  */
 export const openDevice =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
-        const { device } = getState().app.target;
-        if (!device) throw Error(`Failed to open: device not found`);
+        const { device: inputDevice } = getState().app.target;
+        const device = inputDevice as Device;
 
         dispatch(loadingStart());
         dispatch(targetWarningRemove());
@@ -119,14 +118,18 @@ export const openDevice =
         let deviceInfo = getDeviceInfoByJlink(device);
 
         // Update modem target info according to detected device info
-        dispatch(modemKnown(device.jlink.deviceFamily.includes('NRF91')));
+        const isModem = device.jlink.deviceFamily.includes('NRF91');
+        dispatch(modemKnown(isModem));
+        logger.info('Modem detected');
 
         // By default readback protection is none
         let protectionStatus: nrfdl.ProtectionStatus =
             'NRFDL_PROTECTION_STATUS_NONE';
 
         try {
-            logger.info('Loading readback protection status');
+            logger.info(
+                'Loading readback protection status for Application core'
+            );
             protectionStatus =
                 // TODO: fix type in nrfdl: snake_case
                 (
@@ -166,6 +169,9 @@ export const openDevice =
                 'NRFDL_DEVICE_CORE_NETWORK'
             );
             try {
+                logger.info(
+                    'Loading readback protection status for Network core'
+                );
                 protectionStatus = (
                     await nrfdl.deviceControlGetProtectionStatus(
                         getDeviceLibContext(),
@@ -173,6 +179,7 @@ export const openDevice =
                         coreNameConstant
                     )
                 ).protection_status;
+                logger.info(`Readback protection status: ${protectionStatus}`);
             } catch (error) {
                 dispatch(loadingEnd());
                 usageData.sendErrorReport(
@@ -366,7 +373,7 @@ export const read =
 /**
  * Recover one core
  * @param {number} deviceId the Id of the device
- * @param {CoreDefinition} coreInfo the information of each core
+ * @param {CoreDefinition} coreInfo the information of one core
  * @returns {void}
  */
 export const recoverOneCore =
@@ -418,19 +425,20 @@ export const recover =
         if (autoRead) read();
     };
 
-// Sends a HEX string to jprog.program()
+/**
+ * Write firmware in intel HEX format to the device
+ * @param {number} deviceId the Id of the device
+ * @param {CoreDefinition} coreInfo the information of each core
+ * @param {string} hexFileString the converted string of the intel HEX file
+ *
+ * @returns {void}
+ */
 const writeHex = async (
-    serialNumber: string,
+    deviceId: number,
     coreInfo: CoreDefinition,
     hexFileString: string
 ) => {
-    logger.info(
-        'Writing hex file with @nordicsemiconductor/nrf-device-lib-js.'
-    );
-
-    const { id: deviceId } = await getDeviceFromNrfdl(
-        formatSerialNumber(serialNumber)
-    );
+    logger.info('Writing HEX');
 
     nrfdl.firmwareProgram(
         getDeviceLibContext(),
@@ -438,42 +446,41 @@ const writeHex = async (
         'NRFDL_FW_BUFFER',
         'NRFDL_FW_INTEL_HEX',
         Buffer.from(hexFileString, 'utf8'),
-        (err: Error) => {
+        err => {
             if (err)
-                logger.error(`Device programming failed with error: ${err}`);
-            logger.info('Device programming completed.');
+                usageData.sendErrorReport(
+                    `Device programming failed with error: ${err}`
+                );
+            logger.info('Device programming completed');
         },
-        ({ progressJson: progress }: nrfdl.Progress) => {
-            const status = `${progress.message.replace('.', ':')} ${
-                progress.progress_percentage
+        ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
+            console.log(progress);
+            const status = `${progress.operation.replace('.', ':')} ${
+                // TODO: fix type in nrfdl
+                progress.progressPercentage
             }%`;
             logger.info(status);
         },
         null,
-        coreInfo.name === 'Network'
+        coreInfo.name === 'NRFDL_DEVICE_CORE_NETWORK'
             ? 'NRFDL_DEVICE_CORE_NETWORK'
             : 'NRFDL_DEVICE_CORE_APPLICATION'
     );
 };
 
+/**
+ * Write one core
+ *
+ * @param {number} deviceId the Id of the device
+ * @param {CoreDefinition} coreInfo the information of one core
+ * @returns {void}
+ */
 export const writeOneCore =
-    (core: CoreDefinition) =>
+    (deviceId: number, coreInfo: CoreDefinition) =>
     async (dispatch: TDispatch, getState: () => RootState) => {
-        logger.info(`Writing procedure starts for core${core.coreNumber}`);
+        logger.info(`Writing procedure starts for core ${coreInfo.name}`);
         dispatch(writingStart());
-        const {
-            target: { serialNumber },
-            file: { memMaps },
-        } = getState().app;
-        const { pageSize } = core;
-        const serialNumberWithCore = `${parseInt(serialNumber as string, 10)}:${
-            core.coreNumber
-        }`;
-
-        if (!serialNumberWithCore || !pageSize) {
-            logger.error('Select a device before writing');
-            return undefined;
-        }
+        const { memMaps } = getState().app.file;
 
         // Parse input files and filter program regions with core start address and size
         const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
@@ -482,13 +489,13 @@ export const writeOneCore =
             const overlapSize = overlap[0][1].length;
 
             const isInCore =
-                overlapStartAddr >= core.romBaseAddr &&
+                overlapStartAddr >= coreInfo.romBaseAddr &&
                 overlapStartAddr + overlapSize <=
-                    core.romBaseAddr + core.romSize;
+                    coreInfo.romBaseAddr + coreInfo.romSize;
             const isUicr =
-                overlapStartAddr >= core.uicrBaseAddr &&
+                overlapStartAddr >= coreInfo.uicrBaseAddr &&
                 overlapStartAddr + overlapSize <=
-                    core.uicrBaseAddr + core.pageSize;
+                    coreInfo.uicrBaseAddr + coreInfo.pageSize;
             if (!isInCore && !isUicr) {
                 overlaps.delete(key);
             }
@@ -496,41 +503,45 @@ export const writeOneCore =
         if (overlaps.size <= 0) {
             return undefined;
         }
-        const programRegions =
-            MemoryMap.flattenOverlaps(overlaps).paginate(pageSize);
-
-        await writeHex(
-            serialNumberWithCore,
-            core,
-            programRegions.asHexString()
+        const programRegions = MemoryMap.flattenOverlaps(overlaps).paginate(
+            coreInfo.pageSize
         );
 
-        return undefined;
+        await writeHex(deviceId, coreInfo, programRegions.asHexString());
     };
 
-// Does some sanity checks, joins the loaded HEX files, flattens overlaps,
-// paginates the result to fit flash pages, and calls writeHex()
+/**
+ * Write provided file(s) to the device
+ *
+ * @returns {void}
+ */
 export const write =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
-        const {
-            deviceInfo: { cores },
-        } = getState().app.target;
+        const { device: inputDevice, deviceInfo: inputDeviceInfo } =
+            getState().app.target;
+        const { id: deviceId } = inputDevice as Device;
+        const { cores } = inputDeviceInfo as DeviceDefinition;
         const results: unknown[] = [];
-        const argsArray = cores.map(c => [c]);
-        return sequence(
+        const argsArray = cores.map(c => [deviceId, c]);
+        await sequence(
             (...args) => dispatch(writeOneCore(...args)),
             results,
             argsArray
-        ).then(async () => {
-            await dispatch(openDevice());
-            dispatch(writingEnd());
-            dispatch(updateTargetWritable());
-        });
+        );
+        dispatch(writingEnd());
+        await dispatch(openDevice());
+        dispatch(updateTargetWritable());
     };
 
-// Erase all on device and write file to it.
-export const recoverAndWrite = () => (dispatch: TDispatch) =>
-    dispatch(recover(true)).then(() => dispatch(write()));
+/**
+ * Erase all on device and write file to it.
+ *
+ * @returns {void}
+ */
+export const recoverAndWrite = () => async (dispatch: TDispatch) => {
+    await dispatch(recover());
+    await dispatch(write());
+};
 
 // Save the content from the device memory as hex file.
 export const saveAsFile = () => (getState: () => RootState) => {
