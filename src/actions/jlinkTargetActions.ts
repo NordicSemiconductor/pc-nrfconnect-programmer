@@ -38,8 +38,10 @@
 
 import nrfdl, {
     Device,
+    DeviceCore,
     Error as NrfdlError,
     FirmwareReadResult,
+    ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import fs from 'fs';
@@ -74,6 +76,38 @@ import { getTargetRegions } from '../util/regions';
 import { updateFileAppRegions } from './fileActions';
 import { updateTargetWritable } from './targetActions';
 import EventAction from './usageDataActions';
+
+/**
+ * Load protection status of the core
+ *
+ * @param {number}deviceId the Id of the device
+ * @param {string} deviceCoreName the name of the core
+ * @returns{Promise<ProtectionStatus>} the protection status
+ */
+export const loadProtectionStatus = async (
+    deviceId: number,
+    deviceCoreName: string
+): Promise<ProtectionStatus> => {
+    try {
+        logger.info('Loading readback protection status for Application core');
+        // TODO: fix type in nrfdl: snake_case
+        const protectionStatus = (
+            await nrfdl.deviceControlGetProtectionStatus(
+                getDeviceLibContext(),
+                deviceId,
+                deviceCoreName === 'Network'
+                    ? 'NRFDL_DEVICE_CORE_NETWORK'
+                    : undefined
+            )
+        ).protection_status;
+        logger.info(`Readback protection status: ${protectionStatus}`);
+        return protectionStatus;
+    } catch (error) {
+        const errorMessage = `Failed to load readback protection status: ${error}`;
+        usageData.sendErrorReport(errorMessage);
+        throw Error(errorMessage);
+    }
+};
 
 /**
  *
@@ -111,27 +145,8 @@ export const openDevice =
         let protectionStatus: nrfdl.ProtectionStatus =
             'NRFDL_PROTECTION_STATUS_NONE';
 
-        try {
-            logger.info(
-                'Loading readback protection status for Application core'
-            );
-            protectionStatus =
-                // TODO: fix type in nrfdl: snake_case
-                (
-                    await nrfdl.deviceControlGetProtectionStatus(
-                        getDeviceLibContext(),
-                        device.id
-                    )
-                ).protection_status;
-            logger.info(`Readback protection status: ${protectionStatus}`);
-        } catch (error) {
-            dispatch(loadingEnd());
-            usageData.sendErrorReport(
-                `Failed to load readback protection status: ${error}`
-            );
-        }
-
         let coreName = 'Application';
+        loadProtectionStatus(device.id, coreName);
 
         // TODO: fix type in nrfdl
         let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
@@ -146,31 +161,14 @@ export const openDevice =
         // It needs an additional check for readback protection on network core
         if (isFamilyNrf53) {
             coreName = 'Network';
-            const coreNameConstant = 'NRFDL_DEVICE_CORE_NETWORK';
+            loadProtectionStatus(device.id, coreName);
+
             // TODO: fix type in nrfdl
             deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
                 getDeviceLibContext(),
                 device.id,
                 'NRFDL_DEVICE_CORE_NETWORK'
             );
-            try {
-                logger.info(
-                    'Loading readback protection status for Network core'
-                );
-                protectionStatus = (
-                    await nrfdl.deviceControlGetProtectionStatus(
-                        getDeviceLibContext(),
-                        device.id,
-                        coreNameConstant
-                    )
-                ).protection_status;
-                logger.info(`Readback protection status: ${protectionStatus}`);
-            } catch (error) {
-                dispatch(loadingEnd());
-                usageData.sendErrorReport(
-                    `Failed to load readback protection status on network core: ${error}`
-                );
-            }
             deviceCoreInfo = { ...deviceCoreInfo, protectionStatus };
             deviceInfo = addCoreToDeviceInfo(
                 deviceInfo,
