@@ -38,7 +38,6 @@
 
 import nrfdl, {
     Device,
-    DeviceCore,
     Error as NrfdlError,
     FirmwareReadResult,
     ProtectionStatus,
@@ -97,7 +96,7 @@ export const loadProtectionStatus = async (
                 deviceId,
                 deviceCoreName === 'Network'
                     ? 'NRFDL_DEVICE_CORE_NETWORK'
-                    : undefined
+                    : 'NRFDL_DEVICE_CORE_APPLICATION'
             )
         ).protection_status;
         logger.info(`Readback protection status: ${protectionStatus}`);
@@ -139,14 +138,14 @@ export const openDevice =
         // Update modem target info according to detected device info
         const isModem = device.jlink.deviceFamily.includes('NRF91');
         dispatch(modemKnown(isModem));
-        logger.info('Modem detected');
+        if (isModem) logger.info('Modem detected');
 
         // By default readback protection is none
         let protectionStatus: nrfdl.ProtectionStatus =
             'NRFDL_PROTECTION_STATUS_NONE';
 
         let coreName = 'Application';
-        loadProtectionStatus(device.id, coreName);
+        protectionStatus = await loadProtectionStatus(device.id, coreName);
 
         // TODO: fix type in nrfdl
         let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
@@ -161,7 +160,7 @@ export const openDevice =
         // It needs an additional check for readback protection on network core
         if (isFamilyNrf53) {
             coreName = 'Network';
-            loadProtectionStatus(device.id, coreName);
+            protectionStatus = await loadProtectionStatus(device.id, coreName);
 
             // TODO: fix type in nrfdl
             deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
@@ -183,6 +182,7 @@ export const openDevice =
 
         dispatch(updateTargetWritable());
         dispatch(loadingEnd());
+        logger.info('Device is loaded');
     };
 
 /**
@@ -220,7 +220,7 @@ const logDeviceInfo = (device: Device) => {
  */
 const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) => {
     return (await new Promise(resolve => {
-        logger.info(`Reading memory for ${coreInfo.name}`);
+        logger.info(`Reading memory for ${coreInfo.name} core`);
         nrfdl.firmwareRead(
             getDeviceLibContext(),
             deviceId,
@@ -363,7 +363,7 @@ export const recoverOneCore =
     (deviceId: number, coreInfo: CoreDefinition) =>
     async (dispatch: TDispatch) => {
         dispatch(erasingStart());
-        logger.info(`Recovering device: core ${coreInfo.name}`);
+        logger.info(`Recovering ${coreInfo.name} core`);
 
         try {
             await nrfdl.firmwareErase(
@@ -461,7 +461,7 @@ const writeHex = async (
 export const writeOneCore =
     (deviceId: number, coreInfo: CoreDefinition) =>
     async (dispatch: TDispatch, getState: () => RootState) => {
-        logger.info(`Writing procedure starts for core ${coreInfo.name}`);
+        logger.info(`Writing procedure starts for ${coreInfo.name} core`);
         dispatch(writingStart());
         const { memMaps } = getState().app.file;
 
