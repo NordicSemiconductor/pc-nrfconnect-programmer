@@ -76,21 +76,6 @@ import { updateTargetWritable } from './targetActions';
 import EventAction from './usageDataActions';
 
 /**
- * Format serial number to string with padded zeros.
- *
- * @param {string | number} serialNumber input serial number
- * @returns {string} formatted serial number
- */
-export const formatSerialNumber = (serialNumber: string | number) => {
-    serialNumber =
-        typeof serialNumber === 'number'
-            ? serialNumber.toString()
-            : serialNumber;
-
-    return `000${serialNumber.substring(0, 9)}`;
-};
-
-/**
  *
  * Display some information about a DevKit. Called on a DevKit connection.
  * This also triggers reading the whole memory contents of the device.
