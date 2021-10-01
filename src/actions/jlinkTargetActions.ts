@@ -374,8 +374,10 @@ export const recoverOneCore =
                     : 'NRFDL_DEVICE_CORE_APPLICATION'
             );
             return;
-        } catch (e) {
-            logger.error(e);
+        } catch (error) {
+            usageData.sendErrorReport(
+                `Failed to recover ${coreInfo.name} core`
+            );
         }
     };
 
@@ -527,8 +529,9 @@ export const recoverAndWrite = () => async (dispatch: TDispatch) => {
 };
 
 // Save the content from the device memory as hex file.
-export const saveAsFile = () => (getState: () => RootState) => {
-    const { memMap, deviceInfo } = getState().app.target;
+export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
+    const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
+    const deviceInfo = inputDeviceInfo as DeviceDefinition;
     const maxAddress = Math.max(
         ...deviceInfo.cores.map(c => c.romBaseAddr + c.romSize)
     );
@@ -546,7 +549,7 @@ export const saveAsFile = () => (getState: () => RootState) => {
                 err => {
                     if (err) {
                         logger.error(
-                            `Error when saving file: ${err.message || err}`
+                            `Failed to save file: ${err.message || err}`
                         );
                     }
                     logger.info(`File is successfully saved at ${filePath}`);
@@ -554,5 +557,6 @@ export const saveAsFile = () => (getState: () => RootState) => {
             );
         }
     };
+    console.log(remote);
     remote.dialog.showSaveDialog(options).then(save);
 };
