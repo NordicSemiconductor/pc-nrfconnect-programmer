@@ -109,7 +109,6 @@ export const loadProtectionStatus = async (
 };
 
 /**
- *
  * Display some information about a DevKit. Called on a DevKit connection.
  * This also triggers reading the whole memory contents of the device.
  *
