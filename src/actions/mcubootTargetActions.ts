@@ -40,7 +40,7 @@ import nrfdl, {
     Device,
     SerialPort,
 } from '@nordicsemiconductor/nrf-device-lib-js';
-import { logger } from 'pc-nrfconnect-shared';
+import { getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
 
 import {
     mcubootFirmwareValid,
@@ -61,11 +61,7 @@ import {
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
-import {
-    CommunicationType,
-    context,
-    getDeviceFromNrfdl,
-} from '../util/devices';
+import { CommunicationType } from '../util/devices';
 import portPath from '../util/portPath';
 import { updateTargetWritable } from './targetActions';
 
@@ -195,7 +191,7 @@ export const performUpdate =
 
         const progressCallback = ({
             progressJson: progress,
-        }: nrfdl.Progress) => {
+        }: nrfdl.Progress.CallbackParameters) => {
             let dfuProcess;
             try {
                 dfuProcess = JSON.parse(progress.process);
@@ -253,14 +249,14 @@ export const performUpdate =
         dispatch(mcubootWritingStart());
 
         try {
-            const device = await getDeviceFromNrfdl(serialNumber as string);
-            console.log(device);
+            const { device: inputDevice } = getState().app.target;
+            const device = inputDevice as Device;
             nrfdl.firmwareProgram(
                 getDeviceLibContext(),
                 device.id,
                 'NRFDL_FW_FILE',
                 'NRFDL_FW_MCUBOOT',
-                mcubootFilePath,
+                mcubootFilePath as string,
                 completeCallback,
                 progressCallback
             );
