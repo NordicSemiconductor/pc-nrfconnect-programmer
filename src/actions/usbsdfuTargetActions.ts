@@ -241,10 +241,13 @@ export const openDevice =
  * Reset device to Application mode
  * @returns {Promise<void>} resolved promise
  */
-export const resetDevice = () => async (getState: () => RootState) => {
-    const { device: inputDevice } = getState().app.target;
-    const device = inputDevice as Device;
-};
+export const resetDevice =
+    () => async (_: TDispatch, getState: () => RootState) => {
+        const { device: inputDevice } = getState().app.target;
+        const device = inputDevice as Device;
+
+        nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
+    };
 
 /**
  * Create DFU image by given region name and firmware type
@@ -551,16 +554,13 @@ const handleHash = (image: initPacket.DfuImage, hashType: number) => {
  * @param {number} deviceId the Id of device
  * @param {initPacket.DfuImage[]} inputDfuImages the list of DFU image
  *
- * @returns {void}
+ * @returns {Promise<void>} resolved promise
  */
 const operateDFU = async (
     deviceId: number,
     inputDfuImages: initPacket.DfuImage[]
 ) => {
-    // const [dfuImage, ...restImages] = inputDfuImages;
-    // const zipBuffer = await sdfuOperations.createDfuZipBuffer([dfuImage]);
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
-
     fs.writeFileSync('/tmp/sdfu.zip', zipBuffer);
 
     let prevPercentage: number;
@@ -661,7 +661,6 @@ export const write =
             dispatch(writingEnd());
             startWatchingDevices();
             const reconnectedDevice = await waitForDevice(device.serialNumber);
-            console.log(reconnectedDevice);
             dispatch(targetActions.openDevice(reconnectedDevice));
         } catch (error) {
             logger.error(`Failed to write: ${error}`);
