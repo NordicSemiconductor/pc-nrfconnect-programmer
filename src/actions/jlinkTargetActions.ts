@@ -528,7 +528,11 @@ export const recoverAndWrite = () => async (dispatch: TDispatch) => {
     await dispatch(write());
 };
 
-// Save the content from the device memory as hex file.
+/**
+ * Save the content from the device memory as hex file.
+ *
+ * @returns {void}
+ */
 export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
     const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
     const deviceInfo = inputDeviceInfo as DeviceDefinition;
