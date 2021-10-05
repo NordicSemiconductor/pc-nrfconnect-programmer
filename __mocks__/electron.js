@@ -34,4 +34,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export default {};
+module.exports = {
+    remote: jest.mock(),
+};
