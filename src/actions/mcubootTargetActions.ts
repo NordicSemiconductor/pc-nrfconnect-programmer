@@ -147,95 +147,96 @@ export const canWrite =
     };
 
 export const performUpdate =
-    () => async (dispatch: TDispatch, getState: () => RootState) => {
-        const { mcubootFilePath } = getState().app.file;
-        const { serialNumber } = getState().app.target;
+    () => (dispatch: TDispatch, getState: () => RootState) =>
+        new Promise((resolve, reject) => {
+            const { mcubootFilePath } = getState().app.file;
+            const { serialNumber } = getState().app.target;
 
-        logger.info(
-            `Writing ${mcubootFilePath} to device ${serialNumber || ''}`
-        );
+            logger.info(
+                `Writing ${mcubootFilePath} to device ${serialNumber || ''}`
+            );
 
-        let totalPercentage = 0;
-        let totalDuration = 0;
-        let progressMsg = '';
+            let totalPercentage = 0;
+            let totalDuration = 0;
+            let progressMsg = '';
 
-        const progressCallback = ({
-            progressJson: progress,
-        }: nrfdl.Progress.CallbackParameters) => {
-            let dfuProcess;
-            try {
-                dfuProcess = JSON.parse(progress.process);
-            } catch (e) {
-                dispatch(
-                    mcubootProcessUpdate({
-                        message: progress.process,
-                        percentage: totalPercentage,
-                        duration: totalDuration,
-                    })
-                );
-                return;
-            }
-
-            if (dfuProcess && dfuProcess.operation === 'upload_image') {
-                totalPercentage = dfuProcess.progress_percentage;
-                totalDuration = dfuProcess.duration;
-
-                progressMsg = dfuProcess.message || progressMsg;
-                dispatch(
-                    mcubootProcessUpdate({
-                        message: progressMsg,
-                        percentage: totalPercentage,
-                        duration: totalDuration,
-                    })
-                );
-            }
-        };
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const errorCallback = (error: any) => {
-            if (error) {
-                let errorMsg = error.message || error;
-
-                // Program without setting device in MCUboot mode will throw such an error:
-                // Errorcode: CouldNotCallFunction (0x9)
-                // Lowlevel error: Unknown value (ffffff24)
-                if (errorMsg.includes('0x9')) {
-                    errorMsg =
-                        'Please make sure that the device is in MCUboot mode and try again.';
+            const progressCallback = ({
+                progressJson: progress,
+            }: nrfdl.Progress.CallbackParameters) => {
+                let dfuProcess;
+                try {
+                    dfuProcess = JSON.parse(progress.process);
+                } catch (error) {
+                    dispatch(
+                        mcubootProcessUpdate({
+                            message: progress.process,
+                            percentage: totalPercentage,
+                            duration: totalDuration,
+                        })
+                    );
+                    reject(error);
                 }
 
-                logger.error(`MCUboot DFU failed. ${errorMsg}`);
-                dispatch(mcubootWritingFail(errorMsg));
-                return;
+                if (dfuProcess && dfuProcess.operation === 'upload_image') {
+                    totalPercentage = dfuProcess.progress_percentage;
+                    totalDuration = dfuProcess.duration;
+
+                    progressMsg = dfuProcess.message || progressMsg;
+                    dispatch(
+                        mcubootProcessUpdate({
+                            message: progressMsg,
+                            percentage: totalPercentage,
+                            duration: totalDuration,
+                        })
+                    );
+                }
+            };
+
+            const errorCallback = (error: Error) => {
+                if (error) {
+                    let errorMsg = error.message;
+
+                    // Program without setting device in MCUboot mode will throw such an error:
+                    // Errorcode: CouldNotCallFunction (0x9)
+                    // Lowlevel error: Unknown value (ffffff24)
+                    if (errorMsg.includes('0x9')) {
+                        errorMsg =
+                            'Please make sure that the device is in MCUboot mode and try again.';
+                    }
+
+                    logger.error(`MCUboot DFU failed. ${errorMsg}`);
+                    dispatch(mcubootWritingFail(errorMsg));
+                    reject(error);
+                }
+
+                dispatch(mcubootWritingSucceed());
+            };
+
+            const completeCallback = () => {
+                dispatch(mcubootWritingSucceed());
+                reject();
+            };
+
+            dispatch(mcubootWritingStart());
+
+            try {
+                const { device: inputDevice } = getState().app.target;
+                const device = inputDevice as Device;
+                nrfdl.firmwareProgram(
+                    getDeviceLibContext(),
+                    device.id,
+                    'NRFDL_FW_FILE',
+                    'NRFDL_FW_MCUBOOT',
+                    mcubootFilePath as string,
+                    completeCallback,
+                    progressCallback
+                );
+            } catch (error) {
+                errorCallback(error as Error);
             }
 
-            dispatch(mcubootWritingSucceed());
-        };
-
-        const completeCallback = () => {
-            dispatch(mcubootWritingSucceed());
-        };
-
-        dispatch(mcubootWritingStart());
-
-        try {
-            const { device: inputDevice } = getState().app.target;
-            const device = inputDevice as Device;
-            nrfdl.firmwareProgram(
-                getDeviceLibContext(),
-                device.id,
-                'NRFDL_FW_FILE',
-                'NRFDL_FW_MCUBOOT',
-                mcubootFilePath as string,
-                completeCallback,
-                progressCallback
-            );
-        } catch (e) {
-            errorCallback(e);
-        }
-
-        dispatch(updateTargetWritable());
-    };
+            dispatch(updateTargetWritable());
+        });
 
 export const cancelUpdate = () => (dispatch: TDispatch) => {
     dispatch(mcubootWritingClose());

@@ -387,40 +387,41 @@ export const recover =
  *
  * @returns {void}
  */
-const writeHex = async (
+const writeHex = (
     deviceId: number,
     coreInfo: CoreDefinition,
     hexFileString: string
-) => {
-    logger.info('Writing HEX');
+) =>
+    Promise.resolve(() => {
+        logger.info('Writing HEX');
 
-    nrfdl.firmwareProgram(
-        getDeviceLibContext(),
-        deviceId,
-        'NRFDL_FW_BUFFER',
-        'NRFDL_FW_INTEL_HEX',
-        Buffer.from(hexFileString, 'utf8'),
-        err => {
-            if (err)
-                usageData.sendErrorReport(
-                    `Device programming failed with error: ${err}`
-                );
-            logger.info('Device programming completed');
-        },
-        ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-            console.log(progress);
-            const status = `${progress.operation.replace('.', ':')} ${
-                // TODO: fix type in nrfdl
-                progress.progressPercentage
-            }%`;
-            logger.info(status);
-        },
-        null,
-        coreInfo.name === 'NRFDL_DEVICE_CORE_NETWORK'
-            ? 'NRFDL_DEVICE_CORE_NETWORK'
-            : 'NRFDL_DEVICE_CORE_APPLICATION'
-    );
-};
+        nrfdl.firmwareProgram(
+            getDeviceLibContext(),
+            deviceId,
+            'NRFDL_FW_BUFFER',
+            'NRFDL_FW_INTEL_HEX',
+            Buffer.from(hexFileString, 'utf8'),
+            err => {
+                if (err)
+                    usageData.sendErrorReport(
+                        `Device programming failed with error: ${err}`
+                    );
+                logger.info('Device programming completed');
+            },
+            ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
+                console.log(progress);
+                const status = `${progress.operation.replace('.', ':')} ${
+                    // TODO: fix type in nrfdl
+                    progress.progressPercentage
+                }%`;
+                logger.info(status);
+            },
+            null,
+            coreInfo.name === 'NRFDL_DEVICE_CORE_NETWORK'
+                ? 'NRFDL_DEVICE_CORE_NETWORK'
+                : 'NRFDL_DEVICE_CORE_APPLICATION'
+        );
+    });
 
 /**
  * Write one core

@@ -24,7 +24,7 @@ const CoreView = ({ core, active }: CoreViewProps) => {
     const { regions, romSize, romBaseAddr } = core;
     const regionViews = [];
     if (!regions || regions.length <= 0) {
-        return [<RegionView key={0} core={core} width={1} active={active} />];
+        return <RegionView key={0} core={core} width={1} active={active} />;
     }
 
     // Sort the regions by start address and generate a view for it, also
@@ -82,6 +82,7 @@ const CoreView = ({ core, active }: CoreViewProps) => {
                             width={startAddress - lastAddress}
                         />
                     );
+
                     regionViews.push(
                         <RegionView
                             key={startAddress}
@@ -105,7 +106,7 @@ const CoreView = ({ core, active }: CoreViewProps) => {
         />
     );
 
-    return regionViews;
+    return <>{regionViews}</>;
 };
 
 CoreView.propTypes = {

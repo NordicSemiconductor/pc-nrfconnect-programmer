@@ -39,7 +39,7 @@ const convertCoresToViews = (
 ) =>
     allocateCores(targetCores, regions)
         .sort((a, b) => b.romBaseAddr - a.romBaseAddr)
-        .map(c => <CoreView core={c} active={active} />);
+        .map(c => <CoreView core={c} active={active} key={c.mbrBaseAddr} />);
 
 interface MemoryViewProps {
     isTarget: boolean;
@@ -60,12 +60,14 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
     const targetCores = useSelector(getDeviceInfo)?.cores as CoreDefinition[];
 
     const placeHolder =
-        isTarget && isLoading
-            ? // When it is target and during loading, show something.
-              [<CoreView width={1} striped active core={targetCores[0]} />]
-            : // When it is target and during writing, show file regions active.
-              // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
-              convertCoresToViews(targetCores, regions, isTarget && isWriting);
+        isTarget && isLoading ? (
+            // When it is target and during loading, show something.
+            <CoreView width={1} striped active core={targetCores[0]} />
+        ) : (
+            // When it is target and during writing, show file regions active.
+            // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
+            convertCoresToViews(targetCores, regions, isTarget && isWriting)
+        );
     return placeHolder.map((coreView, index) => (
         <React.Fragment key={index.toString()}>
             <div

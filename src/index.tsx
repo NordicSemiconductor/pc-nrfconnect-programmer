@@ -7,12 +7,12 @@
 import React from 'react';
 import { App } from 'pc-nrfconnect-shared';
 
-import AppMainView from './src/components/AppMainView';
-import ControlPanel from './src/components/ControlPanel';
-import DeviceSelector from './src/components/DeviceSelector';
-import appReducer from './src/reducers';
+import AppMainView from './components/AppMainView';
+import ControlPanel from './components/ControlPanel';
+import DeviceSelector from './components/DeviceSelector';
+import appReducer from './reducers';
 
-import './resources/css/index.scss';
+import '../resources/css/index.scss';
 
 export default () => (
     <App

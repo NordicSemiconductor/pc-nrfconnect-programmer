@@ -211,13 +211,12 @@ export const openDevice =
  * Reset device to Application mode
  * @returns {Promise<void>} resolved promise
  */
-export const resetDevice =
-    () => async (_: TDispatch, getState: () => RootState) => {
-        const { device: inputDevice } = getState().app.target;
-        const device = inputDevice as Device;
+export const resetDevice = () => (_: TDispatch, getState: () => RootState) => {
+    const { device: inputDevice } = getState().app.target;
+    const device = inputDevice as Device;
 
-        nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
-    };
+    nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
+};
 
 /**
  * Create DFU image by given region name and firmware type

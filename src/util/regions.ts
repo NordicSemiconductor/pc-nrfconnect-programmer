@@ -63,7 +63,7 @@ export enum RegionColor {
  */
 export interface Region {
     name: RegionName;
-    version: number;
+    version?: number;
     startAddress: number;
     regionSize: number;
     color: RegionColor;
