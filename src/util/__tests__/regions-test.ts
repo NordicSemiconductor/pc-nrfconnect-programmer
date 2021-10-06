@@ -22,21 +22,21 @@ describe('get regions', () => {
         const data = readFileSync(mbrFile);
         const memMap = MemoryMap.fromHex(data.toString());
         const region = regions.getMBRRegion(memMap, CoreDefinition);
-        expect(region.startAddress).toEqual(0);
+        expect(region?.startAddress).toEqual(0);
     });
 
     it('should read Bootloader region', () => {
         const data = readFileSync(bootloaderFile);
         const memMap = MemoryMap.fromHex(data.toString());
         const region = regions.getBootloaderRegion(memMap, CoreDefinition);
-        expect(region.startAddress).toEqual(0xe0000);
+        expect(region?.startAddress).toEqual(0xe0000);
     });
 
     it('should read SoftDevice region', () => {
         const data = readFileSync(softDeviceFile);
         const memMap = MemoryMap.fromHex(data.toString());
         const region = regions.getSoftDeviceRegion(memMap, CoreDefinition);
-        expect(region.startAddress).toEqual(0x1000);
+        expect(region?.startAddress).toEqual(0x1000);
     });
 });
 
