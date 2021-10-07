@@ -35,16 +35,16 @@ const RegionView = ({
     core,
 }: RegionViewProps) => {
     const [show, setShow] = useState(false);
-    const [target, setTarget] = useState<DOMContainer<HTMLElement>>();
+    const [target, setTarget] = useState<HTMLElement>();
     const ref = useRef(null);
 
     const dispatch = useDispatch();
     const removeFile = (filePath: string) =>
         dispatch(fileActions.removeFile(filePath));
 
-    const toggleShow = (event: React.PointerEvent<HTMLDivElement>) => {
+    const toggleShow = (event: React.PointerEvent<HTMLElement>) => {
         setShow(!show);
-        setTarget(event.target);
+        setTarget(event.target as HTMLElement);
     };
 
     const color = region ? region.color : '#d9e1e2';
@@ -56,8 +56,9 @@ const RegionView = ({
     className = hoverable ? `${className} hoverable` : className;
     className = fileNames.length > 1 ? `${className} crosses` : className;
 
-    const containerNode =
-        document.getElementsByClassName('core-main-layout')[0];
+    const containerNode = document.getElementsByClassName(
+        'core-main-layout'
+    )[0] as HTMLElement;
 
     return (
         <div
@@ -73,6 +74,7 @@ const RegionView = ({
             <Overlay
                 trigger={['focus', 'hover']}
                 placement="right"
+                // @ts-ignore -- Don't care about this for now
                 target={target}
                 container={containerNode}
                 show={show}

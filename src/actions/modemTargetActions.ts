@@ -20,16 +20,18 @@ import {
 import { RootState, TDispatch } from '../reducers/types';
 
 export const selectModemFirmware = () => (dispatch: TDispatch) => {
-    const dialogOptions: Electron.OpenDialogOptions = {
+    const dialogOptions = {
         title: 'Select a modem firmware zip file',
         filters: [{ name: 'Modem firmware zip file', extensions: ['zip'] }],
         properties: ['openFile'],
     };
-    remote.dialog.showOpenDialog(dialogOptions).then(({ filePaths }) => {
-        if (filePaths && filePaths.length > 0) {
-            dispatch(modemWritingReady(filePaths[0]));
-        }
-    });
+    remote.dialog
+        .showOpenDialog(dialogOptions)
+        .then(({ filePaths }: { filePaths: string[] }) => {
+            if (filePaths && filePaths.length > 0) {
+                dispatch(modemWritingReady(filePaths[0]));
+            }
+        });
 };
 
 export const cancelUpdate = () => (dispatch: TDispatch) => {

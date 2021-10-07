@@ -52,6 +52,8 @@ export const defaultCore: CoreDefinition = {
     protectionStatus: 'PROTECTION_STATUS_SECURE_REGIONS',
 };
 
+type DeviceFamily = 'nRF51' | 'nRF52' | 'nRF53' | 'nRF91' | 'Unknown';
+
 export interface DeviceDefinition {
     family?: DeviceFamily;
     type?: string;
@@ -226,6 +228,13 @@ export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
         family,
         cores: [],
     } as DeviceDefinition;
+};
+
+type DeviceCoreInfo = {
+    codeAddress: string;
+    codeSize: number;
+    RAMSize: number;
+    codePageSize: number;
 };
 
 /**

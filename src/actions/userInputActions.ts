@@ -6,7 +6,7 @@
 
 import { logger } from 'pc-nrfconnect-shared';
 
-import { TDispatch } from '../reducers';
+import { TDispatch } from '../reducers/types';
 import {
     userInputCancelled,
     userInputReceived,
