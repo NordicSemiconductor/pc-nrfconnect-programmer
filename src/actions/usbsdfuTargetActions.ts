@@ -164,22 +164,16 @@ export const openDevice =
                 const regionName =
                     {
                         // TODO: fix type in nrfdl
-                        [nrfdl.NRFDL_IMAGE_TYPE_BOOTLOADER]:
-                            RegionName.BOOTLOADER,
-                        [nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE]:
-                            RegionName.SOFTDEVICE,
-                        [nrfdl.NRFDL_IMAGE_TYPE_APPLICATION]:
-                            RegionName.APPLICATION,
+                        NRFDL_IMAGE_TYPE_BOOTLOADER: RegionName.BOOTLOADER,
+                        NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionName.SOFTDEVICE,
+                        NRFDL_IMAGE_TYPE_APPLICATION: RegionName.APPLICATION,
                     }[imageType] || RegionName.NONE;
                 const color =
                     {
                         // TODO: fix type in nrfdl
-                        [nrfdl.NRFDL_IMAGE_TYPE_BOOTLOADER]:
-                            RegionColor.BOOTLOADER,
-                        [nrfdl.NRFDL_IMAGE_TYPE_SOFTDEVICE]:
-                            RegionColor.SOFTDEVICE,
-                        [nrfdl.NRFDL_IMAGE_TYPE_APPLICATION]:
-                            RegionColor.APPLICATION,
+                        NRFDL_IMAGE_TYPE_BOOTLOADER: RegionColor.BOOTLOADER,
+                        NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionColor.SOFTDEVICE,
+                        NRFDL_IMAGE_TYPE_APPLICATION: RegionColor.APPLICATION,
                     }[imageType] || RegionColor.NONE;
                 regions = [
                     ...regions,

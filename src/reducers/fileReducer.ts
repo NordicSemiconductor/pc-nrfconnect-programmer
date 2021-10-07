@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import MemoryMap from 'nrf-intel-hex';
+import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
 import { Region } from '../util/regions';
 import { RootState } from './types';
@@ -23,13 +23,13 @@ export interface FileState {
     detectedRegionNames: Set<string>;
     loaded: Record<string, Loaded>;
     mcubootFilePath?: string;
-    memMaps: MemoryMap[];
+    memMaps: MemoryMaps;
     mruFiles: string[];
     regions: Region[];
 }
 
 const initialState: FileState = {
-    detectedRegionNames: new Set<string>(),
+    detectedRegionNames: new Set(),
     loaded: {},
     mcubootFilePath: undefined,
     memMaps: [],
@@ -38,7 +38,7 @@ const initialState: FileState = {
 };
 
 interface FileParsePayload {
-    memMaps: MemoryMap[];
+    memMaps: MemoryMaps;
     loaded: Record<string, Loaded>;
 }
 

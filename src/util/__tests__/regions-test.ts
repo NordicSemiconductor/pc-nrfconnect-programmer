@@ -5,7 +5,7 @@
  */
 
 import { readFileSync } from 'fs';
-import MemoryMap from 'nrf-intel-hex';
+import MemoryMap, { MemoryMaps, MemoryMapTuple } from 'nrf-intel-hex';
 
 import { defaultCore as CoreDefinition } from '../devices';
 import * as regions from '../regions';
@@ -44,7 +44,7 @@ describe('detect regions', () => {
     it('should detect only MBR region', () => {
         const data = readFileSync(mbrFile);
         const memMap = MemoryMap.fromHex(data.toString());
-        const memMaps = [['', memMap]];
+        const memMaps = [['', memMap]] as MemoryMaps;
         const regionList = regions.getFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(1);
         expect(
@@ -67,7 +67,7 @@ describe('detect regions', () => {
     it('should detect only Bootloader region and UICR region', () => {
         const data = readFileSync(bootloaderFile);
         const memMap = MemoryMap.fromHex(data.toString());
-        const memMaps = [['', memMap]];
+        const memMaps = [['', memMap]] as MemoryMaps;
         const regionList = regions.getFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
@@ -90,7 +90,7 @@ describe('detect regions', () => {
     it('should detect MBR and SoftDevice region', () => {
         const data = readFileSync(softDeviceFile);
         const memMap = MemoryMap.fromHex(data.toString());
-        const memMaps = [['', memMap]];
+        const memMaps = [['', memMap]] as MemoryMaps;
         const regionList = regions.getFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
@@ -113,7 +113,7 @@ describe('detect regions', () => {
     it('should detect two Application regions', () => {
         const data = readFileSync(twoAppFile);
         const memMap = MemoryMap.fromHex(data.toString());
-        const memMaps = [['', memMap]];
+        const memMaps = [['', memMap]] as MemoryMaps;
         const regionList = regions.getFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
@@ -141,7 +141,7 @@ describe('detect regions', () => {
         const memMaps = [
             ['', memMap],
             ['', memMap2],
-        ];
+        ] as MemoryMaps;
         const regionList = regions.getFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(4);
         expect(
@@ -172,7 +172,7 @@ describe('detect regions', () => {
             ['', memMap],
             ['', memMap2],
             ['', memMap3],
-        ];
+        ] as MemoryMaps;
         const regionList = regions.getFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(6);
         expect(

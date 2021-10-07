@@ -6,7 +6,6 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import PropTypes from 'prop-types';
 
 import { getIsMcuboot } from '../reducers/mcubootReducer';
@@ -54,65 +53,68 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
     const isErasing = useSelector(getIsErasing);
     const isLoading = useSelector(getIsLoading);
     const isProtected = !!useSelector(getDeviceInfo)?.cores.find(
-        c => c.protectionStatus !== nrfdl.NRFDL_PROTECTION_STATUS_NONE
+        c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
     );
     const refreshEnabled = useSelector(getRefreshEnabled);
     const targetCores = useSelector(getDeviceInfo)?.cores as CoreDefinition[];
 
     const placeHolder =
-        isTarget && isLoading ? (
-            // When it is target and during loading, show something.
-            <CoreView width={1} striped active core={targetCores[0]} />
-        ) : (
-            // When it is target and during writing, show file regions active.
-            // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
-            convertCoresToViews(targetCores, regions, isTarget && isWriting)
-        );
-    return placeHolder.map((coreView, index) => (
-        <React.Fragment key={index.toString()}>
-            <div
-                className="core-container"
-                style={{
-                    flex: coreView.props.core.romSize,
-                }}
-            >
-                {coreView}
-                {isTarget && isErasing && (
-                    <div className="erase-indicator striped active" />
-                )}
-                {isTarget && refreshEnabled && (
-                    <div className="centering-container">
-                        {!isProtected && (
+        isTarget && isLoading
+            ? // When it is target and during loading, show something.
+              [<CoreView active core={targetCores[0]} />]
+            : // When it is target and during writing, show file regions active.
+              // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
+              convertCoresToViews(targetCores, regions!, isTarget && isWriting);
+    return (
+        <>
+            {placeHolder.map((coreView, index) => (
+                <div
+                    key={index.toString()}
+                    className="core-container"
+                    style={{
+                        flex: coreView.props.core.romSize,
+                    }}
+                >
+                    {coreView}
+                    {isTarget && isErasing && (
+                        <div className="erase-indicator striped active" />
+                    )}
+                    {isTarget && refreshEnabled && (
+                        <div className="centering-container">
+                            {!isProtected && (
+                                <div className="read-indicator">
+                                    <p>Device is connected</p>
+                                    <p>
+                                        Press <strong>READ</strong> button to
+                                        read the memory
+                                    </p>
+                                </div>
+                            )}
+                            {isProtected && (
+                                <div className="read-indicator">
+                                    <p>Device is protected</p>
+                                    <p>
+                                        Press <strong>Erase all</strong> button
+                                        to recover the protected memory
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {isTarget && isMcuboot && (
+                        <div className="centering-container">
                             <div className="read-indicator">
                                 <p>Device is connected</p>
                                 <p>
-                                    Press <strong>READ</strong> button to read
-                                    the memory
+                                    Memory layout is not available via MCUboot
                                 </p>
                             </div>
-                        )}
-                        {isProtected && (
-                            <div className="read-indicator">
-                                <p>Device is protected</p>
-                                <p>
-                                    Press <strong>Erase all</strong> button to
-                                    recover the protected memory
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                )}
-                {isTarget && isMcuboot && (
-                    <div className="centering-container">
-                        <div className="read-indicator">
-                            <p>Device is connected</p>
-                            <p>Memory layout is not available via MCUboot</p>
                         </div>
-                    </div>
-                )}
-            </div>
-        </React.Fragment>
-    ));
+                    )}
+                </div>
+            ))}
+        </>
+    );
 };
 
 MemoryView.propTypes = {

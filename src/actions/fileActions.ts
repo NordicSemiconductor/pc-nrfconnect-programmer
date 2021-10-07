@@ -9,7 +9,7 @@
 import electron from 'electron';
 import Store from 'electron-store';
 import { readFile, stat, Stats, statSync } from 'fs';
-import MemoryMap from 'nrf-intel-hex';
+import MemoryMap, { MemoryMapTuple } from 'nrf-intel-hex';
 import { basename } from 'path';
 import { logger } from 'pc-nrfconnect-shared';
 
@@ -102,7 +102,7 @@ const updateDetectedRegionNames =
         ];
         let detectedRegionNames = new Set<string>();
         fileRegions.forEach(r => {
-            if (r.name && regionChecklist.includes(r.name)) {
+            if (r?.name && regionChecklist.includes(r.name)) {
                 detectedRegionNames = detectedRegionNames.add(r.name);
             }
         });
@@ -178,29 +178,28 @@ export const updateFileAppRegions =
 // Regard the Bootloader as a whole when there are gaps found in the Bootloader
 export const updateFileBlRegion =
     () => (dispatch: TDispatch, getState: () => RootState) => {
-        let fileRegions = getState().app.file.regions;
+        const fileRegions = getState().app.file.regions;
         const { cores } = { ...getState().app.target.deviceInfo };
         const blRegions = fileRegions.filter(
-            r => r.name === RegionName.BOOTLOADER
+            region => region.name === RegionName.BOOTLOADER
         );
-        if (blRegions.length <= 0) {
-            return;
-        }
 
-        blRegions.forEach(b => {
-            let blRegion = b;
+        if (blRegions.length <= 0) return;
+
+        blRegions.forEach(blRegion => {
             let blEndAddress: number | undefined;
             const blStartAddress = blRegion.startAddress;
-            const core = cores?.find(
-                c =>
-                    blStartAddress >= c.romBaseAddr &&
-                    blStartAddress < c.romBaseAddr + c.romSize
-            );
+            const coreRomSize = cores?.find(
+                core =>
+                    blStartAddress >= core.romBaseAddr &&
+                    blStartAddress < core.romBaseAddr + core.romSize
+            )?.romSize;
+
             fileRegions.forEach(r => {
                 if (
                     r.name === RegionName.NONE &&
                     r.startAddress > blRegion.startAddress &&
-                    r.startAddress + r.regionSize < (core?.romSize as number) &&
+                    r.startAddress + r.regionSize < (coreRomSize as number) &&
                     (!blEndAddress || blEndAddress <= r.startAddress)
                 ) {
                     blEndAddress = r.startAddress + r.regionSize;
@@ -209,19 +208,12 @@ export const updateFileBlRegion =
 
             // Merge Bootloader regions if more than one Bootloader are detected.
             if (blStartAddress !== undefined && blEndAddress !== undefined) {
-                fileRegions.forEach(r => {
-                    if (r.name === RegionName.NONE) {
-                        fileRegions = fileRegions.remove(
-                            fileRegions.indexOf(r)
-                        );
-                    }
-                });
                 const blRegionIndex = fileRegions.indexOf(blRegion);
                 blRegion = {
                     ...blRegion,
                     regionSize: blEndAddress - blStartAddress,
                 };
-                fileRegions = fileRegions.set(blRegionIndex, blRegion);
+                fileRegions[blRegionIndex] = blRegion;
                 dispatch(fileRegionsKnown(fileRegions));
             }
         });
@@ -232,7 +224,6 @@ export const updateFileRegions =
         dispatch(fileWarningRemove());
 
         const { file, target } = getState().app;
-        const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
 
         let regions: Region[] = [];
         target.deviceInfo?.cores.forEach(c => {
@@ -243,33 +234,6 @@ export const updateFileRegions =
         if (regions.find(r => r.fileNames && r.fileNames.length > 1)) {
             dispatch(
                 fileWarningAdd('Some of the HEX files have overlapping data.')
-            );
-        }
-
-        // Show file warning if out of displaying area.
-        const outsideFlashBlocks: string[] = [];
-        overlaps.forEach((overlap, startAddress) => {
-            const endAddress = startAddress + overlap[0][1].length;
-            const { uicrBaseAddr, romSize, pageSize } = {
-                ...target.deviceInfo,
-            };
-            if (
-                (startAddress < uicrBaseAddr && endAddress > romSize) ||
-                (startAddress >= uicrBaseAddr &&
-                    endAddress > uicrBaseAddr + pageSize)
-            ) {
-                outsideFlashBlocks.push(
-                    `${hexpad8(startAddress)}-${hexpad8(endAddress)}`
-                );
-            }
-        });
-        if (outsideFlashBlocks.length) {
-            dispatch(
-                fileWarningAdd(
-                    `There is data outside the user-writable areas (${outsideFlashBlocks.join(
-                        ', '
-                    )}).`
-                )
             );
         }
 
@@ -384,7 +348,7 @@ const parseOneFile =
                 memMap,
             },
         };
-        const newMemMaps = [...memMaps, [filePath, memMap]] as MemoryMap[];
+        const newMemMaps = [...memMaps, [filePath, memMap]] as MemoryMapTuple[];
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
         dispatch(updateFileRegions());
@@ -403,14 +367,17 @@ export const openFile =
     };
 
 export const openFileDialog = () => (dispatch: TDispatch) => {
-    const dialogOptions: electron.OpenDialogOptions = {
+    const dialogOptions = {
         title: 'Select a HEX file',
         filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
         properties: ['openFile', 'multiSelections'],
     };
     electron.remote.dialog
         .showOpenDialog(dialogOptions)
-        .then(({ filePaths }) => filePaths && dispatch(openFile(...filePaths)));
+        .then(
+            ({ filePaths }: { filePaths: string[] }) =>
+                filePaths && dispatch(openFile(...filePaths))
+        );
 };
 
 export const refreshAllFiles =
@@ -420,7 +387,7 @@ export const refreshAllFiles =
                 const entry = getState().app.file.loaded[filePath];
                 try {
                     const stats = statSync(filePath);
-                    if (entry.loadTime.getTime() < stats.mtime) {
+                    if (entry.loadTime < stats.mtime) {
                         dispatch(removeFile(filePath));
                         logger.info('Reloading: ', filePath);
                         await dispatch(parseOneFile(filePath));

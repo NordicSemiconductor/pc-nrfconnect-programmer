@@ -6,7 +6,7 @@
 
 /* eslint-disable no-bitwise */
 
-import MemoryMap, { MemoryBlocks, Overlaps } from 'nrf-intel-hex';
+import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
 import { logger } from 'pc-nrfconnect-shared';
 
 import { CoreDefinition, DeviceDefinition } from './devices';
@@ -609,7 +609,7 @@ export const getRegionsFromOverlaps = (
  * @returns {Array} the list of region
  */
 export const getFileRegions = (
-    memMaps: MemoryBlocks,
+    memMaps: MemoryMaps,
     coreInfo: CoreDefinition
 ): Region[] => {
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
@@ -628,7 +628,7 @@ export const getFileRegions = (
  * @returns {Array} the list of region
  */
 export const getCoreRegions = (
-    memMaps: MemoryBlocks,
+    memMaps: MemoryMaps,
     coreInfo: CoreDefinition
 ): Region[] => {
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
@@ -647,7 +647,7 @@ export const getCoreRegions = (
  * @returns {Array} the list of region
  */
 export const getTargetRegions = (
-    memMaps: MemoryBlocks,
+    memMaps: MemoryMaps,
     deviceInfo: DeviceDefinition
 ): Region[] => {
     let regions: Region[] = [];

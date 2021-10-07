@@ -12,7 +12,7 @@ import { Region } from '../util/regions';
 import RegionView from './RegionView';
 
 interface CoreWithRegions extends CoreDefinition {
-    regions: Region[];
+    regions?: Region[];
 }
 
 interface CoreViewProps {

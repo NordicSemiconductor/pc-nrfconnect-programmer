@@ -41,15 +41,17 @@ import { CommunicationType } from '../util/devices';
 const useRegisterDragEvents = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        const onDragover = event => {
-            const ev = event;
-            ev.dataTransfer.dropEffect = 'copy';
-            ev.preventDefault();
+        const onDragover = (event: DragEvent) => {
+            if (!event.dataTransfer) return;
+            event.dataTransfer.dropEffect = 'copy';
+            event.preventDefault();
         };
 
-        const onDrop = event => {
-            Array.from(event.dataTransfer.files).forEach(i => {
-                dispatch(fileActions.openFile(i.path));
+        const onDrop = (event: DragEvent) => {
+            if (!event.dataTransfer) return;
+
+            Array.from(event.dataTransfer.files).forEach(file => {
+                dispatch(fileActions.openFile((file as any).path));
             });
             event.preventDefault();
         };
@@ -71,25 +73,27 @@ const useLoadSettingsInitially = () => {
     }, [dispatch]);
 };
 
-const Mru = ({ mruFiles }) => {
+const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
     useRegisterDragEvents();
     useLoadSettingsInitially();
 
     const [show, setShow] = useState(false);
-    const [target, setTarget] = useState(null);
+    const [target, setTarget] = useState<HTMLElement | null>(null);
 
     const dispatch = useDispatch();
-    const openFile = filename => dispatch(fileActions.openFile(filename));
+    const openFile = (filename: string) =>
+        dispatch(fileActions.openFile(filename));
     const openFileDialog = () => dispatch(fileActions.openFileDialog());
     const onToggleFileList = () => dispatch(fileActions.loadMruFiles());
 
-    const onClick = event => {
+    const onClick = (event: React.MouseEvent) => {
+        if (!event.target) return;
         onToggleFileList();
         setShow(!show);
-        setTarget(event.target);
+        setTarget(event.target as HTMLElement);
     };
 
-    const onSelect = filePath => {
+    const onSelect = (filePath: string) => {
         if (filePath) {
             openFile(filePath);
         } else {
@@ -98,8 +102,9 @@ const Mru = ({ mruFiles }) => {
         setShow(false);
     };
 
-    const containerNode =
-        document.getElementsByClassName('core-main-layout')[0];
+    const containerNode = document.getElementsByClassName(
+        'core-main-layout'
+    )[0] as HTMLElement;
 
     return (
         <>
@@ -108,7 +113,6 @@ const Mru = ({ mruFiles }) => {
                 target={target}
                 placement="bottom-end"
                 container={containerNode}
-                trigger="click"
                 rootClose
                 onHide={() => setShow(false)}
                 transition={false}
@@ -150,14 +154,14 @@ Mru.propTypes = {
 };
 
 const ControlPanel = () => {
-    const fileRegionSize = useSelector(getRegions).length;
+    const fileRegionSize = useSelector(getRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
     const targetIsWritable = useSelector(getIsWritable);
     const targetIsRecoverable = useSelector(getIsRecoverable);
     const targetIsMemLoaded = useSelector(getIsMemLoaded);
-    const isProtected = !!useSelector(getDeviceInfo).cores.find(
-        c => c.protectionStatus !== nrfdl.NRFDL_PROTECTION_STATUS_NONE
+    const isProtected = !!useSelector(getDeviceInfo)?.cores.find(
+        c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
     );
     const targetIsReady = useSelector(getIsReady);
     const isJLink = useSelector(getTargetType) === CommunicationType.JLINK;
@@ -273,7 +277,7 @@ const ControlPanel = () => {
                             type="checkbox"
                             id="auto-read-memory-checkbox"
                             className="last-checkbox"
-                            onChange={e => toggleAutoRead(e.target.checked)}
+                            onChange={() => toggleAutoRead()}
                             checked={autoRead}
                             label="Auto read memory"
                         />
@@ -281,7 +285,7 @@ const ControlPanel = () => {
                             type="checkbox"
                             id="toggle-mcuboot-checkbox"
                             className="last-checkbox"
-                            onChange={e => toggleMcuboot(e.target.checked)}
+                            onChange={() => toggleMcuboot()}
                             checked={isMcuboot}
                             label="Enable MCUboot"
                         />
