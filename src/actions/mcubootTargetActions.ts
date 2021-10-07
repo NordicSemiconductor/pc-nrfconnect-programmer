@@ -35,40 +35,11 @@ import { CommunicationType } from '../util/devices';
 import portPath from '../util/portPath';
 import { updateTargetWritable } from './targetActions';
 
-export const pickSerialPort = (serialports: Array<SerialPort>) => {
-    if (!serialports) {
-        return undefined;
-    }
+export const pickSerialPort = (serialports: Array<SerialPort>) =>
+    serialports[0];
 
-    const platform = process.platform.slice(0, 3);
-    switch (platform) {
-        case 'win':
-            return serialports.find(s => /MI_00/.test(s.pnpId));
-        case 'lin':
-            return serialports.find(s => /-if00$/.test(s.pnpId));
-        case 'dar':
-            return serialports.find(s => /1$/.test(portPath(s)));
-        default:
-    }
-
-    return undefined;
-};
-
-export const pickSerialPort2 = (serialports: Array<SerialPort>) => {
-    const platform = process.platform.slice(0, 3);
-
-    switch (platform) {
-        case 'win':
-            return serialports.find(s => /MI_0[23]/.test(s.pnpId));
-        case 'lin':
-            return serialports.find(s => /-if0[23]$/.test(s.pnpId));
-        case 'dar':
-            return serialports.find(s => /[34]$/.test(portPath(s)));
-        default:
-    }
-
-    return {};
-};
+export const pickSerialPort2 = (serialports: Array<SerialPort>) =>
+    serialports.slice(-1)[0];
 
 export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     const { serialPorts } = selectedDevice;
@@ -106,13 +77,9 @@ export const toggleMcuboot =
         dispatch(updateTargetWritable());
     };
 
-export const prepareUpdate =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const filesLoaded = getState().app.file.loaded;
-        const fileName = Object.keys(filesLoaded)[0];
-        // Not sure why a parameter is sent in here
-        dispatch(mcubootWritingReady(fileName));
-    };
+export const prepareUpdate = () => (dispatch: TDispatch) => {
+    dispatch(mcubootWritingReady());
+};
 
 export const canWrite =
     () => (dispatch: TDispatch, getState: () => RootState) => {
@@ -165,7 +132,7 @@ export const performUpdate =
             }: nrfdl.Progress.CallbackParameters) => {
                 let dfuProcess;
                 try {
-                    dfuProcess = JSON.parse(progress.process);
+                    dfuProcess = JSON.parse(progress);
                 } catch (error) {
                     dispatch(
                         mcubootProcessUpdate({

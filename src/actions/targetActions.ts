@@ -55,7 +55,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     }
     if (device.traits.nordicUsb) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicUsb');
-        dispatch(usbsdfuTargetActions.openDevice(device));
+        dispatch(usbsdfuTargetActions.openDevice());
         return;
     }
 
@@ -65,7 +65,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
 
     if (vid === VendorId.NORDIC_SEMICONDUCTOR) {
         if (pid && USBProductIds.includes(pid)) {
-            dispatch(usbsdfuTargetActions.openDevice(device));
+            dispatch(usbsdfuTargetActions.openDevice());
             return;
         }
         if (pid && McubootProductIds.includes(pid)) {

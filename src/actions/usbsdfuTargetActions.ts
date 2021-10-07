@@ -5,7 +5,6 @@
  */
 
 /* eslint-disable import/no-cycle */
-
 import nrfdl, { Device, Error } from '@nordicsemiconductor/nrf-device-lib-js';
 import Crypto from 'crypto';
 import fs from 'fs';
@@ -41,6 +40,7 @@ import {
     NordicFwIds,
 } from '../util/devices';
 import * as initPacket from '../util/initPacket';
+import { DfuImage } from '../util/initPacket';
 import {
     defaultRegion,
     getSoftDeviceId,
@@ -336,10 +336,10 @@ const calculateSHA512Hash = (image: MemoryMap) => {
  * @returns {initPacket.DfuImage} the updated DFU image
  */
 const handleImage = (
-    image: initPacket.DfuImage,
+    image: DfuImage,
     regions: Region[],
     memMap: MemoryMap
-) => {
+): DfuImage => {
     if (!image.initPacket) {
         throw new Error('Init packet was not created.');
     }
@@ -361,16 +361,18 @@ const handleImage = (
         throw new Error('Firmware type is unknown when setting firmware size.');
     }
 
-    const firmwareImage = memMap.slicePad(
+    const slice = memMap.slicePad(
         region?.startAddress as number,
         Math.ceil((region?.regionSize as number) / 4) * 4
     );
+    const firmwareImage = MemoryMap.fromPaddedUint8Array(slice);
+
     return {
         ...image,
         firmwareImage,
         initPacket: {
             ...image.initPacket,
-            [fwSizeStr]: firmwareImage.length,
+            [fwSizeStr]: slice.length,
             sdReq,
         },
     };
@@ -383,7 +385,7 @@ const handleImage = (
  * @param {number} hwVersion the version of hardware
  * @returns {initPacket.DfuImage} the updated DFU image
  */
-const handleHwVersion = (image: initPacket.DfuImage, hwVersion: number) => ({
+const handleHwVersion = (image: DfuImage, hwVersion: number): DfuImage => ({
     ...image,
     initPacket: {
         ...image.initPacket,
@@ -400,10 +402,10 @@ const handleHwVersion = (image: initPacket.DfuImage, hwVersion: number) => ({
  * @returns {initPacket.DfuImage} the updated DFU image
  */
 const handleSdReq = (
-    image: initPacket.DfuImage,
+    image: DfuImage,
     fileMemMap: MemoryMap,
     deviceInfo: DeviceDefinition
-) => {
+): DfuImage => {
     // If sdReq is already set, then do not handle it.
     if (image.initPacket.sdReq && image.initPacket.sdReq.length > 0) {
         return image;
@@ -438,8 +440,8 @@ const handleSdReq = (
  * @param {initPacket.DfuImage} imageInput the DFU image
  * @returns {initPacket.DfuImage} the updated DFU image
  */
-const handleUserInput = (imageInput: initPacket.DfuImage) => {
-    return async (dispatch: TDispatch) => {
+const handleUserInput = (imageInput: DfuImage) => {
+    return async (dispatch: TDispatch): Promise<DfuImage> => {
         let image = imageInput;
         let sdReq;
 
@@ -477,7 +479,7 @@ const handleUserInput = (imageInput: initPacket.DfuImage) => {
  * @param {number} hashType the type of hash
  * @returns {initPacket.DfuImage} the updated DFU image
  */
-const handleHash = (image: initPacket.DfuImage, hashType: number) => {
+const handleHash = (image: DfuImage, hashType: number): DfuImage => {
     let hash;
     switch (hashType) {
         case initPacket.HashType.NO_HASH:
@@ -528,7 +530,7 @@ const operateDFU = async (
 
     let prevPercentage: number;
 
-    return new Promise(resolve =>
+    return new Promise<void>(resolve =>
         nrfdl.firmwareProgram(
             getDeviceLibContext(),
             deviceId,
@@ -538,7 +540,7 @@ const operateDFU = async (
             (error?: Error) => {
                 if (error) {
                     if (
-                        error.error_code ===
+                        error.errorCode ===
                         nrfdl.NRFDL_ERR_SDFU_EXT_SD_VERSION_FAILURE
                     ) {
                         logger.error('Failed to write to the target device');
@@ -560,7 +562,7 @@ const operateDFU = async (
                     // return operateDFU(deviceId, restImages);
                 }
             },
-            ({ progressJson: progress }: nrfdl.Progress) => {
+            ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
                 // Don't repeat percentage steps that have already been logged.
                 if (prevPercentage !== progress.progress_percentage) {
                     const status = `${progress.message.replace('.', ':')} ${
@@ -592,25 +594,22 @@ export const write =
         const fileOverlaps = MemoryMap.overlapMemoryMaps(fileMemMaps);
         const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
         const { deviceInfo } = getState().app.target;
-        const hwVersion = parseInt(deviceInfo?.family.slice(3), 10);
-        let { dfuImages } = getState().app.target;
+        const hwVersion = parseInt(deviceInfo?.family?.slice(3) ?? '0', 10);
+        const { dfuImages } = getState().app.target;
 
-        dfuImages = dfuImages?.map(image =>
-            handleImage(image, fileRegions, fileMemMap)
-        );
-        dfuImages = dfuImages?.map(image => handleHwVersion(image, hwVersion));
-        dfuImages = dfuImages?.map(image =>
-            handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
-        );
-        dfuImages = dfuImages?.map(image =>
-            handleHash(image, initPacket.HashType.SHA256)
-        );
-        dfuImages = await Promise.all(
-            dfuImages?.map(async image =>
+        let images = dfuImages
+            ?.map(image => handleImage(image, fileRegions, fileMemMap))
+            .map(image => handleHwVersion(image, hwVersion))
+            .map(image =>
+                handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
+            )
+            .map(image => handleHash(image, initPacket.HashType.SHA256));
+        images = await Promise.all(
+            images?.map(async image =>
                 dispatch(await handleUserInput(image))
-            ) as Promise<initPacket.DfuImage>[]
+            ) as Promise<DfuImage>[]
         );
-        dispatch(dfuImagesUpdate(dfuImages));
+        dispatch(dfuImagesUpdate(images));
 
         // Start writing after handling images since user may cancel userInput
         logger.info('Performing DFU. This may take a few seconds');
@@ -620,7 +619,7 @@ export const write =
         try {
             const { device } = getState().app.target;
             if (!device) throw Error(`Failed to write due to device not found`);
-            await operateDFU(device.id, dfuImages);
+            await operateDFU(device.id, images);
             dispatch(writingEnd());
             startWatchingDevices();
             const reconnectedDevice = await waitForDevice(device.serialNumber);

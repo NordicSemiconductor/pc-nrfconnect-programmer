@@ -14,7 +14,7 @@ import nrfdl, {
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import fs from 'fs';
-import MemoryMap, { MemoryBlocks } from 'nrf-intel-hex';
+import MemoryMap, { MemoryBlocks, MemoryMaps } from 'nrf-intel-hex';
 import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
 
 import { modemKnown } from '../reducers/modemReducer';
@@ -260,11 +260,10 @@ export const canWrite =
         dispatch(targetWritableKnown(true));
     };
 
-// To fix: Update memMap type. Uint8Array or MemoryMap?
 const updateTargetRegions =
-    (memMap: Uint8Array, deviceInfo: DeviceDefinition) =>
+    (memMap: MemoryMap, deviceInfo: DeviceDefinition) =>
     (dispatch: TDispatch) => {
-        const memMaps: MemoryBlocks = [['', memMap]];
+        const memMaps: MemoryMaps = [['', memMap]];
         const regions = getTargetRegions(memMaps, deviceInfo);
 
         dispatch(targetRegionsKnown(regions));
@@ -293,14 +292,14 @@ export const read =
                 'Skipped reading, since at least one core has app readback protection'
             );
         } else {
-            let memMap;
+            let memMap: MemoryMap[];
             let mergedMemMap;
             try {
-                memMap = await sequence(
+                memMap = (await sequence(
                     getDeviceMemMap,
                     [],
                     deviceInfo.cores.map(c => [device.id, c, true])
-                );
+                )) as MemoryMap[];
                 mergedMemMap = MemoryMap.flattenOverlaps(
                     MemoryMap.overlapMemoryMaps(
                         memMap.filter(m => m).map(m => ['', m])
@@ -365,9 +364,8 @@ export const recover =
 
         const argsArray = cores.map((c: CoreDefinition) => [deviceId, c]);
         await sequence(
-            (...args) => {
-                return dispatch(recoverOneCore(...args));
-            },
+            (id: number, coreInfo: CoreDefinition) =>
+                dispatch(recoverOneCore(id, coreInfo)),
             results,
             argsArray
         );
@@ -412,7 +410,7 @@ const writeHex = (
                 console.log(progress);
                 const status = `${progress.operation.replace('.', ':')} ${
                     // TODO: fix type in nrfdl
-                    progress.progressPercentage
+                    progress.progress_percentage
                 }%`;
                 logger.info(status);
             },
@@ -479,7 +477,8 @@ export const write =
         const results: unknown[] = [];
         const argsArray = cores.map(c => [deviceId, c]);
         await sequence(
-            (...args) => dispatch(writeOneCore(...args)),
+            (id: number, coreInfo: CoreDefinition) =>
+                dispatch(writeOneCore(id, coreInfo)),
             results,
             argsArray
         );
