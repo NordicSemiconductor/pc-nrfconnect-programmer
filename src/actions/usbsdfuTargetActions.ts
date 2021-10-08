@@ -5,7 +5,15 @@
  */
 
 /* eslint-disable import/no-cycle */
-import nrfdl, { Device, Error } from '@nordicsemiconductor/nrf-device-lib-js';
+import {
+    Device,
+    deviceControlReset,
+    Error,
+    firmwareProgram,
+    FWInfo,
+    Progress,
+    readFWInfo,
+} from '@nordicsemiconductor/nrf-device-lib-js';
 import Crypto from 'crypto';
 import fs from 'fs';
 import MemoryMap from 'nrf-intel-hex';
@@ -90,7 +98,7 @@ export const openDevice =
                     romPageSize: 4096,
                 },
             };
-            const fwInfo: nrfdl.FWInfo.ReadResult = await nrfdl.readFwInfo(
+            const fwInfo: FWInfo.ReadResult = await readFWInfo(
                 getDeviceLibContext(),
                 device.id
             );
@@ -150,9 +158,9 @@ export const openDevice =
 
             // Add bootloader, softDevice, applications to regions
             const { imageInfoList } = fwInfo;
-            imageInfoList.forEach((image: nrfdl.FWInfo.Image) => {
+            imageInfoList.forEach((image: FWInfo.Image) => {
                 // TODO: fix type in nrfdl
-                const { image_type: imageType, imageLocation, version } = image;
+                const { imageType, imageLocation, version } = image;
                 const startAddress = imageLocation.address;
                 const regionSize =
                     // TODO: fix type in nrfdl
@@ -192,7 +200,7 @@ export const openDevice =
             dispatch(fileActions.updateFileRegions());
             dispatch(targetActions.updateTargetWritable());
             dispatch(loadingEnd());
-        } catch (versionError: Error) {
+        } catch (versionError: any) {
             logger.error(
                 `Error when fetching device versions: ${
                     versionError.message || versionError
@@ -209,7 +217,7 @@ export const resetDevice = () => (_: TDispatch, getState: () => RootState) => {
     const { device: inputDevice } = getState().app.target;
     const device = inputDevice as Device;
 
-    nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
+    deviceControlReset(getDeviceLibContext(), device.id);
 };
 
 /**
@@ -531,7 +539,7 @@ const operateDFU = async (
     let prevPercentage: number;
 
     return new Promise<void>(resolve =>
-        nrfdl.firmwareProgram(
+        firmwareProgram(
             getDeviceLibContext(),
             deviceId,
             'NRFDL_FW_BUFFER',
@@ -540,8 +548,8 @@ const operateDFU = async (
             (error?: Error) => {
                 if (error) {
                     if (
-                        error.errorCode ===
-                        nrfdl.NRFDL_ERR_SDFU_EXT_SD_VERSION_FAILURE
+                        error.errorCode === 514
+                        // 'NRFDL_ERR_SDFU_EXT_SD_VERSION_FAILURE'
                     ) {
                         logger.error('Failed to write to the target device');
                         logger.error(
@@ -562,14 +570,14 @@ const operateDFU = async (
                     // return operateDFU(deviceId, restImages);
                 }
             },
-            ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
+            ({ progressJson: progress }: Progress.CallbackParameters) => {
                 // Don't repeat percentage steps that have already been logged.
-                if (prevPercentage !== progress.progress_percentage) {
+                if (prevPercentage !== progress.progressPercentage) {
                     const status = `${progress.message.replace('.', ':')} ${
-                        progress.progress_percentage
+                        progress.progressPercentage
                     }%`;
                     logger.info(status);
-                    prevPercentage = progress.progress_percentage;
+                    prevPercentage = progress.progressPercentage;
                 }
             }
         )

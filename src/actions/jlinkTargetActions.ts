@@ -14,7 +14,7 @@ import nrfdl, {
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import fs from 'fs';
-import MemoryMap, { MemoryBlocks, MemoryMaps } from 'nrf-intel-hex';
+import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
 
 import { modemKnown } from '../reducers/modemReducer';
@@ -116,13 +116,16 @@ export const openDevice =
         let coreName = 'Application';
         protectionStatus = await loadProtectionStatus(device.id, coreName);
 
-        // TODO: fix type in nrfdl
-        let deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
+        const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
             getDeviceLibContext(),
             device.id
         );
-        deviceCoreInfo = { ...deviceCoreInfo, protectionStatus };
-        deviceInfo = addCoreToDeviceInfo(deviceInfo, deviceCoreInfo, coreName);
+        deviceInfo = addCoreToDeviceInfo(
+            deviceInfo,
+            deviceCoreInfo,
+            coreName,
+            protectionStatus
+        );
         const isFamilyNrf53 = device.jlink.deviceFamily.includes('NRF53');
 
         // Since nRF53 family is dual core devices
@@ -132,16 +135,17 @@ export const openDevice =
             protectionStatus = await loadProtectionStatus(device.id, coreName);
 
             // TODO: fix type in nrfdl
-            deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
+            const deviceCoreInfoForNrf53 = await nrfdl.getDeviceCoreInfo(
                 getDeviceLibContext(),
                 device.id,
                 'NRFDL_DEVICE_CORE_NETWORK'
             );
-            deviceCoreInfo = { ...deviceCoreInfo, protectionStatus };
+
             deviceInfo = addCoreToDeviceInfo(
                 deviceInfo,
-                deviceCoreInfo,
-                coreName
+                deviceCoreInfoForNrf53,
+                coreName,
+                protectionStatus
             );
         }
         dispatch(targetInfoKnown(deviceInfo));
@@ -407,10 +411,8 @@ const writeHex = (
                 logger.info('Device programming completed');
             },
             ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                console.log(progress);
                 const status = `${progress.operation.replace('.', ':')} ${
-                    // TODO: fix type in nrfdl
-                    progress.progress_percentage
+                    progress.progressPercentage
                 }%`;
                 logger.info(status);
             },
@@ -516,20 +518,20 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
 
     const save = ({ filePath }: Electron.SaveDialogReturnValue) => {
         if (filePath) {
-            fs.writeFile(
-                filePath,
-                memMap.slice(0, maxAddress).asHexString(),
-                err => {
-                    if (err) {
-                        logger.error(
-                            `Failed to save file: ${err.message || err}`
-                        );
-                    }
-                    logger.info(`File is successfully saved at ${filePath}`);
+            const data = memMap?.slice(0, maxAddress).asHexString();
+
+            if (data === undefined) {
+                logger.error('No data in memory map');
+                return;
+            }
+
+            fs.writeFile(filePath, data, err => {
+                if (err) {
+                    logger.error(`Failed to save file: ${err.message || err}`);
                 }
-            );
+                logger.info(`File is successfully saved at ${filePath}`);
+            });
         }
     };
-    console.log(remote);
     remote.dialog.showSaveDialog(options).then(save);
 };

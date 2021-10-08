@@ -132,11 +132,11 @@ export const performUpdate =
             }: nrfdl.Progress.CallbackParameters) => {
                 let dfuProcess;
                 try {
-                    dfuProcess = JSON.parse(progress);
+                    dfuProcess = progress;
                 } catch (error) {
                     dispatch(
                         mcubootProcessUpdate({
-                            message: progress.process,
+                            message: progress.message,
                             percentage: totalPercentage,
                             duration: totalDuration,
                         })
@@ -145,8 +145,8 @@ export const performUpdate =
                 }
 
                 if (dfuProcess && dfuProcess.operation === 'upload_image') {
-                    totalPercentage = dfuProcess.progress_percentage;
-                    totalDuration = dfuProcess.duration;
+                    totalPercentage = dfuProcess.progressPercentage;
+                    totalDuration = dfuProcess.duration ?? 0;
 
                     progressMsg = dfuProcess.message || progressMsg;
                     dispatch(

@@ -6,6 +6,7 @@
 
 import nrfdl, {
     DeviceCore,
+    DeviceCoreInfo,
     ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 
@@ -230,26 +231,21 @@ export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
     } as DeviceDefinition;
 };
 
-type DeviceCoreInfo = {
-    codeAddress: string;
-    codeSize: number;
-    RAMSize: number;
-    codePageSize: number;
-};
-
 /**
  * Add core info to device info
  *
  * @param {DeviceDefinition} deviceInfo - existing device info
  * @param {DeviceCoreInfo} inputCoreInfo - core info to be added
  * @param {string} coreName - the name of the core
+ * @param {ProtectionStatus} protectionStatus - the protection status
  *
  * @returns {DeviceDefinition} the updated device info
  */
 export const addCoreToDeviceInfo = (
     deviceInfo: DeviceDefinition,
     inputCoreInfo: DeviceCoreInfo,
-    coreName: string
+    coreName: string,
+    protectionStatus: ProtectionStatus
 ) =>
     ({
         ...deviceInfo,
@@ -261,12 +257,12 @@ export const addCoreToDeviceInfo = (
                 coreNumber: deviceInfo.cores.length,
                 romBaseAddr: inputCoreInfo.codeAddress,
                 romSize: inputCoreInfo.codeSize,
-                ramSize: inputCoreInfo.RAMSize,
                 pageSize: inputCoreInfo.codePageSize,
                 // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
                 // uicrBaseAddr: inputCoreInfo.uicrAddress,
                 uicrSize: inputCoreInfo.codePageSize,
                 ...inputCoreInfo,
+                protectionStatus,
             },
         ],
     } as DeviceDefinition);
