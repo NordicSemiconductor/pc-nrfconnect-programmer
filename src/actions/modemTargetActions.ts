@@ -3,7 +3,6 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
-
 import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import { getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
@@ -75,7 +74,7 @@ export const programDfuModem =
                 progressJson: progress,
             }: nrfdl.Progress.CallbackParameters) => {
                 // TODO: Fix type in nrfdl
-                const message = `${progress.operation} ${progress.progress_percentage}%`;
+                const message = `${progress.operation} ${progress.progressPercentage}%`;
                 dispatch(modemProcessUpdate({ message }));
             };
 

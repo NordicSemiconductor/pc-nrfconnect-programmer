@@ -1,3 +1,5 @@
+declare module "electron";
+
 declare namespace Electron {
     interface SaveDialogReturnValue {
         /**
