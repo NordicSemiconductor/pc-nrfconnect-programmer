@@ -34,7 +34,7 @@
         "clean-modules": "rimraf \"node_modules/!(rimraf|.bin)\""
     },
     "devDependencies": {
-        "@nordicsemiconductor/nrf-device-lib-js": "^0.3.14",
+        "@nordicsemiconductor/nrf-device-lib-js": "^0.3.16",
         "@reduxjs/toolkit": "^1.6.1",
         "@types/react": "16.9.49",
         "@types/react-redux": "^7.1.16",
@@ -44,7 +44,7 @@
         "babel-plugin-transform-async-to-generator": "^6.24.1",
         "immutable": "^3.8.2",
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#semver:^5.0.0",
+        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#semver:^5.5.2",
         "protobufjs": "^6.8.4",
         "react": "16.13.1",
         "react-dom": "16.13.1",

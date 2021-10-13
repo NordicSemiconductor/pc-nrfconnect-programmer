@@ -63,7 +63,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
             ? // When it is target and during loading, show something.
               [<CoreView key="something-nice" active core={targetCores[0]} />]
             : // When it is target and during writing, show file regions active.
-              // : convertRegionsToViews(regions, targetSize, isTarget && isWriting, targetFicrBaseAddr);
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               convertCoresToViews(targetCores, regions!, isTarget && isWriting);
     return (
         <>

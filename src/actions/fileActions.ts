@@ -25,7 +25,6 @@ import { targetInfoKnown } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
 import { deviceDefinition, getDeviceDefinition } from '../util/devices';
-import { hexpad8 } from '../util/hexpad';
 import {
     defaultRegion,
     getFileRegions,

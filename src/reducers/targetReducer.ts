@@ -6,16 +6,15 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
+import { Device, DfuImage } from 'pc-nrfconnect-shared';
 
 import {
     CommunicationType,
     DeviceDefinition,
     deviceDefinition,
 } from '../util/devices';
-import { DfuImage } from '../util/initPacket';
 import { Region } from '../util/regions';
 import { fileParse, filesEmpty } from './fileReducer';
 import { RootState } from './types';

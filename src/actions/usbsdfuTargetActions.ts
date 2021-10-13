@@ -17,7 +17,11 @@ import Crypto from 'crypto';
 import fs from 'fs';
 import MemoryMap from 'nrf-intel-hex';
 import {
+    defaultInitPacket,
+    DfuImage,
+    FwType,
     getDeviceLibContext,
+    HashType,
     logger,
     sdfuOperations,
     startWatchingDevices,
@@ -46,8 +50,6 @@ import {
     getDeviceInfoByUSB,
     NordicFwIds,
 } from '../util/devices';
-import * as initPacket from '../util/initPacket';
-import { DfuImage } from '../util/initPacket';
 import {
     defaultRegion,
     getSoftDeviceId,
@@ -60,10 +62,10 @@ import * as fileActions from './fileActions';
 import * as targetActions from './targetActions';
 import * as userInputActions from './userInputActions';
 
-const defaultDfuImage: initPacket.DfuImage = {
+const defaultDfuImage: DfuImage = {
     name: '',
-    initPacket: initPacket.defaultInitPacket,
-    firmwareImage: undefined,
+    initPacket: defaultInitPacket,
+    firmwareImage: new Uint8Array(),
 };
 
 /**
@@ -201,7 +203,9 @@ export const openDevice =
             dispatch(loadingEnd());
         } catch (versionError) {
             logger.error(
-                `Error when fetching device versions: ${(versionError as any).message || versionError
+                `Error when fetching device versions: ${
+                    (versionError as { message: string }).message ||
+                    versionError
                 }`
             );
         }
@@ -226,10 +230,10 @@ export const resetDevice = () => (_: TDispatch, getState: () => RootState) => {
  */
 const createDfuImage = (regionName: string, fwType: number) => {
     const initPacketInUse = {
-        ...initPacket.defaultInitPacket,
+        ...defaultInitPacket,
         fwType,
     };
-    const dfuImage: initPacket.DfuImage = {
+    const dfuImage: DfuImage = {
         ...defaultDfuImage,
         name: regionName,
         initPacket: initPacketInUse,
@@ -244,34 +248,25 @@ const createDfuImage = (regionName: string, fwType: number) => {
  */
 const createDfuImages =
     () => (dispatch: TDispatch, getState: () => RootState) => {
-        let dfuImages: initPacket.DfuImage[] = [];
+        let dfuImages: DfuImage[] = [];
         getState().app.file.detectedRegionNames.forEach(regionName => {
             switch (regionName) {
                 case RegionName.BOOTLOADER:
                     dfuImages = [
                         ...dfuImages,
-                        createDfuImage(
-                            regionName,
-                            initPacket.FwType.BOOTLOADER
-                        ),
+                        createDfuImage(regionName, FwType.BOOTLOADER),
                     ];
                     break;
                 case RegionName.SOFTDEVICE:
                     dfuImages = [
                         ...dfuImages,
-                        createDfuImage(
-                            regionName,
-                            initPacket.FwType.SOFTDEVICE
-                        ),
+                        createDfuImage(regionName, FwType.SOFTDEVICE),
                     ];
                     break;
                 case RegionName.APPLICATION:
                     dfuImages = [
                         ...dfuImages,
-                        createDfuImage(
-                            regionName,
-                            initPacket.FwType.APPLICATION
-                        ),
+                        createDfuImage(regionName, FwType.APPLICATION),
                     ];
                     break;
                 default:
@@ -336,10 +331,10 @@ const calculateSHA512Hash = (image = new Uint8Array()) => {
 /**
  * Update firmware image and its length
  *
- * @param {initPacket.DfuImage} image the DFU image
+ * @param {DfuImage} image the DFU image
  * @param {Region[]} regions the list of region
  * @param {MemoryMap} memMap the memory map of firmware
- * @returns {initPacket.DfuImage} the updated DFU image
+ * @returns {DfuImage} the updated DFU image
  */
 const handleImage = (
     image: DfuImage,
@@ -386,9 +381,9 @@ const handleImage = (
 /**
  * Update hardware version
  *
- * @param {initPacket.DfuImage} image the DFU image
+ * @param {DfuImage} image the DFU image
  * @param {number} hwVersion the version of hardware
- * @returns {initPacket.DfuImage} the updated DFU image
+ * @returns {DfuImage} the updated DFU image
  */
 const handleHwVersion = (image: DfuImage, hwVersion: number): DfuImage => ({
     ...image,
@@ -401,10 +396,10 @@ const handleHwVersion = (image: DfuImage, hwVersion: number): DfuImage => ({
 /**
  * Update SoftDevice required version
  *
- * @param {initPacket.DfuImage} image the DFU image
+ * @param {DfuImage} image the DFU image
  * @param {MemoryMap} fileMemMap the memory map loaded from the file
  * @param {DeviceDefinition} deviceInfo the information of device
- * @returns {initPacket.DfuImage} the updated DFU image
+ * @returns {DfuImage} the updated DFU image
  */
 const handleSdReq = (
     image: DfuImage,
@@ -442,8 +437,8 @@ const handleSdReq = (
 /**
  * Update init packet with user input
  *
- * @param {initPacket.DfuImage} imageInput the DFU image
- * @returns {initPacket.DfuImage} the updated DFU image
+ * @param {DfuImage} imageInput the DFU image
+ * @returns {DfuImage} the updated DFU image
  */
 const handleUserInput = (imageInput: DfuImage) => {
     return async (dispatch: TDispatch): Promise<DfuImage> => {
@@ -465,12 +460,12 @@ const handleUserInput = (imageInput: DfuImage) => {
         }
         image = sdReq
             ? ({
-                ...image,
-                initPacket: {
-                    ...image.initPacket,
-                    sdReq: [sdReq],
-                },
-            } as initPacket.DfuImage)
+                  ...image,
+                  initPacket: {
+                      ...image.initPacket,
+                      sdReq: [sdReq],
+                  },
+              } as DfuImage)
             : image;
 
         return image;
@@ -480,28 +475,28 @@ const handleUserInput = (imageInput: DfuImage) => {
 /**
  * Update calculated hash regarding to the DFU image
  *
- * @param {initPacket.DfuImage} image the DFU image
+ * @param {DfuImage} image the DFU image
  * @param {number} hashType the type of hash
- * @returns {initPacket.DfuImage} the updated DFU image
+ * @returns {DfuImage} the updated DFU image
  */
 const handleHash = (image: DfuImage, hashType: number): DfuImage => {
     let hash;
     switch (hashType) {
-        case initPacket.HashType.NO_HASH:
+        case HashType.NO_HASH:
             logger.error('No hash is not supported');
             break;
-        case initPacket.HashType.SHA128:
+        case HashType.SHA128:
             logger.error('Hash type SHA128 is not supported');
             break;
-        case initPacket.HashType.SHA256:
+        case HashType.SHA256:
             hash = calculateSHA256Hash(image.firmwareImage);
             logger.info('Hash is generated by SHA256');
             break;
-        case initPacket.HashType.SHA512:
+        case HashType.SHA512:
             hash = calculateSHA512Hash(image.firmwareImage);
             logger.info('Hash is generated by SHA512');
             break;
-        case initPacket.HashType.CRC:
+        case HashType.CRC:
             logger.error('Hash type CRC is not supported');
             break;
         default:
@@ -515,21 +510,18 @@ const handleHash = (image: DfuImage, hashType: number): DfuImage => {
             hashType,
             hash,
         },
-    } as initPacket.DfuImage;
+    } as DfuImage;
 };
 
 /**
  * Operate DFU process with update all the images on the target device
  *
  * @param {number} deviceId the Id of device
- * @param {initPacket.DfuImage[]} inputDfuImages the list of DFU image
+ * @param {DfuImage[]} inputDfuImages the list of DFU image
  *
  * @returns {Promise<void>} resolved promise
  */
-const operateDFU = async (
-    deviceId: number,
-    inputDfuImages: initPacket.DfuImage[]
-) => {
+const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
     fs.writeFileSync('/tmp/sdfu.zip', zipBuffer);
 
@@ -570,8 +562,9 @@ const operateDFU = async (
             ({ progressJson: progress }: Progress.CallbackParameters) => {
                 // Don't repeat percentage steps that have already been logged.
                 if (prevPercentage !== progress.progressPercentage) {
-                    const status = `${progress.message.replace('.', ':')} ${progress.progressPercentage
-                        }%`;
+                    const status = `${progress.message.replace('.', ':')} ${
+                        progress.progressPercentage
+                    }%`;
                     logger.info(status);
                     prevPercentage = progress.progressPercentage;
                 }
@@ -607,7 +600,7 @@ export const write =
             .map(image =>
                 handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
             )
-            .map(image => handleHash(image, initPacket.HashType.SHA256));
+            .map(image => handleHash(image, HashType.SHA256));
         images = await Promise.all(
             images?.map(async image =>
                 dispatch(await handleUserInput(image))

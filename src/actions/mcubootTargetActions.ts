@@ -6,11 +6,8 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl, {
-    Device,
-    SerialPort,
-} from '@nordicsemiconductor/nrf-device-lib-js';
-import { getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
+import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
+import { Device, getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
 
 import {
     mcubootFirmwareValid,

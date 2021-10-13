@@ -13,7 +13,6 @@ import Form from 'react-bootstrap/Form';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
@@ -51,7 +50,12 @@ const useRegisterDragEvents = () => {
             if (!event.dataTransfer) return;
 
             Array.from(event.dataTransfer.files).forEach(file => {
-                dispatch(fileActions.openFile((file as any).path));
+                dispatch(
+                    fileActions.openFile(
+                        // Electron has meddled with this type without exposing new type definition
+                        (file as unknown as { path: string }).path
+                    )
+                );
             });
             event.preventDefault();
         };
