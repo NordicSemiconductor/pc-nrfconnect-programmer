@@ -1,0 +1,6 @@
+{
+  "extends": "./node_modules/pc-nrfconnect-shared/config/tsconfig.json",
+  "compilerOptions": {
+    "typeRoots": ["./types", "./node_modules/@types"]
+  }
+}
