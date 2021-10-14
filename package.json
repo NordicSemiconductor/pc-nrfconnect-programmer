@@ -25,8 +25,8 @@
         "webpack": "nrfconnect-scripts build-dev",
         "build": "nrfconnect-scripts build-prod",
         "nordic-publish": "nrfconnect-scripts nordic-publish",
-        "lint": "nrfconnect-scripts lint lib index.jsx",
-        "lintfix": "nrfconnect-scripts lint --fix lib index.jsx",
+        "lint": "nrfconnect-scripts lint src",
+        "lintfix": "nrfconnect-scripts lint --fix src",
         "test": "nrfconnect-scripts test",
         "test-watch": "nrfconnect-scripts test --watch",
         "clean": "npm run clean-dist && npm run clean-modules",
@@ -34,9 +34,8 @@
         "clean-modules": "rimraf \"node_modules/!(rimraf|.bin)\""
     },
     "devDependencies": {
-        "@nordicsemiconductor/nrf-device-lib-js": "^0.3.9",
+        "@nordicsemiconductor/nrf-device-lib-js": "^0.3.16",
         "@reduxjs/toolkit": "^1.6.1",
-        "@types/electron": "^1.6.10",
         "@types/react": "16.9.49",
         "@types/react-redux": "^7.1.16",
         "@types/serialport": "^8.0.1",
@@ -45,8 +44,7 @@
         "babel-plugin-transform-async-to-generator": "^6.24.1",
         "immutable": "^3.8.2",
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrf-dfu-js": "^0.2.10",
-        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#semver:^4.28.2",
+        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#semver:^5.5.3",
         "protobufjs": "^6.8.4",
         "react": "16.13.1",
         "react-dom": "16.13.1",
@@ -54,7 +52,8 @@
     },
     "dependencies": {
         "adm-zip": "^0.5.2",
-        "electron-store": "5.1.1"
+        "electron-store": "5.1.1",
+        "react-timer-hook": "^3.0.5"
     },
     "bundledDependencies": [
         "electron-store"
