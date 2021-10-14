@@ -1,3 +1,8 @@
+## 2.0.0 prerelease
+### Changed
+- Establish compatibility with nRF Connect for Desktop 3.8
+- Use new nRF Connect for Desktop look & feel.
+
 ## 1.4.11 - 2021-06-11
 ### Fixed
 - Programming with external debugger. Note: programming a protected SoC via external debugger is not supported.
