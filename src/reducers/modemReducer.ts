@@ -22,6 +22,7 @@ export interface ModemState {
     progressPercentage: number;
     progressDuration: number;
     progressStep: number;
+    progressOperation: string;
     errorMsg: string;
 }
 
@@ -36,14 +37,16 @@ const initialState: ModemState = {
     progressPercentage: 0,
     progressDuration: 0,
     progressStep: 0,
+    progressOperation: MODEM_DFU_NOT_STARTED,
     errorMsg: '',
 };
 
 interface ModemProcessUpdatePayload {
     message: string;
-    percentage?: number;
+    progressPercentage?: number;
     duration?: number;
     step?: number;
+    operation?: string;
 }
 
 const modemSlice = createSlice({
@@ -57,10 +60,11 @@ const modemSlice = createSlice({
             state,
             action: PayloadAction<ModemProcessUpdatePayload>
         ) {
+            console.log(action.payload);
             state.progressMsg = action.payload.message;
-            state.progressPercentage = action.payload.percentage ?? 0;
+            state.progressPercentage = action.payload.progressPercentage ?? 0;
             state.progressDuration = action.payload.duration ?? 0;
-            state.progressStep = action.payload.step ?? 0;
+            state.progressOperation = action.payload.operation ?? '';
         },
         modemWritingReady(state, action: PayloadAction<string>) {
             state.modemFwName = action.payload;

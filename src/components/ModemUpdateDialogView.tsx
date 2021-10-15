@@ -24,7 +24,6 @@ import {
     getModemFwName,
     getProgressMsg,
     getProgressPercentage,
-    getProgressStep,
 } from '../reducers/modemReducer';
 
 const ModemUpdateDialogView = () => {
@@ -35,7 +34,6 @@ const ModemUpdateDialogView = () => {
     const modemFwName = useSelector(getModemFwName);
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
-    const progressStep = useSelector(getProgressStep);
     const errorMsg = useSelector(getErrorMsg);
     const isMcuboot = useSelector(getIsMcuboot);
 
@@ -55,12 +53,6 @@ const ModemUpdateDialogView = () => {
         pause();
     }
 
-    let progressStepStatus = '';
-    progressStepStatus =
-        progressStep === 1 ? ': App firmware update' : progressStepStatus;
-    progressStepStatus =
-        progressStep === 2 ? ': Modem firmware update' : progressStepStatus;
-
     return (
         <Modal show={isVisible} onHide={onCancel} backdrop="static">
             <Modal.Header>
@@ -76,11 +68,7 @@ const ModemUpdateDialogView = () => {
                     <div>{modemFwName}</div>
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>
-                        {!isMcuboot && 'Status'}
-                        {isMcuboot &&
-                            `Step ${progressStep}/2${progressStepStatus}`}
-                    </Form.Label>
+                    <Form.Label>Status</Form.Label>
                     <div>{progressMsg}</div>
                     {isMcuboot && isWriting && (
                         <ProgressBar
