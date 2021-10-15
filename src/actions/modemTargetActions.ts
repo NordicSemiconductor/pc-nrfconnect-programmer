@@ -73,9 +73,14 @@ export const programDfuModem =
             const progressCallback = ({
                 progressJson: progress,
             }: nrfdl.Progress.CallbackParameters) => {
-                // TODO: Fix type in nrfdl
-                const message = `${progress.operation} ${progress.progressPercentage}%`;
-                dispatch(modemProcessUpdate({ message }));
+                let updatedProgress = progress;
+                if (progress.operation === 'erase_image') {
+                    updatedProgress = {
+                        ...progress,
+                        message: `${progress.message} This will take some time.`,
+                    };
+                }
+                dispatch(modemProcessUpdate(updatedProgress));
             };
 
             try {
