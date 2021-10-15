@@ -11,7 +11,8 @@ import {
     firmwareProgram,
     FWInfo,
     Progress,
-    readFWInfo,
+    // @ts-ignore -- type error from nrfdl, remove when fixed
+    readFwInfo,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import Crypto from 'crypto';
 import fs from 'fs';
@@ -99,7 +100,7 @@ export const openDevice =
                     romPageSize: 4096,
                 },
             };
-            const fwInfo: FWInfo.ReadResult = await readFWInfo(
+            const fwInfo: FWInfo.ReadResult = await readFwInfo(
                 getDeviceLibContext(),
                 device.id
             );
