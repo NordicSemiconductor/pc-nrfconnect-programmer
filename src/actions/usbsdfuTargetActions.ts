@@ -623,6 +623,8 @@ export const write =
             const reconnectedDevice = await waitForDevice(device.serialNumber);
             dispatch(targetActions.openDevice(reconnectedDevice));
         } catch (error) {
-            logger.error(`Failed to write: ${error}`);
+            logger.error(
+                `Failed to write: ${(error as Error).message || error}`
+            );
         }
     };

@@ -13,7 +13,7 @@ import nrfdl, {
 import range from './range';
 
 export type CoreDefinition = {
-    name: DeviceCore;
+    name: DeviceCore | string;
     coreNumber: number;
     romBaseAddr: number;
     romSize: number;

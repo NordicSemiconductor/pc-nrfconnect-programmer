@@ -394,7 +394,11 @@ export const refreshAllFiles =
                     }
                     logger.info('Does not need to be reloaded: ', filePath);
                 } catch (error) {
-                    logger.error(`Could not open HEX file: ${error}`);
+                    logger.error(
+                        `Could not open HEX file: ${
+                            (error as Error).message || error
+                        }`
+                    );
                     dispatch(errorDialogShowAction(error));
                 }
             })

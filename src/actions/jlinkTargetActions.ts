@@ -58,7 +58,9 @@ export const loadProtectionStatus = async (
     deviceCoreName: string
 ): Promise<ProtectionStatus> => {
     try {
-        logger.info('Loading readback protection status for Application core');
+        logger.info(
+            `Loading readback protection status for ${deviceCoreName} core`
+        );
         // TODO: fix type in nrfdl: snake_case
         const protectionStatus = (
             await nrfdl.deviceControlGetProtectionStatus(
@@ -72,7 +74,9 @@ export const loadProtectionStatus = async (
         logger.info(`Readback protection status: ${protectionStatus}`);
         return protectionStatus;
     } catch (error) {
-        const errorMessage = `Failed to load readback protection status: ${error}`;
+        const errorMessage = `Failed to load readback protection status: ${
+            (error as Error).message || error
+        }`;
         usageData.sendErrorReport(errorMessage);
         throw Error(errorMessage);
     }
@@ -216,12 +220,15 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) => {
                     coreInfo.romBaseAddr + coreInfo.romSize
                 );
                 memMap = MemoryMap.fromPaddedUint8Array(paddedArray);
+                logger.info(
+                    `Completed reading memory for ${coreInfo.name} core`
+                );
                 resolve(memMap);
             },
             () => {},
             null,
             null,
-            coreInfo.name === 'NRFDL_DEVICE_CORE_NETWORK'
+            coreInfo.name === 'Network'
                 ? 'NRFDL_DEVICE_CORE_NETWORK'
                 : 'NRFDL_DEVICE_CORE_APPLICATION'
         );
@@ -302,7 +309,7 @@ export const read =
                 memMap = (await sequence(
                     getDeviceMemMap,
                     [],
-                    deviceInfo.cores.map(c => [device.id, c, true])
+                    deviceInfo.cores.map(c => [device.id, c])
                 )) as MemoryMap[];
                 mergedMemMap = MemoryMap.flattenOverlaps(
                     MemoryMap.overlapMemoryMaps(
@@ -310,7 +317,9 @@ export const read =
                     )
                 );
             } catch (error) {
-                throw Error(`getDeviceMemMap: ${error}`);
+                throw Error(
+                    `getDeviceMemMap: ${(error as Error).message || error}`
+                );
             }
             dispatch(
                 targetContentsKnown({
@@ -338,17 +347,20 @@ export const recoverOneCore =
         logger.info(`Recovering ${coreInfo.name} core`);
 
         try {
-            await nrfdl.firmwareErase(
+            await nrfdl.deviceControlRecover(
                 getDeviceLibContext(),
                 deviceId,
-                coreInfo.name === 'NRFDL_DEVICE_CORE_NETWORK'
+                coreInfo.name === 'Network'
                     ? 'NRFDL_DEVICE_CORE_NETWORK'
                     : 'NRFDL_DEVICE_CORE_APPLICATION'
             );
+            logger.info(`Completed recovering ${coreInfo.name} core`);
             return;
         } catch (error) {
             usageData.sendErrorReport(
-                `Failed to recover ${coreInfo.name} core`
+                `Failed to recover ${coreInfo.name} core: ${
+                    (error as Error).message || error
+                }`
             );
         }
     };
@@ -356,10 +368,13 @@ export const recoverOneCore =
 /**
  * Recover all cores one by one
  *
+ *
+ * @param {boolean} continueToWrite if a write action is operated right after the recover, the read action is not needed
  * @returns {void}
  */
 export const recover =
-    () => async (dispatch: TDispatch, getState: () => RootState) => {
+    (continueToWrite = false) =>
+    async (dispatch: TDispatch, getState: () => RootState) => {
         const { device: inputDevice, deviceInfo: inputDeviceInfo } =
             getState().app.target;
         const { id: deviceId } = inputDevice as Device;
@@ -376,9 +391,10 @@ export const recover =
 
         dispatch(erasingEnd());
         logger.info('Device recovery completed');
+        await dispatch(openDevice());
 
         const { autoRead } = getState().app.settings;
-        if (autoRead) read();
+        if (autoRead && !continueToWrite) read();
     };
 
 /**
@@ -394,8 +410,8 @@ const writeHex = (
     coreInfo: CoreDefinition,
     hexFileString: string
 ) =>
-    Promise.resolve(() => {
-        logger.info('Writing HEX');
+    new Promise<void>(resolve => {
+        logger.info(`Writing HEX to ${coreInfo.name} core`);
 
         nrfdl.firmwareProgram(
             getDeviceLibContext(),
@@ -408,7 +424,8 @@ const writeHex = (
                     usageData.sendErrorReport(
                         `Device programming failed with error: ${err}`
                     );
-                logger.info('Device programming completed');
+                logger.info(`Completed writing HEX to ${coreInfo.name} core`);
+                resolve();
             },
             ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
                 const status = `${progress.operation.replace('.', ':')} ${
@@ -417,7 +434,7 @@ const writeHex = (
                 logger.info(status);
             },
             null,
-            coreInfo.name === 'NRFDL_DEVICE_CORE_NETWORK'
+            coreInfo.name === 'Network'
                 ? 'NRFDL_DEVICE_CORE_NETWORK'
                 : 'NRFDL_DEVICE_CORE_APPLICATION'
         );
@@ -495,7 +512,8 @@ export const write =
  * @returns {void}
  */
 export const recoverAndWrite = () => async (dispatch: TDispatch) => {
-    await dispatch(recover());
+    const continueToWrite = true;
+    await dispatch(recover(continueToWrite));
     await dispatch(write());
 };
 
