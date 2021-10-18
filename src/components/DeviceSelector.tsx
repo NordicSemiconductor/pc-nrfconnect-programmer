@@ -40,7 +40,7 @@ const mapDispatch = (dispatch: TDispatch) => ({
     },
     onDeviceDeselected: () => {
         usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
-        logger.info('Target device closed.');
+        logger.info('Target device closed');
     },
 });
 
