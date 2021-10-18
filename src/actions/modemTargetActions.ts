@@ -51,7 +51,11 @@ export const programDfuModem =
 
             const errorCallback = (error: Error) => {
                 if (error) {
-                    logger.error(`Modem DFU failed with error: ${error}`);
+                    logger.error(
+                        `Modem DFU failed with error: ${
+                            (error as Error).message || error
+                        }`
+                    );
                     let errorMsg = error.message;
                     if (error.message.includes('0x4')) {
                         errorMsg =

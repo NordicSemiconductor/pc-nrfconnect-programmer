@@ -22,7 +22,7 @@ import * as modemTargetActions from '../actions/modemTargetActions';
 import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
-import { getMruFiles } from '../reducers/fileReducer';
+import { getFileRegions, getMruFiles } from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
 import { getIsModem } from '../reducers/modemReducer';
 import { getAutoRead } from '../reducers/settingsReducer';
@@ -32,7 +32,6 @@ import {
     getIsReady,
     getIsRecoverable,
     getIsWritable,
-    getRegions,
     getTargetType,
 } from '../reducers/targetReducer';
 import { CommunicationType } from '../util/devices';
@@ -158,7 +157,7 @@ Mru.propTypes = {
 };
 
 const ControlPanel = () => {
-    const fileRegionSize = useSelector(getRegions)?.length;
+    const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
     const targetIsWritable = useSelector(getIsWritable);

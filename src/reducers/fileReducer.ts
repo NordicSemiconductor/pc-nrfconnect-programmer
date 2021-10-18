@@ -88,6 +88,7 @@ export const getLoaded = (state: RootState) => state.app.file.loaded;
 export const getMruFiles = (state: RootState) => state.app.file.mruFiles;
 export const getMcubootFilePath = (state: RootState) =>
     state.app.file.mcubootFilePath;
+export const getFileRegions = (state: RootState) => state.app.file.regions;
 
 export {
     filesEmpty,
