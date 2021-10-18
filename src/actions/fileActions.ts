@@ -226,6 +226,7 @@ export const updateFileRegions =
 
         let regions: Region[] = [];
         target.deviceInfo?.cores.forEach(c => {
+            logger.info(`Update files regions according to ${c.name} core`);
             regions = [...regions, ...getFileRegions(file.memMaps, c)];
         });
 
