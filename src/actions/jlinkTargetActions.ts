@@ -159,7 +159,7 @@ export const openDevice =
 
         dispatch(updateTargetWritable());
         dispatch(loadingEnd());
-        logger.info('Device is loaded');
+        logger.info('Device is loaded and ready for further operation');
     };
 
 /**
@@ -221,7 +221,7 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) => {
                 );
                 memMap = MemoryMap.fromPaddedUint8Array(paddedArray);
                 logger.info(
-                    `Completed reading memory for ${coreInfo.name} core`
+                    `Reading memory for ${coreInfo.name} core completed`
                 );
                 resolve(memMap);
             },
@@ -354,7 +354,7 @@ export const recoverOneCore =
                     ? 'NRFDL_DEVICE_CORE_NETWORK'
                     : 'NRFDL_DEVICE_CORE_APPLICATION'
             );
-            logger.info(`Completed recovering ${coreInfo.name} core`);
+            logger.info(`Recovering ${coreInfo.name} core completed`);
             return;
         } catch (error) {
             usageData.sendErrorReport(
@@ -424,11 +424,12 @@ const writeHex = (
                     usageData.sendErrorReport(
                         `Device programming failed with error: ${err}`
                     );
-                logger.info(`Completed writing HEX to ${coreInfo.name} core`);
+                logger.info(`Writing HEX to ${coreInfo.name} core completed`);
                 resolve();
             },
             ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                const status = `${progress.operation.replace('.', ':')} ${
+                console.log(progress);
+                const status = `${progress.message.replace('.', ':')} ${
                     progress.progressPercentage
                 }%`;
                 logger.info(status);
@@ -480,6 +481,7 @@ export const writeOneCore =
         );
 
         await writeHex(deviceId, coreInfo, programRegions.asHexString());
+        logger.info(`Writing procedure ends for ${coreInfo.name} core`);
     };
 
 /**
@@ -502,6 +504,7 @@ export const write =
             argsArray
         );
         dispatch(writingEnd());
+        await dispatch(resetDevice());
         await dispatch(openDevice());
         dispatch(updateTargetWritable());
     };
@@ -516,6 +519,20 @@ export const recoverAndWrite = () => async (dispatch: TDispatch) => {
     await dispatch(recover(continueToWrite));
     await dispatch(write());
 };
+
+/**
+ * Reset device to Application mode
+ * @returns {Promise<void>} resolved promise
+ */
+export const resetDevice =
+    () => async (_: TDispatch, getState: () => RootState) => {
+        logger.info(`Resetting device`);
+        const { device: inputDevice } = getState().app.target;
+        const device = inputDevice as Device;
+
+        await nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
+        logger.info(`Resetting device completed`);
+    };
 
 /**
  * Save the content from the device memory as hex file.
