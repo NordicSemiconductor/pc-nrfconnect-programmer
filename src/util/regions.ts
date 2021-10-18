@@ -613,6 +613,7 @@ export const getFileRegions = (
     memMaps: MemoryMaps,
     coreInfo: CoreDefinition
 ): Region[] => {
+    logger.info('Parse memory regions for file');
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     const regions = getRegionsFromOverlaps(overlaps, coreInfo);
 
@@ -632,6 +633,7 @@ export const getCoreRegions = (
     memMaps: MemoryMaps,
     coreInfo: CoreDefinition
 ): Region[] => {
+    logger.info(`Parse memory regions for ${coreInfo.name} core`);
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     const regions = getRegionsFromOverlaps(overlaps, coreInfo);
 

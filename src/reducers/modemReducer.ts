@@ -60,7 +60,6 @@ const modemSlice = createSlice({
             state,
             action: PayloadAction<ModemProcessUpdatePayload>
         ) {
-            console.log(action.payload);
             state.progressMsg = action.payload.message;
             state.progressPercentage = action.payload.progressPercentage ?? 0;
             state.progressDuration = action.payload.duration ?? 0;

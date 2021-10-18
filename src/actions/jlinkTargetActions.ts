@@ -428,7 +428,6 @@ const writeHex = (
                 resolve();
             },
             ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                console.log(progress);
                 const status = `${progress.message.replace('.', ':')} ${
                     progress.progressPercentage
                 }%`;
