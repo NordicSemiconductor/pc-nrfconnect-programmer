@@ -10,6 +10,7 @@ import { App } from 'pc-nrfconnect-shared';
 import AppMainView from './components/AppMainView';
 import ControlPanel from './components/ControlPanel';
 import DeviceSelector from './components/DeviceSelector';
+import DocumentationSections from './components/DocumentationSections';
 import appReducer from './reducers';
 
 import '../resources/css/index.scss';
@@ -21,5 +22,6 @@ export default () => (
         deviceSelect={<DeviceSelector />}
         sidePanel={<ControlPanel />}
         panes={[{ name: 'Programmer', Main: AppMainView }]}
+        documentation={DocumentationSections}
     />
 );

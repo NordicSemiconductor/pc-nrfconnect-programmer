@@ -1,4 +1,7 @@
 ## 2.0.0 prerelease
+### Added
+- Documentation section in `About` pane.
+
 ### Changed
 - Establish compatibility with nRF Connect for Desktop 3.8
 - Use new nRF Connect for Desktop look & feel.
