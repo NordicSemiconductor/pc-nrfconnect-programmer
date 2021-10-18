@@ -44,7 +44,7 @@
         "babel-plugin-transform-async-to-generator": "^6.24.1",
         "immutable": "^3.8.2",
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#semver:^5.5.3",
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v5.5.4",
         "protobufjs": "^6.8.4",
         "react": "16.13.1",
         "react-dom": "16.13.1",
