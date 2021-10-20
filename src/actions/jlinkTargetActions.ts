@@ -154,12 +154,12 @@ export const openDevice =
         }
         dispatch(targetInfoKnown(deviceInfo));
 
-        const { autoRead } = getState().app.settings;
-        if (autoRead) read();
-
         dispatch(updateTargetWritable());
         dispatch(loadingEnd());
         logger.info('Device is loaded and ready for further operation');
+
+        const { autoRead } = getState().app.settings;
+        if (autoRead) await dispatch(read());
     };
 
 /**
@@ -391,10 +391,9 @@ export const recover =
 
         dispatch(erasingEnd());
         logger.info('Device recovery completed');
-        await dispatch(openDevice());
 
         const { autoRead } = getState().app.settings;
-        if (autoRead && !continueToWrite) read();
+        if (autoRead && !continueToWrite) await dispatch(openDevice());
     };
 
 /**
