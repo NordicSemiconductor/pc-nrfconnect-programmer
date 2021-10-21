@@ -14,5 +14,4 @@ import { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
  * appended with the result of each promise.
  */
 
-export default (serialPort: SerialPort): string | null =>
-    serialPort?.comName || null;
+export default (serialPort: SerialPort): string | null => serialPort.comName;
