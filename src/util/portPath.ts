@@ -14,4 +14,4 @@
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default (serialPort: any): string =>
-    serialPort ? serialPort.path || serialPort.comName : undefined;
+    serialPort ? serialPort.comName : undefined;
