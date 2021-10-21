@@ -64,13 +64,17 @@ const ModemUpdateDialogView = () => {
             </Modal.Header>
             <Modal.Body>
                 <Form.Group>
-                    <Form.Label>Modem firmware</Form.Label>
+                    <Form.Label>
+                        <b>Modem firmware</b>
+                    </Form.Label>
                     <div>{modemFwName}</div>
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Status</Form.Label>
+                    <Form.Label>
+                        <b>Status</b>
+                    </Form.Label>
                     <div>{progressMsg}</div>
-                    {isMcuboot && isWriting && (
+                    {isWriting && (
                         <ProgressBar
                             hidden={!isWriting}
                             animated
@@ -123,7 +127,6 @@ const ModemUpdateDialogView = () => {
                 {!isWritingSucceed && (
                     <Button
                         variant="primary"
-                        className="core-btn"
                         onClick={onWriteStart}
                         disabled={isWriting}
                     >
@@ -131,7 +134,7 @@ const ModemUpdateDialogView = () => {
                     </Button>
                 )}
                 <Button
-                    className="core-btn"
+                    variant="secondary"
                     onClick={onCancel}
                     disabled={isWriting}
                 >
