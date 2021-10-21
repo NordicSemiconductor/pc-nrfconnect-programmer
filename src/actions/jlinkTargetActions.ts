@@ -392,8 +392,7 @@ export const recover =
         dispatch(erasingEnd());
         logger.info('Device recovery completed');
 
-        const { autoRead } = getState().app.settings;
-        if (autoRead && !continueToWrite) await dispatch(openDevice());
+        if (!continueToWrite) await dispatch(openDevice());
     };
 
 /**
