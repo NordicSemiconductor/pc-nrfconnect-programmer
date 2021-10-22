@@ -31,11 +31,13 @@ import { targetWarningRemove } from '../reducers/warningReducer';
 import { CommunicationType } from '../util/devices';
 import { updateTargetWritable } from './targetActions';
 
-export const pickSerialPort = (serialports: Array<SerialPort>) =>
-    serialports[0];
+export const pickSerialPort = (
+    serialports: Array<SerialPort>
+): SerialPort | undefined => serialports[0];
 
-export const pickSerialPort2 = (serialports: Array<SerialPort>) =>
-    serialports.slice(-1)[0];
+export const pickSerialPort2 = (
+    serialports: Array<SerialPort>
+): SerialPort | undefined => serialports.slice(-1)[0];
 
 export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     const { serialPorts } = selectedDevice;
