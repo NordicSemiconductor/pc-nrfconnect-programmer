@@ -6,7 +6,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { Device, getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
 
 import {
@@ -31,13 +31,8 @@ import { targetWarningRemove } from '../reducers/warningReducer';
 import { CommunicationType } from '../util/devices';
 import { updateTargetWritable } from './targetActions';
 
-export const pickSerialPort = (
-    serialports: Array<SerialPort>
-): SerialPort | undefined => serialports[0];
-
-export const pickSerialPort2 = (
-    serialports: Array<SerialPort>
-): SerialPort | undefined => serialports.slice(-1)[0];
+export const first = <T>(items: T[]): T | undefined => items[0];
+export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
 
 export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     const { serialPorts } = selectedDevice;
@@ -51,8 +46,8 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     dispatch(modemKnown(true));
     dispatch(
         mcubootPortKnown({
-            port: pickSerialPort(serialPorts)?.comName ?? undefined,
-            port2: pickSerialPort2(serialPorts)?.comName ?? undefined,
+            port: first(serialPorts)?.comName ?? undefined,
+            port2: last(serialPorts)?.comName ?? undefined,
         })
     );
     dispatch(updateTargetWritable());
