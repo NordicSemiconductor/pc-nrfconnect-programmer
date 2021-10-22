@@ -29,7 +29,6 @@ import {
 import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
 import { CommunicationType } from '../util/devices';
-import portPath from '../util/portPath';
 import { updateTargetWritable } from './targetActions';
 
 export const pickSerialPort = (serialports: Array<SerialPort>) =>
@@ -50,8 +49,8 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     dispatch(modemKnown(true));
     dispatch(
         mcubootPortKnown({
-            port: portPath(pickSerialPort(serialPorts)),
-            port2: portPath(pickSerialPort2(serialPorts)),
+            port: pickSerialPort(serialPorts)?.comName ?? undefined,
+            port2: pickSerialPort2(serialPorts)?.comName ?? undefined,
         })
     );
     dispatch(updateTargetWritable());
