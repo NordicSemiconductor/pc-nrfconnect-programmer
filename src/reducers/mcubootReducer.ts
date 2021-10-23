@@ -23,6 +23,8 @@ export interface McubootState {
     progressMsg: string;
     progressPercentage: number;
     progressDuration: number;
+    progressStep: number;
+    progressOperation: string;
     errorMsg: string;
 }
 
@@ -38,6 +40,8 @@ const initialState: McubootState = {
     progressMsg: MCUBOOT_DFU_NOT_STARTED,
     progressPercentage: 0,
     progressDuration: 0,
+    progressStep: 0,
+    progressOperation: MCUBOOT_DFU_NOT_STARTED,
     errorMsg: '',
 };
 
@@ -48,8 +52,10 @@ interface MCUBootPortKnownPayload {
 
 interface MCUBootProcessUpdatePayload {
     message: string;
-    percentage: number;
-    duration: number;
+    progressPercentage?: number;
+    duration?: number;
+    step?: number;
+    operation?: string;
 }
 
 const mcubootSlice = createSlice({
@@ -71,8 +77,9 @@ const mcubootSlice = createSlice({
             action: PayloadAction<MCUBootProcessUpdatePayload>
         ) {
             state.progressMsg = action.payload.message;
-            state.progressPercentage = action.payload.percentage;
-            state.progressDuration = action.payload.duration;
+            state.progressPercentage = action.payload.progressPercentage ?? 0;
+            state.progressDuration = action.payload.duration ?? 0;
+            state.progressOperation = action.payload.operation ?? '';
         },
         mcubootWritingReady(state) {
             state.progressMsg = MCUBOOT_DFU_NOT_STARTED;
