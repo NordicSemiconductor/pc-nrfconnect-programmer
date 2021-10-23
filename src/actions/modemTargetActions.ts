@@ -5,7 +5,7 @@
  */
 import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
-import { getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
+import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
 
 import {
     MODEM_DFU_STARTING,
@@ -39,39 +39,30 @@ export const cancelUpdate = () => (dispatch: TDispatch) => {
 
 export const programDfuModem =
     (fileName: string) => (dispatch: TDispatch, getState: () => RootState) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             const { device: inputDevice } = getState().app.target;
             const { id: deviceId } = inputDevice as Device;
 
-            const successCallback = () => {
+            const errorCallback = (error: nrfdl.Error) => {
+                logger.error(
+                    `Modem DFU failed with error: ${error.message || error}`
+                );
+                let errorMsg = error.message;
+                // To be fixed in nrfdl
+                /* @ts-ignore */
+                if (error.error_code === 0x25b) {
+                    errorMsg =
+                        'Please make sure that the device is in MCUboot mode and try again.';
+                }
+                dispatch(modemWritingFail(errorMsg));
+                usageData.sendErrorReport(errorMsg);
+            };
+
+            const successCallback = (error?: nrfdl.Error) => {
+                if (error) return errorCallback(error);
                 logger.info('Modem DFU completed successfully!');
                 dispatch(modemWritingSucceed());
                 resolve();
-            };
-
-            const errorCallback = (error: Error) => {
-                if (error) {
-                    logger.error(
-                        `Modem DFU failed with error: ${
-                            (error as Error).message || error
-                        }`
-                    );
-                    let errorMsg = error.message;
-                    if (error.message.includes('0x4')) {
-                        errorMsg =
-                            'Failed with internal error. ' +
-                            'Please click Erase all button and try updating modem again.';
-                    }
-                    // Program without setting device in MCUboot mode will throw such an error:
-                    // Errorcode: CouldNotCallFunction (0x9)
-                    // Lowlevel error: Unknown value (ffffff24)
-                    if (errorMsg.includes('0x9')) {
-                        errorMsg =
-                            'Please make sure that the device is in MCUboot mode and try again.';
-                    }
-                    dispatch(modemWritingFail(errorMsg));
-                    reject(error);
-                }
             };
 
             const progressCallback = ({
@@ -87,19 +78,15 @@ export const programDfuModem =
                 dispatch(modemProcessUpdate(updatedProgress));
             };
 
-            try {
-                nrfdl.firmwareProgram(
-                    getDeviceLibContext(),
-                    deviceId,
-                    'NRFDL_FW_FILE',
-                    'NRFDL_FW_NRF91_MODEM',
-                    fileName,
-                    successCallback,
-                    progressCallback
-                );
-            } catch (error) {
-                errorCallback(error as Error);
-            }
+            nrfdl.firmwareProgram(
+                getDeviceLibContext(),
+                deviceId,
+                'NRFDL_FW_FILE',
+                'NRFDL_FW_NRF91_MODEM',
+                fileName,
+                successCallback,
+                progressCallback
+            );
         });
 
 export const performMcuUpdate = (fileName: string) => (dispatch: TDispatch) => {
