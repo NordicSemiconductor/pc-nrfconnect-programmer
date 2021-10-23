@@ -58,7 +58,7 @@ export const programDfuModem =
                 usageData.sendErrorReport(errorMsg);
             };
 
-            const successCallback = (error?: nrfdl.Error) => {
+            const completeCallback = (error?: nrfdl.Error) => {
                 if (error) return errorCallback(error);
                 logger.info('Modem DFU completed successfully!');
                 dispatch(modemWritingSucceed());
@@ -90,7 +90,7 @@ export const programDfuModem =
                 'NRFDL_FW_FILE',
                 'NRFDL_FW_NRF91_MODEM',
                 fileName,
-                successCallback,
+                completeCallback,
                 progressCallback
             );
         });
