@@ -112,12 +112,13 @@ export const canWrite =
 
 export const performUpdate =
     () => (dispatch: TDispatch, getState: () => RootState) =>
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
+            const { device: inputDevice } = getState().app.target;
+            const device = inputDevice as Device;
             const { mcubootFilePath } = getState().app.file;
-            const { serialNumber } = getState().app.target;
 
             logger.info(
-                `Writing ${mcubootFilePath} to device ${serialNumber || ''}`
+                `Writing ${mcubootFilePath} to device ${device.serialNumber}`
             );
 
             let totalPercentage = 0;
@@ -127,6 +128,7 @@ export const performUpdate =
             const progressCallback = ({
                 progressJson: progress,
             }: nrfdl.Progress.CallbackParameters) => {
+                console.log(progress);
                 let dfuProcess;
                 try {
                     dfuProcess = progress;
@@ -156,50 +158,39 @@ export const performUpdate =
                 }
             };
 
-            const errorCallback = (error: Error) => {
-                if (error) {
-                    let errorMsg = error.message;
-
-                    // Program without setting device in MCUboot mode will throw such an error:
-                    // Errorcode: CouldNotCallFunction (0x9)
-                    // Lowlevel error: Unknown value (ffffff24)
-                    if (errorMsg.includes('0x9')) {
-                        errorMsg =
-                            'Please make sure that the device is in MCUboot mode and try again.';
-                    }
-
-                    logger.error(`MCUboot DFU failed. ${errorMsg}`);
-                    dispatch(mcubootWritingFail(errorMsg));
-                    reject(error);
+            const errorCallback = (error: nrfdl.Error) => {
+                logger.error(
+                    `MCUboot DFU failed with error: ${error.message || error}`
+                );
+                let errorMsg = error.message;
+                // To be fixed in nrfdl
+                /* @ts-ignore */
+                if (error.error_code === 0x25b) {
+                    errorMsg =
+                        'Please make sure that the device is in MCUboot mode and try again.';
                 }
-
-                dispatch(mcubootWritingSucceed());
+                logger.error(errorMsg);
+                dispatch(mcubootWritingFail(errorMsg));
             };
 
-            const completeCallback = () => {
+            const completeCallback = (error: nrfdl.Error | undefined) => {
+                if (error) return errorCallback(error);
+                logger.info('MCUboot DFU completed successfully!');
                 dispatch(mcubootWritingSucceed());
-                reject();
+                dispatch(updateTargetWritable());
+                resolve();
             };
 
             dispatch(mcubootWritingStart());
-
-            try {
-                const { device: inputDevice } = getState().app.target;
-                const device = inputDevice as Device;
-                nrfdl.firmwareProgram(
-                    getDeviceLibContext(),
-                    device.id,
-                    'NRFDL_FW_FILE',
-                    'NRFDL_FW_MCUBOOT',
-                    mcubootFilePath as string,
-                    completeCallback,
-                    progressCallback
-                );
-            } catch (error) {
-                errorCallback(error as Error);
-            }
-
-            dispatch(updateTargetWritable());
+            nrfdl.firmwareProgram(
+                getDeviceLibContext(),
+                device.id,
+                'NRFDL_FW_FILE',
+                'NRFDL_FW_MCUBOOT',
+                mcubootFilePath as string,
+                completeCallback,
+                progressCallback
+            );
         });
 
 export const cancelUpdate = () => (dispatch: TDispatch) => {
