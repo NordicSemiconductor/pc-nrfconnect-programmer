@@ -108,7 +108,7 @@ export const canWrite =
 
 export const performUpdate =
     () => (dispatch: TDispatch, getState: () => RootState) =>
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>(resolve => {
             const { device: inputDevice } = getState().app.target;
             const device = inputDevice as Device;
             const { mcubootFilePath } = getState().app.file;
@@ -116,43 +116,6 @@ export const performUpdate =
             logger.info(
                 `Writing ${mcubootFilePath} to device ${device.serialNumber}`
             );
-
-            let totalPercentage = 0;
-            let totalDuration = 0;
-            let progressMsg = '';
-
-            const progressCallback = ({
-                progressJson: progress,
-            }: nrfdl.Progress.CallbackParameters) => {
-                console.log(progress);
-                let dfuProcess;
-                try {
-                    dfuProcess = progress;
-                } catch (error) {
-                    dispatch(
-                        mcubootProcessUpdate({
-                            message: progress.message,
-                            percentage: totalPercentage,
-                            duration: totalDuration,
-                        })
-                    );
-                    reject(error);
-                }
-
-                if (dfuProcess && dfuProcess.operation === 'upload_image') {
-                    totalPercentage = dfuProcess.progressPercentage;
-                    totalDuration = dfuProcess.duration ?? 0;
-
-                    progressMsg = dfuProcess.message || progressMsg;
-                    dispatch(
-                        mcubootProcessUpdate({
-                            message: progressMsg,
-                            percentage: totalPercentage,
-                            duration: totalDuration,
-                        })
-                    );
-                }
-            };
 
             const errorCallback = (error: nrfdl.Error) => {
                 logger.error(
@@ -175,6 +138,19 @@ export const performUpdate =
                 dispatch(mcubootWritingSucceed());
                 dispatch(updateTargetWritable());
                 resolve();
+            };
+
+            const progressCallback = ({
+                progressJson: progress,
+            }: nrfdl.Progress.CallbackParameters) => {
+                let updatedProgress = progress;
+                if (progress.operation === 'erase_image') {
+                    updatedProgress = {
+                        ...progress,
+                        message: `${progress.message} This will take some time.`,
+                    };
+                }
+                dispatch(mcubootProcessUpdate(updatedProgress));
             };
 
             dispatch(mcubootWritingStart());
