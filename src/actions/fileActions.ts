@@ -20,6 +20,7 @@ import {
     filesEmpty,
     mcubootFileKnown,
     mruFilesLoadSuccess,
+    zipFileKnown,
 } from '../reducers/fileReducer';
 import { targetInfoKnown } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
@@ -358,20 +359,29 @@ const parseOneFile =
 export const openFile =
     (...params: string[]) =>
     async (dispatch: TDispatch): Promise<unknown> => {
-        if (params[0]) {
-            dispatch(mcubootFileKnown(undefined));
-            await dispatch(parseOneFile(params[0]));
+        const filePath = params[0];
+        if (!filePath) return dispatch(loadMruFiles());
+
+        // The last selected file has higher priority
+        dispatch(mcubootFileKnown(undefined));
+        dispatch(zipFileKnown(undefined));
+
+        if (filePath.toLowerCase().endsWith('.zip')) {
+            dispatch(zipFileKnown(filePath));
             return dispatch(openFile(...params.slice(1)));
         }
-        return dispatch(loadMruFiles());
+        if (filePath.toLowerCase().endsWith('.hex')) {
+            await dispatch(parseOneFile(filePath));
+            return dispatch(openFile(...params.slice(1)));
+        }
     };
 
 export const openFileDialog = () => (dispatch: TDispatch) => {
     const dialogOptions = {
-        title: 'Select a HEX file',
+        title: 'Select a HEX / ZIP file',
         filters: [
             {
-                name: 'Intel HEX / ZIP files',
+                name: 'HEX / ZIP files',
                 extensions: ['hex', 'zip'],
             },
         ],
