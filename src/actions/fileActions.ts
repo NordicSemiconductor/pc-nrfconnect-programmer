@@ -372,7 +372,7 @@ export const openFileDialog = () => (dispatch: TDispatch) => {
         filters: [
             {
                 name: 'Intel HEX / ZIP files',
-                extensions: ['hex', 'ihex', 'zip'],
+                extensions: ['hex', 'zip'],
             },
         ],
         properties: ['openFile', 'multiSelections'],
