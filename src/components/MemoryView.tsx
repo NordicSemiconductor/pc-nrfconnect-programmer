@@ -8,6 +8,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { getZipFilePath } from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
 import {
     getDeviceInfo,
@@ -48,6 +49,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
     const regions = useSelector((state: RootState) =>
         isTarget ? state.app.target.regions : state.app.file.regions
     );
+    const zipFilePath = useSelector(getZipFilePath);
     const isMcuboot = useSelector(getIsMcuboot);
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
@@ -65,6 +67,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
             : // When it is target and during writing, show file regions active.
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               convertCoresToViews(targetCores, regions!, isTarget && isWriting);
+
     return (
         <>
             {placeHolder.map((coreView, index) => (
@@ -108,6 +111,14 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                                 <p>
                                     Memory layout is not available via MCUboot
                                 </p>
+                            </div>
+                        </div>
+                    )}
+                    {!isTarget && zipFilePath && (
+                        <div className="centering-container">
+                            <div className="read-indicator">
+                                <p>ZIP file is selected</p>
+                                <p>{zipFilePath}</p>
                             </div>
                         </div>
                     )}
