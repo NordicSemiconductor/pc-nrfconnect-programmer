@@ -146,7 +146,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
             </Overlay>
             <Button variant="danger" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
-                Add HEX file
+                Add file
             </Button>
         </>
     );

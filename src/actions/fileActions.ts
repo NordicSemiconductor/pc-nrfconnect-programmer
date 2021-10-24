@@ -369,7 +369,12 @@ export const openFile =
 export const openFileDialog = () => (dispatch: TDispatch) => {
     const dialogOptions = {
         title: 'Select a HEX file',
-        filters: [{ name: 'Intel HEX files', extensions: ['hex', 'ihex'] }],
+        filters: [
+            {
+                name: 'Intel HEX / ZIP files',
+                extensions: ['hex', 'ihex', 'zip'],
+            },
+        ],
         properties: ['openFile', 'multiSelections'],
     };
     electron.remote.dialog
