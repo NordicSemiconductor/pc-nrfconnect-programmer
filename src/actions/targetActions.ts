@@ -9,6 +9,7 @@
 import { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import { Device, logger, usageData } from 'pc-nrfconnect-shared';
 
+import { modemWritingReady } from '../reducers/modemReducer';
 import {
     loadingStart,
     targetDeviceKnown,
@@ -99,7 +100,14 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
 
 export const updateTargetWritable =
     () => (dispatch: TDispatch, getState: () => RootState) => {
-        switch (getState().app.target.targetType) {
+        const {
+            target: { targetType },
+            mcuboot: { isMcuboot },
+            modem: { isModem },
+            file: { zipFilePath },
+        } = getState().app;
+
+        switch (targetType) {
             case CommunicationType.JLINK:
                 dispatch(jlinkTargetActions.canWrite());
                 break;
@@ -112,21 +120,33 @@ export const updateTargetWritable =
             default:
                 dispatch(targetWritableKnown(false));
         }
+        if (zipFilePath && (isMcuboot || isModem))
+            dispatch(targetWritableKnown(true));
     };
 
 export const write = () => (dispatch: TDispatch, getState: () => RootState) => {
     // Refresh all files in case that some files have been updated right before write action.
     dispatch(refreshAllFiles());
+    const {
+        target,
+        file: { zipFilePath },
+        mcuboot: { isMcuboot },
+        modem: { isModem },
+    } = getState().app;
 
-    if (getState().app.mcuboot.isMcuboot) {
+    if (zipFilePath && isModem) {
+        dispatch(modemWritingReady(zipFilePath));
+    }
+
+    if (isMcuboot) {
         dispatch(mcubootTargetActions.prepareUpdate());
         return;
     }
-    if (getState().app.target.targetType === CommunicationType.JLINK) {
+    if (target.targetType === CommunicationType.JLINK) {
         dispatch(jlinkTargetActions.write());
         return;
     }
-    if (getState().app.target.targetType === CommunicationType.USBSDFU) {
+    if (target.targetType === CommunicationType.USBSDFU) {
         dispatch(usbsdfuTargetActions.write());
         return;
     }

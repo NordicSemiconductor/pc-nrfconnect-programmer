@@ -368,6 +368,7 @@ export const openFile =
 
         if (filePath.toLowerCase().endsWith('.zip')) {
             dispatch(zipFileKnown(filePath));
+            dispatch(updateTargetWritable());
             return dispatch(openFile(...params.slice(1)));
         }
         if (filePath.toLowerCase().endsWith('.hex')) {
