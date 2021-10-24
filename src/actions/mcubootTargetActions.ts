@@ -82,7 +82,7 @@ export const canWrite =
 
         // Check if mcu firmware is detected.
         // If not, then return.
-        const { mcubootFilePath, regions } = getState().app.file;
+        const { mcubootFilePath } = getState().app.file;
         if (!mcubootFilePath) {
             return;
         }
@@ -94,12 +94,10 @@ export const canWrite =
             return;
         }
 
-        // Check if region starting at 0x0 is detected for Thingy91
-        if (regions.find(r => r.startAddress === 0)) {
-            dispatch(mcubootFirmwareValid(false));
-        } else {
-            dispatch(mcubootFirmwareValid(true));
-        }
+        // Check if firmware is valid for Thingy91
+        // So far there is no strict rule for checking it
+        // Therefore set it always true
+        dispatch(mcubootFirmwareValid(true));
 
         // Enable write button if all above items have been checked
         dispatch(targetWarningRemove());
