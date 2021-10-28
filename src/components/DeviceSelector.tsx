@@ -26,7 +26,7 @@ const deviceListing: DeviceListing = {
 };
 
 const deviceSetup: DeviceSetup = {
-    needSerialPort: true,
+    needSerialport: true,
 };
 
 const mapState = () => ({
