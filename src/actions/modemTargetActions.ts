@@ -84,6 +84,12 @@ export const programDfuModem =
                         message: `${progress.message} This will take some time.`,
                     };
                 }
+                if (!progress.result && progress.operation === 'upload_image') {
+                    updatedProgress = {
+                        ...progress,
+                        message: `Uploading image. This will take some time.`,
+                    };
+                }
                 dispatch(modemProcessUpdate(updatedProgress));
             };
 
