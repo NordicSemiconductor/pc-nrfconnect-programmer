@@ -136,6 +136,7 @@ export const write = () => (dispatch: TDispatch, getState: () => RootState) => {
 
     if (zipFilePath && isModem) {
         dispatch(modemWritingReady(zipFilePath));
+        return;
     }
 
     if (isMcuboot) {
