@@ -23,7 +23,6 @@ import {
     USBProductIds,
     VendorId,
 } from '../util/devices';
-import portPath from '../util/portPath';
 import { refreshAllFiles } from './fileActions';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
@@ -40,7 +39,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     dispatch(
         targetPortChanged({
             serialNumber,
-            path: serialport ? portPath(serialport) : undefined,
+            path: serialport?.comName ?? undefined,
         })
     );
 
