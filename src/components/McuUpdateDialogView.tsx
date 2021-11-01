@@ -11,6 +11,7 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
+import { useStopwatch } from 'react-timer-hook';
 
 import { cancelUpdate, performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath } from '../reducers/fileReducer';
@@ -21,7 +22,6 @@ import {
     getIsWriting,
     getIsWritingFail,
     getIsWritingSucceed,
-    getProgressDuration,
     getProgressMsg,
     getProgressPercentage,
 } from '../reducers/mcubootReducer';
@@ -34,12 +34,24 @@ const McuUpdateDialogView = () => {
     const isWritingSucceed = useSelector(getIsWritingSucceed);
     const isFirmwareValid = useSelector(getIsFirmwareValid);
     const mcubootFwPath = useSelector(getMcubootFilePath);
-    const progressDuration = useSelector(getProgressDuration);
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
 
     const dispatch = useDispatch();
     const onCancel = () => dispatch(cancelUpdate());
+
+    const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
+        useStopwatch({ autoStart: true });
+
+    const onWriteStart = () => {
+        reset();
+        start();
+        dispatch(performUpdate());
+    };
+
+    if (isRunning && (isWritingSucceed || isWritingFail)) {
+        pause();
+    }
 
     return (
         <Modal show={isVisible} onHide={onCancel} backdrop="static">
@@ -84,15 +96,15 @@ const McuUpdateDialogView = () => {
                             Thingy:91 MCUboot DFU.
                         </Alert>
                     )}
-                    {!isFirmwareValid && (
-                        <Alert variant="warning">
-                            The selected HEX file appears to be invalid for
-                            Thingy:91 MCUboot DFU.
-                        </Alert>
-                    )}
                     {isWritingSucceed && (
                         <Alert variant="success">
-                            Completed successfully in {progressDuration / 1000}{' '}
+                            Completed successfully in
+                            {` ${
+                                days * 24 * 60 * 60 +
+                                hours * 60 * 60 +
+                                minutes * 60 +
+                                seconds
+                            } `}
                             seconds.
                         </Alert>
                     )}
@@ -109,7 +121,7 @@ const McuUpdateDialogView = () => {
                     <Button
                         variant="primary"
                         className="core-btn"
-                        onClick={() => dispatch(performUpdate())}
+                        onClick={onWriteStart}
                         disabled={isWriting}
                     >
                         Write

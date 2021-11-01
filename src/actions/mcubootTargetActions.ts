@@ -6,7 +6,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import { Device, getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
 
 import {
@@ -29,14 +29,10 @@ import {
 import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
 import { CommunicationType } from '../util/devices';
-import portPath from '../util/portPath';
 import { updateTargetWritable } from './targetActions';
 
-export const pickSerialPort = (serialports: Array<SerialPort>) =>
-    serialports[0];
-
-export const pickSerialPort2 = (serialports: Array<SerialPort>) =>
-    serialports.slice(-1)[0];
+export const first = <T>(items: T[]): T | undefined => items[0];
+export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
 
 export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     const { serialPorts } = selectedDevice;
@@ -50,8 +46,8 @@ export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
     dispatch(modemKnown(true));
     dispatch(
         mcubootPortKnown({
-            port: portPath(pickSerialPort(serialPorts)),
-            port2: portPath(pickSerialPort2(serialPorts)),
+            port: first(serialPorts)?.comName ?? undefined,
+            port2: last(serialPorts)?.comName ?? undefined,
         })
     );
     dispatch(updateTargetWritable());
@@ -86,7 +82,7 @@ export const canWrite =
 
         // Check if mcu firmware is detected.
         // If not, then return.
-        const { mcubootFilePath, regions } = getState().app.file;
+        const { mcubootFilePath } = getState().app.file;
         if (!mcubootFilePath) {
             return;
         }
@@ -98,12 +94,10 @@ export const canWrite =
             return;
         }
 
-        // Check if region starting at 0x0 is detected for Thingy91
-        if (regions.find(r => r.startAddress === 0)) {
-            dispatch(mcubootFirmwareValid(false));
-        } else {
-            dispatch(mcubootFirmwareValid(true));
-        }
+        // Check if firmware is valid for Thingy91
+        // So far there is no strict rule for checking it
+        // Therefore set it always true
+        dispatch(mcubootFirmwareValid(true));
 
         // Enable write button if all above items have been checked
         dispatch(targetWarningRemove());
@@ -112,94 +106,61 @@ export const canWrite =
 
 export const performUpdate =
     () => (dispatch: TDispatch, getState: () => RootState) =>
-        new Promise((resolve, reject) => {
+        new Promise<void>(resolve => {
+            const { device: inputDevice } = getState().app.target;
+            const device = inputDevice as Device;
             const { mcubootFilePath } = getState().app.file;
-            const { serialNumber } = getState().app.target;
 
             logger.info(
-                `Writing ${mcubootFilePath} to device ${serialNumber || ''}`
+                `Writing ${mcubootFilePath} to device ${device.serialNumber}`
             );
 
-            let totalPercentage = 0;
-            let totalDuration = 0;
-            let progressMsg = '';
+            const errorCallback = (error: nrfdl.Error) => {
+                logger.error(
+                    `MCUboot DFU failed with error: ${error.message || error}`
+                );
+                let errorMsg = error.message;
+                // To be fixed in nrfdl
+                /* @ts-ignore */
+                if (error.error_code === 0x25b) {
+                    errorMsg =
+                        'Please make sure that the device is in MCUboot mode and try again.';
+                }
+                logger.error(errorMsg);
+                dispatch(mcubootWritingFail(errorMsg));
+            };
+
+            const completeCallback = (error: nrfdl.Error | undefined) => {
+                if (error) return errorCallback(error);
+                logger.info('MCUboot DFU completed successfully!');
+                dispatch(mcubootWritingSucceed());
+                dispatch(updateTargetWritable());
+                resolve();
+            };
 
             const progressCallback = ({
                 progressJson: progress,
             }: nrfdl.Progress.CallbackParameters) => {
-                let dfuProcess;
-                try {
-                    dfuProcess = progress;
-                } catch (error) {
-                    dispatch(
-                        mcubootProcessUpdate({
-                            message: progress.message,
-                            percentage: totalPercentage,
-                            duration: totalDuration,
-                        })
-                    );
-                    reject(error);
+                let updatedProgress = progress;
+                if (progress.operation === 'erase_image') {
+                    updatedProgress = {
+                        ...progress,
+                        message: `${progress.message} This will take some time.`,
+                    };
                 }
-
-                if (dfuProcess && dfuProcess.operation === 'upload_image') {
-                    totalPercentage = dfuProcess.progressPercentage;
-                    totalDuration = dfuProcess.duration ?? 0;
-
-                    progressMsg = dfuProcess.message || progressMsg;
-                    dispatch(
-                        mcubootProcessUpdate({
-                            message: progressMsg,
-                            percentage: totalPercentage,
-                            duration: totalDuration,
-                        })
-                    );
-                }
-            };
-
-            const errorCallback = (error: Error) => {
-                if (error) {
-                    let errorMsg = error.message;
-
-                    // Program without setting device in MCUboot mode will throw such an error:
-                    // Errorcode: CouldNotCallFunction (0x9)
-                    // Lowlevel error: Unknown value (ffffff24)
-                    if (errorMsg.includes('0x9')) {
-                        errorMsg =
-                            'Please make sure that the device is in MCUboot mode and try again.';
-                    }
-
-                    logger.error(`MCUboot DFU failed. ${errorMsg}`);
-                    dispatch(mcubootWritingFail(errorMsg));
-                    reject(error);
-                }
-
-                dispatch(mcubootWritingSucceed());
-            };
-
-            const completeCallback = () => {
-                dispatch(mcubootWritingSucceed());
-                reject();
+                dispatch(mcubootProcessUpdate(updatedProgress));
             };
 
             dispatch(mcubootWritingStart());
-
-            try {
-                const { device: inputDevice } = getState().app.target;
-                const device = inputDevice as Device;
-                nrfdl.firmwareProgram(
-                    getDeviceLibContext(),
-                    device.id,
-                    'NRFDL_FW_FILE',
-                    'NRFDL_FW_MCUBOOT',
-                    mcubootFilePath as string,
-                    completeCallback,
-                    progressCallback
-                );
-            } catch (error) {
-                errorCallback(error as Error);
-            }
-
-            dispatch(updateTargetWritable());
+            nrfdl.firmwareProgram(
+                getDeviceLibContext(),
+                device.id,
+                'NRFDL_FW_FILE',
+                'NRFDL_FW_MCUBOOT',
+                mcubootFilePath as string,
+                completeCallback,
+                progressCallback
+            );
         });
 
 export const cancelUpdate = () => (dispatch: TDispatch) => {
