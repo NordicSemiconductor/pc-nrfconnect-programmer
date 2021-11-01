@@ -1,4 +1,4 @@
-## 2.0.0 prerelease
+## 2.0.0 - 2021-11-01
 ### Added
 - Documentation section in `About` pane.
 
