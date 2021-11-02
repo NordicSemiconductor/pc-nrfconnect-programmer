@@ -114,7 +114,7 @@ const mcubootSlice = createSlice({
         },
     },
     extraReducers: {
-        DEVICE_SELECTED: () => ({ ...initialState }),
+        'device/selectDevice': () => ({ ...initialState }),
     },
 });
 
