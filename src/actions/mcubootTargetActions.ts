@@ -20,6 +20,7 @@ import {
     mcubootWritingStart,
     mcubootWritingSucceed,
 } from '../reducers/mcubootReducer';
+import { modemKnown } from '../reducers/modemReducer';
 import {
     loadingEnd,
     targetTypeKnown,
@@ -76,6 +77,7 @@ export const openDevice =
             })
         );
         dispatch(mcubootKnown(true));
+        if (isMcubootModem()) dispatch(modemKnown(true));
         dispatch(
             mcubootPortKnown({
                 port: first(serialPorts)?.comName ?? undefined,

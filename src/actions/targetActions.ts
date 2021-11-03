@@ -9,7 +9,7 @@
 import { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import { Device, logger, usageData } from 'pc-nrfconnect-shared';
 
-import { modemKnown, modemWritingReady } from '../reducers/modemReducer';
+import { modemWritingReady } from '../reducers/modemReducer';
 import {
     loadingStart,
     targetDeviceKnown,
@@ -48,7 +48,6 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     }
     if (device.traits.mcuboot || mcubootTargetActions.isMcuboot(vid, pid)) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
-        if (mcubootTargetActions.isMcubootModem()) dispatch(modemKnown(true));
         dispatch(mcubootTargetActions.openDevice());
         return;
     }
