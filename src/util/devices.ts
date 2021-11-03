@@ -211,31 +211,30 @@ export const JLinkProductIds = [
 
 export const getDeviceDefinition = (type: string): DeviceDefinition =>
     deviceDefinitions.find((device: DeviceDefinition) =>
-        device?.type?.includes(type)
+        device?.type?.toLowerCase().includes(type.toLowerCase())
     ) || {
         ...deviceDefinition,
         type,
     };
 
 // Get device info by calling version command
-export const getDeviceInfoByUSB = ({
-    part,
-    memory,
-}: {
-    part: number;
+export const getDeviceInfoByUSB = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    memory: any;
-}) => {
-    const deviceInfoByUsb = getDeviceDefinition(part.toString(16));
+    hwInfo: any
+) => {
+    const deviceInfoByUsb = getDeviceDefinition(
+        // hwInfo.deviceVersion example 'NRF52840_AAD0'
+        hwInfo.deviceVersion.slice(0, 8)
+    );
     const [core] = deviceInfoByUsb.cores;
     return {
         ...deviceInfoByUsb,
         cores: [
             {
                 ...core,
-                romSize: memory.romSize,
-                pageSize: memory.romPageSize,
-                ramSize: memory.ramSize,
+                romSize: hwInfo.romSize,
+                pageSize: hwInfo.romPageSize,
+                ramSize: hwInfo.ramSize,
             },
         ],
     };

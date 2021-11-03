@@ -105,24 +105,25 @@ export const openDevice =
         );
 
         try {
-            const hardwareVersion = {
-                part: 337984,
-                variant: 1094796080,
-                memory: {
-                    romSize: 1048576,
-                    ramSize: 262144,
-                    romPageSize: 4096,
-                },
-            };
             const fwInfo: FWInfo.ReadResult = await readFwInfo(
                 getDeviceLibContext(),
                 device.id
             );
-            const deviceInfoOrigin = getDeviceInfoByUSB(hardwareVersion);
-            dispatch(targetInfoKnown(deviceInfoOrigin));
+            const defaultHwInfo = {
+                deviceVersion: 'nRF52840',
+                romSize: 0x100000, // 1 Mb
+                ramSize: 0x40000, // 256 Kb
+                romPageSize: 0x1000, // 4Kb
+            };
+            const deviceInfo = getDeviceInfoByUSB(
+                // TODO: fix type in nrfdl
+                // @ts-ignore -- type error from nrfdl, remove when fixed
+                device.hwInfo || defaultHwInfo
+            );
+            dispatch(targetInfoKnown(deviceInfo));
 
             const appCoreNumber = 0;
-            const coreInfo = deviceInfoOrigin.cores[appCoreNumber];
+            const coreInfo = deviceInfo.cores[appCoreNumber];
 
             let regions: Region[] = [];
 
