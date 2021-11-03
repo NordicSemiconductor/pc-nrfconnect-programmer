@@ -290,7 +290,24 @@ const addMruFile = (filename: string) => {
     }
 };
 
-const parseOneFile =
+const parseZipFile = (filePath: string) => async (dispatch: TDispatch) => {
+    const stats: Stats = await new Promise((resolve, reject) => {
+        stat(filePath, (statsError, result) => {
+            if (statsError) {
+                logger.error(`Could not open HEX file: ${statsError}`);
+                dispatch(errorDialogShowAction(statsError));
+                removeMruFile(filePath);
+                return reject();
+            }
+            return resolve(result);
+        });
+    });
+    logger.info('Checking ZIP file: ', filePath);
+    logger.info('File was last modified at ', stats.mtime.toLocaleString());
+    addMruFile(filePath);
+};
+
+const parseHexFile =
     (filePath: string) =>
     async (dispatch: TDispatch, getState: () => RootState) => {
         const { loaded, memMaps } = getState().app.file;
@@ -368,11 +385,15 @@ export const openFile =
 
         if (filePath.toLowerCase().endsWith('.zip')) {
             dispatch(zipFileKnown(filePath));
+            await dispatch(parseZipFile(filePath));
             dispatch(updateTargetWritable());
             return dispatch(openFile(...params.slice(1)));
         }
-        if (filePath.toLowerCase().endsWith('.hex')) {
-            await dispatch(parseOneFile(filePath));
+        if (
+            filePath.toLowerCase().endsWith('.hex') ||
+            filePath.toLowerCase().endsWith('.ihex')
+        ) {
+            await dispatch(parseHexFile(filePath));
             return dispatch(openFile(...params.slice(1)));
         }
     };
@@ -383,7 +404,7 @@ export const openFileDialog = () => (dispatch: TDispatch) => {
         filters: [
             {
                 name: 'HEX / ZIP files',
-                extensions: ['hex', 'zip'],
+                extensions: ['hex', 'iHex', 'zip'],
             },
         ],
         properties: ['openFile', 'multiSelections'],
@@ -406,7 +427,7 @@ export const refreshAllFiles =
                     if (entry.loadTime < stats.mtime) {
                         dispatch(removeFile(filePath));
                         logger.info('Reloading: ', filePath);
-                        await dispatch(parseOneFile(filePath));
+                        await dispatch(parseHexFile(filePath));
                         return;
                     }
                     logger.info('Does not need to be reloaded: ', filePath);
