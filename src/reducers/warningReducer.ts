@@ -47,7 +47,7 @@ const warningSlice = createSlice({
         },
     },
     extraReducers: {
-        DEVICE_SELECTED: state => {
+        'device/selectDevice': state => {
             state.targetWarnings = [];
             state.userWarnings = [];
         },

@@ -15,7 +15,6 @@ import {
     readFwInfo,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import Crypto from 'crypto';
-import fs from 'fs';
 import MemoryMap from 'nrf-intel-hex';
 import {
     defaultInitPacket,
@@ -524,7 +523,6 @@ const handleHash = (image: DfuImage, hashType: number): DfuImage => {
  */
 const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
-    fs.writeFileSync('/tmp/sdfu.zip', zipBuffer);
 
     let prevPercentage: number;
 
@@ -615,7 +613,9 @@ export const write =
 
         stopWatchingDevices();
         try {
-            const { device } = getState().app.target;
+            const state = getState();
+            const device =
+                state.device.devices[state.device?.selectedSerialNumber ?? ''];
             if (!device) throw Error(`Failed to write due to device not found`);
             await operateDFU(device.id, images);
             dispatch(writingEnd());
