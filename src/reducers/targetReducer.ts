@@ -138,13 +138,11 @@ const targetSlice = createSlice({
         },
     },
     extraReducers: {
-        DEVICE_SELECTED: (_, action) => {
-            return {
-                ...initialState,
-                serialNumber: action.device.serialNumber,
-            };
-        },
-        DEVICE_DESELECTED: () => ({ ...initialState }),
+        'device/selectDevice': (_, action) => ({
+            ...initialState,
+            serialNumber: action.payload.serialNumber,
+        }),
+        'device/deselectDevice': () => ({ ...initialState }),
         // @ts-expect-error in TypeScript, this would need to be [counter.actions.increment.type]
         [filesEmpty]: state => {
             state.writtenAddress = 0;
