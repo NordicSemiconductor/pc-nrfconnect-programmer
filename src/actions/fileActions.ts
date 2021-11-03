@@ -294,7 +294,7 @@ const parseZipFile = (filePath: string) => async (dispatch: TDispatch) => {
     const stats: Stats = await new Promise((resolve, reject) => {
         stat(filePath, (statsError, result) => {
             if (statsError) {
-                logger.error(`Could not open HEX file: ${statsError}`);
+                logger.error(`Could not open ZIP file: ${statsError}`);
                 dispatch(errorDialogShowAction(statsError));
                 removeMruFile(filePath);
                 return reject();
