@@ -176,7 +176,12 @@ export const USBProductIds = [0x521f, 0xc00a, 0xcafe];
 /**
  * Supported USB MCUboot product IDs
  */
-export const McubootProductIds = [0x520f, 0x9100];
+export const McubootProductIds = [0x520f, 0x9100, 0x530c];
+
+/**
+ * Supported USB modem product IDs
+ */
+export const ModemProductIds = [0x520f, 0x9100];
 
 /**
  * Supported JLink product IDs

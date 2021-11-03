@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 
 import { cancelUpdate, performUpdate } from '../actions/mcubootTargetActions';
-import { getMcubootFilePath } from '../reducers/fileReducer';
+import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
 import {
     getErrorMsg,
     getIsFirmwareValid,
@@ -34,6 +34,7 @@ const McuUpdateDialogView = () => {
     const isWritingSucceed = useSelector(getIsWritingSucceed);
     const isFirmwareValid = useSelector(getIsFirmwareValid);
     const mcubootFwPath = useSelector(getMcubootFilePath);
+    const zipFilePath = useSelector(getZipFilePath);
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
 
@@ -64,7 +65,7 @@ const McuUpdateDialogView = () => {
             <Modal.Body>
                 <Form.Group>
                     <Form.Label>Firmware</Form.Label>
-                    <div>{mcubootFwPath}</div>
+                    <div>{mcubootFwPath || zipFilePath}</div>
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>Status</Form.Label>

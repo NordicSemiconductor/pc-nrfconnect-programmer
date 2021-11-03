@@ -23,6 +23,7 @@ const deviceListing: DeviceListing = {
     nordicUsb: true,
     serialport: true,
     jlink: true,
+    mcuboot: true,
 };
 
 const deviceSetup: DeviceSetup = {

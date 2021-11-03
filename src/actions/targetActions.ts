@@ -9,7 +9,7 @@
 import { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import { Device, logger, usageData } from 'pc-nrfconnect-shared';
 
-import { modemWritingReady } from '../reducers/modemReducer';
+import { modemKnown, modemWritingReady } from '../reducers/modemReducer';
 import {
     loadingStart,
     targetDeviceKnown,
@@ -35,6 +35,9 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
 
     const { serialNumber, serialPorts } = device;
     const serialport = serialPorts[0];
+    const { vendorId, productId } = serialport as SerialPort;
+    const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
+    const pid = productId ? parseInt(productId.toString(), 16) : undefined;
 
     dispatch(
         targetPortChanged({
@@ -48,9 +51,10 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
         return;
     }
-    if (device.traits.mcuboot) {
+    if (device.traits.mcuboot || mcubootTargetActions.isMcuboot(vid, pid)) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
-        dispatch(mcubootTargetActions.openDevice(device));
+        if (mcubootTargetActions.isMcubootModem()) dispatch(modemKnown(true));
+        dispatch(mcubootTargetActions.openDevice());
         return;
     }
     if (device.traits.nordicUsb) {
@@ -59,17 +63,9 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         return;
     }
 
-    const { vendorId, productId } = serialport as SerialPort;
-    const vid = vendorId ? parseInt(vendorId.toString(), 16) : null;
-    const pid = productId ? parseInt(productId.toString(), 16) : null;
-
     if (vid === VendorId.NORDIC_SEMICONDUCTOR) {
         if (pid && USBProductIds.includes(pid)) {
             dispatch(usbsdfuTargetActions.openDevice());
-            return;
-        }
-        if (pid && McubootProductIds.includes(pid)) {
-            dispatch(mcubootTargetActions.openDevice(device));
             return;
         }
     }

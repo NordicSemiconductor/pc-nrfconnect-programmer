@@ -20,7 +20,6 @@ import {
     mcubootWritingStart,
     mcubootWritingSucceed,
 } from '../reducers/mcubootReducer';
-import { modemKnown } from '../reducers/modemReducer';
 import {
     loadingEnd,
     targetTypeKnown,
@@ -28,38 +27,57 @@ import {
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
-import { CommunicationType } from '../util/devices';
+import {
+    CommunicationType,
+    McubootProductIds,
+    ModemProductIds,
+    VendorId,
+} from '../util/devices';
 import { updateTargetWritable } from './targetActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
 export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
 
-export const openDevice = (selectedDevice: Device) => (dispatch: TDispatch) => {
-    const { serialPorts } = selectedDevice;
-    dispatch(
-        targetTypeKnown({
-            targetType: CommunicationType.MCUBOOT,
-            isRecoverable: false,
-        })
-    );
-    dispatch(mcubootKnown(true));
-    dispatch(modemKnown(true));
-    dispatch(
-        mcubootPortKnown({
-            port: first(serialPorts)?.comName ?? undefined,
-            port2: last(serialPorts)?.comName ?? undefined,
-        })
-    );
-    dispatch(updateTargetWritable());
-    dispatch(loadingEnd());
-};
+export const isMcuboot = (vid?: number, pid?: number) =>
+    vid &&
+    pid &&
+    vid === VendorId.NORDIC_SEMICONDUCTOR &&
+    McubootProductIds.includes(pid);
+
+export const isMcubootModem = (vid?: number, pid?: number) =>
+    vid &&
+    pid &&
+    vid === VendorId.NORDIC_SEMICONDUCTOR &&
+    ModemProductIds.includes(pid);
+
+export const openDevice =
+    () => (dispatch: TDispatch, getState: () => RootState) => {
+        const { device: inputDevice } = getState().app.target;
+        const device = inputDevice as Device;
+        const { serialPorts } = device;
+        dispatch(
+            targetTypeKnown({
+                targetType: CommunicationType.MCUBOOT,
+                isRecoverable: false,
+            })
+        );
+        dispatch(mcubootKnown(true));
+        dispatch(
+            mcubootPortKnown({
+                port: first(serialPorts)?.comName ?? undefined,
+                port2: last(serialPorts)?.comName ?? undefined,
+            })
+        );
+        dispatch(updateTargetWritable());
+        dispatch(loadingEnd());
+    };
 
 export const toggleMcuboot =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         const { port } = getState().app.target;
-        const { isMcuboot } = getState().app.mcuboot;
+        const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
 
-        if (isMcuboot) {
+        if (isMcubootTarget) {
             dispatch(mcubootKnown(false));
             dispatch(mcubootPortKnown({}));
         } else {
@@ -82,15 +100,15 @@ export const canWrite =
 
         // Check if mcu firmware is detected.
         // If not, then return.
-        const { mcubootFilePath } = getState().app.file;
-        if (!mcubootFilePath) {
+        const { mcubootFilePath, zipFilePath } = getState().app.file;
+        if (!mcubootFilePath && !zipFilePath) {
             return;
         }
 
         // Check if target is MCU target.
         // If not, then return.
-        const { isMcuboot } = getState().app.mcuboot;
-        if (!isMcuboot) {
+        const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
+        if (!isMcubootTarget) {
             return;
         }
 
@@ -109,10 +127,14 @@ export const performUpdate =
         new Promise<void>(resolve => {
             const { device: inputDevice } = getState().app.target;
             const device = inputDevice as Device;
-            const { mcubootFilePath } = getState().app.file;
+            const { mcubootFilePath, zipFilePath } = getState().app.file;
+            const dfuFilePath = mcubootFilePath || zipFilePath;
+            const firmwareFormat = mcubootFilePath
+                ? 'NRFDL_FW_MCUBOOT'
+                : 'NRFDL_FW_MCUBOOT_MULTI_IMAGE';
 
             logger.info(
-                `Writing ${mcubootFilePath} to device ${device.serialNumber}`
+                `Writing ${dfuFilePath} to device ${device.serialNumber}`
             );
 
             const errorCallback = (error: nrfdl.Error) => {
@@ -156,8 +178,8 @@ export const performUpdate =
                 getDeviceLibContext(),
                 device.id,
                 'NRFDL_FW_FILE',
-                'NRFDL_FW_MCUBOOT',
-                mcubootFilePath as string,
+                firmwareFormat,
+                dfuFilePath as string,
                 completeCallback,
                 progressCallback
             );
