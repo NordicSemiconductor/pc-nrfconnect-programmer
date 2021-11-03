@@ -10,8 +10,11 @@
 
 enum EventAction {
     OPEN_DEVICE = 'Open device',
-    OPEN_JLINK_DEVICE = 'Open jlink device',
     CLOSE_DEVICE = 'Close device',
+    OPEN_DEVICE_JLINK_OB = 'Open jlink OB version',
+    OPEN_DEVICE_FAMILY = 'Open jlink device family',
+    OPEN_DEVICE_VERSION = 'Open jlink device version',
+    OPEN_DEVICE_BOARD_VERSION = 'Open jlink device board version',
 }
 
 export default EventAction;

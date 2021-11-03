@@ -17,12 +17,7 @@ import {
     targetWritableKnown,
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
-import {
-    CommunicationType,
-    McubootProductIds,
-    USBProductIds,
-    VendorId,
-} from '../util/devices';
+import { CommunicationType } from '../util/devices';
 import { refreshAllFiles } from './fileActions';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
@@ -46,7 +41,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         })
     );
 
-    if (device.traits.jlink) {
+    if (device.traits.jlink || jlinkTargetActions.isJlink()) {
         dispatch(jlinkTargetActions.openDevice());
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
         return;
@@ -57,20 +52,9 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         dispatch(mcubootTargetActions.openDevice());
         return;
     }
-    if (device.traits.nordicUsb) {
+    if (device.traits.nordicUsb || usbsdfuTargetActions.isNordicUsb(vid, pid)) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicUsb');
         dispatch(usbsdfuTargetActions.openDevice());
-        return;
-    }
-
-    if (vid === VendorId.NORDIC_SEMICONDUCTOR) {
-        if (pid && USBProductIds.includes(pid)) {
-            dispatch(usbsdfuTargetActions.openDevice());
-            return;
-        }
-    }
-    if (vid === VendorId.SEGGER) {
-        dispatch(jlinkTargetActions.openDevice());
         return;
     }
 

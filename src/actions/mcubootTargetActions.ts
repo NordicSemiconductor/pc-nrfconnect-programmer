@@ -38,12 +38,26 @@ import { updateTargetWritable } from './targetActions';
 export const first = <T>(items: T[]): T | undefined => items[0];
 export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
 
+/**
+ * Check whether the device is MCUboot device or not by providing vender Id and product Id
+ *
+ * @param {number} vid Vender Id
+ * @param {number} pid Product Id
+ * @returns {boolean} whether the device is MCUboot device
+ */
 export const isMcuboot = (vid?: number, pid?: number) =>
     vid &&
     pid &&
     vid === VendorId.NORDIC_SEMICONDUCTOR &&
     McubootProductIds.includes(pid);
 
+/**
+ * Check whether the device is MCUboot device with modem or not by providing vender Id and product Id
+ *
+ * @param {number} vid Vender Id
+ * @param {number} pid Product Id
+ * @returns {boolean} whether the device is MCUboot device with modem
+ */
 export const isMcubootModem = (vid?: number, pid?: number) =>
     vid &&
     pid &&

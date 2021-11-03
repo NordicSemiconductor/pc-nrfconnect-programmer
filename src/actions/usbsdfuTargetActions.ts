@@ -49,6 +49,8 @@ import {
     DeviceDefinition,
     getDeviceInfoByUSB,
     NordicFwIds,
+    USBProductIds,
+    VendorId,
 } from '../util/devices';
 import {
     defaultRegion,
@@ -67,6 +69,19 @@ const defaultDfuImage: DfuImage = {
     initPacket: defaultInitPacket,
     firmwareImage: new Uint8Array(),
 };
+
+/**
+ * Check whether the device is Nordic USB device or not by providing vender Id and product Id
+ *
+ * @param {number} vid Vender Id
+ * @param {number} pid Product Id
+ * @returns {boolean} whether the device is Nordic USB device
+ */
+export const isNordicUsb = (vid?: number, pid?: number) =>
+    vid &&
+    pid &&
+    vid === VendorId.NORDIC_SEMICONDUCTOR &&
+    USBProductIds.includes(pid);
 
 /**
  * Display some information about a devkit. Called on a devkit connection.
