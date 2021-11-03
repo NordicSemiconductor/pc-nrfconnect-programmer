@@ -53,7 +53,16 @@ export const defaultCore: CoreDefinition = {
     protectionStatus: 'PROTECTION_STATUS_SECURE_REGIONS',
 };
 
-type DeviceFamily = 'nRF51' | 'nRF52' | 'nRF53' | 'nRF91' | 'Unknown';
+/**
+ * Supported Nordic device families
+ */
+export enum DeviceFamily {
+    NRF51 = 'nRF51',
+    NRF52 = 'nRF52',
+    NRF53 = 'nRF53',
+    NRF91 = 'nRF91',
+    UNKNOWN = 'Unknown',
+}
 
 export interface DeviceDefinition {
     family?: DeviceFamily;
@@ -65,7 +74,7 @@ export interface DeviceDefinition {
  * Default definition for device info
  */
 export const deviceDefinition: DeviceDefinition = {
-    family: 'Unknown',
+    family: DeviceFamily.UNKNOWN,
     type: 'Unknown',
     cores: [defaultCore],
 };
@@ -78,13 +87,13 @@ const deviceDefinitions: DeviceDefinition[] = [
     // nRF52840 dongle cannot fetch info by @nordicsemiconductor/nrf-device-lib-js
     {
         ...deviceDefinition,
-        family: 'nRF52',
+        family: DeviceFamily.NRF52,
         type: 'nRF52840',
     },
     // nRF9160 has different ficr and uicr base address
     {
         ...deviceDefinition,
-        family: 'nRF91',
+        family: DeviceFamily.NRF91,
         type: 'nRF9160',
         cores: [
             {
@@ -97,7 +106,7 @@ const deviceDefinitions: DeviceDefinition[] = [
     // nRF5340 has dual core definitions
     {
         ...deviceDefinition,
-        family: 'nRF53',
+        family: DeviceFamily.NRF53,
         type: 'nRF5340',
         cores: [
             {

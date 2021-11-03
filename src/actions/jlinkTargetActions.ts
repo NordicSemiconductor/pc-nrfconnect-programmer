@@ -38,6 +38,7 @@ import {
     CommunicationType,
     CoreDefinition,
     DeviceDefinition,
+    DeviceFamily,
     getDeviceInfoByJlink,
     VendorId,
 } from '../util/devices';
@@ -120,7 +121,7 @@ export const openDevice =
         let deviceInfo = getDeviceInfoByJlink(device);
 
         // Update modem target info according to detected device info
-        const isModem = device.jlink.deviceFamily.includes('NRF91');
+        const isModem = device.jlink.deviceFamily.includes(DeviceFamily.NRF91);
         dispatch(modemKnown(isModem));
         if (isModem) logger.info('Modem detected');
 
@@ -141,7 +142,9 @@ export const openDevice =
             coreName,
             protectionStatus
         );
-        const isFamilyNrf53 = device.jlink.deviceFamily.includes('NRF53');
+        const isFamilyNrf53 = device.jlink.deviceFamily.includes(
+            DeviceFamily.NRF53
+        );
 
         // Since nRF53 family is dual core devices
         // It needs an additional check for readback protection on network core

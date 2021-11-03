@@ -7,7 +7,12 @@
 /* eslint-disable import/no-cycle */
 
 import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
-import { Device, getDeviceLibContext, logger } from 'pc-nrfconnect-shared';
+import {
+    Device,
+    getDeviceLibContext,
+    logger,
+    usageData,
+} from 'pc-nrfconnect-shared';
 
 import {
     mcubootFirmwareValid,
@@ -30,11 +35,13 @@ import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
 import {
     CommunicationType,
+    DeviceFamily,
     McubootProductIds,
     ModemProductIds,
     VendorId,
 } from '../util/devices';
 import { updateTargetWritable } from './targetActions';
+import EventAction from './usageDataActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
 export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
@@ -77,7 +84,19 @@ export const openDevice =
             })
         );
         dispatch(mcubootKnown(true));
-        if (isMcubootModem()) dispatch(modemKnown(true));
+        if (isMcubootModem()) {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_FAMILY,
+                DeviceFamily.NRF91
+            );
+            dispatch(modemKnown(true));
+        } else {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_FAMILY,
+                DeviceFamily.NRF53
+            );
+            dispatch(modemKnown(false));
+        }
         dispatch(
             mcubootPortKnown({
                 port: first(serialPorts)?.comName ?? undefined,
