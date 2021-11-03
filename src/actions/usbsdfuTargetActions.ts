@@ -26,6 +26,7 @@ import {
     sdfuOperations,
     startWatchingDevices,
     stopWatchingDevices,
+    usageData,
     waitForDevice,
 } from 'pc-nrfconnect-shared';
 
@@ -47,6 +48,7 @@ import {
 import {
     CommunicationType,
     DeviceDefinition,
+    DeviceFamily,
     getDeviceInfoByUSB,
     NordicFwIds,
     USBProductIds,
@@ -62,6 +64,7 @@ import {
 } from '../util/regions';
 import * as fileActions from './fileActions';
 import * as targetActions from './targetActions';
+import EventAction from './usageDataActions';
 import * as userInputActions from './userInputActions';
 
 const defaultDfuImage: DfuImage = {
@@ -102,6 +105,15 @@ export const openDevice =
         );
         logger.info(
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
+        );
+        usageData.sendUsageData(
+            EventAction.OPEN_DEVICE_FAMILY,
+            DeviceFamily.NRF52
+        );
+        usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
+        usageData.sendUsageData(
+            EventAction.OPEN_DEVICE_BOARD_VERSION,
+            'PCA10059'
         );
 
         try {
