@@ -85,17 +85,37 @@ export const openDevice =
         );
         dispatch(mcubootKnown(true));
         if (isMcubootModem()) {
+            // Only Thingy91 matches the condition
+            // Update when a new Nordic USB device has both mcuboot and modem
+            dispatch(modemKnown(true));
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_FAMILY,
                 DeviceFamily.NRF91
             );
-            dispatch(modemKnown(true));
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_VERSION,
+                'Thingy91'
+            );
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_BOARD_VERSION,
+                'PCA20035'
+            );
         } else {
+            // Only Thingy53 matches the condition
+            // Update when a new Nordic USB device has mcuboot without modem
+            dispatch(modemKnown(false));
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_FAMILY,
                 DeviceFamily.NRF53
             );
-            dispatch(modemKnown(false));
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_VERSION,
+                'Thingy53'
+            );
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_BOARD_VERSION,
+                'PCA20053'
+            );
         }
         dispatch(
             mcubootPortKnown({
