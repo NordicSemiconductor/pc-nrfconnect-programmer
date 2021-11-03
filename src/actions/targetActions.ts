@@ -112,11 +112,10 @@ export const write = () => (dispatch: TDispatch, getState: () => RootState) => {
         modem: { isModem },
     } = getState().app;
 
-    if (zipFilePath && isModem) {
+    if (isModem && zipFilePath) {
         dispatch(modemWritingReady(zipFilePath));
         return;
     }
-
     if (isMcuboot) {
         dispatch(mcubootTargetActions.prepareUpdate());
         return;

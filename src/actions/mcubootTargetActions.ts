@@ -6,7 +6,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Device,
     getDeviceLibContext,
@@ -77,6 +77,11 @@ export const openDevice =
         const { device: inputDevice } = getState().app.target;
         const device = inputDevice as Device;
         const { serialPorts } = device;
+        const serialport = serialPorts[0];
+        const { vendorId, productId } = serialport as SerialPort;
+        const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
+        const pid = productId ? parseInt(productId.toString(), 16) : undefined;
+
         dispatch(
             targetTypeKnown({
                 targetType: CommunicationType.MCUBOOT,
@@ -84,7 +89,7 @@ export const openDevice =
             })
         );
         dispatch(mcubootKnown(true));
-        if (isMcubootModem()) {
+        if (isMcubootModem(vid, pid)) {
             // Only Thingy91 matches the condition
             // Update when a new Nordic USB device has both mcuboot and modem
             dispatch(modemKnown(true));
