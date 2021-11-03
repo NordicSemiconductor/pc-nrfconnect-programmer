@@ -1,3 +1,10 @@
+## 2.1.0 - Unreleased
+### Added
+- Thingy53 support
+- Usage data for which general device information
+### Changed
+- Removed modem update from the control panel and integrate modem update to normal write action
+
 ## 2.0.0 - 2021-11-01
 ### Added
 - Documentation section in `About` pane.
