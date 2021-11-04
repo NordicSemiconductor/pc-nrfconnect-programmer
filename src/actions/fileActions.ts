@@ -291,7 +291,7 @@ const addMruFile = (filename: string) => {
 };
 
 const parseZipFile = (filePath: string) => async (dispatch: TDispatch) => {
-    const stats: Stats = await new Promise((resolve, reject) => {
+    const stats = await new Promise<Stats>((resolve, reject) => {
         stat(filePath, (statsError, result) => {
             if (statsError) {
                 logger.error(`Could not open ZIP file: ${statsError}`);
