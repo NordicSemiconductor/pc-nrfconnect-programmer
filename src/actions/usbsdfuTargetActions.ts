@@ -26,6 +26,7 @@ import {
     sdfuOperations,
     startWatchingDevices,
     stopWatchingDevices,
+    usageData,
     waitForDevice,
 } from 'pc-nrfconnect-shared';
 
@@ -47,8 +48,11 @@ import {
 import {
     CommunicationType,
     DeviceDefinition,
+    DeviceFamily,
     getDeviceInfoByUSB,
     NordicFwIds,
+    USBProductIds,
+    VendorId,
 } from '../util/devices';
 import {
     defaultRegion,
@@ -60,6 +64,7 @@ import {
 } from '../util/regions';
 import * as fileActions from './fileActions';
 import * as targetActions from './targetActions';
+import EventAction from './usageDataActions';
 import * as userInputActions from './userInputActions';
 
 const defaultDfuImage: DfuImage = {
@@ -67,6 +72,19 @@ const defaultDfuImage: DfuImage = {
     initPacket: defaultInitPacket,
     firmwareImage: new Uint8Array(),
 };
+
+/**
+ * Check whether the device is Nordic USB device or not by providing vender Id and product Id
+ *
+ * @param {number} vid Vender Id
+ * @param {number} pid Product Id
+ * @returns {boolean} whether the device is Nordic USB device
+ */
+export const isNordicUsb = (vid?: number, pid?: number) =>
+    vid &&
+    pid &&
+    vid === VendorId.NORDIC_SEMICONDUCTOR &&
+    USBProductIds.includes(pid);
 
 /**
  * Display some information about a devkit. Called on a devkit connection.
@@ -88,26 +106,36 @@ export const openDevice =
         logger.info(
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
         );
+        usageData.sendUsageData(
+            EventAction.OPEN_DEVICE_FAMILY,
+            DeviceFamily.NRF52
+        );
+        usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
+        usageData.sendUsageData(
+            EventAction.OPEN_DEVICE_BOARD_VERSION,
+            'PCA10059'
+        );
 
         try {
-            const hardwareVersion = {
-                part: 337984,
-                variant: 1094796080,
-                memory: {
-                    romSize: 1048576,
-                    ramSize: 262144,
-                    romPageSize: 4096,
-                },
-            };
             const fwInfo: FWInfo.ReadResult = await readFwInfo(
                 getDeviceLibContext(),
                 device.id
             );
-            const deviceInfoOrigin = getDeviceInfoByUSB(hardwareVersion);
-            dispatch(targetInfoKnown(deviceInfoOrigin));
+            const defaultHwInfo = {
+                deviceVersion: 'nRF52840',
+                romSize: 0x100000, // 1 Mb
+                ramSize: 0x40000, // 256 Kb
+                romPageSize: 0x1000, // 4Kb
+            };
+            const deviceInfo = getDeviceInfoByUSB(
+                // TODO: fix type in nrfdl
+                // @ts-ignore -- type error from nrfdl, remove when fixed
+                device.hwInfo || defaultHwInfo
+            );
+            dispatch(targetInfoKnown(deviceInfo));
 
             const appCoreNumber = 0;
-            const coreInfo = deviceInfoOrigin.cores[appCoreNumber];
+            const coreInfo = deviceInfo.cores[appCoreNumber];
 
             let regions: Region[] = [];
 

@@ -18,13 +18,11 @@ import PropTypes from 'prop-types';
 import * as fileActions from '../actions/fileActions';
 import * as jlinkTargetActions from '../actions/jlinkTargetActions';
 import * as mcubootTargetActions from '../actions/mcubootTargetActions';
-import * as modemTargetActions from '../actions/modemTargetActions';
 import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
 import { getFileRegions, getMruFiles } from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
-import { getIsModem } from '../reducers/modemReducer';
 import { getAutoRead } from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
@@ -146,7 +144,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
             </Overlay>
             <Button variant="danger" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
-                Add HEX file
+                Add file
             </Button>
         </>
     );
@@ -170,7 +168,6 @@ const ControlPanel = () => {
     const isJLink = useSelector(getTargetType) === CommunicationType.JLINK;
     const isUsbSerial =
         useSelector(getTargetType) === CommunicationType.USBSDFU;
-    const isModem = useSelector(getIsModem);
     const isMcuboot = useSelector(getIsMcuboot);
 
     const dispatch = useDispatch();
@@ -185,8 +182,6 @@ const ControlPanel = () => {
     const performJLinkRead = () => dispatch(jlinkTargetActions.read());
     const performReset = () => dispatch(usbsdfuTargetActions.resetDevice());
     const performWrite = () => dispatch(targetActions.write());
-    const performModemUpdate = () =>
-        dispatch(modemTargetActions.selectModemFirmware());
 
     return (
         <div className="control-panel">
@@ -293,21 +288,6 @@ const ControlPanel = () => {
                             label="Enable MCUboot"
                         />
                     </Form.Group>
-                </Card.Body>
-            </Card>
-            <Card>
-                <Card.Header>Cellular Modem</Card.Header>
-                <Card.Body>
-                    <ButtonGroup vertical>
-                        <Button
-                            key="performModemUpdate"
-                            onClick={performModemUpdate}
-                            disabled={!isModem || !targetIsReady}
-                        >
-                            <span className="mdi mdi-pencil" />
-                            Update modem
-                        </Button>
-                    </ButtonGroup>
                 </Card.Body>
             </Card>
         </div>

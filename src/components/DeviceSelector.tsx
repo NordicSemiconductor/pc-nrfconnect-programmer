@@ -23,6 +23,9 @@ const deviceListing: DeviceListing = {
     nordicUsb: true,
     serialport: true,
     jlink: true,
+    // To be fixed in shared
+    /* @ts-ignore */
+    mcuboot: true,
 };
 
 const deviceSetup: DeviceSetup = {
