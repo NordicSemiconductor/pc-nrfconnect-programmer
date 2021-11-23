@@ -53,6 +53,8 @@ const ModemUpdateDialogView = () => {
         pause();
     }
 
+    const temporarilySkippingProgressBar = true;
+
     return (
         <Modal show={isVisible} onHide={onCancel} backdrop="static">
             <Modal.Header>
@@ -74,7 +76,7 @@ const ModemUpdateDialogView = () => {
                         <b>Status</b>
                     </Form.Label>
                     <div>{progressMsg}</div>
-                    {isWriting && (
+                    {isWriting && !temporarilySkippingProgressBar && (
                         <ProgressBar
                             hidden={!isWriting}
                             animated
