@@ -121,7 +121,9 @@ export const openDevice =
         let deviceInfo = getDeviceInfoByJlink(device);
 
         // Update modem target info according to detected device info
-        const isModem = device.jlink.deviceFamily.includes(DeviceFamily.NRF91);
+        const isModem = device.jlink.deviceFamily
+            .toLowerCase()
+            .includes(DeviceFamily.NRF91.toLowerCase());
         dispatch(modemKnown(isModem));
         if (isModem) logger.info('Modem detected');
 
