@@ -38,13 +38,25 @@ import {
     CommunicationType,
     CoreDefinition,
     DeviceDefinition,
+    DeviceFamily,
     getDeviceInfoByJlink,
+    VendorId,
 } from '../util/devices';
 import sequence from '../util/promise';
 import { getTargetRegions } from '../util/regions';
 import { updateFileAppRegions } from './fileActions';
 import { updateTargetWritable } from './targetActions';
 import EventAction from './usageDataActions';
+
+/**
+ * Check whether the device is JLink device or not by providing vender Id and product Id
+ *
+ * @param {number} vid Vender Id
+ * @param {number} pid Product Id
+ * @returns {boolean} whether the device is JLink device
+ */
+export const isJlink = (vid?: number, pid?: number) =>
+    vid && pid && vid === VendorId.SEGGER;
 
 /**
  * Load protection status of the core
@@ -109,7 +121,9 @@ export const openDevice =
         let deviceInfo = getDeviceInfoByJlink(device);
 
         // Update modem target info according to detected device info
-        const isModem = device.jlink.deviceFamily.includes('NRF91');
+        const isModem = device.jlink.deviceFamily
+            .toLowerCase()
+            .includes(DeviceFamily.NRF91.toLowerCase());
         dispatch(modemKnown(isModem));
         if (isModem) logger.info('Modem detected');
 
@@ -130,7 +144,9 @@ export const openDevice =
             coreName,
             protectionStatus
         );
-        const isFamilyNrf53 = device.jlink.deviceFamily.includes('NRF53');
+        const isFamilyNrf53 = device.jlink.deviceFamily.includes(
+            DeviceFamily.NRF53
+        );
 
         // Since nRF53 family is dual core devices
         // It needs an additional check for readback protection on network core
@@ -176,15 +192,21 @@ const logDeviceInfo = (device: Device) => {
     } = device.jlink;
     logger.info('JLink OB firmware version', jlinkObFirmwareVersion);
     usageData.sendUsageData(
-        EventAction.OPEN_JLINK_DEVICE,
+        EventAction.OPEN_DEVICE_JLINK_OB,
         `${jlinkObFirmwareVersion}`
     );
     logger.info('Device family', deviceFamily);
-    usageData.sendUsageData(EventAction.OPEN_JLINK_DEVICE, `${deviceFamily}`);
+    usageData.sendUsageData(EventAction.OPEN_DEVICE_FAMILY, `${deviceFamily}`);
     logger.info('Device version', deviceVersion);
-    usageData.sendUsageData(EventAction.OPEN_JLINK_DEVICE, `${deviceVersion}`);
+    usageData.sendUsageData(
+        EventAction.OPEN_DEVICE_VERSION,
+        `${deviceVersion}`
+    );
     logger.info('Board version', boardVersion);
-    usageData.sendUsageData(EventAction.OPEN_JLINK_DEVICE, `${boardVersion}`);
+    usageData.sendUsageData(
+        EventAction.OPEN_DEVICE_BOARD_VERSION,
+        `${boardVersion}`
+    );
 };
 
 /**

@@ -9,6 +9,7 @@
 import { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import { Device, logger, usageData } from 'pc-nrfconnect-shared';
 
+import { modemWritingReady } from '../reducers/modemReducer';
 import {
     loadingStart,
     targetDeviceKnown,
@@ -16,12 +17,7 @@ import {
     targetWritableKnown,
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
-import {
-    CommunicationType,
-    McubootProductIds,
-    USBProductIds,
-    VendorId,
-} from '../util/devices';
+import { CommunicationType } from '../util/devices';
 import { refreshAllFiles } from './fileActions';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
@@ -34,6 +30,9 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
 
     const { serialNumber, serialPorts } = device;
     const serialport = serialPorts[0];
+    const { vendorId, productId } = serialport as SerialPort;
+    const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
+    const pid = productId ? parseInt(productId.toString(), 16) : undefined;
 
     dispatch(
         targetPortChanged({
@@ -42,38 +41,19 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         })
     );
 
-    if (device.traits.jlink) {
+    if (device.traits.jlink || jlinkTargetActions.isJlink()) {
         dispatch(jlinkTargetActions.openDevice());
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
         return;
     }
-    if (device.traits.mcuboot) {
+    if (device.traits.mcuboot || mcubootTargetActions.isMcuboot(vid, pid)) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
-        dispatch(mcubootTargetActions.openDevice(device));
+        dispatch(mcubootTargetActions.openDevice());
         return;
     }
-    if (device.traits.nordicUsb) {
+    if (device.traits.nordicUsb || usbsdfuTargetActions.isNordicUsb(vid, pid)) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicUsb');
         dispatch(usbsdfuTargetActions.openDevice());
-        return;
-    }
-
-    const { vendorId, productId } = serialport as SerialPort;
-    const vid = vendorId ? parseInt(vendorId.toString(), 16) : null;
-    const pid = productId ? parseInt(productId.toString(), 16) : null;
-
-    if (vid === VendorId.NORDIC_SEMICONDUCTOR) {
-        if (pid && USBProductIds.includes(pid)) {
-            dispatch(usbsdfuTargetActions.openDevice());
-            return;
-        }
-        if (pid && McubootProductIds.includes(pid)) {
-            dispatch(mcubootTargetActions.openDevice(device));
-            return;
-        }
-    }
-    if (vid === VendorId.SEGGER) {
-        dispatch(jlinkTargetActions.openDevice());
         return;
     }
 
@@ -98,7 +78,14 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
 
 export const updateTargetWritable =
     () => (dispatch: TDispatch, getState: () => RootState) => {
-        switch (getState().app.target.targetType) {
+        const {
+            target: { targetType },
+            mcuboot: { isMcuboot },
+            modem: { isModem },
+            file: { zipFilePath },
+        } = getState().app;
+
+        switch (targetType) {
             case CommunicationType.JLINK:
                 dispatch(jlinkTargetActions.canWrite());
                 break;
@@ -111,21 +98,33 @@ export const updateTargetWritable =
             default:
                 dispatch(targetWritableKnown(false));
         }
+        if (zipFilePath && (isMcuboot || isModem))
+            dispatch(targetWritableKnown(true));
     };
 
 export const write = () => (dispatch: TDispatch, getState: () => RootState) => {
     // Refresh all files in case that some files have been updated right before write action.
     dispatch(refreshAllFiles());
+    const {
+        target,
+        file: { zipFilePath },
+        mcuboot: { isMcuboot },
+        modem: { isModem },
+    } = getState().app;
 
-    if (getState().app.mcuboot.isMcuboot) {
+    if (isModem && zipFilePath) {
+        dispatch(modemWritingReady(zipFilePath));
+        return;
+    }
+    if (isMcuboot) {
         dispatch(mcubootTargetActions.prepareUpdate());
         return;
     }
-    if (getState().app.target.targetType === CommunicationType.JLINK) {
+    if (target.targetType === CommunicationType.JLINK) {
         dispatch(jlinkTargetActions.write());
         return;
     }
-    if (getState().app.target.targetType === CommunicationType.USBSDFU) {
+    if (target.targetType === CommunicationType.USBSDFU) {
         dispatch(usbsdfuTargetActions.write());
         return;
     }

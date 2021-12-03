@@ -7,7 +7,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-import { getLoaded } from '../reducers/fileReducer';
+import { getLoaded, getZipFilePath } from '../reducers/fileReducer';
 import { getDeviceInfo, getSerialNumber } from '../reducers/targetReducer';
 import { DeviceDefinition } from '../util/devices';
 import McuUpdateDialogView from './McuUpdateDialogView';
@@ -34,6 +34,7 @@ function hasFileContent(loaded: Record<string, unknown>) {
 
 const AppMainView = () => {
     const loaded = useSelector(getLoaded);
+    const zipFilePath = useSelector(getZipFilePath);
     const serialNumber = useSelector(getSerialNumber);
     const deviceInfo = useSelector(getDeviceInfo);
 
@@ -53,9 +54,9 @@ const AppMainView = () => {
                 />
                 <MemoryBoxView
                     title="File memory layout"
-                    description="Drag & drop one or more HEX files here"
+                    description="Drag & drop HEX/ZIP files here"
                     iconName="mdi mdi-folder-open"
-                    isHolder={!hasFileContent(loaded)}
+                    isHolder={!hasFileContent(loaded) && !zipFilePath}
                 />
             </div>
             <UserInputDialogView />
