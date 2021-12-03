@@ -2,11 +2,14 @@
 ### Added
 - Thingy53 support
 - Usage data for which general device information
+
+
 ### Changed
 - Removed modem update from the control panel and integrate modem update to normal write action
 
 ## 2.0.1 - 2021-11-04
 ### Changed
+- Simplify modem DFU progress indicator temporarily
 - Moved region info to left side of region.
 
 ## 2.0.0 - 2021-11-01
