@@ -3,6 +3,7 @@
 - Thingy53 support
 - Usage data for which general device information
 
+
 ### Changed
 - Removed modem update from the control panel and integrate modem update to normal write action
 
