@@ -3,6 +3,9 @@
 - Thingy53 support
 - Usage data for which general device information
 
+### Fixed
+- Long file name is not wrapped for file selection view
+
 
 ### Changed
 - Removed modem update from the control panel and integrate modem update to normal write action
