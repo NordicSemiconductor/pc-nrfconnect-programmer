@@ -5,6 +5,7 @@
  */
 
 import { connect } from 'react-redux';
+// eslint-disable-next-line import/no-unresolved
 import { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Device as SharedDevice,
@@ -23,8 +24,7 @@ const deviceListing: DeviceListing = {
     nordicUsb: true,
     serialport: true,
     jlink: true,
-    // To be fixed in shared
-    /* @ts-ignore */
+    // @ts-ignore To be fixed in shared
     mcuboot: true,
 };
 

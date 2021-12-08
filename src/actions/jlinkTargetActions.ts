@@ -11,6 +11,7 @@ import nrfdl, {
     Error as NrfdlError,
     FirmwareReadResult,
     ProtectionStatus,
+    // eslint-disable-next-line import/no-unresolved
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import fs from 'fs';
@@ -570,6 +571,7 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
         defaultPath: `nRF_Connect_Programmer_${Date.now()}.hex`,
     };
 
+    // eslint-disable-next-line no-undef
     const save = ({ filePath }: Electron.SaveDialogReturnValue) => {
         if (filePath) {
             const data = memMap?.slice(0, maxAddress).asHexString();

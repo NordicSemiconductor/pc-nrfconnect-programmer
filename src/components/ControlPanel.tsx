@@ -93,7 +93,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
         setShow(!show);
         setTarget(event.target as HTMLElement);
     };
-
+    // (eventKey: string | null, e: React.SyntheticEvent<unknown>) => void
     const onSelect = (filePath: string) => {
         if (filePath) {
             openFile(filePath);
@@ -139,6 +139,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                         </Dropdown.Item>
                     )}
                     <Dropdown.Divider />
+                    {/* @ts-ignore This works */}
                     <Dropdown.Item onSelect={onSelect}>Browse...</Dropdown.Item>
                 </Popover>
             </Overlay>
