@@ -6,9 +6,9 @@
 ### Fixed
 - Long file name is not wrapped for file selection view
 
-
 ### Changed
 - Removed modem update from the control panel and integrate modem update to normal write action
+- Use newest shared
 
 ## 2.0.1 - 2021-11-04
 ### Changed

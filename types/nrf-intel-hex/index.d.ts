@@ -55,7 +55,7 @@ declare module "nrf-intel-hex" {
             address: number,
             length: number,
             padByte?: number
-        ): Uint8Array;
+        ): Buffer;
 
         public contains(memMap: MemoryMap): boolean;
     }

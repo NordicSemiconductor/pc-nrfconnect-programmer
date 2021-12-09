@@ -8,6 +8,7 @@ import nrfdl, {
     DeviceCore,
     DeviceCoreInfo,
     ProtectionStatus,
+    // eslint-disable-next-line import/no-unresolved
 } from '@nordicsemiconductor/nrf-device-lib-js';
 
 import range from './range';
