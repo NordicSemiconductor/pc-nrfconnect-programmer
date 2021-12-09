@@ -17,7 +17,7 @@ $labelHeight: 12px;
             font-size: 1.2em;
         }
         .card-body {
-            background-color: rgba(0, 0, 0, 0.03);;
+            background-color: rgba(0, 0, 0, 0.03);
         }
         .dropdown {
             width: 100%;
@@ -28,7 +28,7 @@ $labelHeight: 12px;
         .dropdown-toggle {
             width: 100%;
         }
-        .btn-group-vertical{
+        .btn-group-vertical {
             width: 100%;
         }
         .btn {
@@ -38,9 +38,12 @@ $labelHeight: 12px;
             text-align: left;
             font-size: 1.1em;
             line-height: 2em;
-            background-color: #FFF;
+            background-color: #fff;
             border-color: #f5f5f5;
             color: rgba(0, 0, 0, 0.88);
+            display: flex;
+            align-items: center;
+
             .mdi {
                 margin-right: 8px;
                 font-size: 1.1em;
@@ -52,7 +55,7 @@ $labelHeight: 12px;
             margin: 0 auto;
             padding: 12px 0 12px 36px;
             font-size: 1.1em;
-            background-color: #FFF;
+            background-color: #fff;
             border-color: #f5f5f5;
             color: rgba(0, 0, 0, 0.88);
         }

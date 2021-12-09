@@ -32,6 +32,7 @@ import {
     getIsWritable,
     getTargetType,
 } from '../reducers/targetReducer';
+import { truncateMiddle } from '../util';
 import { CommunicationType } from '../util/devices';
 
 const useRegisterDragEvents = () => {
@@ -129,8 +130,11 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                             <Dropdown.Item
                                 key={filePath}
                                 onSelect={() => onSelect(filePath)}
+                                title={filePath}
                             >
-                                {filePath}
+                                {filePath.length > 60
+                                    ? truncateMiddle(filePath, 30, 40)
+                                    : filePath}
                             </Dropdown.Item>
                         ))
                     ) : (
@@ -139,11 +143,16 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                         </Dropdown.Item>
                     )}
                     <Dropdown.Divider />
-                    {/* @ts-ignore This works */}
-                    <Dropdown.Item onSelect={onSelect}>Browse...</Dropdown.Item>
+                    <Dropdown.Item
+                        /* @ts-ignore This works */
+                        onSelect={onSelect}
+                        style={{ fontWeight: 700 }}
+                    >
+                        Browse...
+                    </Dropdown.Item>
                 </Popover>
             </Overlay>
-            <Button variant="danger" onClick={onClick}>
+            <Button variant="primary" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
                 Add file
             </Button>
