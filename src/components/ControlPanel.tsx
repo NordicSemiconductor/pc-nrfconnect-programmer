@@ -13,6 +13,7 @@ import Form from 'react-bootstrap/Form';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
+import { truncateMiddle } from 'pc-nrfconnect-shared';
 import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
@@ -32,7 +33,6 @@ import {
     getIsWritable,
     getTargetType,
 } from '../reducers/targetReducer';
-import { truncateMiddle } from '../util';
 import { CommunicationType } from '../util/devices';
 
 const useRegisterDragEvents = () => {
@@ -132,9 +132,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                                 onSelect={() => onSelect(filePath)}
                                 title={filePath}
                             >
-                                {filePath.length > 60
-                                    ? truncateMiddle(filePath, 30, 40)
-                                    : filePath}
+                                {truncateMiddle(filePath, 30, 40)}
                             </Dropdown.Item>
                         ))
                     ) : (
