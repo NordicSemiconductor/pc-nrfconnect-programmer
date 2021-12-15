@@ -170,6 +170,13 @@ export const openDevice =
             );
         }
         dispatch(targetInfoKnown(deviceInfo));
+        dispatch(
+            targetContentsKnown({
+                targetMemMap: new MemoryMap([]),
+                isMemLoaded: false,
+            })
+        );
+        dispatch(updateTargetRegions(new MemoryMap([]), deviceInfo));
 
         dispatch(updateTargetWritable());
         dispatch(loadingEnd());
