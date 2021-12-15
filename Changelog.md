@@ -1,14 +1,15 @@
 ## 2.1.0 - Unreleased
 ### Added
-- Thingy53 support
-- Usage data for which general device information
+- Thingy53 support.
+- Usage data for which general device information.
 
 ### Fixed
-- Long file name is not wrapped for file selection view
+- Long file name is not wrapped for file selection view.
+- Not able to program HEX file if part of the regions are outside of the device memory size.
 
 ### Changed
-- Removed modem update from the control panel and integrate modem update to normal write action
-- Use newest shared
+- Removed modem update from the control panel and integrate modem update to normal write action.
+- Use newest shared>
 
 ## 2.0.1 - 2021-11-04
 ### Changed
