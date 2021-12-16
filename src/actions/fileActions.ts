@@ -39,7 +39,7 @@ import {
 } from '../util/regions';
 import { updateTargetWritable } from './targetActions';
 
-const persistentStore = new Store({ name: 'nrf-programmer' });
+const persistentStore = new Store({ name: 'pc-nrfconnect-programmer' });
 
 export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
 

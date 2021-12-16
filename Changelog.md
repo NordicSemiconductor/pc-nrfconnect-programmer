@@ -6,7 +6,8 @@
 ### Fixed
 - Long file name is not wrapped for file selection view.
 - Not able to program HEX file if part of the regions are outside of the device memory size.
-- Previous file regions are removed after write/remove action
+- Previous file regions are removed after write/remove action.
+- `Restore Defaults...` option not resetting stored values.
 
 ### Changed
 - Removed modem update from the control panel and integrate modem update to normal write action.
