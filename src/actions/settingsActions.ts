@@ -12,7 +12,7 @@ import {
 } from '../reducers/settingsReducer';
 import { RootState, TDispatch } from '../reducers/types';
 
-const persistentStore = new Store({ name: 'nrf-programmer' });
+const persistentStore = new Store({ name: 'pc-nrfconnect-programmer' });
 
 export function loadSettings() {
     return (dispatch: TDispatch) => {
