@@ -1,4 +1,4 @@
-## 2.1.0 - 2022-01-05
+## 2.1.0 - 2022-01-06
 ### Added
 - Thingy53 support.
 - Usage data for general device information.
@@ -12,7 +12,7 @@
 - Hovering certain areas of the app would cause flickering layout.
 
 ### Changed
-- Removed modem update from the control panel and integrate modem update to normal write action.
+- Removed `Update modem` button from the control panel and make it a part of the regular firmware upgrade flow.
 - Styling updates to **Add file** dialog window.
 
 ## 2.0.1 - 2021-11-04
