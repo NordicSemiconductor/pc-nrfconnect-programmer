@@ -12,7 +12,7 @@
 - Hovering certain areas of the app would cause flickering layout.
 
 ### Changed
-- Removed `Update modem` button from the control panel and make it a part of the regular firmware upgrade flow. To update modem, add modem file with the add file dialog, or drag and drop into the file memory layout, and click write.
+- Removed `Update modem` button. To update modem, add modem file with the add file dialog, or drag and drop into the file memory layout, and click write.
 - Styling updates to **Add file** dialog window.
 
 ## 2.0.1 - 2021-11-04
