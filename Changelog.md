@@ -1,6 +1,6 @@
 ## 2.1.0 - 2022-01-06
 ### Added
-- Thingy53 support.
+- Thingy:53 support.
 - Usage data for general device information.
 
 ### Fixed
