@@ -26,6 +26,10 @@
     align-items: center;
     justify-content: center;
     padding-bottom: 2rem;
+
+    .arrow::before {
+        border-bottom-color: #999;
+    }
 }
 
 .memory-layout {
@@ -163,7 +167,16 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background-image: linear-gradient(45deg, #f00 25%, #f77 25%, #f77 50%, #f00 50%, #f00 75%, #f77 75%, #f77);
+        background-image: linear-gradient(
+            45deg,
+            #f00 25%,
+            #f77 25%,
+            #f77 50%,
+            #f00 50%,
+            #f00 75%,
+            #f77 75%,
+            #f77
+        );
         background-size: 8px 8px;
     }
     .region button {
@@ -184,7 +197,16 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background-image:  linear-gradient(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+        background-image: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.15) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.15) 75%,
+            transparent 75%,
+            transparent
+        );
         animation-direction: reverse;
     }
     button.transparent {
@@ -233,7 +255,16 @@
 }
 
 .striped {
-    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
+    );
     background-size: 1rem 1rem;
 }
 
@@ -281,6 +312,10 @@ div:last-child > p {
         display: block;
         line-height: 1.4em;
     }
+
+    .arrow::before {
+        border-left-color: #999;
+    }
 }
 
 .icon-spin {
@@ -303,22 +338,22 @@ div:last-child > p {
 }
 
 .modem-success {
-    background-color: #D0DF00;
-    color: #FFF;
+    background-color: #d0df00;
+    color: #fff;
     text-align: center;
 }
 
 .modem-fail {
-    background-color: #EE2F4E;
-    color: #FFF;
+    background-color: #ee2f4e;
+    color: #fff;
     text-align: center;
 }
 
 .modem-progress .progress {
-  background: lightgray;
+    background: lightgray;
 }
 .modem-progress .progress-bar {
-  background: steelblue;
-  color: white;
-  transition: width 1s;
+    background: steelblue;
+    color: white;
+    transition: width 1s;
 }
