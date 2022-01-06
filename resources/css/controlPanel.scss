@@ -67,5 +67,17 @@ $labelHeight: 12px;
     .popover-body {
         padding: 0.25rem 0;
         font-size: 0.875rem;
+
+        .dropdown-divider {
+            margin: 0.25rem 0;
+        }
+
+        .dropdown-item.disabled {
+            opacity: 0.7 !important;
+        }
+    }
+
+    .arrow::before {
+        border-bottom-color: #999;
     }
 }

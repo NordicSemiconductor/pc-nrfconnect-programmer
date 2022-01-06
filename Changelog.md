@@ -7,12 +7,13 @@
 - Long file name is not wrapped for file selection view.
 - Not able to program HEX file if part of the regions are outside of the device memory size.
 - Previous file regions are removed after write/remove action.
-- `Restore Defaults...` option not resetting stored values.
+- `Restore Defaults...` option not resetting stored values. This will however cause the currently persisted data
+  to be wiped (such as previously added files).
 - Hovering certain areas of the app would cause flickering layout.
 
 ### Changed
 - Removed modem update from the control panel and integrate modem update to normal write action.
-- Styling updates to *Add HEX file* dialog window.
+- Styling updates to **Add file** dialog window.
 
 ## 2.0.1 - 2021-11-04
 ### Changed

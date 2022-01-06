@@ -137,7 +137,8 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                         ))
                     ) : (
                         <Dropdown.Item disabled>
-                            No recently used files
+                            No recently used files, click <i>Browse</i> or drag
+                            and drop files to add them
                         </Dropdown.Item>
                     )}
                     <Dropdown.Divider />
