@@ -31,7 +31,12 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
 
     const { serialNumber, serialPorts } = device;
     const serialport = serialPorts[0];
-    const { vendorId, productId } = serialport as SerialPort;
+
+    let vendorId;
+    let productId;
+    if (serialport) {
+        ({ vendorId, productId } = serialport as SerialPort);
+    }
     const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
     const pid = productId ? parseInt(productId.toString(), 16) : undefined;
 
