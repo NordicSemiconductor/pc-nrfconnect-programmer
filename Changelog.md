@@ -1,3 +1,7 @@
+## Unreleased
+### Changed
+- Use shared code for persisting local settings in app.
+
 ## 2.1.1 - 2022-01-07
 ### Fixed
 - Issue with selecting external JLink device.

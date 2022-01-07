@@ -4,23 +4,20 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import Store from 'electron-store';
-
 import {
     settingsLoad,
     toggleAutoRead as toggleAutoReadAction,
 } from '../reducers/settingsReducer';
 import { RootState, TDispatch } from '../reducers/types';
-
-const persistentStore = new Store({ name: 'pc-nrfconnect-programmer' });
+import { getSettings, setSettings } from '../store';
 
 export function loadSettings() {
     return (dispatch: TDispatch) => {
-        const settings = persistentStore.get('settings') || {};
+        const settings = getSettings();
         if (!settings.autoRead) {
             settings.autoRead = false;
         }
-        persistentStore.set('settings', settings);
+        setSettings(settings);
         dispatch(settingsLoad(settings));
     };
 }
@@ -31,7 +28,7 @@ export function toggleAutoRead() {
 
         // Do not use async functions above，
         // otherwise the state would be the same as before toggling
-        persistentStore.set('settings', {
+        setSettings({
             autoRead: getState().app.settings.autoRead,
         });
     };
