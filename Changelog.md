@@ -1,19 +1,27 @@
-## 2.1.0 - Unreleased
+## 2.1.1 - 2022-01-07
+### Fixed
+- Issue with selecting external JLink device.
+
+## 2.1.0 - 2022-01-06
 ### Added
-- Thingy53 support
-- Usage data for which general device information
+- Thingy:53 support.
+- Usage data for general device information.
 
 ### Fixed
-- Long file name is not wrapped for file selection view
+- Long file name is not wrapped for file selection view.
+- Not able to program HEX file if part of the regions are outside of the device memory size.
+- Previous file regions are removed after write/remove action.
+- `Restore Defaults...` option not resetting stored values. This will however cause the currently persisted data
+  to be wiped (such as previously added files).
+- Hovering certain areas of the app would cause flickering layout.
 
 ### Changed
-- Removed modem update from the control panel and integrate modem update to normal write action
-- Use newest shared
+- Removed `Update modem` button. To update modem, add modem file with the add file dialog, or drag and drop into the file memory layout, and click write.
+- Styling updates to **Add file** dialog window.
 
 ## 2.0.1 - 2021-11-04
 ### Changed
 - Simplify modem DFU progress indicator temporarily
-- Moved region info to left side of region.
 
 ## 2.0.0 - 2021-11-01
 ### Added

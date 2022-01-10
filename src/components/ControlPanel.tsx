@@ -13,6 +13,7 @@ import Form from 'react-bootstrap/Form';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
+import { truncateMiddle } from 'pc-nrfconnect-shared';
 import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
@@ -129,21 +130,28 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                             <Dropdown.Item
                                 key={filePath}
                                 onSelect={() => onSelect(filePath)}
+                                title={filePath}
                             >
-                                {filePath}
+                                {truncateMiddle(filePath, 30, 40)}
                             </Dropdown.Item>
                         ))
                     ) : (
                         <Dropdown.Item disabled>
-                            No recently used files
+                            No recently used files, click <i>Browse</i> or drag
+                            and drop files to add them
                         </Dropdown.Item>
                     )}
                     <Dropdown.Divider />
-                    {/* @ts-ignore This works */}
-                    <Dropdown.Item onSelect={onSelect}>Browse...</Dropdown.Item>
+                    <Dropdown.Item
+                        /* @ts-ignore This works */
+                        onSelect={onSelect}
+                        style={{ fontWeight: 700 }}
+                    >
+                        Browse...
+                    </Dropdown.Item>
                 </Popover>
             </Overlay>
-            <Button variant="danger" onClick={onClick}>
+            <Button variant="primary" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
                 Add file
             </Button>

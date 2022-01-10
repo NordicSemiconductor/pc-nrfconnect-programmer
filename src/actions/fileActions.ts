@@ -9,7 +9,7 @@
 import electron from 'electron';
 import Store from 'electron-store';
 import { readFile, stat, Stats, statSync } from 'fs';
-import MemoryMap, { MemoryMapTuple } from 'nrf-intel-hex';
+import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
 import { basename } from 'path';
 import { logger } from 'pc-nrfconnect-shared';
 
@@ -25,7 +25,11 @@ import {
 import { targetInfoKnown } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
-import { deviceDefinition, getDeviceDefinition } from '../util/devices';
+import {
+    CoreDefinition,
+    deviceDefinition,
+    getDeviceDefinition,
+} from '../util/devices';
 import {
     defaultRegion,
     getFileRegions,
@@ -35,7 +39,7 @@ import {
 } from '../util/regions';
 import { updateTargetWritable } from './targetActions';
 
-const persistentStore = new Store({ name: 'nrf-programmer' });
+const persistentStore = new Store({ name: 'pc-nrfconnect-programmer' });
 
 export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
 
@@ -53,14 +57,14 @@ const updateCoreInfo =
 
         // If device is selected, device family and device type will not be null
         // and so will not assume target cores by file regions.
-        if (family || type) {
+        if (family !== 'Unknown' || type !== 'Unknown') {
             return;
         }
 
         // Display multiple cores if at least one of the regions matches
         // the requirements of nRF5340
         const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
-        const startAddresses = [...overlaps.keys()];
+        const startAddresses = [...overlaps.keys()].sort().reverse();
         const { cores } = getDeviceDefinition('nRF5340');
         const networkCore = cores[1];
         const { romBaseAddr: netwrokRomBaseAddr, romSize: networkRomSize } =
@@ -85,6 +89,26 @@ const updateCoreInfo =
                             ...cores[1],
                             romBaseAddr: 0x1000000,
                             romSize: 0x40000, // 256 KB
+                        },
+                    ],
+                })
+            );
+            return;
+        }
+
+        // Display 1 MB memory size or display to end address if the end address is greater than 1 MB
+        const lastStartAddress = startAddresses[startAddresses.length - 1];
+        const lastOverlap = overlaps.get(lastStartAddress) as Overlap;
+        if (lastOverlap) {
+            const lastEndAddress = lastStartAddress + lastOverlap[0][1]?.length;
+            dispatch(
+                targetInfoKnown({
+                    ...deviceDefinition,
+                    cores: [
+                        {
+                            ...cores[0],
+                            romBaseAddr: 0x0,
+                            romSize: Math.max(lastEndAddress, 0x100000), // 1 MB
                         },
                     ],
                 })
@@ -224,12 +248,31 @@ export const updateFileRegions =
         dispatch(fileWarningRemove());
 
         const { file, target } = getState().app;
+        const cores = target.deviceInfo?.cores as CoreDefinition[];
 
         let regions: Region[] = [];
-        target.deviceInfo?.cores.forEach(c => {
+        cores.forEach((c: CoreDefinition) => {
             logger.info(`Update files regions according to ${c.name} core`);
             regions = [...regions, ...getFileRegions(file.memMaps, c)];
         });
+
+        // Show file warning if file region is out of core memory.
+        const validRegions = regions.filter(r =>
+            cores.find(
+                c =>
+                    r.startAddress >= c.romBaseAddr &&
+                    r.startAddress + r.regionSize <= c.romBaseAddr + c.romSize
+            )
+        );
+        if (validRegions.length !== regions.length) {
+            dispatch(
+                fileWarningAdd(
+                    'Part of the HEX regions are out of the device memory size, ' +
+                        'but you can still proceed write operation'
+                )
+            );
+            regions = validRegions;
+        }
 
         // Show file warning if overlapping.
         if (regions.find(r => r.fileNames && r.fileNames.length > 1)) {
