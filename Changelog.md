@@ -1,3 +1,7 @@
+## 2.1.1 - 2022-01-07
+### Fixed
+- Issue with selecting external JLink device.
+
 ## 2.1.0 - 2022-01-06
 ### Added
 - Thingy:53 support.
