@@ -260,9 +260,7 @@ const ControlPanel = () => {
                         <Button
                             key="performReset"
                             onClick={performReset}
-                            disabled={
-                                !(isUsbSerial || isJLink) || !targetIsReady
-                            }
+                            disabled={!isJLink || !targetIsReady}
                         >
                             <span className="mdi mdi-record" />
                             Reset
