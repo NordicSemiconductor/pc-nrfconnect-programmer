@@ -307,10 +307,11 @@ const ControlPanel = () => {
                                 type="checkbox"
                                 checked={autoReset}
                                 onChange={() => toggleAutoReset()}
+                                title="Reset device after read/write operations"
                             />
                             <Form.Label>
                                 <span>Auto reset</span>
-                                {isModem && autoReset && (
+                                {isJLink && isModem && autoReset && (
                                     <span
                                         title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
                                         className="mdi mdi-alert"
