@@ -1,3 +1,7 @@
+## 2.1.2 - 2022-01-12
+### Added
+- Instructions for updating the modem firmware.
+
 ## 2.1.1 - 2022-01-07
 ### Fixed
 - Issue with selecting external JLink device.
