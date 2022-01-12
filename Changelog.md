@@ -1,3 +1,7 @@
+## 2.1.3 - unreleased
+### Fixed
+- Issue with programming nRF52 SoC on Thingy91.
+
 ## 2.1.2 - 2022-01-12
 ### Added
 - Instructions for updating the modem firmware.
