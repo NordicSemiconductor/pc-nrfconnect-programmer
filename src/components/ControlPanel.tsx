@@ -189,7 +189,13 @@ const ControlPanel = () => {
         dispatch(jlinkTargetActions.recoverAndWrite());
     const performSaveAsFile = () => dispatch(jlinkTargetActions.saveAsFile());
     const performJLinkRead = () => dispatch(jlinkTargetActions.read());
-    const performReset = () => dispatch(usbsdfuTargetActions.resetDevice());
+    const performReset = () => {
+        if (isUsbSerial) {
+            dispatch(usbsdfuTargetActions.resetDevice());
+        } else {
+            dispatch(jlinkTargetActions.resetDevice());
+        }
+    };
     const performWrite = () => dispatch(targetActions.write());
 
     return (
@@ -252,7 +258,9 @@ const ControlPanel = () => {
                         <Button
                             key="performReset"
                             onClick={performReset}
-                            disabled={!isUsbSerial || !targetIsReady}
+                            disabled={
+                                !(isUsbSerial || isJLink) || !targetIsReady
+                            }
                         >
                             <span className="mdi mdi-record" />
                             Reset
