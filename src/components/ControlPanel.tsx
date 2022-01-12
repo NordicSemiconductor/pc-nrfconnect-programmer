@@ -299,6 +299,24 @@ const ControlPanel = () => {
                     </Form.Group>
                 </Card.Body>
             </Card>
+            <Card>
+                <Card.Header>Cellular Modem</Card.Header>
+                <Card.Body>
+                    <p>
+                        To update the modem:
+                        <ol>
+                            <li>Connect a device</li>
+                            <li>
+                                Click <b>Add file</b>
+                            </li>
+                            <li>Select modem zip file</li>
+                            <li>
+                                Click <b>Write</b>
+                            </li>
+                        </ol>
+                    </p>
+                </Card.Body>
+            </Card>
         </div>
     );
 };
