@@ -24,7 +24,7 @@ import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
 import { getFileRegions, getMruFiles } from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
-import { getAutoRead } from '../reducers/settingsReducer';
+import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
     getIsMemLoaded,
@@ -167,6 +167,7 @@ const ControlPanel = () => {
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
+    const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
     const targetIsRecoverable = useSelector(getIsRecoverable);
     const targetIsMemLoaded = useSelector(getIsMemLoaded);
@@ -183,6 +184,7 @@ const ControlPanel = () => {
     const closeFiles = () => dispatch(fileActions.closeFiles());
     const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
     const toggleAutoRead = () => dispatch(settingsActions.toggleAutoRead());
+    const toggleAutoReset = () => dispatch(settingsActions.toggleAutoReset());
     const toggleMcuboot = () => dispatch(mcubootTargetActions.toggleMcuboot());
     const performRecover = () => dispatch(jlinkTargetActions.recover());
     const performRecoverAndWrite = () =>
@@ -295,6 +297,14 @@ const ControlPanel = () => {
                             onChange={() => toggleAutoRead()}
                             checked={autoRead}
                             label="Auto read memory"
+                        />
+                        <Form.Check
+                            type="checkbox"
+                            id="auto-reset-checkbox"
+                            className="last-checkbox"
+                            onChange={() => toggleAutoReset()}
+                            checked={autoReset}
+                            label="Auto reset"
                         />
                         <Form.Check
                             type="checkbox"
