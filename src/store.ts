@@ -15,7 +15,9 @@ interface Settings {
     autoRead: boolean;
 }
 
-const { set, get } = getPersistentStore<StoreSchema>();
+const store = getPersistentStore<StoreSchema>();
+const set = store.set.bind(store);
+const get = store.get.bind(store);
 
 export const setSettings = (settings: Settings) => {
     set('settings', settings);
