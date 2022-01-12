@@ -21,6 +21,9 @@ export function loadSettings() {
         if (!settings.autoRead) {
             settings.autoRead = false;
         }
+        if (!settings.autoReset) {
+            settings.autoReset = false;
+        }
         persistentStore.set('settings', settings);
         dispatch(settingsLoad(settings));
     };

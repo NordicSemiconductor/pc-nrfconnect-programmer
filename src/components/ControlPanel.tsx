@@ -24,6 +24,7 @@ import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
 import { getFileRegions, getMruFiles } from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
+import { getIsModem } from '../reducers/modemReducer';
 import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
@@ -179,6 +180,7 @@ const ControlPanel = () => {
     const isUsbSerial =
         useSelector(getTargetType) === CommunicationType.USBSDFU;
     const isMcuboot = useSelector(getIsMcuboot);
+    const isModem = useSelector(getIsModem);
 
     const dispatch = useDispatch();
     const closeFiles = () => dispatch(fileActions.closeFiles());
@@ -299,11 +301,23 @@ const ControlPanel = () => {
                         <Form.Check
                             type="checkbox"
                             id="auto-reset-checkbox"
-                            className="last-checkbox"
-                            onChange={() => toggleAutoReset()}
-                            checked={autoReset}
-                            label="Auto reset"
-                        />
+                            className="last-checkbox auto-reset-checkbox"
+                        >
+                            <Form.Check.Input
+                                type="checkbox"
+                                checked={autoReset}
+                                onChange={() => toggleAutoReset()}
+                            />
+                            <Form.Label>
+                                <span>Auto reset</span>
+                                {isModem && autoReset && (
+                                    <span
+                                        title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
+                                        className="mdi mdi-alert"
+                                    />
+                                )}
+                            </Form.Label>
+                        </Form.Check>
                         <Form.Check
                             type="checkbox"
                             id="toggle-mcuboot-checkbox"
