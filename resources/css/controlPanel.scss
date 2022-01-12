@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+@import '~pc-nrfconnect-shared/styles';
 $labelHeight: 12px;
 
 .control-panel {
@@ -69,7 +70,7 @@ $labelHeight: 12px;
             padding-right: 12px;
 
             .mdi-alert {
-                color: orange;
+                color: $gray-400;
             }
         }
     }
