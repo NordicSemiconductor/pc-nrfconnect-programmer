@@ -18,6 +18,8 @@ import {
 
 import { openDevice } from '../actions/targetActions';
 import EventAction from '../actions/usageDataActions';
+import { mcubootWritingClose } from '../reducers/mcubootReducer';
+import { modemWritingClose } from '../reducers/modemReducer';
 import { TDispatch } from '../reducers/types';
 
 const deviceListing: DeviceListing = {
@@ -43,6 +45,8 @@ const mapDispatch = (dispatch: TDispatch) => ({
     },
     onDeviceDeselected: () => {
         usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
+        dispatch(mcubootWritingClose());
+        dispatch(modemWritingClose());
         logger.info('Target device closed');
     },
 });
