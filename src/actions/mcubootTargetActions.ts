@@ -191,7 +191,7 @@ export const performUpdate =
             const { mcubootFilePath, zipFilePath } = getState().app.file;
             const dfuFilePath = mcubootFilePath || zipFilePath;
             const firmwareFormat = mcubootFilePath
-                ? 'NRFDL_FW_MCUBOOT'
+                ? 'NRFDL_FW_INTEL_HEX'
                 : 'NRFDL_FW_MCUBOOT_MULTI_IMAGE';
 
             logger.info(
