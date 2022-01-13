@@ -1,6 +1,6 @@
-## 2.2.0 - unreleased
+## 2.2.0 - 2022-01-13
 ### Added
-- Auto-reset setting which, if toggled, adds a device reset after read/write operations.
+- Auto-reset setting which, if toggled, adds a device reset after read/write operations. This setting is enabled by default.
 - Instructions for updating the modem firmware.
 
 ### Fixed
