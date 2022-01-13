@@ -1,10 +1,15 @@
-## 2.1.3 - unreleased
+## 2.2.0 - unreleased
+### Added
+- Auto-reset setting which, if toggled, adds a device reset after read/write operations.
+- Instructions for updating the modem firmware.
+
 ### Fixed
 - Issue with programming nRF52 SoC on Thingy91.
+- Reset button is now disabled for USB devices as this operation is currently not supported.
+- Reset button now works for JLink devices.
 
-## 2.1.2 - 2022-01-12
-### Added
-- Instructions for updating the modem firmware.
+### Changed
+- Device is no longer by default reset after a write operation, if the user wants to reset the device after write, use the new `Auto reset` feature.
 
 ## 2.1.1 - 2022-01-07
 ### Fixed

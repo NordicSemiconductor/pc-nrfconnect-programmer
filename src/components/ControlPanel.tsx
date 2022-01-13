@@ -24,7 +24,8 @@ import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
 import { getFileRegions, getMruFiles } from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
-import { getAutoRead } from '../reducers/settingsReducer';
+import { getIsModem } from '../reducers/modemReducer';
+import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
     getIsMemLoaded,
@@ -167,6 +168,7 @@ const ControlPanel = () => {
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
+    const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
     const targetIsRecoverable = useSelector(getIsRecoverable);
     const targetIsMemLoaded = useSelector(getIsMemLoaded);
@@ -178,18 +180,26 @@ const ControlPanel = () => {
     const isUsbSerial =
         useSelector(getTargetType) === CommunicationType.USBSDFU;
     const isMcuboot = useSelector(getIsMcuboot);
+    const isModem = useSelector(getIsModem);
 
     const dispatch = useDispatch();
     const closeFiles = () => dispatch(fileActions.closeFiles());
     const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
     const toggleAutoRead = () => dispatch(settingsActions.toggleAutoRead());
+    const toggleAutoReset = () => dispatch(settingsActions.toggleAutoReset());
     const toggleMcuboot = () => dispatch(mcubootTargetActions.toggleMcuboot());
     const performRecover = () => dispatch(jlinkTargetActions.recover());
     const performRecoverAndWrite = () =>
         dispatch(jlinkTargetActions.recoverAndWrite());
     const performSaveAsFile = () => dispatch(jlinkTargetActions.saveAsFile());
     const performJLinkRead = () => dispatch(jlinkTargetActions.read());
-    const performReset = () => dispatch(usbsdfuTargetActions.resetDevice());
+    const performReset = () => {
+        if (isUsbSerial) {
+            dispatch(usbsdfuTargetActions.resetDevice());
+        } else {
+            dispatch(jlinkTargetActions.resetDevice());
+        }
+    };
     const performWrite = () => dispatch(targetActions.write());
 
     return (
@@ -252,7 +262,7 @@ const ControlPanel = () => {
                         <Button
                             key="performReset"
                             onClick={performReset}
-                            disabled={!isUsbSerial || !targetIsReady}
+                            disabled={!isJLink || !targetIsReady}
                         >
                             <span className="mdi mdi-record" />
                             Reset
@@ -288,6 +298,27 @@ const ControlPanel = () => {
                             checked={autoRead}
                             label="Auto read memory"
                         />
+                        <Form.Check
+                            type="checkbox"
+                            id="auto-reset-checkbox"
+                            className="last-checkbox auto-reset-checkbox"
+                        >
+                            <Form.Check.Input
+                                type="checkbox"
+                                checked={autoReset}
+                                onChange={() => toggleAutoReset()}
+                                title="Reset device after read/write operations"
+                            />
+                            <Form.Label>
+                                <span>Auto reset</span>
+                                {isJLink && isModem && autoReset && (
+                                    <span
+                                        title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
+                                        className="mdi mdi-alert"
+                                    />
+                                )}
+                            </Form.Label>
+                        </Form.Check>
                         <Form.Check
                             type="checkbox"
                             id="toggle-mcuboot-checkbox"

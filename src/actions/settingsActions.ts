@@ -9,6 +9,7 @@ import Store from 'electron-store';
 import {
     settingsLoad,
     toggleAutoRead as toggleAutoReadAction,
+    toggleAutoReset as toggleAutoResetAction,
 } from '../reducers/settingsReducer';
 import { RootState, TDispatch } from '../reducers/types';
 
@@ -19,6 +20,9 @@ export function loadSettings() {
         const settings = persistentStore.get('settings') || {};
         if (!settings.autoRead) {
             settings.autoRead = false;
+        }
+        if (!settings.autoReset) {
+            settings.autoReset = false;
         }
         persistentStore.set('settings', settings);
         dispatch(settingsLoad(settings));
@@ -33,6 +37,18 @@ export function toggleAutoRead() {
         // otherwise the state would be the same as before toggling
         persistentStore.set('settings', {
             autoRead: getState().app.settings.autoRead,
+        });
+    };
+}
+
+export function toggleAutoReset() {
+    return (dispatch: TDispatch, getState: () => RootState) => {
+        dispatch(toggleAutoResetAction());
+
+        // Do not use async functions above，
+        // otherwise the state would be the same as before toggling
+        persistentStore.set('settings', {
+            autoReset: getState().app.settings.autoReset,
         });
     };
 }
