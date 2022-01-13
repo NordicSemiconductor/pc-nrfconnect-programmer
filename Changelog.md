@@ -1,4 +1,4 @@
-## 2.2.0 - unreleased
+## 2.2.0 - 2022-01-13
 ### Added
 - Auto-reset setting which, if toggled, adds a device reset after read/write operations.
 - Instructions for updating the modem firmware.
