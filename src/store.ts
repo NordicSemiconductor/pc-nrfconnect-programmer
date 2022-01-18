@@ -7,12 +7,13 @@
 import { getPersistentStore } from 'pc-nrfconnect-shared';
 
 interface StoreSchema {
-    settings: { autoRead: boolean };
+    settings: Settings;
     mruFiles: string[];
 }
 
 interface Settings {
     autoRead: boolean;
+    autoReset: boolean;
 }
 
 const store = getPersistentStore<StoreSchema>();

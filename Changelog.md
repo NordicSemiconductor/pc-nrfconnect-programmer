@@ -2,6 +2,19 @@
 ### Changed
 - Use shared code for persisting local settings in app.
 
+## 2.2.0 - 2022-01-13
+### Added
+- Auto-reset setting which, if toggled, adds a device reset after read/write operations. This setting is enabled by default.
+- Instructions for updating the modem firmware.
+
+### Fixed
+- Issue with programming nRF52 SoC on Thingy91.
+- Reset button is now disabled for USB devices as this operation is currently not supported.
+- Reset button now works for JLink devices.
+
+### Changed
+- Device is no longer by default reset after a write operation, if the user wants to reset the device after write, use the new `Auto reset` feature.
+
 ## 2.1.1 - 2022-01-07
 ### Fixed
 - Issue with selecting external JLink device.

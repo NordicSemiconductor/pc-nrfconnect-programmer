@@ -19,6 +19,7 @@ import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
 
 import { modemKnown } from '../reducers/modemReducer';
+import { getAutoReset } from '../reducers/settingsReducer';
 import {
     erasingEnd,
     erasingStart,
@@ -362,6 +363,9 @@ export const read =
 
         dispatch(updateTargetWritable());
         dispatch(loadingEnd());
+
+        const autoReset = getAutoReset(getState());
+        if (autoReset) dispatch(resetDevice());
     };
 
 /**
@@ -531,7 +535,8 @@ export const write =
             argsArray
         );
         dispatch(writingEnd());
-        await dispatch(resetDevice());
+        const autoReset = getAutoReset(getState());
+        if (autoReset) await dispatch(resetDevice());
         await dispatch(openDevice());
         dispatch(updateTargetWritable());
     };
