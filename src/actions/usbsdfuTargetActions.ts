@@ -25,8 +25,6 @@ import {
     HashType,
     logger,
     sdfuOperations,
-    startWatchingDevices,
-    stopWatchingDevices,
     usageData,
     waitForDevice,
 } from 'pc-nrfconnect-shared';
@@ -640,7 +638,6 @@ export const write =
         logger.info('Performing DFU. This may take a few seconds');
         dispatch(writingStart());
 
-        stopWatchingDevices();
         try {
             const state = getState();
             const device =
@@ -648,7 +645,6 @@ export const write =
             if (!device) throw Error(`Failed to write due to device not found`);
             await operateDFU(device.id, images);
             dispatch(writingEnd());
-            startWatchingDevices();
             const reconnectedDevice = await waitForDevice(device.serialNumber);
             dispatch(targetActions.openDevice(reconnectedDevice));
         } catch (error) {
