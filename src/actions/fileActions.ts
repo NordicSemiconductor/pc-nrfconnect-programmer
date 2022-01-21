@@ -27,6 +27,7 @@ import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
 import {
     CoreDefinition,
+    coreFriendlyName,
     deviceDefinition,
     getDeviceDefinition,
 } from '../util/devices';
@@ -249,9 +250,13 @@ export const updateFileRegions =
         const cores = target.deviceInfo?.cores as CoreDefinition[];
 
         let regions: Region[] = [];
-        cores.forEach((c: CoreDefinition) => {
-            logger.info(`Update files regions according to ${c.name} core`);
-            regions = [...regions, ...getFileRegions(file.memMaps, c)];
+        cores.forEach((core: CoreDefinition) => {
+            logger.info(
+                `Update files regions according to ${coreFriendlyName(
+                    core.name
+                )} core`
+            );
+            regions = [...regions, ...getFileRegions(file.memMaps, core)];
         });
 
         // Show file warning if file region is out of core memory.

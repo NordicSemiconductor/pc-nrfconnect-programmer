@@ -14,7 +14,7 @@ import nrfdl, {
 import range from './range';
 
 export type CoreDefinition = {
-    name: DeviceCore | string;
+    name: DeviceCore;
     coreNumber: number;
     romBaseAddr: number;
     romSize: number;
@@ -84,7 +84,7 @@ export const deviceDefinition: DeviceDefinition = {
  * Some information cannot be fetch by @nordicsemiconductor/nrf-device-lib-js
  * Define the default values here
  */
-const deviceDefinitions: DeviceDefinition[] = [
+export const deviceDefinitions: DeviceDefinition[] = [
     // nRF52840 dongle cannot fetch info by @nordicsemiconductor/nrf-device-lib-js
     {
         ...deviceDefinition,
@@ -131,6 +131,13 @@ const deviceDefinitions: DeviceDefinition[] = [
         ],
     },
 ];
+
+export const coreFriendlyName = (coreName: DeviceCore) =>
+    ({
+        NRFDL_DEVICE_CORE_APPLICATION: 'Application',
+        NRFDL_DEVICE_CORE_MODEM: 'Modem',
+        NRFDL_DEVICE_CORE_NETWORK: 'Network',
+    }[coreName] ?? coreName);
 
 /**
  * Nordic SoftDevice Id referring to pc-nrfutil
@@ -266,25 +273,24 @@ export const getDeviceInfoByJlink = (device: nrfdl.Device) => {
 export const addCoreToDeviceInfo = (
     deviceInfo: DeviceDefinition,
     inputCoreInfo: DeviceCoreInfo,
-    coreName: string,
+    coreName: nrfdl.DeviceCore,
     protectionStatus: ProtectionStatus
-) =>
-    ({
-        ...deviceInfo,
-        cores: [
-            ...deviceInfo.cores,
-            {
-                ...defaultCore,
-                name: coreName,
-                coreNumber: deviceInfo.cores.length,
-                romBaseAddr: inputCoreInfo.codeAddress,
-                romSize: inputCoreInfo.codeSize,
-                pageSize: inputCoreInfo.codePageSize,
-                // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
-                // uicrBaseAddr: inputCoreInfo.uicrAddress,
-                uicrSize: inputCoreInfo.codePageSize,
-                ...inputCoreInfo,
-                protectionStatus,
-            },
-        ],
-    } as DeviceDefinition);
+): DeviceDefinition => ({
+    ...deviceInfo,
+    cores: [
+        ...deviceInfo.cores,
+        {
+            ...defaultCore,
+            name: coreName,
+            coreNumber: deviceInfo.cores.length,
+            romBaseAddr: inputCoreInfo.codeAddress,
+            romSize: inputCoreInfo.codeSize,
+            pageSize: inputCoreInfo.codePageSize,
+            // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
+            uicrBaseAddr: inputCoreInfo.uicrAddress,
+            uicrSize: inputCoreInfo.codePageSize,
+            ...inputCoreInfo,
+            protectionStatus,
+        },
+    ],
+});

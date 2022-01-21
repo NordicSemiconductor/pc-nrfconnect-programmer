@@ -5,14 +5,16 @@
  */
 
 import React from 'react';
+import { DeviceCore } from '@nordicsemiconductor/nrf-device-lib-js';
 import PropTypes from 'prop-types';
 
+import { coreFriendlyName } from '../util/devices';
 import { hexpad8 } from '../util/hexpad';
 
 const hexpad9 = (x: number) => hexpad8(x || '');
 
 interface CoreInfoViewProps {
-    name: string;
+    name: DeviceCore;
     romBaseAddr: number;
     romSize: number;
 }
@@ -22,7 +24,7 @@ const CoreInfoView = ({ name, romBaseAddr, romSize }: CoreInfoViewProps) => (
         {name && (
             <div>
                 <h5>Core name</h5>
-                <p>{name}</p>
+                <p>{coreFriendlyName(name)}</p>
             </div>
         )}
         <div>
