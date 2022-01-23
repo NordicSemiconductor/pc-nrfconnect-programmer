@@ -28,7 +28,7 @@ import { getMruFiles, setMruFiles } from '../store';
 import {
     CoreDefinition,
     coreFriendlyName,
-    deviceDefinition,
+    defaultDeviceDefinition,
     getDeviceDefinition,
 } from '../util/devices';
 import {
@@ -77,7 +77,7 @@ const updateCoreInfo =
         ) {
             dispatch(
                 targetInfoKnown({
-                    ...deviceDefinition,
+                    ...defaultDeviceDefinition,
                     cores: [
                         {
                             ...cores[0],
@@ -102,7 +102,7 @@ const updateCoreInfo =
             const lastEndAddress = lastStartAddress + lastOverlap[0][1]?.length;
             dispatch(
                 targetInfoKnown({
-                    ...deviceDefinition,
+                    ...defaultDeviceDefinition,
                     cores: [
                         {
                             ...cores[0],
@@ -309,7 +309,7 @@ export const closeFiles =
 
         // Initialize the state of deviceInfo if no device is selected
         if (!getState().app.target.deviceInfo?.type) {
-            dispatch(targetInfoKnown(deviceDefinition));
+            dispatch(targetInfoKnown(defaultDeviceDefinition));
         }
         dispatch(updateTargetWritable());
     };

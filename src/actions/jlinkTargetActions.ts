@@ -11,7 +11,6 @@ import nrfdl, {
     Error as NrfdlError,
     FirmwareReadResult,
     ProtectionStatus,
-    // eslint-disable-next-line import/no-unresolved
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import { remote } from 'electron';
 import fs from 'fs';
@@ -36,14 +35,13 @@ import {
 import { RootState, TDispatch } from '../reducers/types';
 import { targetWarningRemove } from '../reducers/warningReducer';
 import {
-    addCoreToDeviceInfo,
     CommunicationType,
     CoreDefinition,
     coreFriendlyName,
     DeviceDefinition,
-    deviceDefinitions,
     DeviceFamily,
     getDeviceInfoByJlink,
+    updateCoreInfo,
     VendorId,
 } from '../util/devices';
 import sequence from '../util/promise';
@@ -123,70 +121,17 @@ export const openDevice =
 
         logDeviceInfo(device);
         let deviceInfo = getDeviceInfoByJlink(device);
+        deviceInfo = await updateCoresWithNrfdl(dispatch, device, deviceInfo);
 
         // Update modem target info according to detected device info
-        const isModem = device.jlink.deviceFamily
-            ?.toLowerCase()
+        const isModem = deviceInfo.family
+            .toLowerCase()
             .includes(DeviceFamily.NRF91.toLowerCase());
+
         dispatch(modemKnown(isModem));
+
         if (isModem) logger.info('Modem detected');
 
-        // By default readback protection is none
-        let protectionStatus: nrfdl.ProtectionStatus =
-            'NRFDL_PROTECTION_STATUS_NONE';
-
-        let coreName: nrfdl.DeviceCore = 'NRFDL_DEVICE_CORE_APPLICATION';
-        protectionStatus = await loadProtectionStatus(device.id, coreName);
-
-        if (protectionStatus === 'NRFDL_PROTECTION_STATUS_NONE') {
-            const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
-                getDeviceLibContext(),
-                device.id
-            );
-
-            deviceInfo = addCoreToDeviceInfo(
-                deviceInfo,
-                deviceCoreInfo,
-                coreName,
-                protectionStatus
-            );
-        } else {
-            [deviceInfo] = deviceDefinitions.slice(-1);
-        }
-
-        const isFamilyNrf53 = device.jlink?.deviceFamily?.includes(
-            DeviceFamily.NRF53
-        );
-
-        // Since nRF53 family is dual core devices
-        // It needs an additional check for readback protection on network core
-        if (
-            isFamilyNrf53 &&
-            protectionStatus === 'NRFDL_PROTECTION_STATUS_NONE'
-        ) {
-            coreName = 'NRFDL_DEVICE_CORE_NETWORK';
-            protectionStatus = await loadProtectionStatus(device.id, coreName);
-
-            if (protectionStatus === 'NRFDL_PROTECTION_STATUS_NONE') {
-                // TODO: fix type in nrfdl
-                const deviceCoreInfoForNrf53 = await nrfdl.getDeviceCoreInfo(
-                    getDeviceLibContext(),
-                    device.id,
-                    coreName
-                );
-
-                deviceInfo = addCoreToDeviceInfo(
-                    deviceInfo,
-                    deviceCoreInfoForNrf53,
-                    coreName,
-                    protectionStatus
-                );
-            } else {
-                // Read protected core, load default value.
-                deviceInfo.cores.push(deviceDefinitions[2].cores[1]);
-                // deviceInfo.cores[1].protectionStatus = protectionStatus;
-            }
-        }
         dispatch(targetInfoKnown(deviceInfo));
         dispatch(
             targetContentsKnown({
@@ -613,4 +558,34 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
         }
     };
     remote.dialog.showSaveDialog(options).then(save);
+};
+const updateCoresWithNrfdl = async (
+    dispatch: TDispatch,
+    device: Device,
+    deviceInfo: DeviceDefinition
+): Promise<DeviceDefinition> => {
+    const cores = await Promise.all(
+        deviceInfo.cores.map(async (core, index) => {
+            const protectionStatus = await loadProtectionStatus(
+                device.id,
+                core.name
+            );
+
+            if (protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
+                return core;
+            }
+            const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
+                getDeviceLibContext(),
+                device.id,
+                core.name
+            );
+            return updateCoreInfo(
+                core,
+                index,
+                deviceCoreInfo,
+                protectionStatus
+            );
+        })
+    );
+    return { ...deviceInfo, cores };
 };
