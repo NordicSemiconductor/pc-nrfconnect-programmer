@@ -269,38 +269,13 @@ export const getDeviceInfoByJlink = (
 /**
  * Add core info to device info
  *
- * @param {DeviceDefinition} deviceInfo - existing device info
+ * @param {DeviceDefinition} existingDefinition - existing device info
+ * @param {number} coreNumber - the number of the core
  * @param {DeviceCoreInfo} inputCoreInfo - core info to be added
- * @param {string} coreName - the name of the core
  * @param {ProtectionStatus} protectionStatus - the protection status
  *
  * @returns {DeviceDefinition} the updated device info
  */
-export const addCoreToDeviceInfo = (
-    deviceInfo: DeviceDefinition,
-    inputCoreInfo: DeviceCoreInfo,
-    coreName: nrfdl.DeviceCore,
-    protectionStatus: ProtectionStatus
-): DeviceDefinition => ({
-    ...deviceInfo,
-    cores: [
-        ...deviceInfo.cores,
-        {
-            ...defaultCore,
-            name: coreName,
-            coreNumber: deviceInfo.cores.length,
-            romBaseAddr: inputCoreInfo.codeAddress,
-            romSize: inputCoreInfo.codeSize,
-            pageSize: inputCoreInfo.codePageSize,
-            // TODO: Check if uicrAddress is present in nrfjprog under nrf-device-lib
-            uicrBaseAddr: inputCoreInfo.uicrAddress,
-            uicrSize: inputCoreInfo.codePageSize,
-            ...inputCoreInfo,
-            protectionStatus,
-        },
-    ],
-});
-
 export const updateCoreInfo = (
     existingDefinition: CoreDefinition,
     coreNumber: number,
@@ -312,7 +287,7 @@ export const updateCoreInfo = (
     romBaseAddr: inputCoreInfo.codeAddress,
     romSize: inputCoreInfo.codeSize,
     pageSize: inputCoreInfo.codePageSize,
-    // uicrBaseAddr: inputCoreInfo.uicrAddress,
+    uicrBaseAddr: inputCoreInfo.uicrAddress,
     uicrSize: inputCoreInfo.codePageSize,
     ...inputCoreInfo,
     protectionStatus,
