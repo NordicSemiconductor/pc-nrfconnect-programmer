@@ -45,17 +45,19 @@ const useRegisterDragEvents = () => {
             event.preventDefault();
         };
 
-        const onDrop = (event: DragEvent) => {
+        const onDrop = async (event: DragEvent) => {
             if (!event.dataTransfer) return;
 
-            Array.from(event.dataTransfer.files).forEach(file => {
-                dispatch(
+            // eslint-disable-next-line no-restricted-syntax
+            for (const file of event.dataTransfer.files) {
+                // eslint-disable-next-line no-await-in-loop
+                await dispatch(
                     fileActions.openFile(
-                        // Electron has meddled with this type without exposing new type definition
                         (file as unknown as { path: string }).path
                     )
                 );
-            });
+            }
+
             event.preventDefault();
         };
 
