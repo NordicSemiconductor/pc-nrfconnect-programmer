@@ -27,7 +27,8 @@ import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
 import {
     CoreDefinition,
-    deviceDefinition,
+    coreFriendlyName,
+    defaultDeviceDefinition,
     getDeviceDefinition,
 } from '../util/devices';
 import {
@@ -76,7 +77,7 @@ const updateCoreInfo =
         ) {
             dispatch(
                 targetInfoKnown({
-                    ...deviceDefinition,
+                    ...defaultDeviceDefinition,
                     cores: [
                         {
                             ...cores[0],
@@ -101,7 +102,7 @@ const updateCoreInfo =
             const lastEndAddress = lastStartAddress + lastOverlap[0][1]?.length;
             dispatch(
                 targetInfoKnown({
-                    ...deviceDefinition,
+                    ...defaultDeviceDefinition,
                     cores: [
                         {
                             ...cores[0],
@@ -249,9 +250,13 @@ export const updateFileRegions =
         const cores = target.deviceInfo?.cores as CoreDefinition[];
 
         let regions: Region[] = [];
-        cores.forEach((c: CoreDefinition) => {
-            logger.info(`Update files regions according to ${c.name} core`);
-            regions = [...regions, ...getFileRegions(file.memMaps, c)];
+        cores.forEach((core: CoreDefinition) => {
+            logger.info(
+                `Update files regions according to ${coreFriendlyName(
+                    core.name
+                )} core`
+            );
+            regions = [...regions, ...getFileRegions(file.memMaps, core)];
         });
 
         // Show file warning if file region is out of core memory.
@@ -304,7 +309,7 @@ export const closeFiles =
 
         // Initialize the state of deviceInfo if no device is selected
         if (!getState().app.target.deviceInfo?.type) {
-            dispatch(targetInfoKnown(deviceDefinition));
+            dispatch(targetInfoKnown(defaultDeviceDefinition));
         }
         dispatch(updateTargetWritable());
     };

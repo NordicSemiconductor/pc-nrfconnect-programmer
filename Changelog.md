@@ -1,6 +1,11 @@
-## Unreleased
+## 2.2.1
 ### Changed
 - Use shared code for persisting local settings in app.
+- Detect cores on nRF53 with readback protection.
+
+### Fixed
+- Remove readback protection on nRF53.
+- Dropping several hex files.
 
 ## 2.2.0 - 2022-01-13
 ### Added
