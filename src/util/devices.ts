@@ -231,13 +231,15 @@ export const getDeviceDefinition = (type: string): DeviceDefinition =>
     };
 
 // Get device info by calling version command
-export const getDeviceInfoByUSB = (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    hwInfo: any
-) => {
+export const getDeviceInfoByUSB = (hwInfo: nrfdl.HwInfo) => {
+    // Assume devices with an empty deviceVersion are nrf52
+    const version = hwInfo.deviceVersion?.length
+        ? hwInfo.deviceVersion
+        : DeviceFamily.NRF52;
+
     const deviceInfoByUsb = getDeviceDefinition(
         // hwInfo.deviceVersion example 'NRF52840_AAD0'
-        hwInfo.deviceVersion.slice(0, 8)
+        version.slice(0, 8)
     );
     const [core] = deviceInfoByUsb.cores;
     return {
