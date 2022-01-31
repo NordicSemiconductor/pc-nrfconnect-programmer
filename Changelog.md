@@ -1,4 +1,4 @@
-## 2.2.1
+## 2.3.0
 ### Changed
 - Use shared code for persisting local settings in app.
 - Detect cores on nRF53 with readback protection.
