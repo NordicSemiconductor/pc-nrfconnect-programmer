@@ -95,6 +95,14 @@ export const deviceDefinitions: DeviceDefinition[] = [
         ...defaultDeviceDefinition,
         family: DeviceFamily.NRF52,
         type: 'nRF52840',
+        cores: [
+            {
+                ...defaultCore,
+                romSize: 0x100000, // 1 Mb
+                ramSize: 0x40000, // 256 Kb
+                pageSize: 0x1000, // 4Kb
+            },
+        ],
     },
     // nRF9160 has different ficr and uicr base address
     {
@@ -230,29 +238,46 @@ export const getDeviceDefinition = (type: string): DeviceDefinition =>
         type,
     };
 
-// Get device info by calling version command
-export const getDeviceInfoByUSB = (hwInfo: nrfdl.HwInfo) => {
-    // Assume devices with an empty deviceVersion are nrf52
-    const version = hwInfo.deviceVersion?.length
-        ? hwInfo.deviceVersion
-        : DeviceFamily.NRF52;
-
-    const deviceInfoByUsb = getDeviceDefinition(
-        // hwInfo.deviceVersion example 'NRF52840_AAD0'
-        version.slice(0, 8)
+const getProductId = (device: nrfdl.Device) =>
+    parseInt(
+        device.serialPorts.reduce(
+            (m, p) => (p.vendorId === '1915' ? p.productId : '') || m,
+            ''
+        ),
+        16
     );
-    const [core] = deviceInfoByUsb.cores;
-    return {
-        ...deviceInfoByUsb,
-        cores: [
-            {
-                ...core,
-                romSize: hwInfo.romSize,
-                pageSize: hwInfo.romPageSize,
-                ramSize: hwInfo.ramSize,
-            },
-        ],
-    };
+
+const identifyUsbByVersion = (device: nrfdl.Device) => {
+    return device.hwInfo?.deviceVersion?.length > 0
+        ? getDeviceDefinition(
+              device.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
+          )
+        : null;
+};
+
+const identifyUsbBySerialPort = (device: nrfdl.Device) => {
+    const productId = getProductId(device);
+
+    // nRF52
+    if (USBProductIds.some(id => id === productId)) {
+        return deviceDefinitions.find(d => d.family === DeviceFamily.NRF52);
+    }
+
+    // nRF91
+    if (ModemProductIds.some(id => id === productId)) {
+        return deviceDefinitions.find(d => d.family === DeviceFamily.NRF91);
+    }
+
+    return null;
+};
+
+// Get device info by calling version command
+export const getDeviceInfoByUSB = (device: nrfdl.Device) => {
+    return (
+        identifyUsbByVersion(device) ||
+        identifyUsbBySerialPort(device) ||
+        defaultDeviceDefinition
+    );
 };
 
 // Get device info by calling @nordicsemiconductor/nrf-device-lib-js

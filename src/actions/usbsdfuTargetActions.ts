@@ -122,17 +122,7 @@ export const openDevice =
                 getDeviceLibContext(),
                 device.id
             );
-            const defaultHwInfo = {
-                deviceVersion: 'nRF52840',
-                romSize: 0x100000, // 1 Mb
-                ramSize: 0x40000, // 256 Kb
-                romPageSize: 0x1000, // 4Kb
-            };
-            const deviceInfo = getDeviceInfoByUSB(
-                // TODO: fix type in nrfdl
-                // @ts-ignore -- type error from nrfdl, remove when fixed
-                device.hwInfo || defaultHwInfo
-            );
+            const deviceInfo = getDeviceInfoByUSB(device);
             dispatch(targetInfoKnown(deviceInfo));
 
             const appCoreNumber = 0;
