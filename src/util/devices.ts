@@ -8,7 +8,6 @@ import nrfdl, {
     DeviceCore,
     DeviceCoreInfo,
     ProtectionStatus,
-    // eslint-disable-next-line import/no-unresolved
 } from '@nordicsemiconductor/nrf-device-lib-js';
 
 import range from './range';
@@ -230,13 +229,15 @@ export const JLinkProductIds = [
     ...range(0x1001, 0x101f),
 ];
 
-export const getDeviceDefinition = (type: string): DeviceDefinition =>
-    deviceDefinitions.find((device: DeviceDefinition) =>
+export const getDeviceDefinition = (type: string): DeviceDefinition => {
+    const predefined = deviceDefinitions.find((device: DeviceDefinition) =>
         device?.type?.toLowerCase().includes(type.toLowerCase())
-    ) || {
-        ...defaultDeviceDefinition,
+    );
+    return {
+        ...(predefined ?? defaultDeviceDefinition),
         type,
     };
+};
 
 const getProductId = (device: nrfdl.Device) =>
     parseInt(
@@ -284,11 +285,12 @@ export const getDeviceInfoByUSB = (device: nrfdl.Device) => {
 export const getDeviceInfoByJlink = (
     device: nrfdl.Device
 ): DeviceDefinition => {
-    const family = (device.jlink.deviceFamily ??
-        DeviceFamily.UNKNOWN) as DeviceFamily;
+    const type = device.jlink.deviceVersion ?? 'Unknown';
+    const family = device.jlink.deviceFamily as DeviceFamily;
 
     return {
-        ...getDeviceDefinition(family),
+        ...getDeviceDefinition(type),
+        type,
         family,
     };
 };

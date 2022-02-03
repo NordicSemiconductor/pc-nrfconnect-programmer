@@ -1,3 +1,7 @@
+## 2.3.2
+### Fixed
+- Show correct version of selected device.
+
 ## 2.3.1
 ### Fixed
 - Crash when settings are empty.
