@@ -1,3 +1,7 @@
+## 2.3.1
+### Fixed
+- Crash when settings are empty.
+
 ## 2.3.0
 ### Changed
 - Use shared code for persisting local settings in app.
