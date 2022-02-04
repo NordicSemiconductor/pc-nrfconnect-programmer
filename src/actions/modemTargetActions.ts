@@ -5,38 +5,16 @@
  */
 // eslint-disable-next-line import/no-unresolved
 import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
-import { remote } from 'electron';
 import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
 
 import {
     MODEM_DFU_STARTING,
     modemProcessUpdate,
-    modemWritingClose,
     modemWritingFail,
-    modemWritingReady,
     modemWritingStart,
     modemWritingSucceed,
 } from '../reducers/modemReducer';
 import { RootState, TDispatch } from '../reducers/types';
-
-export const selectModemFirmware = () => (dispatch: TDispatch) => {
-    const dialogOptions = {
-        title: 'Select a modem firmware zip file',
-        filters: [{ name: 'Modem firmware zip file', extensions: ['zip'] }],
-        properties: ['openFile'],
-    };
-    remote.dialog
-        .showOpenDialog(dialogOptions)
-        .then(({ filePaths }: { filePaths: string[] }) => {
-            if (filePaths && filePaths.length > 0) {
-                dispatch(modemWritingReady(filePaths[0]));
-            }
-        });
-};
-
-export const cancelUpdate = () => (dispatch: TDispatch) => {
-    dispatch(modemWritingClose());
-};
 
 export const programDfuModem =
     (fileName: string) => (dispatch: TDispatch, getState: () => RootState) =>
@@ -106,10 +84,6 @@ export const programDfuModem =
             );
         });
 
-export const performMcuUpdate = (fileName: string) => (dispatch: TDispatch) => {
-    dispatch(programDfuModem(fileName));
-};
-
 export const performUpdate =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         dispatch(modemWritingStart());
@@ -127,9 +101,5 @@ export const performUpdate =
         logger.info('Modem DFU starts to write...');
         logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
 
-        if (getState().app.mcuboot.isMcuboot) {
-            dispatch(performMcuUpdate(fileName));
-        } else {
-            dispatch(programDfuModem(fileName));
-        }
+        dispatch(programDfuModem(fileName));
     };

@@ -43,10 +43,6 @@ import {
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import {
-    targetWarningRemove,
-    userWarningRemove,
-} from '../reducers/warningReducer';
-import {
     CommunicationType,
     DeviceDefinition,
     DeviceFamily,
@@ -97,7 +93,6 @@ export const openDevice =
         const { device: inputDevice } = getState().app.target;
         const device = inputDevice as Device;
 
-        dispatch(targetWarningRemove());
         dispatch(
             targetTypeKnown({
                 targetType: CommunicationType.USBSDFU,
@@ -304,7 +299,6 @@ export const canWrite =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         // Disable write button
         dispatch(targetWritableKnown(false));
-        dispatch(targetWarningRemove());
 
         // Check if there are writable regions.
         // If not, then return.
@@ -319,7 +313,6 @@ export const canWrite =
         }
 
         // Enable write button if all above items have been checked
-        dispatch(targetWarningRemove());
         dispatch(targetWritableKnown(true));
     };
 
@@ -598,8 +591,6 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
  */
 export const write =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
-        dispatch(targetWarningRemove());
-        dispatch(userWarningRemove());
         dispatch(fileActions.updateFileBlRegion());
         dispatch(fileActions.updateFileAppRegions());
         dispatch(createDfuImages());

@@ -13,7 +13,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 
-import { cancelUpdate, performUpdate } from '../actions/modemTargetActions';
+import { performUpdate } from '../actions/modemTargetActions';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
 import {
     getErrorMsg,
@@ -24,6 +24,7 @@ import {
     getModemFwName,
     getProgressMsg,
     getProgressPercentage,
+    modemWritingClose,
 } from '../reducers/modemReducer';
 
 const ModemUpdateDialogView = () => {
@@ -38,7 +39,7 @@ const ModemUpdateDialogView = () => {
     const isMcuboot = useSelector(getIsMcuboot);
 
     const dispatch = useDispatch();
-    const onCancel = () => dispatch(cancelUpdate());
+    const onCancel = () => dispatch(modemWritingClose());
 
     const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
         useStopwatch({ autoStart: true });
