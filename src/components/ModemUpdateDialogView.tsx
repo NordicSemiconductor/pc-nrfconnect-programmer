@@ -37,6 +37,7 @@ const ModemUpdateDialogView = () => {
     const progressPercentage = useSelector(getProgressPercentage);
     const errorMsg = useSelector(getErrorMsg);
     const isMcuboot = useSelector(getIsMcuboot);
+    const expectedFwName = /mfw_nrf9160_\d+.\d+.\d+.zip/.test(modemFwName);
 
     const dispatch = useDispatch();
     const onCancel = () => dispatch(modemWritingClose());
@@ -71,6 +72,31 @@ const ModemUpdateDialogView = () => {
                         <b>Modem firmware</b>
                     </Form.Label>
                     <div>{modemFwName}</div>
+                </Form.Group>
+                <Form.Group>
+                    {!isWriting &&
+                        !isWritingSucceed &&
+                        !isWritingFail &&
+                        !expectedFwName && (
+                            <Alert
+                                label="Unexpected file name detected"
+                                variant="warning"
+                            >
+                                <br />
+                                Nordic official modem firmware files are named
+                                mrf_nrf9160_*.zip.
+                                <br />
+                                Modem firmware files can be downloaded from{' '}
+                                <a
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    href="https://www.nordicsemi.com/Products/Development-hardware/nrf9160-dk/download#infotabs"
+                                >
+                                    www.nordicsemi.com
+                                </a>
+                                .
+                            </Alert>
+                        )}
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>
