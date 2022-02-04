@@ -153,6 +153,8 @@ export const openDevice =
  * @returns {void}
  */
 const logDeviceInfo = (device: Device) => {
+    if (!device.jlink) return;
+
     const {
         jlinkObFirmwareVersion,
         deviceFamily,

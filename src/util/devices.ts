@@ -285,8 +285,8 @@ export const getDeviceInfoByUSB = (device: nrfdl.Device) => {
 export const getDeviceInfoByJlink = (
     device: nrfdl.Device
 ): DeviceDefinition => {
-    const type = device.jlink.deviceVersion ?? 'Unknown';
-    const family = device.jlink.deviceFamily as DeviceFamily;
+    const type = device.jlink?.deviceVersion ?? 'Unknown';
+    const family = device.jlink?.deviceFamily as DeviceFamily;
 
     return {
         ...getDeviceDefinition(type),
