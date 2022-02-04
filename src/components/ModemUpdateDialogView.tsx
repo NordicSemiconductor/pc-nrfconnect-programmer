@@ -5,13 +5,13 @@
  */
 
 import React from 'react';
-import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
+import { Alert } from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/modemTargetActions';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
@@ -145,7 +145,8 @@ const ModemUpdateDialogView = () => {
                         </Alert>
                     )}
                     {isWritingFail && !isWriting && (
-                        <Alert variant="danger">
+                        <Alert label="Error" variant="danger">
+                            <br />
                             {errorMsg ||
                                 'Failed. Check the log below for more details...'}
                         </Alert>

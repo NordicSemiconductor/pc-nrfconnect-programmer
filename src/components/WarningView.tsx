@@ -5,8 +5,8 @@
  */
 
 import React from 'react';
-import Alert from 'react-bootstrap/Alert';
 import { useSelector } from 'react-redux';
+import { Alert } from 'pc-nrfconnect-shared';
 
 import { getFileWarnings } from '../reducers/warningReducer';
 
