@@ -6,7 +6,7 @@
 
 /* eslint-disable import/no-cycle */
 
-import electron from 'electron';
+import { dialog } from '@electron/remote';
 import { readFile, stat, Stats, statSync } from 'fs';
 import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
 import { basename } from 'path';
@@ -451,7 +451,7 @@ export const openFileDialog = () => (dispatch: TDispatch) => {
         ],
         properties: ['openFile', 'multiSelections'],
     };
-    electron.remote.dialog
+    dialog
         .showOpenDialog(dialogOptions)
         .then(
             ({ filePaths }: { filePaths: string[] }) =>

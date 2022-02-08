@@ -6,13 +6,13 @@
 
 /* eslint-disable import/no-cycle */
 
+import { dialog } from '@electron/remote';
 import nrfdl, {
     Device,
     Error as NrfdlError,
     FirmwareReadResult,
     ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
-import { remote } from 'electron';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
@@ -558,8 +558,9 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
             });
         }
     };
-    remote.dialog.showSaveDialog(options).then(save);
+    dialog.showSaveDialog(options).then(save);
 };
+
 const updateCoresWithNrfdl = async (
     dispatch: TDispatch,
     device: Device,
