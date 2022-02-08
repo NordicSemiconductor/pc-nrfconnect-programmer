@@ -33,7 +33,6 @@ import {
     writingStart,
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
-import { targetWarningRemove } from '../reducers/warningReducer';
 import {
     CommunicationType,
     CoreDefinition,
@@ -108,7 +107,6 @@ export const openDevice =
         const device = inputDevice as Device;
 
         dispatch(loadingStart());
-        dispatch(targetWarningRemove());
         dispatch(
             targetTypeKnown({
                 targetType: CommunicationType.JLINK,
@@ -155,6 +153,8 @@ export const openDevice =
  * @returns {void}
  */
 const logDeviceInfo = (device: Device) => {
+    if (!device.jlink) return;
+
     const {
         jlinkObFirmwareVersion,
         deviceFamily,

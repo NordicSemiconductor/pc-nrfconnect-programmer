@@ -10,6 +10,7 @@
 import { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import { Device, logger, usageData } from 'pc-nrfconnect-shared';
 
+import { mcubootWritingReady } from '../reducers/mcubootReducer';
 import { modemWritingReady } from '../reducers/modemReducer';
 import {
     loadingStart,
@@ -123,7 +124,7 @@ export const write = () => (dispatch: TDispatch, getState: () => RootState) => {
         return;
     }
     if (isMcuboot) {
-        dispatch(mcubootTargetActions.prepareUpdate());
+        dispatch(mcubootWritingReady());
         return;
     }
     if (target.targetType === CommunicationType.JLINK) {

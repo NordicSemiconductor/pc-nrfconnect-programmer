@@ -20,9 +20,7 @@ import {
     mcubootKnown,
     mcubootPortKnown,
     mcubootProcessUpdate,
-    mcubootWritingClose,
     mcubootWritingFail,
-    mcubootWritingReady,
     mcubootWritingStart,
     mcubootWritingSucceed,
 } from '../reducers/mcubootReducer';
@@ -33,7 +31,6 @@ import {
     targetWritableKnown,
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
-import { targetWarningRemove } from '../reducers/warningReducer';
 import {
     CommunicationType,
     DeviceFamily,
@@ -149,15 +146,10 @@ export const toggleMcuboot =
         dispatch(updateTargetWritable());
     };
 
-export const prepareUpdate = () => (dispatch: TDispatch) => {
-    dispatch(mcubootWritingReady());
-};
-
 export const canWrite =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         // Disable write button
         dispatch(targetWritableKnown(false));
-        dispatch(targetWarningRemove());
 
         // Check if mcu firmware is detected.
         // If not, then return.
@@ -179,7 +171,6 @@ export const canWrite =
         dispatch(mcubootFirmwareValid(true));
 
         // Enable write button if all above items have been checked
-        dispatch(targetWarningRemove());
         dispatch(targetWritableKnown(true));
     };
 
@@ -245,7 +236,3 @@ export const performUpdate =
                 progressCallback
             );
         });
-
-export const cancelUpdate = () => (dispatch: TDispatch) => {
-    dispatch(mcubootWritingClose());
-};

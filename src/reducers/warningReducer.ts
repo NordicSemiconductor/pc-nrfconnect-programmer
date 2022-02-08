@@ -30,21 +30,6 @@ const warningSlice = createSlice({
         fileWarningRemove(state) {
             state.fileWarnings = [];
         },
-        targetWarningAdd(state, action: PayloadAction<string>) {
-            state.targetWarnings = [...state.targetWarnings, action.payload];
-        },
-        targetWarningRemove(state) {
-            state.targetWarnings = [];
-        },
-        userWarningAdd(state, action: PayloadAction<string>) {
-            state.userWarnings = [...state.userWarnings, action.payload];
-        },
-        userWarningRemove(state) {
-            state.userWarnings = [];
-        },
-        allWarningRemove() {
-            return { ...initialState };
-        },
     },
     extraReducers: {
         'device/selectDevice': state => {
@@ -56,29 +41,8 @@ const warningSlice = createSlice({
 
 export default warningSlice.reducer;
 
-const {
-    fileWarningAdd,
-    fileWarningRemove,
-    targetWarningAdd,
-    targetWarningRemove,
-    userWarningAdd,
-    userWarningRemove,
-    allWarningRemove,
-} = warningSlice.actions;
+const { fileWarningAdd, fileWarningRemove } = warningSlice.actions;
 
-export const getUserWarnings = (state: RootState) =>
-    state.app.warning.userWarnings;
 export const getFileWarnings = (state: RootState) =>
     state.app.warning.fileWarnings;
-export const getTargetWarnings = (state: RootState) =>
-    state.app.warning.targetWarnings;
-
-export {
-    fileWarningAdd,
-    fileWarningRemove,
-    targetWarningAdd,
-    targetWarningRemove,
-    userWarningAdd,
-    userWarningRemove,
-    allWarningRemove,
-};
+export { fileWarningAdd, fileWarningRemove };
