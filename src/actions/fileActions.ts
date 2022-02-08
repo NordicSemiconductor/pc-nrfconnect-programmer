@@ -450,7 +450,8 @@ export const openFileDialog = () => (dispatch: TDispatch) => {
             },
         ],
         properties: ['openFile', 'multiSelections'],
-    };
+        // eslint-disable-next-line no-undef
+    } as Electron.OpenDialogOptions;
     dialog
         .showOpenDialog(dialogOptions)
         .then(
