@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
-// eslint-disable-next-line import/no-unresolved
+
 import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
 
@@ -27,7 +27,7 @@ export const programDfuModem =
                     `Modem DFU failed with error: ${error.message || error}`
                 );
                 let errorMsg = error.message;
-                // @ts-ignore To be fixed in nrfdl
+                // @ts-expect-error To be fixed in nrfdl
                 if (error.error_code === 0x25b) {
                     errorMsg =
                         'Please make sure that the device is in MCUboot mode and try again.';

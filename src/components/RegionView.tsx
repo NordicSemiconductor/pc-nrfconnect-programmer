@@ -75,7 +75,7 @@ const RegionView = ({
             <Overlay
                 trigger={['focus', 'hover']}
                 placement="left"
-                // @ts-ignore -- Don't care about this for now
+                // @ts-expect-error -- Don't care about this for now
                 target={target}
                 container={containerNode}
                 show={show}

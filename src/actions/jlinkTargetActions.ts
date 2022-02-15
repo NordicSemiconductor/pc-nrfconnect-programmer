@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-/* eslint-disable import/no-cycle */
-
 import { dialog } from '@electron/remote';
 import nrfdl, {
     Device,
