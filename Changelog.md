@@ -1,3 +1,7 @@
+## Unreleased
+### Fixed
+- Properly show some more programming errors.
+
 ## 2.3.2
 ### Fixed
 - Show correct version of selected device.

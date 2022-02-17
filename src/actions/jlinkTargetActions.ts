@@ -15,7 +15,12 @@ import nrfdl, {
 import { remote } from 'electron';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
-import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
+import {
+    describeError,
+    getDeviceLibContext,
+    logger,
+    usageData,
+} from 'pc-nrfconnect-shared';
 
 import { modemKnown } from '../reducers/modemReducer';
 import { getAutoReset } from '../reducers/settingsReducer';
@@ -409,10 +414,12 @@ const writeHex = (
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_INTEL_HEX',
             Buffer.from(hexFileString, 'utf8'),
-            err => {
-                if (err)
+            error => {
+                if (error)
                     usageData.sendErrorReport(
-                        `Device programming failed with error: ${err}`
+                        `Device programming failed with error: ${describeError(
+                            error
+                        )}`
                     );
                 logger.info(`Writing HEX to ${coreInfo.name} core completed`);
                 resolve();
