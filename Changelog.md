@@ -1,12 +1,13 @@
-## 2.3.2
+## 2.3.2 - 2022-02-18
 ### Fixed
-- Show correct version of selected device.
+- Show correct hardware type of selected device.
+- Modem file name verification.
 
-## 2.3.1
+## 2.3.1 - 2022-02-03
 ### Fixed
 - Crash when settings are empty.
 
-## 2.3.0
+## 2.3.0 - 2022-01-31
 ### Changed
 - Use shared code for persisting local settings in app.
 - Detect cores on nRF53 with readback protection.
