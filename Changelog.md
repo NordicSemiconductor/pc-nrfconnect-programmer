@@ -1,3 +1,7 @@
+## 2.3.3 - 2022-02-23
+### Fixed
+- Show correct hardware layout of selected device.
+
 ## 2.3.2 - 2022-02-18
 ### Fixed
 - Show correct hardware type of selected device.

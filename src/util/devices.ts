@@ -289,7 +289,7 @@ export const getDeviceInfoByJlink = (
     const family = device.jlink?.deviceFamily as DeviceFamily;
 
     return {
-        ...getDeviceDefinition(type),
+        ...getDeviceDefinition(family),
         type,
         family,
     };
