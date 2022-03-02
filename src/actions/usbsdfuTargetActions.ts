@@ -41,10 +41,6 @@ import {
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import {
-    targetWarningRemove,
-    userWarningRemove,
-} from '../reducers/warningReducer';
-import {
     CommunicationType,
     DeviceDefinition,
     DeviceFamily,
@@ -95,7 +91,6 @@ export const openDevice =
         const { device: inputDevice } = getState().app.target;
         const device = inputDevice as Device;
 
-        dispatch(targetWarningRemove());
         dispatch(
             targetTypeKnown({
                 targetType: CommunicationType.USBSDFU,
@@ -120,17 +115,7 @@ export const openDevice =
                 getDeviceLibContext(),
                 device.id
             );
-            const defaultHwInfo = {
-                deviceVersion: 'nRF52840',
-                romSize: 0x100000, // 1 Mb
-                ramSize: 0x40000, // 256 Kb
-                romPageSize: 0x1000, // 4Kb
-            };
-            const deviceInfo = getDeviceInfoByUSB(
-                // TODO: fix type in nrfdl
-                // @ts-ignore -- type error from nrfdl, remove when fixed
-                device.hwInfo || defaultHwInfo
-            );
+            const deviceInfo = getDeviceInfoByUSB(device);
             dispatch(targetInfoKnown(deviceInfo));
 
             const appCoreNumber = 0;
@@ -312,7 +297,6 @@ export const canWrite =
     () => (dispatch: TDispatch, getState: () => RootState) => {
         // Disable write button
         dispatch(targetWritableKnown(false));
-        dispatch(targetWarningRemove());
 
         // Check if there are writable regions.
         // If not, then return.
@@ -327,7 +311,6 @@ export const canWrite =
         }
 
         // Enable write button if all above items have been checked
-        dispatch(targetWarningRemove());
         dispatch(targetWritableKnown(true));
     };
 
@@ -606,8 +589,6 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
  */
 export const write =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
-        dispatch(targetWarningRemove());
-        dispatch(userWarningRemove());
         dispatch(fileActions.updateFileBlRegion());
         dispatch(fileActions.updateFileAppRegions());
         dispatch(createDfuImages());

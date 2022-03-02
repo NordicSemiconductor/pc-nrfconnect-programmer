@@ -17,6 +17,13 @@
     }
 }
 
+.alert {
+    a {
+        color: white;
+        text-decoration: underline;
+    }
+}
+
 .memory-box-container {
     display: flex;
     flex-direction: row;

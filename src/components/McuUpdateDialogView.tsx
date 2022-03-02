@@ -5,15 +5,15 @@
  */
 
 import React from 'react';
-import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
+import { Alert } from 'pc-nrfconnect-shared';
 
-import { cancelUpdate, performUpdate } from '../actions/mcubootTargetActions';
+import { performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
 import {
     getErrorMsg,
@@ -24,6 +24,7 @@ import {
     getIsWritingSucceed,
     getProgressMsg,
     getProgressPercentage,
+    mcubootWritingClose,
 } from '../reducers/mcubootReducer';
 
 const McuUpdateDialogView = () => {
@@ -39,7 +40,7 @@ const McuUpdateDialogView = () => {
     const progressPercentage = useSelector(getProgressPercentage);
 
     const dispatch = useDispatch();
-    const onCancel = () => dispatch(cancelUpdate());
+    const onCancel = () => dispatch(mcubootWritingClose());
 
     const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
         useStopwatch({ autoStart: true });
@@ -110,7 +111,8 @@ const McuUpdateDialogView = () => {
                         </Alert>
                     )}
                     {isWritingFail && (
-                        <Alert variant="danger">
+                        <Alert label="Error" variant="danger">
+                            <br />
                             {errorMsg ||
                                 'Failed. Check the log below for more details...'}
                         </Alert>

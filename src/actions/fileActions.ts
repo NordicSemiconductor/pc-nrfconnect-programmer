@@ -7,7 +7,6 @@
 /* eslint-disable import/no-cycle */
 
 import electron from 'electron';
-import Store from 'electron-store';
 import { readFile, stat, Stats, statSync } from 'fs';
 import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
 import { basename } from 'path';
@@ -25,9 +24,11 @@ import {
 import { targetInfoKnown } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
+import { getMruFiles, setMruFiles } from '../store';
 import {
     CoreDefinition,
-    deviceDefinition,
+    coreFriendlyName,
+    defaultDeviceDefinition,
     getDeviceDefinition,
 } from '../util/devices';
 import {
@@ -38,8 +39,6 @@ import {
     RegionName,
 } from '../util/regions';
 import { updateTargetWritable } from './targetActions';
-
-const persistentStore = new Store({ name: 'pc-nrfconnect-programmer' });
 
 export const ERROR_DIALOG_SHOW = 'ERROR_DIALOG_SHOW';
 
@@ -78,7 +77,7 @@ const updateCoreInfo =
         ) {
             dispatch(
                 targetInfoKnown({
-                    ...deviceDefinition,
+                    ...defaultDeviceDefinition,
                     cores: [
                         {
                             ...cores[0],
@@ -103,7 +102,7 @@ const updateCoreInfo =
             const lastEndAddress = lastStartAddress + lastOverlap[0][1]?.length;
             dispatch(
                 targetInfoKnown({
-                    ...deviceDefinition,
+                    ...defaultDeviceDefinition,
                     cores: [
                         {
                             ...cores[0],
@@ -251,9 +250,13 @@ export const updateFileRegions =
         const cores = target.deviceInfo?.cores as CoreDefinition[];
 
         let regions: Region[] = [];
-        cores.forEach((c: CoreDefinition) => {
-            logger.info(`Update files regions according to ${c.name} core`);
-            regions = [...regions, ...getFileRegions(file.memMaps, c)];
+        cores.forEach((core: CoreDefinition) => {
+            logger.info(
+                `Update files regions according to ${coreFriendlyName(
+                    core.name
+                )} core`
+            );
+            regions = [...regions, ...getFileRegions(file.memMaps, core)];
         });
 
         // Show file warning if file region is out of core memory.
@@ -306,30 +309,25 @@ export const closeFiles =
 
         // Initialize the state of deviceInfo if no device is selected
         if (!getState().app.target.deviceInfo?.type) {
-            dispatch(targetInfoKnown(deviceDefinition));
+            dispatch(targetInfoKnown(defaultDeviceDefinition));
         }
         dispatch(updateTargetWritable());
     };
 
 export const loadMruFiles = () => (dispatch: TDispatch) => {
-    const files = persistentStore.get('mruFiles', []);
+    const files = getMruFiles();
     dispatch(mruFilesLoadSuccess(files));
 };
 
 const removeMruFile = (filename: string) => {
-    const files = persistentStore.get('mruFiles', []);
-    persistentStore.set(
-        'mruFiles',
-        files.filter((file: string) => file !== filename)
-    );
+    const files = getMruFiles();
+    setMruFiles(files.filter((file: string) => file !== filename));
 };
 
 const addMruFile = (filename: string) => {
-    const files = persistentStore.get('mruFiles', []);
+    const files = getMruFiles();
     if (files.indexOf(filename) === -1) {
-        files.unshift(filename);
-        files.splice(10);
-        persistentStore.set('mruFiles', files);
+        setMruFiles([filename, ...files.slice(0, 9)]);
     }
 };
 

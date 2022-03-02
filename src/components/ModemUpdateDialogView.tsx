@@ -5,15 +5,15 @@
  */
 
 import React from 'react';
-import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
+import { Alert } from 'pc-nrfconnect-shared';
 
-import { cancelUpdate, performUpdate } from '../actions/modemTargetActions';
+import { performUpdate } from '../actions/modemTargetActions';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
 import {
     getErrorMsg,
@@ -24,6 +24,7 @@ import {
     getModemFwName,
     getProgressMsg,
     getProgressPercentage,
+    modemWritingClose,
 } from '../reducers/modemReducer';
 
 const ModemUpdateDialogView = () => {
@@ -36,9 +37,10 @@ const ModemUpdateDialogView = () => {
     const progressPercentage = useSelector(getProgressPercentage);
     const errorMsg = useSelector(getErrorMsg);
     const isMcuboot = useSelector(getIsMcuboot);
+    const expectedFwName = /mfw_nrf9160_\d+.\d+.\d+.zip/.test(modemFwName);
 
     const dispatch = useDispatch();
-    const onCancel = () => dispatch(cancelUpdate());
+    const onCancel = () => dispatch(modemWritingClose());
 
     const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
         useStopwatch({ autoStart: true });
@@ -70,6 +72,31 @@ const ModemUpdateDialogView = () => {
                         <b>Modem firmware</b>
                     </Form.Label>
                     <div>{modemFwName}</div>
+                </Form.Group>
+                <Form.Group>
+                    {!isWriting &&
+                        !isWritingSucceed &&
+                        !isWritingFail &&
+                        !expectedFwName && (
+                            <Alert
+                                label="Unexpected file name detected"
+                                variant="warning"
+                            >
+                                <br />
+                                Nordic official modem firmware files are named
+                                mrf_nrf9160_*.zip.
+                                <br />
+                                Modem firmware files can be downloaded from{' '}
+                                <a
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    href="https://www.nordicsemi.com/Products/Development-hardware/nrf9160-dk/download#infotabs"
+                                >
+                                    www.nordicsemi.com
+                                </a>
+                                .
+                            </Alert>
+                        )}
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>
@@ -118,7 +145,8 @@ const ModemUpdateDialogView = () => {
                         </Alert>
                     )}
                     {isWritingFail && !isWriting && (
-                        <Alert variant="danger">
+                        <Alert label="Error" variant="danger">
+                            <br />
                             {errorMsg ||
                                 'Failed. Check the log below for more details...'}
                         </Alert>

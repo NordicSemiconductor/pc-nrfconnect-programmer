@@ -12,8 +12,8 @@ import { Device, DfuImage } from 'pc-nrfconnect-shared';
 
 import {
     CommunicationType,
+    defaultDeviceDefinition,
     DeviceDefinition,
-    deviceDefinition,
 } from '../util/devices';
 import { Region } from '../util/regions';
 import { fileParse, filesEmpty } from './fileReducer';
@@ -44,7 +44,7 @@ const initialState: TargetState = {
     targetType: CommunicationType.UNKNOWN,
     port: undefined,
     serialNumber: undefined,
-    deviceInfo: deviceDefinition,
+    deviceInfo: defaultDeviceDefinition,
     memMap: undefined,
     regions: [],
     warnings: [],

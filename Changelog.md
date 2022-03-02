@@ -1,3 +1,25 @@
+## 2.3.3 - 2022-02-23
+### Fixed
+- Show correct hardware layout of selected device.
+
+## 2.3.2 - 2022-02-18
+### Fixed
+- Show correct hardware type of selected device.
+- Modem file name verification.
+
+## 2.3.1 - 2022-02-03
+### Fixed
+- Crash when settings are empty.
+
+## 2.3.0 - 2022-01-31
+### Changed
+- Use shared code for persisting local settings in app.
+- Detect cores on nRF53 with readback protection.
+
+### Fixed
+- Remove readback protection on nRF53.
+- Dropping several hex files.
+
 ## 2.2.0 - 2022-01-13
 ### Added
 - Auto-reset setting which, if toggled, adds a device reset after read/write operations. This setting is enabled by default.
