@@ -9,70 +9,45 @@ $labelHeight: 12px;
 
 .control-panel {
     // Adjust for the old styled control panel in the new styled side panel
-    padding-top: 10px;
-    margin: 0 -8px;
-
-    .card {
-        margin-bottom: 16px;
-        .card-header {
-            font-size: 1.2em;
-        }
-        .card-body {
-            background-color: rgba(0, 0, 0, 0.03);
-        }
-        .dropdown {
-            width: 100%;
-            .btn {
-                box-shadow: none;
-            }
-        }
-        .dropdown-toggle {
-            width: 100%;
-        }
-        .btn-group-vertical {
-            width: 100%;
-        }
+    .dropdown {
+        width: 100%;
         .btn {
-            width: 100%;
-            margin: 0 auto;
             box-shadow: none;
-            text-align: left;
-            font-size: 1.1em;
-            line-height: 2em;
-            background-color: #fff;
-            border-color: #f5f5f5;
-            color: rgba(0, 0, 0, 0.88);
-            display: flex;
-            align-items: center;
-
-            .mdi {
-                margin-right: 8px;
-                font-size: 1.1em;
-                color: #0080c0;
-            }
         }
-        .form-check {
-            width: 100%;
-            margin: 0 auto;
-            padding: 12px 0 12px 36px;
+    }
+    .dropdown-toggle {
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: left;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        height: 24px;
+        color: $gray-700;
+        border-color: $gray-700;
+        padding: revert;
+
+        .mdi {
+            flex: 0.5;
             font-size: 1.1em;
-            background-color: #fff;
-            border-color: #f5f5f5;
-            color: rgba(0, 0, 0, 0.88);
+            color: $gray-700;
+        }
+        .mdi-alert {
+            margin-left: auto;
         }
     }
 
-    .auto-reset-checkbox {
-        label {
-            margin-bottom: 0;
-            display: flex;
-            justify-content: space-between;
-            padding-right: 12px;
+    .toggle:first-of-type {
+        margin-top: 16px;
+    }
 
-            .mdi-alert {
-                color: $gray-400;
-            }
-        }
+    .mdi-alert {
+        margin-left: 8px;
+        color: $gray-400;
     }
 }
 
@@ -80,7 +55,7 @@ $labelHeight: 12px;
     max-width: initial !important;
     .popover-body {
         padding: 0.25rem 0;
-        font-size: 0.875rem;
+        font-size: 14px;
 
         .dropdown-divider {
             margin: 0.25rem 0;
@@ -92,6 +67,19 @@ $labelHeight: 12px;
     }
 
     .arrow::before {
-        border-bottom-color: #999;
+        border-bottom-color: $gray-900;
+    }
+}
+
+.cellular-modem-instructions {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid $gray-200;
+    padding: 8px;
+    justify-content: center;
+    align-items: flex-start;
+    font-size: 12px;
+    ol {
+        margin-bottom: 0;
     }
 }

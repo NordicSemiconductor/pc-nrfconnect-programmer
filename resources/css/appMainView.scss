@@ -6,8 +6,8 @@
 
 .warning-view {
     width: 100%;
-    padding: 2% 1.5%;
-    max-width: 1000px;
+    padding-bottom: 16px;
+    max-width: 1016px;
     align-self: center;
     .alert {
         margin-bottom: 0;
@@ -29,10 +29,10 @@
     flex-direction: row;
     height: 100%;
     width: 100%;
+    gap: 16px;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: center;
-    padding-bottom: 2rem;
 
     .arrow::before {
         border-bottom-color: #999;
@@ -45,30 +45,31 @@
     flex: 1;
     flex-grow: 1;
     flex-direction: column;
-    margin: 0% 3%;
     max-width: 500px;
     width: 50%;
     height: 100%;
 
     .panel-heading {
-        padding-bottom: 0;
+        padding: 0;
+        background-color: $gray-50;
+        border-bottom: 0;
         .panel-title {
-            color: gray;
+            color: $gray-700;
+            height: 32px;
             display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 12px;
+            font-weight: normal;
+            margin-bottom: 0;
             .glyphicon {
-                color: rgba(0, 0, 0, 0.175);
-                align-self: auto;
                 margin-left: auto;
+                color: $gray-300;
             }
             .target-info {
                 padding-left: 0.5em;
-                font-size: 12px;
             }
-        }
-    }
-    .panel-heading:hover {
-        .target-info {
-            color: rgba(0, 0, 0, 0.375);
         }
     }
     .panel-body {
@@ -99,10 +100,10 @@
         top: 25px;
         left: 14px;
     }
-}
 
-.last-checkbox {
-    margin-bottom: 0;
+    .popover .arrow::before {
+        border-bottom-color: $gray-900;
+    }
 }
 
 .memory-layout-container {
@@ -114,10 +115,10 @@
     flex-direction: column;
     .glyphicon {
         font-size: 4em;
-        color: rgba(0, 0, 0, 0.175);
+        color: $gray-100;
     }
     p {
-        color: #9d9d9d;
+        color: $gray-200;
         padding-top: 20px;
         text-align: center;
     }
@@ -206,11 +207,11 @@
         height: 100%;
         background-image: linear-gradient(
             135deg,
-            rgba(255, 255, 255, 0.15) 25%,
+            $gray-200 25%,
             transparent 25%,
             transparent 50%,
-            rgba(255, 255, 255, 0.15) 50%,
-            rgba(255, 255, 255, 0.15) 75%,
+            $gray-200 50%,
+            $gray-200 75%,
             transparent 75%,
             transparent
         );
@@ -227,8 +228,8 @@
     }
     .read-indicator {
         text-align: center;
-        color: #808080;
-        font-size: 16px;
+        color: $gray-700;
+        font-size: 14px;
         word-break: break-all;
         padding: 16px;
     }
@@ -264,11 +265,11 @@
 .striped {
     background-image: linear-gradient(
         45deg,
-        rgba(255, 255, 255, 0.15) 25%,
+        $gray-200 25%,
         transparent 25%,
         transparent 50%,
-        rgba(255, 255, 255, 0.15) 50%,
-        rgba(255, 255, 255, 0.15) 75%,
+        $gray-200 50%,
+        $gray-200 75%,
         transparent 75%,
         transparent
     );
@@ -280,7 +281,8 @@
 }
 
 .popover {
-    border-radius: 0px;
+    border-radius: 1px;
+    border-color: $gray-700;
 }
 
 #popover-region {
@@ -289,20 +291,20 @@
 
 .popover-body {
     padding-top: 24px;
-    color: #005c84;
+    color: $nordic-blue;
 }
 
 .popover-body h5 {
     font-size: 12px;
     line-height: 6px;
-    color: darkgrey;
+    color: $gray-500;
 }
 
 .popover-body p {
     font-size: 15x;
     line-height: 12px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid $gray-100;
 }
 
 div:last-child > p {
@@ -321,7 +323,7 @@ div:last-child > p {
     }
 
     .arrow::before {
-        border-left-color: #999;
+        border-left-color: $gray-900;
     }
 }
 
