@@ -6,14 +6,17 @@
 
 import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Card from 'react-bootstrap/Card';
 import Dropdown from 'react-bootstrap/Dropdown';
-import Form from 'react-bootstrap/Form';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
-import { truncateMiddle } from 'pc-nrfconnect-shared';
+import {
+    colors,
+    Group,
+    SidePanel,
+    Toggle,
+    truncateMiddle,
+} from 'pc-nrfconnect-shared';
 import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
@@ -154,7 +157,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                     </Dropdown.Item>
                 </Popover>
             </Overlay>
-            <Button variant="primary" onClick={onClick}>
+            <Button variant="secondary" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
                 Add file
             </Button>
@@ -205,136 +208,120 @@ const ControlPanel = () => {
     const performWrite = () => dispatch(targetActions.write());
 
     return (
-        <div className="control-panel">
-            <Card>
-                <Card.Header>File</Card.Header>
-                <Card.Body>
-                    <ButtonGroup vertical>
-                        <Mru mruFiles={mruFiles} />
-                        <Button onClick={refreshAllFiles}>
-                            <span className="mdi mdi-refresh" />
-                            Reload files
-                        </Button>
-                        <Button onClick={closeFiles}>
-                            <span className="mdi mdi-minus-circle" />
-                            Clear files
-                        </Button>
-                    </ButtonGroup>
-                </Card.Body>
-            </Card>
-            <Card>
-                <Card.Header>Device</Card.Header>
-                <Card.Body>
-                    <ButtonGroup vertical>
-                        <Button
-                            key="performRecover"
-                            onClick={performRecover}
-                            disabled={
-                                isMcuboot ||
-                                !isJLink ||
-                                !targetIsReady ||
-                                !targetIsRecoverable
-                            }
-                        >
-                            <span className="mdi mdi-eraser" />
-                            Erase all
-                        </Button>
-                        <Button
-                            key="performRecoverAndWrite"
-                            onClick={performRecoverAndWrite}
-                            disabled={
-                                isMcuboot ||
-                                !isJLink ||
-                                !targetIsReady ||
-                                !fileRegionSize ||
-                                !(targetIsRecoverable && mruFiles.length)
-                            }
-                        >
-                            <span className="mdi mdi-pencil" />
-                            Erase & write
-                        </Button>
-                        <Button
-                            key="performSaveAsFile"
-                            onClick={performSaveAsFile}
-                            disabled={!isJLink || !targetIsMemLoaded}
-                        >
-                            <span className="mdi mdi-floppy" />
-                            Save as file
-                        </Button>
-                        <Button
-                            key="performReset"
-                            onClick={performReset}
-                            disabled={!isJLink || !targetIsReady}
-                        >
-                            <span className="mdi mdi-record" />
-                            Reset
-                        </Button>
-                        <Button
-                            key="performWrite"
-                            onClick={performWrite}
-                            disabled={!targetIsReady || !targetIsWritable}
-                        >
-                            <span className="mdi mdi-pencil" />
-                            Write
-                        </Button>
-                        <Button
-                            key="performJLinkRead"
-                            onClick={performJLinkRead}
-                            disabled={
-                                isMcuboot ||
-                                !isJLink ||
-                                !targetIsReady ||
-                                isProtected
-                            }
-                        >
-                            <span className="mdi mdi-refresh" />
-                            Read
-                        </Button>
-                    </ButtonGroup>
-                    <Form.Group controlId="formBasicChecbox">
-                        <Form.Check
-                            type="checkbox"
-                            id="auto-read-memory-checkbox"
-                            className="last-checkbox"
-                            onChange={() => toggleAutoRead()}
-                            checked={autoRead}
-                            label="Auto read memory"
-                        />
-                        <Form.Check
-                            type="checkbox"
-                            id="auto-reset-checkbox"
-                            className="last-checkbox auto-reset-checkbox"
-                        >
-                            <Form.Check.Input
-                                type="checkbox"
-                                checked={autoReset}
-                                onChange={() => toggleAutoReset()}
-                                title="Reset device after read/write operations"
+        <SidePanel className="control-panel">
+            <Group heading="File">
+                <Mru mruFiles={mruFiles} />
+                <Button variant="secondary" onClick={refreshAllFiles}>
+                    <span className="mdi mdi-refresh" />
+                    Reload files
+                </Button>
+                <Button variant="secondary" onClick={closeFiles}>
+                    <span className="mdi mdi-minus-circle" />
+                    Clear files
+                </Button>
+            </Group>
+            <Group heading="Device">
+                <Button
+                    variant="secondary"
+                    key="performRecover"
+                    onClick={performRecover}
+                    disabled={
+                        isMcuboot ||
+                        !isJLink ||
+                        !targetIsReady ||
+                        !targetIsRecoverable
+                    }
+                >
+                    <span className="mdi mdi-eraser" />
+                    Erase all
+                </Button>
+                <Button
+                    key="performRecoverAndWrite"
+                    variant="secondary"
+                    onClick={performRecoverAndWrite}
+                    disabled={
+                        isMcuboot ||
+                        !isJLink ||
+                        !targetIsReady ||
+                        !fileRegionSize ||
+                        !(targetIsRecoverable && mruFiles.length)
+                    }
+                >
+                    <span className="mdi mdi-pencil" />
+                    Erase & write
+                </Button>
+                <Button
+                    key="performSaveAsFile"
+                    variant="secondary"
+                    onClick={performSaveAsFile}
+                    disabled={!isJLink || !targetIsMemLoaded}
+                >
+                    <span className="mdi mdi-floppy" />
+                    Save as file
+                </Button>
+                <Button
+                    key="performReset"
+                    variant="secondary"
+                    onClick={performReset}
+                    disabled={!isJLink || !targetIsReady}
+                >
+                    <span className="mdi mdi-record" />
+                    Reset
+                </Button>
+                <Button
+                    key="performWrite"
+                    variant="secondary"
+                    onClick={performWrite}
+                    disabled={!targetIsReady || !targetIsWritable}
+                >
+                    <span className="mdi mdi-pencil" />
+                    Write
+                </Button>
+                <Button
+                    key="performJLinkRead"
+                    variant="secondary"
+                    onClick={performJLinkRead}
+                    disabled={
+                        isMcuboot || !isJLink || !targetIsReady || isProtected
+                    }
+                >
+                    <span className="mdi mdi-refresh" />
+                    Read
+                </Button>
+                <Toggle
+                    onToggle={() => toggleAutoRead()}
+                    isToggled={autoRead}
+                    label="Auto read memory"
+                    barColor={colors.gray700}
+                    handleColor={colors.gray300}
+                />
+                <Toggle
+                    isToggled={autoReset}
+                    onToggle={() => toggleAutoReset()}
+                    title="Reset device after read/write operations"
+                    barColor={colors.gray700}
+                    handleColor={colors.gray300}
+                >
+                    <>
+                        Auto Reset
+                        {isJLink && isModem && autoReset && (
+                            <span
+                                title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
+                                className="mdi mdi-alert"
                             />
-                            <Form.Label>
-                                <span>Auto reset</span>
-                                {isJLink && isModem && autoReset && (
-                                    <span
-                                        title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
-                                        className="mdi mdi-alert"
-                                    />
-                                )}
-                            </Form.Label>
-                        </Form.Check>
-                        <Form.Check
-                            type="checkbox"
-                            id="toggle-mcuboot-checkbox"
-                            className="last-checkbox"
-                            onChange={() => toggleMcuboot()}
-                            checked={isMcuboot}
-                            label="Enable MCUboot"
-                        />
-                    </Form.Group>
-                </Card.Body>
-            </Card>
-            <Card>
-                <Card.Header>Cellular Modem</Card.Header>
-                <Card.Body>
+                        )}
+                    </>
+                </Toggle>
+                <Toggle
+                    onToggle={() => toggleMcuboot()}
+                    isToggled={isMcuboot}
+                    label="Enable MCUboot"
+                    barColor={colors.gray700}
+                    handleColor={colors.gray300}
+                />
+            </Group>
+            <Group heading="Cellular Modem">
+                <div className="cellular-modem-instructions">
                     To update the modem:
                     <ol>
                         <li>Connect a device</li>
@@ -346,9 +333,9 @@ const ControlPanel = () => {
                             Click <b>Write</b>
                         </li>
                     </ol>
-                </Card.Body>
-            </Card>
-        </div>
+                </div>
+            </Group>
+        </SidePanel>
     );
 };
 

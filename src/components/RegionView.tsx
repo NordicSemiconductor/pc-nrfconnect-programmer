@@ -9,6 +9,7 @@ import Button from 'react-bootstrap/Button';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch } from 'react-redux';
+import { colors } from 'pc-nrfconnect-shared';
 import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
@@ -47,10 +48,10 @@ const RegionView = ({
         setTarget(event.target as HTMLElement);
     };
 
-    const color = region ? region.color : '#d9e1e2';
+    const color = region ? region.color : colors.gray100;
     const fileNames = region ? region.fileNames : [];
 
-    let className = 'region centering-container';
+    let className = 'region';
     className = striped ? `${className} striped` : className;
     className = active ? `${className} active striped` : className;
     className = hoverable ? `${className} hoverable` : className;
