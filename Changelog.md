@@ -1,6 +1,7 @@
 ## Unreleased
 ### Changed
 - Update UI.
+- Disable `Write` button for JLink devices and add tooltip.
 
 ## 2.3.3 - 2022-02-23
 ### Fixed

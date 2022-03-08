@@ -272,7 +272,12 @@ const ControlPanel = () => {
                     key="performWrite"
                     variant="secondary"
                     onClick={performWrite}
-                    disabled={!targetIsReady || !targetIsWritable}
+                    disabled={!targetIsReady || !targetIsWritable || isJLink}
+                    title={
+                        isJLink
+                            ? 'The Write operation is not supported for JLink devices. Use Erase & write.'
+                            : ''
+                    }
                 >
                     <span className="mdi mdi-pencil" />
                     Write
