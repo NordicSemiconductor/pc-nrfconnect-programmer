@@ -22,9 +22,13 @@ const WarningView = () => {
     const fileWarningStrings = useSelector(getFileWarnings);
 
     return (
-        <div className="warning-view">
-            {combineWarnings(fileWarningStrings)}
-        </div>
+        <>
+            {fileWarningStrings.length > 0 && (
+                <div className="warning-view">
+                    {combineWarnings(fileWarningStrings)}
+                </div>
+            )}
+        </>
     );
 };
 
