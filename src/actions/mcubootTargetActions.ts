@@ -38,6 +38,7 @@ import {
     ModemProductIds,
     VendorId,
 } from '../util/devices';
+import { updateFileRegions } from './fileActions';
 import { updateTargetWritable } from './targetActions';
 import EventAction from './usageDataActions';
 
@@ -126,6 +127,7 @@ export const openDevice =
                 port2: last(serialPorts)?.comName ?? undefined,
             })
         );
+        dispatch(updateFileRegions());
         dispatch(updateTargetWritable());
         dispatch(loadingEnd());
     };

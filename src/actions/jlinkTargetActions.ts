@@ -45,7 +45,7 @@ import {
 } from '../util/devices';
 import sequence from '../util/promise';
 import { getTargetRegions } from '../util/regions';
-import { updateFileAppRegions } from './fileActions';
+import { updateFileAppRegions, updateFileRegions } from './fileActions';
 import { updateTargetWritable } from './targetActions';
 import EventAction from './usageDataActions';
 
@@ -139,6 +139,7 @@ export const openDevice =
         );
         dispatch(updateTargetRegions(new MemoryMap([]), deviceInfo));
 
+        dispatch(updateFileRegions());
         dispatch(updateTargetWritable());
         dispatch(loadingEnd());
         logger.info('Device is loaded and ready for further operation');
