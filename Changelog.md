@@ -3,6 +3,9 @@
 - Update UI.
 - Disable `Write` button for JLink devices and add tooltip.
 
+### Fixed
+- Update file regions when device is selected after hex file has been added.
+
 ## 2.3.3 - 2022-02-23
 ### Fixed
 - Show correct hardware layout of selected device.
