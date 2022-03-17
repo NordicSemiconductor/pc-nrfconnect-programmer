@@ -14,6 +14,7 @@ import { SettingsState } from './settingsReducer';
 import { TargetState } from './targetReducer';
 import { UserInputState } from './userInputReducer';
 import { WarningState } from './warningReducer';
+import { ArgsState } from './argsReducer';
 
 interface AppState {
     // AppState {
@@ -24,6 +25,7 @@ interface AppState {
     target: TargetState;
     userInput: UserInputState;
     warning: WarningState;
+    args: ArgsState;
 }
 
 export type RootState = NrfConnectState<AppState>;

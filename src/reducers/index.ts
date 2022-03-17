@@ -13,6 +13,7 @@ import settings from './settingsReducer';
 import target from './targetReducer';
 import userInput from './userInputReducer';
 import warning from './warningReducer';
+import args from './argsReducer';
 
 const rootReducer = combineReducers({
     file,
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
     target,
     userInput,
     warning,
+    args,
 });
 
 export default rootReducer;
