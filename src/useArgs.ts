@@ -1,12 +1,17 @@
-import { logger } from 'pc-nrfconnect-shared';
+/*
+ * Copyright (c) 2022 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
+ */
+
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as fs from 'fs';
+import { logger } from 'pc-nrfconnect-shared';
 
 import * as fileActions from './actions/fileActions';
 import * as targetActions from './actions/targetActions';
-
-import { getAreArgsParsed, argsParsed } from './reducers/argsReducer';
+import { argsParsed, getAreArgsParsed } from './reducers/argsReducer';
 import { getConnectedDevices } from './reducers/targetReducer';
 import { RootState, TDispatch } from './reducers/types';
 
@@ -25,6 +30,7 @@ interface Args {
  *
  * `--filePath` - Adds the file at the given path.
  *
+ * @returns {void}
  */
 export default function useArgs(): void {
     const dispatch = useDispatch();
@@ -37,7 +43,7 @@ export default function useArgs(): void {
             const args = parseArgs(process.argv);
             dispatch(actOnArgs(args));
         }
-    }, [connectedDevices]);
+    }, [connectedDevices, areArgsParsed, dispatch]);
 }
 
 function parseArgs(argv: string[]): Args {
@@ -51,7 +57,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 function actOnArgs({ filePath, deviceSerial }: Args) {
-    return function (dispatch: TDispatch, getState: () => RootState) {
+    return (dispatch: TDispatch, getState: () => RootState) => {
         if (filePath) {
             if (fs.existsSync(filePath)) {
                 dispatch(fileActions.openFile(filePath));
