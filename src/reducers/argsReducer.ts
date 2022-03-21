@@ -26,7 +26,6 @@ const argsSlice = createSlice({
     },
     extraReducers: builder => {
         builder.addDefaultCase((state, action) => {
-            console.log('DEILIG', action);
             return state;
         });
     },
