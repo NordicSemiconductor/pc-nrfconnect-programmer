@@ -425,6 +425,7 @@ export const openFile =
         dispatch(zipFileKnown(undefined));
 
         if (filePath.toLowerCase().endsWith('.zip')) {
+            dispatch(filesEmpty());
             dispatch(zipFileKnown(filePath));
             await dispatch(parseZipFile(filePath));
             dispatch(updateTargetWritable());
