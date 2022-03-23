@@ -25,7 +25,11 @@ import * as mcubootTargetActions from '../actions/mcubootTargetActions';
 import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
-import { getFileRegions, getMruFiles } from '../reducers/fileReducer';
+import {
+    getFileRegions,
+    getMruFiles,
+    getZipFilePath,
+} from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
 import { getIsModem } from '../reducers/modemReducer';
 import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
@@ -186,6 +190,7 @@ const ControlPanel = () => {
         useSelector(getTargetType) === CommunicationType.USBSDFU;
     const isMcuboot = useSelector(getIsMcuboot);
     const isModem = useSelector(getIsModem);
+    const zipFile = useSelector(getZipFilePath);
 
     const dispatch = useDispatch();
     const closeFiles = () => dispatch(fileActions.closeFiles());
@@ -272,9 +277,13 @@ const ControlPanel = () => {
                     key="performWrite"
                     variant="secondary"
                     onClick={performWrite}
-                    disabled={!targetIsReady || !targetIsWritable || isJLink}
+                    disabled={
+                        !targetIsReady ||
+                        !targetIsWritable ||
+                        (isJLink && !zipFile)
+                    }
                     title={
-                        isJLink
+                        isJLink && !zipFile
                             ? 'The Write operation is not supported for JLink devices. Use Erase & write.'
                             : ''
                     }
