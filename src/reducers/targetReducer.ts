@@ -200,7 +200,6 @@ export const getRefreshEnabled = (state: RootState) =>
     !state.app.target.isLoading &&
     !state.app.target.isWriting &&
     !state.app.target.isErasing;
-export const getConnectedDevices = (state: RootState) => state.device.devices;
 
 export {
     targetTypeKnown,
