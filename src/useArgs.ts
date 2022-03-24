@@ -5,12 +5,11 @@
  */
 
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import * as fs from 'fs';
 import { logger } from 'pc-nrfconnect-shared';
 
 import * as fileActions from './actions/fileActions';
-import { argsParsed, getAreArgsParsed } from './reducers/argsReducer';
 import { TDispatch } from './reducers/types';
 
 interface Args {
@@ -30,14 +29,10 @@ interface Args {
 export default function useArgs(): void {
     const dispatch = useDispatch();
 
-    const areArgsParsed = useSelector(getAreArgsParsed);
-
     useEffect(() => {
-        if (!areArgsParsed) {
-            const args = parseArgs(process.argv);
-            dispatch(actOnArgs(args));
-        }
-    }, [areArgsParsed, dispatch]);
+        const args = parseArgs(process.argv);
+        dispatch(actOnArgs(args));
+    }, [dispatch]);
 }
 
 function parseArgs(argv: string[]): Args {
@@ -61,7 +56,5 @@ function actOnArgs({ filePath }: Args) {
                 );
             }
         }
-
-        dispatch(argsParsed());
     };
 }
