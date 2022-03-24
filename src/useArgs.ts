@@ -62,7 +62,7 @@ function actOnArgs({ filePath, deviceSerial }: Args) {
             if (fs.existsSync(filePath)) {
                 dispatch(fileActions.openFile(filePath));
                 logger.info(
-                    `Opening device ${deviceSerial} (passed as argument to --filePath)`
+                    `Opening file ${filePath} (passed as argument to --filePath)`
                 );
             } else {
                 logger.warn(
