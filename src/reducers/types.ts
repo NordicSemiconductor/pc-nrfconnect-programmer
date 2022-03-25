@@ -7,7 +7,6 @@
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { NrfConnectState } from 'pc-nrfconnect-shared';
 
-import { ArgsState } from './argsReducer';
 import { FileState } from './fileReducer';
 import { McubootState } from './mcubootReducer';
 import { ModemState } from './modemReducer';
@@ -25,7 +24,6 @@ interface AppState {
     target: TargetState;
     userInput: UserInputState;
     warning: WarningState;
-    args: ArgsState;
 }
 
 export type RootState = NrfConnectState<AppState>;

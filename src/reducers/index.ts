@@ -6,7 +6,6 @@
 
 import { combineReducers } from 'redux';
 
-import args from './argsReducer';
 import file from './fileReducer';
 import mcuboot from './mcubootReducer';
 import modem from './modemReducer';
@@ -23,7 +22,6 @@ const rootReducer = combineReducers({
     target,
     userInput,
     warning,
-    args,
 });
 
 export default rootReducer;
