@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 
 import { getLoaded, getZipFilePath } from '../reducers/fileReducer';
 import { getDeviceInfo, getSerialNumber } from '../reducers/targetReducer';
+import useOpenFileFromArgs from '../useOpenFileFromArgs';
 import { DeviceDefinition } from '../util/devices';
 import McuUpdateDialogView from './McuUpdateDialogView';
 import MemoryBoxView from './MemoryBoxView';
@@ -37,6 +38,8 @@ const AppMainView = () => {
     const zipFilePath = useSelector(getZipFilePath);
     const serialNumber = useSelector(getSerialNumber);
     const deviceInfo = useSelector(getDeviceInfo);
+
+    useOpenFileFromArgs();
 
     return (
         <div className="app-main-view">

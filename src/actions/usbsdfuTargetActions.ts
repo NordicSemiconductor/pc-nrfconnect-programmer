@@ -25,6 +25,7 @@ import {
     HashType,
     logger,
     sdfuOperations,
+    selectedDevice,
     usageData,
     waitForDevice,
 } from 'pc-nrfconnect-shared';
@@ -620,9 +621,7 @@ export const write =
         dispatch(writingStart());
 
         try {
-            const state = getState();
-            const device =
-                state.device.devices[state.device?.selectedSerialNumber ?? ''];
+            const device = selectedDevice(getState());
             if (!device) throw Error(`Failed to write due to device not found`);
             await operateDFU(device.id, images);
             dispatch(writingEnd());
