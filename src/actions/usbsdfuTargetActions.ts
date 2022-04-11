@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
-/* eslint-disable import/no-cycle */
+
 import {
     Device,
     deviceControlReset,
@@ -11,9 +11,7 @@ import {
     firmwareProgram,
     FWInfo,
     Progress,
-    // @ts-ignore -- type error from nrfdl, remove when fixed
     readFwInfo,
-    // eslint-disable-next-line import/no-unresolved
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';

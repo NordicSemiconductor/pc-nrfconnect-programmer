@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 

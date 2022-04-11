@@ -6,7 +6,6 @@
 
 /* eslint-disable no-bitwise */
 
-// eslint-disable-next-line import/no-unresolved
 import { FWInfo } from '@nordicsemiconductor/nrf-device-lib-js';
 import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
 import { logger } from 'pc-nrfconnect-shared';

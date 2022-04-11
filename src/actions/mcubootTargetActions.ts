@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-/* eslint-disable import/no-cycle */
-
-// eslint-disable-next-line import/no-unresolved
 import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Device,
@@ -197,7 +194,7 @@ export const performUpdate =
                 );
                 let errorMsg = error.message;
                 // To be fixed in nrfdl
-                // @ts-ignore will be fixed in nrfdl
+                // @ts-expect-error will be fixed in nrfdl
                 if (error.error_code === 0x25b) {
                     errorMsg =
                         'Please make sure that the device is in MCUboot mode and try again.';

@@ -4,9 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-/* eslint-disable import/no-cycle */
-
-import electron from 'electron';
+import { dialog } from '@electron/remote';
 import { readFile, stat, Stats, statSync } from 'fs';
 import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
 import { basename } from 'path';
@@ -450,8 +448,9 @@ export const openFileDialog = () => (dispatch: TDispatch) => {
             },
         ],
         properties: ['openFile', 'multiSelections'],
-    };
-    electron.remote.dialog
+        // eslint-disable-next-line no-undef
+    } as Electron.OpenDialogOptions;
+    dialog
         .showOpenDialog(dialogOptions)
         .then(
             ({ filePaths }: { filePaths: string[] }) =>

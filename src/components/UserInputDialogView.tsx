@@ -41,7 +41,7 @@ const UserInputDialogView = () => {
         }
     }
 
-    function onInputChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    const onInputChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
         let value = event.target.value || '';
         value = value !== '0' ? value : '';
         value = value.includes('0x')
@@ -50,7 +50,7 @@ const UserInputDialogView = () => {
         setSelectedValue(value);
         setCustomValue(value);
         setIsValidInput(!Number.isNaN(parseInt(value, 16)));
-    }
+    };
 
     return (
         <Modal show={isVisible} onHide={onCancel} backdrop="static">
