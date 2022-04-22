@@ -79,7 +79,6 @@ const RegionView = ({
                 target={target}
                 container={containerNode}
                 show={show}
-                rootClose
                 onHide={() => setShow(false)}
                 transition={false}
             >
