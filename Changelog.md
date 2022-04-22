@@ -6,6 +6,7 @@
 ### Fixed
 - Update file regions when device is selected after hex file has been added.
 - Adding a zip file clears any previuosly opened files.
+- Did not display all serialport devices.
 
 ## 2.3.3 - 2022-02-23
 ### Fixed

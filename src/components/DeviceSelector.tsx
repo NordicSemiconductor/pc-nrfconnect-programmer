@@ -23,7 +23,7 @@ import { TDispatch } from '../reducers/types';
 
 const deviceListing: DeviceListing = {
     nordicUsb: true,
-    serialport: true,
+    serialPort: true,
     jlink: true,
     // @ts-expect-error To be fixed in shared
     mcuboot: true,
