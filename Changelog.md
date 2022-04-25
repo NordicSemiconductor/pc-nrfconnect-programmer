@@ -1,11 +1,11 @@
-## Unreleased
+## 3.0.0 - 2022-04-25
 ### Changed
 - Update UI.
 - Disable `Write` button for JLink devices and add tooltip.
 
 ### Fixed
 - Update file regions when device is selected after hex file has been added.
-- Adding a zip file clears any previuosly opened files.
+- Adding a zip file clears any previously opened files.
 - Did not display all serialport devices.
 - Clicking a file or core region no longer inverts the hover effect.
 
