@@ -10,7 +10,7 @@
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
-        "nrfconnect": "^3.10.0"
+        "nrfconnect": "^3.11.1"
     },
     "main": "dist/bundle.js",
     "files": [
@@ -21,22 +21,20 @@
         "LICENSE"
     ],
     "scripts": {
-        "dev": "nrfconnect-scripts build-watch",
-        "webpack": "nrfconnect-scripts build-dev",
-        "build": "nrfconnect-scripts build-prod",
-        "nordic-publish": "nrfconnect-scripts nordic-publish",
-        "lint": "nrfconnect-scripts lint src",
-        "lintfix": "nrfconnect-scripts lint --fix src",
-        "test": "nrfconnect-scripts test",
-        "test-watch": "nrfconnect-scripts test --watch",
-        "clean": "npm run clean-dist && npm run clean-modules",
-        "clean-dist": "rimraf dist",
-        "clean-modules": "rimraf \"node_modules/!(rimraf|.bin)\""
+        "dev": "webpack watch --mode development",
+        "webpack": "webpack build --mode development",
+        "build": "webpack build",
+        "test": "jest",
+        "check": "run-p --silent --continue-on-error --print-label check:*",
+        "check:lint": "eslint --color .",
+        "check:types": "check-for-typescript tsc --noEmit --pretty",
+        "check:license": "nrfconnect-license check",
+        "nordic-publish": "nordic-publish"
     },
     "devDependencies": {
         "@reduxjs/toolkit": "^1.6.1",
         "@types/electron": "^1.6.10",
-        "@types/react": "^17.0.37",
+        "@types/react": "^17.0.44",
         "@types/react-redux": "^7.1.16",
         "@types/serialport": "^8.0.1",
         "await-semaphore": "^0.1.3",
@@ -44,7 +42,7 @@
         "babel-plugin-transform-async-to-generator": "^6.24.1",
         "immutable": "^3.8.2",
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v5.17.0",
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v6.0.5",
         "protobufjs": "^6.8.4",
         "react": "16.13.1",
         "react-dom": "16.13.1",
@@ -59,7 +57,7 @@
         "react-timer-hook"
     ],
     "eslintConfig": {
-        "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc.json"
+        "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
     },
     "prettier": "./node_modules/pc-nrfconnect-shared/config/prettier.config.js"
 }
