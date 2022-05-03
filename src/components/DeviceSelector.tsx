@@ -5,10 +5,9 @@
  */
 
 import { connect } from 'react-redux';
-import { Device } from '@nordicsemiconductor/nrf-device-lib-js';
+import { Device, DeviceTraits } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Device as SharedDevice,
-    DeviceListing,
     DeviceSelector,
     DeviceSetup,
     logger,
@@ -21,11 +20,10 @@ import { mcubootWritingClose } from '../reducers/mcubootReducer';
 import { modemWritingClose } from '../reducers/modemReducer';
 import { TDispatch } from '../reducers/types';
 
-const deviceListing: DeviceListing = {
+const deviceListing: DeviceTraits = {
     nordicUsb: true,
     serialPort: true,
     jlink: true,
-    // @ts-expect-error To be fixed in shared
     mcuboot: true,
 };
 
