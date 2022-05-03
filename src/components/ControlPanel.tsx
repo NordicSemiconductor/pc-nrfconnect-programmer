@@ -209,7 +209,11 @@ const ControlPanel = () => {
             dispatch(jlinkTargetActions.resetDevice());
         }
     };
-    const performWrite = () => dispatch(targetActions.write());
+    const performWrite = () => {
+        // Refresh all files in case that some files have been updated right before write action.
+        dispatch(refreshAllFiles());
+        dispatch(targetActions.write());
+    };
 
     return (
         <SidePanel className="control-panel">
