@@ -17,7 +17,7 @@ import {
 } from '../util/devices';
 import { Region } from '../util/regions';
 import { fileParse, filesEmpty } from './fileReducer';
-import { RootState } from './types';
+import type { RootState } from './types';
 
 export interface TargetState {
     readonly targetType: CommunicationType;
