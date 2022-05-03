@@ -36,7 +36,6 @@ import {
     VendorId,
 } from '../util/devices';
 import { updateFileRegions } from './fileActions';
-import { updateTargetWritable } from './targetActions';
 import EventAction from './usageDataActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
@@ -125,7 +124,7 @@ export const openDevice =
             })
         );
         dispatch(updateFileRegions());
-        dispatch(updateTargetWritable());
+        dispatch(canWrite());
         dispatch(loadingEnd());
     };
 
@@ -142,7 +141,7 @@ export const toggleMcuboot =
             dispatch(mcubootPortKnown({ port }));
         }
 
-        dispatch(updateTargetWritable());
+        dispatch(canWrite());
     };
 
 export const canWrite =
@@ -160,7 +159,8 @@ export const canWrite =
         // Check if target is MCU target.
         // If not, then return.
         const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
-        if (!isMcubootTarget) {
+        const { isModem } = getState().app.modem;
+        if (!isMcubootTarget || !isModem) {
             return;
         }
 
@@ -207,7 +207,7 @@ export const performUpdate =
                 if (error) return errorCallback(error);
                 logger.info('MCUboot DFU completed successfully!');
                 dispatch(mcubootWritingSucceed());
-                dispatch(updateTargetWritable());
+                dispatch(canWrite());
                 resolve();
             };
 

@@ -210,7 +210,7 @@ export const openDevice =
 
             dispatch(targetRegionsKnown(regions));
             dispatch(fileActions.updateFileRegions());
-            dispatch(targetActions.updateTargetWritable());
+            dispatch(canWrite());
             dispatch(loadingEnd());
         } catch (versionError) {
             logger.error(

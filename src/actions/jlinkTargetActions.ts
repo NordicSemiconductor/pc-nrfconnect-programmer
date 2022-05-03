@@ -44,7 +44,6 @@ import {
 import sequence from '../util/promise';
 import { getTargetRegions } from '../util/regions';
 import { updateFileAppRegions, updateFileRegions } from './fileActions';
-import { updateTargetWritable } from './targetActions';
 import EventAction from './usageDataActions';
 
 /**
@@ -138,7 +137,7 @@ export const openDevice =
         dispatch(updateTargetRegions(new MemoryMap([]), deviceInfo));
 
         dispatch(updateFileRegions());
-        dispatch(updateTargetWritable());
+        dispatch(canWrite());
         dispatch(loadingEnd());
         logger.info('Device is loaded and ready for further operation');
 
@@ -245,10 +244,20 @@ export const canWrite =
         const appState = getState().app;
         const { isErased, isMemLoaded } = appState.target;
         const { isMcuboot } = appState.mcuboot;
-        const { memMaps: fileMemMaps, mcubootFilePath } = appState.file;
+        const {
+            memMaps: fileMemMaps,
+            mcubootFilePath,
+            zipFilePath,
+        } = appState.file;
+        const { isModem } = appState.modem;
 
         // If MCU is enabled and MCU firmware is detected
         if (isMcuboot && mcubootFilePath) {
+            dispatch(targetWritableKnown(true));
+            return;
+        }
+
+        if (zipFilePath && (isMcuboot || isModem)) {
             dispatch(targetWritableKnown(true));
             return;
         }
@@ -258,6 +267,7 @@ export const canWrite =
             dispatch(targetWritableKnown(false));
             return;
         }
+
         dispatch(targetWritableKnown(true));
     };
 
@@ -320,7 +330,7 @@ export const read =
             dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
         }
 
-        dispatch(updateTargetWritable());
+        dispatch(canWrite());
         dispatch(loadingEnd());
 
         const autoReset = getAutoReset(getState());
@@ -493,7 +503,7 @@ export const write =
         const autoReset = getAutoReset(getState());
         if (autoReset) await dispatch(resetDevice());
         await dispatch(openDevice());
-        dispatch(updateTargetWritable());
+        dispatch(canWrite());
     };
 
 /**
