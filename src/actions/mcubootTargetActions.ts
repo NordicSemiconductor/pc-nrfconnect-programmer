@@ -35,7 +35,7 @@ import {
     ModemProductIds,
     VendorId,
 } from '../util/devices';
-import { updateFileRegions } from './fileActions';
+import { updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];

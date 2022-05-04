@@ -43,7 +43,7 @@ import {
 } from '../util/devices';
 import sequence from '../util/promise';
 import { getTargetRegions } from '../util/regions';
-import { updateFileAppRegions, updateFileRegions } from './fileActions';
+import { updateFileAppRegions, updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
 /**
