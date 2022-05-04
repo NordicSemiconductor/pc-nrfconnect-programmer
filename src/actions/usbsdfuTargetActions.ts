@@ -31,6 +31,7 @@ import {
 import {
     dfuImagesUpdate,
     loadingEnd,
+    targetDeviceKnown,
     targetInfoKnown,
     targetRegionsKnown,
     targetTypeKnown,
@@ -56,8 +57,11 @@ import {
     RegionName,
     RegionPermission,
 } from '../util/regions';
-import * as fileActions from './fileActions';
-import * as targetActions from './targetActions';
+import {
+    updateFileAppRegions,
+    updateFileBlRegion,
+    updateFileRegions,
+} from './regionsActions';
 import EventAction from './usageDataActions';
 import * as userInputActions from './userInputActions';
 
@@ -209,8 +213,8 @@ export const openDevice =
             });
 
             dispatch(targetRegionsKnown(regions));
-            dispatch(fileActions.updateFileRegions());
-            dispatch(targetActions.updateTargetWritable());
+            dispatch(updateFileRegions());
+            dispatch(canWrite());
             dispatch(loadingEnd());
         } catch (versionError) {
             logger.error(
@@ -588,8 +592,8 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
  */
 export const write =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
-        dispatch(fileActions.updateFileBlRegion());
-        dispatch(fileActions.updateFileAppRegions());
+        dispatch(updateFileBlRegion());
+        dispatch(updateFileAppRegions());
         dispatch(createDfuImages());
 
         const fileRegions = getState().app.file.regions;
@@ -624,7 +628,8 @@ export const write =
             await operateDFU(device.id, images);
             dispatch(writingEnd());
             const reconnectedDevice = await waitForDevice(device.serialNumber);
-            dispatch(targetActions.openDevice(reconnectedDevice));
+            dispatch(targetDeviceKnown(reconnectedDevice));
+            dispatch(openDevice());
         } catch (error) {
             logger.error(
                 `Failed to write: ${(error as Error).message || error}`

@@ -63,16 +63,16 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
     const placeHolder =
         isTarget && isLoading
             ? // When it is target and during loading, show something.
-              [<CoreView key="something-nice" active core={targetCores[0]} />]
+              [<CoreView key="placeholder" active core={targetCores[0]} />]
             : // When it is target and during writing, show file regions active.
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               convertCoresToViews(targetCores, regions!, isTarget && isWriting);
 
     return (
         <>
-            {placeHolder.map((coreView, index) => (
+            {placeHolder.map(coreView => (
                 <div
-                    key={index.toString()}
+                    key={coreView.props.key}
                     className="core-container"
                     style={{
                         flex: coreView.props.core.romSize,

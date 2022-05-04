@@ -17,7 +17,6 @@ import {
 } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { CommunicationType } from '../util/devices';
-import { refreshAllFiles } from './fileActions';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
 import EventAction from './usageDataActions';
@@ -107,8 +106,6 @@ export const updateTargetWritable =
     };
 
 export const write = () => (dispatch: TDispatch, getState: () => RootState) => {
-    // Refresh all files in case that some files have been updated right before write action.
-    dispatch(refreshAllFiles());
     const {
         target,
         file: { zipFilePath },

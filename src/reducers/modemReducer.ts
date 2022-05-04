@@ -6,7 +6,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { RootState } from './types';
+import type { RootState } from './types';
 
 export const MODEM_DFU_NOT_STARTED = 'Not started.';
 export const MODEM_DFU_STARTING = 'Starting...';

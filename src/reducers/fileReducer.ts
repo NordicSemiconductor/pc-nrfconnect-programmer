@@ -8,7 +8,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
 import { Region } from '../util/regions';
-import { RootState } from './types';
+import type { RootState } from './types';
 
 type Loaded = {
     filename: string;
