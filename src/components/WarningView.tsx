@@ -21,14 +21,12 @@ const combineWarnings = (fileWarningStrings: string[]) =>
 const WarningView = () => {
     const fileWarningStrings = useSelector(getFileWarnings);
 
+    if (fileWarningStrings.length <= 0) return null;
+
     return (
-        <>
-            {fileWarningStrings.length > 0 && (
-                <div className="warning-view">
-                    {combineWarnings(fileWarningStrings)}
-                </div>
-            )}
-        </>
+        <div className="warning-view">
+            {combineWarnings(fileWarningStrings)}
+        </div>
     );
 };
 

@@ -186,8 +186,8 @@ const logDeviceInfo = (device: Device) => {
  * @param {CoreDefinition} coreInfo the information of the core
  * @returns {void}
  */
-const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) => {
-    return (await new Promise(resolve => {
+const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
+    (await new Promise(resolve => {
         logger.info(`Reading memory for ${coreInfo.name} core`);
         nrfdl.firmwareRead(
             getDeviceLibContext(),
@@ -222,7 +222,6 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) => {
             coreInfo.name
         );
     })) as MemoryMap;
-};
 
 /**
  * Check if the files can be written to the target device

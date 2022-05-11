@@ -248,13 +248,12 @@ const getProductId = (device: nrfdl.Device) =>
         16
     );
 
-const identifyUsbByVersion = (device: nrfdl.Device) => {
-    return device.hwInfo?.deviceVersion?.length > 0
+const identifyUsbByVersion = (device: nrfdl.Device) =>
+    device.hwInfo?.deviceVersion?.length > 0
         ? getDeviceDefinition(
               device.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
           )
         : null;
-};
 
 const identifyUsbBySerialPort = (device: nrfdl.Device) => {
     const productId = getProductId(device);
@@ -273,13 +272,10 @@ const identifyUsbBySerialPort = (device: nrfdl.Device) => {
 };
 
 // Get device info by calling version command
-export const getDeviceInfoByUSB = (device: nrfdl.Device) => {
-    return (
-        identifyUsbByVersion(device) ||
-        identifyUsbBySerialPort(device) ||
-        defaultDeviceDefinition
-    );
-};
+export const getDeviceInfoByUSB = (device: nrfdl.Device) =>
+    identifyUsbByVersion(device) ||
+    identifyUsbBySerialPort(device) ||
+    defaultDeviceDefinition;
 
 // Get device info by calling @nordicsemiconductor/nrf-device-lib-js
 export const getDeviceInfoByJlink = (

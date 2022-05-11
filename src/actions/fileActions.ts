@@ -8,7 +8,6 @@ import { dialog } from '@electron/remote';
 import { readFile, stat, Stats, statSync } from 'fs';
 import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
 import { basename } from 'path';
-/* @ts-expect-error No ErrorDialogActions type exported */
 import { ErrorDialogActions, logger } from 'pc-nrfconnect-shared';
 
 import {
@@ -77,7 +76,8 @@ const updateCoreInfo =
         const lastStartAddress = startAddresses[startAddresses.length - 1];
         const lastOverlap = overlaps.get(lastStartAddress) as Overlap;
         if (lastOverlap) {
-            const lastEndAddress = lastStartAddress + lastOverlap[0][1]?.length;
+            const lastEndAddress =
+                lastStartAddress + (lastOverlap[0][1]?.length ?? 0);
             dispatch(
                 targetInfoKnown({
                     ...defaultDeviceDefinition,
@@ -140,8 +140,8 @@ const parseZipFile = (filePath: string) => async (dispatch: TDispatch) => {
     const stats = await new Promise<Stats>((resolve, reject) => {
         stat(filePath, (statsError, result) => {
             if (statsError) {
-                logger.error(`Could not open ZIP file: ${statsError}`);
-                dispatch(ErrorDialogActions.showDialog(statsError));
+                logger.error(`Could not open ZIP file: ${statsError.message}`);
+                dispatch(ErrorDialogActions.showDialog(statsError.message));
                 removeMruFile(filePath);
                 return reject();
             }
@@ -164,8 +164,10 @@ const parseHexFile =
         const stats: Stats = await new Promise((resolve, reject) => {
             stat(filePath, (statsError, result) => {
                 if (statsError) {
-                    logger.error(`Could not open HEX file: ${statsError}`);
-                    dispatch(ErrorDialogActions.showDialog(statsError));
+                    logger.error(
+                        `Could not open HEX file: ${statsError.message}`
+                    );
+                    dispatch(ErrorDialogActions.showDialog(statsError.message));
                     removeMruFile(filePath);
                     return reject();
                 }
@@ -181,8 +183,10 @@ const parseHexFile =
                     stats.mtime.toLocaleString()
                 );
                 if (readError) {
-                    logger.error(`Could not open HEX file: ${readError}`);
-                    dispatch(ErrorDialogActions.showDialog(readError));
+                    logger.error(
+                        `Could not open HEX file: ${readError.message}`
+                    );
+                    dispatch(ErrorDialogActions.showDialog(readError.message));
                     removeMruFile(filePath);
                     return reject();
                 }
@@ -195,8 +199,8 @@ const parseHexFile =
         try {
             memMap = MemoryMap.fromHex(data.toString());
         } catch (e) {
-            logger.error(`Could not open HEX file: ${e}`);
-            dispatch(ErrorDialogActions.showDialog(e));
+            logger.error(`Could not open HEX file: ${(e as Error).message}`);
+            dispatch(ErrorDialogActions.showDialog((e as Error).message));
             return;
         }
 
@@ -285,7 +289,9 @@ export const refreshAllFiles =
                             (error as Error).message || error
                         }`
                     );
-                    dispatch(ErrorDialogActions.showDialog(error));
+                    dispatch(
+                        ErrorDialogActions.showDialog((error as Error).message)
+                    );
                 }
             })
         );
