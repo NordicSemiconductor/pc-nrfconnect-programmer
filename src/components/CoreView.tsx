@@ -106,6 +106,7 @@ const CoreView = ({ core, active }: CoreViewProps) => {
         />
     );
 
+    // eslint-disable-next-line react/jsx-no-useless-fragment -- RegionViews is an array and requires a fragment
     return <>{regionViews}</>;
 };
 

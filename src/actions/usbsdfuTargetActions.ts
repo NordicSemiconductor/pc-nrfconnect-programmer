@@ -453,8 +453,9 @@ const handleSdReq = (
  * @param {DfuImage} imageInput the DFU image
  * @returns {DfuImage} the updated DFU image
  */
-const handleUserInput = (imageInput: DfuImage) => {
-    return async (dispatch: TDispatch): Promise<DfuImage> => {
+const handleUserInput =
+    (imageInput: DfuImage) =>
+    async (dispatch: TDispatch): Promise<DfuImage> => {
         let image = imageInput;
         let sdReq;
 
@@ -483,7 +484,6 @@ const handleUserInput = (imageInput: DfuImage) => {
 
         return image;
     };
-};
 
 /**
  * Update calculated hash regarding to the DFU image
@@ -539,7 +539,7 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
 
     let prevPercentage: number;
 
-    return new Promise<void>(resolve =>
+    return new Promise<void>(resolve => {
         firmwareProgram(
             getDeviceLibContext(),
             deviceId,
@@ -581,8 +581,8 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
                     prevPercentage = progress.progressPercentage;
                 }
             }
-        )
-    );
+        );
+    });
 };
 
 /**

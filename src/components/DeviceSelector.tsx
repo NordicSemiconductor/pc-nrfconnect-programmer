@@ -22,7 +22,7 @@ import { TDispatch } from '../reducers/types';
 
 const deviceListing: DeviceTraits = {
     nordicUsb: true,
-    serialPort: true,
+    serialPorts: true,
     jlink: true,
     mcuboot: true,
 };

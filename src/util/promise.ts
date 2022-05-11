@@ -17,6 +17,7 @@
 const sequence = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fun: (...args: any) => Promise<unknown>,
+    // eslint-disable-next-line default-param-last
     results: Array<unknown> = [],
     argsArray: Array<Array<unknown>>
 ): Promise<unknown> => {
