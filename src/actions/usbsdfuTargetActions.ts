@@ -17,6 +17,7 @@ import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';
 import {
     defaultInitPacket,
+    describeError,
     DfuImage,
     FwType,
     getDeviceLibContext,
@@ -218,10 +219,9 @@ export const openDevice =
             dispatch(loadingEnd());
         } catch (versionError) {
             logger.error(
-                `Error when fetching device versions: ${
-                    (versionError as { message: string }).message ||
+                `Error when fetching device versions: ${describeError(
                     versionError
-                }`
+                )}`
             );
         }
     };
@@ -557,7 +557,7 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
                             'The required SoftDevice version does not match'
                         );
                     } else {
-                        logger.error(error);
+                        logger.error(describeError(error));
                     }
                     throw error;
                 } else {
@@ -631,8 +631,6 @@ export const write =
             dispatch(targetDeviceKnown(reconnectedDevice));
             dispatch(openDevice());
         } catch (error) {
-            logger.error(
-                `Failed to write: ${(error as Error).message || error}`
-            );
+            logger.error(`Failed to write: ${describeError(error)}`);
         }
     };

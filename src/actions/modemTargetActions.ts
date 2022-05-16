@@ -5,7 +5,12 @@
  */
 
 import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
-import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
+import {
+    describeError,
+    getDeviceLibContext,
+    logger,
+    usageData,
+} from 'pc-nrfconnect-shared';
 
 import {
     MODEM_DFU_STARTING,
@@ -23,10 +28,8 @@ export const programDfuModem =
             const { id: deviceId } = inputDevice as Device;
 
             const errorCallback = (error: nrfdl.Error) => {
-                logger.error(
-                    `Modem DFU failed with error: ${error.message || error}`
-                );
-                let errorMsg = error.message;
+                let errorMsg = describeError(error);
+                logger.error(`Modem DFU failed with error: ${errorMsg}`);
                 // @ts-expect-error To be fixed in nrfdl
                 if (error.error_code === 0x25b) {
                     errorMsg =
