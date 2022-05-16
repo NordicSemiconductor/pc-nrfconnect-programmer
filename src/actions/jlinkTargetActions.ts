@@ -7,13 +7,17 @@
 import { dialog } from '@electron/remote';
 import nrfdl, {
     Device,
-    Error as NrfdlError,
     FirmwareReadResult,
     ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
-import { getDeviceLibContext, logger, usageData } from 'pc-nrfconnect-shared';
+import {
+    describeError,
+    getDeviceLibContext,
+    logger,
+    usageData,
+} from 'pc-nrfconnect-shared';
 
 import { modemKnown } from '../reducers/modemReducer';
 import { getAutoReset } from '../reducers/settingsReducer';
@@ -84,9 +88,9 @@ export const loadProtectionStatus = async (
         logger.info(`Readback protection status: ${protectionStatus}`);
         return protectionStatus;
     } catch (error) {
-        const errorMessage = `Failed to load readback protection status: ${
-            (error as Error).message || error
-        }`;
+        const errorMessage = `Failed to load readback protection status: ${describeError(
+            error
+        )}`;
         usageData.sendErrorReport(errorMessage);
         throw Error(errorMessage);
     }
@@ -195,7 +199,7 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_INTEL_HEX',
             result => {
-                const errorMessage = (result as NrfdlError).message;
+                const errorMessage = describeError(result);
                 if (errorMessage) {
                     usageData.sendErrorReport(
                         `Failed to get device memory map: ${errorMessage}`
@@ -316,9 +320,7 @@ export const read =
                     )
                 );
             } catch (error) {
-                throw Error(
-                    `getDeviceMemMap: ${(error as Error).message || error}`
-                );
+                throw Error(`getDeviceMemMap: ${describeError(error)}`);
             }
             dispatch(
                 targetContentsKnown({
@@ -358,9 +360,9 @@ export const recoverOneCore =
             return;
         } catch (error) {
             usageData.sendErrorReport(
-                `Failed to recover ${coreInfo.name} core: ${
-                    (error as Error).message || error
-                }`
+                `Failed to recover ${coreInfo.name} core: ${describeError(
+                    error
+                )}`
             );
         }
     };
@@ -420,7 +422,9 @@ const writeHex = (
             err => {
                 if (err)
                     usageData.sendErrorReport(
-                        `Device programming failed with error: ${err}`
+                        `Device programming failed with error: ${describeError(
+                            err
+                        )}`
                     );
                 logger.info(`Writing HEX to ${coreInfo.name} core completed`);
                 resolve();
@@ -559,7 +563,7 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
 
             fs.writeFile(filePath, data, err => {
                 if (err) {
-                    logger.error(`Failed to save file: ${err.message || err}`);
+                    logger.error(`Failed to save file: ${describeError(err)}`);
                 }
                 logger.info(`File is successfully saved at ${filePath}`);
             });

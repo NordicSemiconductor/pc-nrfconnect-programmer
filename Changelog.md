@@ -1,3 +1,9 @@
+## 3.0.1 - 2022-05-16
+
+### Fixed
+
+-   Some errors were not displayed correctly.
+
 ## 3.0.0 - 2022-04-26
 
 ### Changed

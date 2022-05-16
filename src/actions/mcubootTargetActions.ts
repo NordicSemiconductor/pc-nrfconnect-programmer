@@ -6,6 +6,7 @@
 
 import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
+    describeError,
     Device,
     getDeviceLibContext,
     logger,
@@ -189,10 +190,8 @@ export const performUpdate =
             );
 
             const errorCallback = (error: nrfdl.Error) => {
-                logger.error(
-                    `MCUboot DFU failed with error: ${error.message || error}`
-                );
-                let errorMsg = error.message;
+                let errorMsg = describeError(error);
+                logger.error(`MCUboot DFU failed with error: ${errorMsg}`);
                 // To be fixed in nrfdl
                 // @ts-expect-error will be fixed in nrfdl
                 if (error.error_code === 0x25b) {
