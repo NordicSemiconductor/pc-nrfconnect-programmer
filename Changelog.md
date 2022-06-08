@@ -1,8 +1,9 @@
-## 3.0.1 - 2022-05-16
+## 3.0.1 - 2022-06-08
 
 ### Fixed
 
 -   Some errors were not displayed correctly.
+-   Not able to open external device without
 
 ## 3.0.0 - 2022-04-26
 
