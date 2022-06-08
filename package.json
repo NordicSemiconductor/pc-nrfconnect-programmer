@@ -54,6 +54,7 @@
         "react-timer-hook": "^3.0.5"
     },
     "bundledDependencies": [
+        "adm-zip",
         "electron-store",
         "react-timer-hook"
     ],
