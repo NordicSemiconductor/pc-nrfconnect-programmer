@@ -27,8 +27,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
     dispatch(targetDeviceKnown(device));
 
     const { serialNumber, serialPorts } = device;
-    const serialport =
-        serialPorts && serialPorts.length > 1 ? serialPorts[0] : undefined;
+    const serialport = serialPorts?.slice(0)[0];
 
     let vendorId;
     let productId;
