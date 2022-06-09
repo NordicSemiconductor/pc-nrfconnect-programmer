@@ -211,7 +211,7 @@ const ControlPanel = () => {
     };
     const performWrite = () => {
         // Refresh all files in case that some files have been updated right before write action.
-        dispatch(refreshAllFiles());
+        refreshAllFiles();
         dispatch(targetActions.write());
     };
 
