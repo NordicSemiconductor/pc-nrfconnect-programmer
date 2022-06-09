@@ -199,10 +199,11 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_INTEL_HEX',
             result => {
-                const errorMessage = describeError(result);
-                if (errorMessage) {
+                if ((result as nrfdl.Error).message) {
                     usageData.sendErrorReport(
-                        `Failed to get device memory map: ${errorMessage}`
+                        `Failed to get device memory map: ${describeError(
+                            result
+                        )}`
                     );
                     return;
                 }

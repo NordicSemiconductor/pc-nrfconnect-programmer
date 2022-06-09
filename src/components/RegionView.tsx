@@ -44,7 +44,7 @@ const RegionView = ({
         dispatch(fileActions.removeFile(filePath));
 
     const toggleShow = (event: React.PointerEvent<HTMLElement>) => {
-        setShow(!show);
+        setShow(event.type === 'pointerenter');
         setTarget(event.target as HTMLElement);
     };
 
