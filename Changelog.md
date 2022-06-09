@@ -1,3 +1,10 @@
+## 3.0.2
+
+### Fixed
+
+-   `Write` when flashing modem firmware files did nothing.
+-   Reading a device would freeze the app.
+
 ## 3.0.1 - 2022-06-08
 
 ### Fixed
