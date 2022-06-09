@@ -3,7 +3,7 @@
 ### Fixed
 
 -   Some errors were not displayed correctly.
--   Not able to open external device without
+-   Not able to open device with external JLink debugger.
 
 ## 3.0.0 - 2022-04-26
 
