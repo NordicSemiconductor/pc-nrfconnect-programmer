@@ -5,6 +5,11 @@
 -   `Write` when flashing modem firmware files did nothing.
 -   Reading a device would freeze the app.
 
+### Known issues
+
+-   Connecting devices on linux sometimes takes several attempts (user has to
+    reconnect device).
+
 ## 3.0.1 - 2022-06-08
 
 ### Fixed
