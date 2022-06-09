@@ -1,3 +1,16 @@
+## 3.0.2 - 2022-06-09
+
+### Fixed
+
+-   Writing modem fw and reading memory layout.
+
+## 3.0.1 - 2022-06-08
+
+### Fixed
+
+-   Some errors were not displayed correctly.
+-   Not able to use J-Link BASE.
+
 ## 3.0.0 - 2022-04-25
 ### Changed
 - Update UI.
