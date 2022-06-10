@@ -47,16 +47,12 @@
         "protobufjs": "^6.8.4",
         "react": "16.13.1",
         "react-dom": "16.13.1",
-        "react-redux": "^7.2.0"
-    },
-    "dependencies": {
-        "adm-zip": "^0.5.2",
+        "react-redux": "^7.2.0",
         "react-timer-hook": "^3.0.5"
     },
+    "dependencies": {},
     "bundledDependencies": [
-        "adm-zip",
-        "electron-store",
-        "react-timer-hook"
+        "electron-store"
     ],
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
