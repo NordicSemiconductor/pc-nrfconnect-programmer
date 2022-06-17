@@ -1,3 +1,9 @@
+## 3.0.3 - 2022-06-17
+
+### Fixed
+
+-   Correctly detect some MCUboot devices (notably Thingy53).
+
 ## 3.0.2 - 2022-06-09
 
 ### Fixed
