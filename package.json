@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-programmer",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "description": "Program a Nordic SoC with HEX files from nRF Connect",
     "displayName": "Programmer",
     "repository": {

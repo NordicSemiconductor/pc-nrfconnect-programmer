@@ -49,7 +49,9 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
         return;
     }
-    if (device.traits.mcuboot || mcubootTargetActions.isMcuboot(vid, pid)) {
+    // Trait changed between nrfdl-version, will be rectified in device-lib-js in later.
+    const mcuBootTrait = device.traits.mcuboot || (<any>device.traits).mcuBoot;
+    if (mcuBootTrait || mcubootTargetActions.isMcuboot(vid, pid)) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
         dispatch(mcubootTargetActions.openDevice());
         return;
