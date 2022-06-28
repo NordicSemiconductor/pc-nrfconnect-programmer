@@ -151,27 +151,19 @@ export const canWrite =
         dispatch(targetWritableKnown(false));
 
         // Check if mcu firmware is detected.
-        // If not, then return.
-        const { mcubootFilePath, zipFilePath } = getState().app.file;
-        if (!mcubootFilePath && !zipFilePath) {
-            return;
-        }
-
         // Check if target is MCU target.
-        // If not, then return.
+        const { mcubootFilePath, zipFilePath } = getState().app.file;
         const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
-        const { isModem } = getState().app.modem;
-        if (!isMcubootTarget || !isModem) {
-            return;
+
+        if ((mcubootFilePath || zipFilePath) && isMcubootTarget) {
+            // Check if firmware is valid for Thingy91
+            // So far there is no strict rule for checking it
+            // Therefore set it always true
+            dispatch(mcubootFirmwareValid(true));
+
+            // Enable write button if all above items have been checked
+            dispatch(targetWritableKnown(true));
         }
-
-        // Check if firmware is valid for Thingy91
-        // So far there is no strict rule for checking it
-        // Therefore set it always true
-        dispatch(mcubootFirmwareValid(true));
-
-        // Enable write button if all above items have been checked
-        dispatch(targetWritableKnown(true));
     };
 
 export const performUpdate =
