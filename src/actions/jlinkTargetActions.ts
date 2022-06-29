@@ -191,7 +191,7 @@ const logDeviceInfo = (device: Device) => {
  * @returns {void}
  */
 const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
-    (await new Promise(resolve => {
+    (await new Promise((resolve, reject) => {
         logger.info(`Reading memory for ${coreInfo.name} core`);
         nrfdl.firmwareRead(
             getDeviceLibContext(),
@@ -205,7 +205,7 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
                             result
                         )}`
                     );
-                    return;
+                    reject();
                 }
 
                 let memMap = MemoryMap.fromHex(
@@ -321,7 +321,8 @@ export const read =
                     )
                 );
             } catch (error) {
-                throw Error(`getDeviceMemMap: ${describeError(error)}`);
+                logger.error('Error when reading device');
+                return;
             }
             dispatch(
                 targetContentsKnown({
@@ -527,7 +528,6 @@ export const recoverAndWrite = () => async (dispatch: TDispatch) => {
  */
 export const resetDevice =
     () => async (_: TDispatch, getState: () => RootState) => {
-        logger.info(`Resetting device`);
         const { device: inputDevice } = getState().app.target;
         const device = inputDevice as Device;
 
