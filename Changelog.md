@@ -1,3 +1,9 @@
+## 3.0.4 - 2022-06-28
+
+### Fixed
+
+-   Don't show erronous warning when mcu flashing the Thingy53.
+
 ## 3.0.3 - 2022-06-17
 
 ### Fixed
