@@ -22,7 +22,7 @@ function getTargetTitle(
     deviceInfo: DeviceDefinition | undefined
 ) {
     if (serialNumber) {
-        return deviceInfo?.type !== 'Unknown'
+        return deviceInfo?.type?.toUpperCase() !== 'UNKNOWN'
             ? deviceInfo?.type
             : deviceInfo.family;
     }
