@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fixed
+
+-   Sometimes displayed known devices as `UNKNOWN`.
+
 ## 3.0.4 - 2022-06-28
 
 ### Fixed
