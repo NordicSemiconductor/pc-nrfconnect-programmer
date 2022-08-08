@@ -57,11 +57,11 @@ export const defaultCore: CoreDefinition = {
  * Supported Nordic device families
  */
 export enum DeviceFamily {
-    NRF51 = 'nRF51',
-    NRF52 = 'nRF52',
-    NRF53 = 'nRF53',
-    NRF91 = 'nRF91',
-    UNKNOWN = 'Unknown',
+    NRF51 = 'NRF51_FAMILY',
+    NRF52 = 'NRF52_FAMILY',
+    NRF53 = 'NRF53_FAMILY',
+    NRF91 = 'NRF91_FAMILY',
+    UNKNOWN = 'UNKNOWN_FAMILY',
 }
 
 export interface DeviceDefinition {
@@ -75,7 +75,7 @@ export interface DeviceDefinition {
  */
 export const defaultDeviceDefinition: DeviceDefinition = {
     family: DeviceFamily.UNKNOWN,
-    type: 'Unknown',
+    type: 'UNKNOWN',
     cores: [defaultCore],
 };
 
@@ -281,7 +281,7 @@ export const getDeviceInfoByUSB = (device: nrfdl.Device) =>
 export const getDeviceInfoByJlink = (
     device: nrfdl.Device
 ): DeviceDefinition => {
-    const type = device.jlink?.deviceVersion ?? 'Unknown';
+    const type = device.jlink?.deviceVersion;
     const family = device.jlink?.deviceFamily as DeviceFamily;
 
     return {
