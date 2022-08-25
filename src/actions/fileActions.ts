@@ -15,6 +15,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import {
+    elfParse,
     fileParse,
     filesEmpty,
     mcubootFileKnown,
@@ -25,11 +26,7 @@ import { targetInfoKnown } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
-import {
-    defaultDeviceDefinition,
-    DeviceFamily,
-    getDeviceDefinition,
-} from '../util/devices';
+import { defaultDeviceDefinition, getDeviceDefinition } from '../util/devices';
 import { updateFileRegions } from './regionsActions';
 import { updateTargetWritable } from './targetActions';
 
@@ -41,7 +38,7 @@ const updateCoreInfo =
 
         // If device is selected, device family and device type will not be null
         // and so will not assume target cores by file regions.
-        if (family !== DeviceFamily.UNKNOWN || type !== 'UNKNOWN') {
+        if (family !== 'Unknown' || type !== 'Unknown') {
             return;
         }
 
@@ -239,6 +236,34 @@ const parseHexFile =
         dispatch(updateTargetWritable());
     };
 
+const parseElf = (filePath: string) => async (dispatch: TDispatch) => {
+    const stats = await new Promise<Stats>((resolve, reject) => {
+        stat(filePath, (statsError, result) => {
+            if (statsError) {
+                logger.error(
+                    `Could not open Elf file: ${describeError(statsError)}`
+                );
+                dispatch(
+                    ErrorDialogActions.showDialog(describeError(statsError))
+                );
+                removeMruFile(filePath);
+                return reject();
+            }
+            return resolve(result);
+        });
+    });
+
+    logger.info('Checking Elf file: ', filePath);
+    logger.info('File was last modified at ', stats.mtime.toLocaleString());
+    addMruFile(filePath);
+    // License for elfy can be found at https://github.com/indutny/elfy
+    const elfy = require('elfy');
+    const fs = require('fs');
+    const fileData = fs.readFileSync(filePath);
+    const elf = elfy.parse(fileData);
+    dispatch(elfParse(elf));
+};
+
 export const openFile =
     (...params: string[]) =>
     async (dispatch: TDispatch): Promise<unknown> => {
@@ -256,10 +281,16 @@ export const openFile =
             dispatch(updateTargetWritable());
             return dispatch(openFile(...params.slice(1)));
         }
+        if (filePath.toLowerCase().endsWith('.elf')) {
+            dispatch(filesEmpty());
+            await dispatch(parseElf(filePath));
+            return dispatch(openFile(...params.slice(1)));
+        }
         if (
             filePath.toLowerCase().endsWith('.hex') ||
             filePath.toLowerCase().endsWith('.ihex')
         ) {
+            dispatch(filesEmpty());
             await dispatch(parseHexFile(filePath));
             return dispatch(openFile(...params.slice(1)));
         }
@@ -267,11 +298,11 @@ export const openFile =
 
 export const openFileDialog = () => (dispatch: TDispatch) => {
     const dialogOptions = {
-        title: 'Select a HEX / ZIP file',
+        title: 'Select a HEX / ZIP / Elf file',
         filters: [
             {
-                name: 'HEX / ZIP files',
-                extensions: ['hex', 'iHex', 'zip'],
+                name: 'HEX / ZIP / ELF files',
+                extensions: ['hex', 'iHex', 'zip', 'elf'],
             },
         ],
         properties: ['openFile', 'multiSelections'],

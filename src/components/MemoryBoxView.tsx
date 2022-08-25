@@ -9,12 +9,14 @@ import Card from 'react-bootstrap/Card';
 import Popover from 'react-bootstrap/Popover';
 import PropTypes from 'prop-types';
 
+import Canvas from './Canvas';
 import DeviceInfoView from './DeviceInfoView';
 import MemoryView from './MemoryView';
 
 interface MemoryBoxViewProps {
     title: string;
     description?: string;
+    hasViz?: boolean;
     iconName?: string;
     isHolder?: boolean;
     isTarget?: boolean;
@@ -25,6 +27,7 @@ const MemoryBoxView = ({
     description,
     iconName,
     isHolder,
+    hasViz,
     isTarget,
 }: MemoryBoxViewProps) => {
     const [showOverlay, setShowOverlay] = useState(false);
@@ -41,10 +44,12 @@ const MemoryBoxView = ({
                     {isTarget && (
                         <span className="mdi mdi-information-outline target-info" />
                     )}
+
                     <span className={`glyphicon ${iconName}`} />
+                    {hasViz && '.elf'}
                 </Card.Title>
             </Card.Header>
-            {isTarget && showOverlay && (
+            {!hasViz && isTarget && showOverlay && (
                 <Popover
                     id="deviceInfo"
                     placement="bottom"
@@ -55,17 +60,33 @@ const MemoryBoxView = ({
                     <DeviceInfoView />
                 </Popover>
             )}
-            <Card.Body className={`panel-body ${isHolder && 'empty'} stacked`}>
-                {isHolder && (
-                    <div className="memory-layout-container">
-                        <h1>
-                            <span className={`glyphicon ${iconName}`} />
-                        </h1>
-                        <p>{description}</p>
-                    </div>
-                )}
-                {!isHolder && <MemoryView isTarget={isTarget as boolean} />}
-            </Card.Body>
+            {hasViz && (
+                <Card.Body
+                    className={`panel-body ${isHolder && 'empty'} stacked`}
+                >
+                    {isHolder && (
+                        <div className="memory-layout-container">
+                            <Canvas />
+                        </div>
+                    )}
+                    {!isHolder && <MemoryView isTarget={isTarget as boolean} />}
+                </Card.Body>
+            )}
+            {!hasViz && (
+                <Card.Body
+                    className={`panel-body ${isHolder && 'empty'} stacked`}
+                >
+                    {isHolder && (
+                        <div className="memory-layout-container">
+                            <h1>
+                                <span className={`glyphicon ${iconName}`} />
+                            </h1>
+                            <p>{description}</p>
+                        </div>
+                    )}
+                    {!isHolder && <MemoryView isTarget={isTarget as boolean} />}
+                </Card.Body>
+            )}
         </Card>
     );
 };
@@ -76,6 +97,7 @@ MemoryBoxView.propTypes = {
     iconName: PropTypes.string,
     isHolder: PropTypes.bool,
     isTarget: PropTypes.bool,
+    hasViz: PropTypes.bool,
 };
 
 MemoryBoxView.defaultProps = {
@@ -83,6 +105,7 @@ MemoryBoxView.defaultProps = {
     iconName: null,
     isHolder: false,
     isTarget: false,
+    hasViz: false,
 };
 
 export default MemoryBoxView;

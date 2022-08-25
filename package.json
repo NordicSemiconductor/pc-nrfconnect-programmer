@@ -33,11 +33,13 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "nrf-intel-hex": "^1.2.0",
+        "nrf-intel-hex": "^1.3.0",
         "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#v6.6.1",
         "react-timer-hook": "^3.0.5"
     },
-    "dependencies": {},
+    "dependencies": {
+        "elfy": "^1.0.0"
+    },
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
     },

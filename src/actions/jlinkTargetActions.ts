@@ -580,28 +580,25 @@ const updateCoresWithNrfdl = async (
 ): Promise<DeviceDefinition> => {
     const cores = await Promise.all(
         deviceInfo.cores.map(async (core, index) => {
-            try {
-                const protectionStatus = await loadProtectionStatus(
-                    device.id,
-                    core.name
-                );
-                if (protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
-                    return core;
-                }
-                const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
-                    getDeviceLibContext(),
-                    device.id,
-                    core.name
-                );
-                return updateCoreInfo(
-                    core,
-                    index,
-                    deviceCoreInfo,
-                    protectionStatus
-                );
-            } catch (e) {
+            const protectionStatus = await loadProtectionStatus(
+                device.id,
+                core.name
+            );
+
+            if (protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
                 return core;
             }
+            const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
+                getDeviceLibContext(),
+                device.id,
+                core.name
+            );
+            return updateCoreInfo(
+                core,
+                index,
+                deviceCoreInfo,
+                protectionStatus
+            );
         })
     );
     return { ...deviceInfo, cores };

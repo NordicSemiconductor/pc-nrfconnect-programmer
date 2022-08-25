@@ -1,0 +1,23 @@
+/*
+ * Copyright (c) 2015 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
+ */
+
+.section-info-view {
+    padding-top: 4px;
+    font-size: 12px;
+    min-width: 155px;
+    .fields {
+        padding-top: 12px;
+        border-bottom: 1px solid #b0bec5;
+    }
+    div:last-child {
+        border: none;
+    }
+    p {
+        text-align: left !important;
+        padding-top: 0 !important;
+        color: #263238 !important;
+    }
+}
