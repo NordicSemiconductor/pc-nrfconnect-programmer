@@ -24,8 +24,6 @@ const deviceListing: DeviceTraits = {
     nordicUsb: true,
     serialPorts: true,
     jlink: true,
-    // @ts-expect-error Old type kept for backwards compatibility
-    mcuboot: true,
     mcuBoot: true,
 };
 

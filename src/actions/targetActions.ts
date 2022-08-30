@@ -50,9 +50,7 @@ export const openDevice = (device: Device) => (dispatch: TDispatch) => {
         return;
     }
 
-    // Old traits type kept for backwards compatibility
-    const mcuBootTrait = (<any>device.traits).mcuboot || device.traits.mcuBoot;
-    if (mcuBootTrait || mcubootTargetActions.isMcuboot(vid, pid)) {
+    if (device.traits.mcuBoot || mcubootTargetActions.isMcuboot(vid, pid)) {
         usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
         dispatch(mcubootTargetActions.openDevice());
         return;
