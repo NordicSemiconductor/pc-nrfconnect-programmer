@@ -26,7 +26,11 @@ import { targetInfoKnown } from '../reducers/targetReducer';
 import { RootState, TDispatch } from '../reducers/types';
 import { fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
-import { defaultDeviceDefinition, getDeviceDefinition } from '../util/devices';
+import {
+    defaultDeviceDefinition,
+    DeviceFamily,
+    getDeviceDefinition,
+} from '../util/devices';
 import { updateFileRegions } from './regionsActions';
 import { updateTargetWritable } from './targetActions';
 
@@ -38,7 +42,7 @@ const updateCoreInfo =
 
         // If device is selected, device family and device type will not be null
         // and so will not assume target cores by file regions.
-        if (family !== 'Unknown' || type !== 'Unknown') {
+        if (family !== DeviceFamily.UNKNOWN || type !== 'UNKNOWN') {
             return;
         }
 
@@ -298,7 +302,7 @@ export const openFile =
 
 export const openFileDialog = () => (dispatch: TDispatch) => {
     const dialogOptions = {
-        title: 'Select a HEX / ZIP / Elf file',
+        title: 'Select a HEX / ZIP / ELF file',
         filters: [
             {
                 name: 'HEX / ZIP / ELF files',

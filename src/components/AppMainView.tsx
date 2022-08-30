@@ -19,7 +19,7 @@ function getTargetTitle(
     deviceInfo: DeviceDefinition | undefined
 ) {
     if (serialNumber) {
-        return deviceInfo?.type !== 'Unknown'
+        return deviceInfo?.type !== 'UNKNOWN'
             ? deviceInfo?.type
             : deviceInfo.family;
     }
@@ -44,11 +44,11 @@ const AppMainView = () => {
             <WarningView />
             <div className="memory-box-container">
                 <MemoryBoxView
-                    title="Memory visualization"
+                    title="File memory layout"
                     description="Drag & drop HEX/ZIP/ELF files here"
                     iconName="mdi mdi-file-outline"
                     isHolder={!hasFileContent(loaded) && !zipFilePath}
-                    hasViz={elf !== undefined}
+                    containsVisualization={elf !== undefined}
                 />
                 <MemoryBoxView
                     title={

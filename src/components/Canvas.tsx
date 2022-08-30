@@ -284,10 +284,8 @@ const Canvas = () => {
     };
 
     return (
-        // This should be in it's own CSS file
         <div className="canvas-container">
             <canvas
-                id="canvas"
                 onMouseMove={handleOnMouseMove}
                 ref={canvasRef}
                 width={canvasWidth}
@@ -298,6 +296,8 @@ const Canvas = () => {
 
             {
                 // All of this should preferably be in the sectionInfoView component
+                // To move it to sectionInfoView, We'll need mousePos, tooltipUpper, clientHeight|undefined, color, and sectionNumber
+                // Is this really worth it?
                 sectionNumber >= 0 && show && (
                     <div
                         ref={ref}
