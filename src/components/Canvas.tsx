@@ -28,6 +28,7 @@ const Canvas = () => {
     const elf = useSelector(getElf); // Gets all info about the elf-file
     const sections = elf.body.sections.slice(1); // First section is null, so it's discarded. This might not be the case for every elf-file...
     const sectionMap: number[][] = initializeSectionMap();
+    const borderColor = 'white';
 
     const numBoxes = getNumBoxes();
     const boxesPerRow = Math.floor(canvasWidth / boxDisplaySize);
@@ -201,38 +202,39 @@ const Canvas = () => {
     }
 
     function drawBoxBorders(x: number, y: number, sectionMap: number[][]) {
-        if (c) {
-            const xPos = rowBoxSize.slice(0, x).reduce((a, b) => a + b, 0);
-            const width = rowBoxSize[x];
-            const height = maxBoxSize;
-
-            c.beginPath();
-            c.save();
-            c.translate(-0.5, -0.5);
-            c.strokeStyle = 'black';
-
-            if (
-                getSectionNumberByGridPosition(x, y, sectionMap) !==
-                getSectionNumberByGridPosition(x, y + 1, sectionMap)
-            ) {
-                // Bottom border
-                c.moveTo(xPos, (y + 1) * height);
-                c.lineTo(xPos + width, (y + 1) * height);
-            }
-            if (
-                getSectionNumberByGridPosition(x, y, sectionMap) !==
-                getSectionNumberByGridPosition(x + 1, y, sectionMap)
-            ) {
-                // Right border
-                c.moveTo(xPos + width, y * height);
-                c.lineTo(xPos + width, (y + 1) * height);
-            }
-
-            // Leftmost and topmost borders only need to be drawn once, as they are contiguous
-
-            c.restore();
-            c.stroke();
+        if (!c) {
+            return;
         }
+
+        const xPos = rowBoxSize.slice(0, x).reduce((a, b) => a + b, 0);
+        const width = rowBoxSize[x];
+        const height = maxBoxSize;
+
+        c.beginPath();
+        c.save();
+        c.translate(-0.5, -0.5);
+
+        if (
+            getSectionNumberByGridPosition(x, y, sectionMap) !==
+            getSectionNumberByGridPosition(x, y + 1, sectionMap)
+        ) {
+            // Bottom border
+            c.moveTo(xPos, (y + 1) * height);
+            c.lineTo(xPos + width, (y + 1) * height);
+        }
+        if (
+            getSectionNumberByGridPosition(x, y, sectionMap) !==
+            getSectionNumberByGridPosition(x + 1, y, sectionMap)
+        ) {
+            // Right border
+            c.moveTo(xPos + width, y * height);
+            c.lineTo(xPos + width, (y + 1) * height);
+        }
+
+        // Leftmost and topmost borders only need to be drawn once, as they are contiguous
+
+        c.restore();
+        c.stroke();
     }
 
     useEffect(() => {
@@ -267,6 +269,10 @@ const Canvas = () => {
         c.beginPath();
         c.fillStyle = 'rgb(255, 255, 255)';
         c.fillRect(0, 0, canvasWidth, canvasHeight);
+        c.strokeStyle = borderColor;
+
+        // Makes drawn lines a bit longer, which is needed to pervent corners from coloring
+        c.lineCap = 'square';
 
         drawBoxes();
 
@@ -314,14 +320,14 @@ const Canvas = () => {
                             pointerEvents: 'none',
                             backgroundColor: 'white',
                             background: tooltipUpper
-                                ? `linear-gradient(45deg, ${
-                                      // Top left
-                                      getColorBySectionNumber(sectionNumber)
-                                  } 20px, #FFFFFF 21px)`
-                                : `linear-gradient(135deg, ${
-                                      // Top left
-                                      getColorBySectionNumber(sectionNumber)
-                                  } 20px, #FFFFFF 21px)`,
+                                ? // Bottom left triangle
+                                  `linear-gradient(45deg, ${getColorBySectionNumber(
+                                      sectionNumber
+                                  )} 20px, #FFFFFF 21px)`
+                                : // Top left triangle
+                                  `linear-gradient(135deg, ${getColorBySectionNumber(
+                                      sectionNumber
+                                  )} 20px, #FFFFFF 21px)`,
                             zIndex: 2,
                             padding: '5px 20px',
                             border: '1px solid grey',
