@@ -25,6 +25,7 @@ const deviceListing: DeviceTraits = {
     serialPorts: true,
     jlink: true,
     mcuBoot: true,
+    nordicDfu: true,
 };
 
 const deviceSetup: DeviceSetup = {

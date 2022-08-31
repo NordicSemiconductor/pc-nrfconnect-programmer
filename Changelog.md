@@ -1,15 +1,10 @@
-## 3.0.5
-
-### Fixed
-
--   Sometimes displayed known devices as `UNKNOWN`.
--   Device loads forever if protection status failed to be read.
-
-## 3.0.4 - 2022-06-28
+## 3.0.4 - 2022-08-31
 
 ### Fixed
 
 -   Don't show erronous warning when mcu flashing the Thingy53.
+-   Sometimes displayed known devices as `UNKNOWN`.
+-   Device loads forever if protection status failed to be read.
 
 ## 3.0.3 - 2022-06-17
 
