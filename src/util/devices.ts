@@ -239,6 +239,20 @@ export const getDeviceDefinition = (type: string): DeviceDefinition => {
     };
 };
 
+const getDeviceDefinitionByFamily = (
+    family: DeviceFamily
+): DeviceDefinition => {
+    const predefined = deviceDefinitions.find(
+        (device: DeviceDefinition) => device?.family === family
+    );
+    return (
+        predefined ?? {
+            ...defaultDeviceDefinition,
+            family,
+        }
+    );
+};
+
 const getProductId = (device: nrfdl.Device) =>
     parseInt(
         device.serialPorts.reduce(
@@ -285,7 +299,7 @@ export const getDeviceInfoByJlink = (
     const family = device.jlink?.deviceFamily as DeviceFamily;
 
     return {
-        ...getDeviceDefinition(family),
+        ...getDeviceDefinitionByFamily(family),
         type,
         family,
     };
