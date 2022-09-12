@@ -18,6 +18,7 @@ import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
 import {
     getErrorMsg,
     getIsFirmwareValid,
+    getIsMcuboot,
     getIsReady,
     getIsWriting,
     getIsWritingFail,
@@ -38,6 +39,7 @@ const McuUpdateDialogView = () => {
     const zipFilePath = useSelector(getZipFilePath);
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
+    const isMcuBoot = useSelector(getIsMcuboot);
 
     const dispatch = useDispatch();
     const onCancel = () => dispatch(mcubootWritingClose());
@@ -95,7 +97,7 @@ const McuUpdateDialogView = () => {
                     {!isFirmwareValid && (
                         <Alert variant="warning">
                             The selected HEX file appears to be invalid for
-                            Thingy:91 MCUboot DFU.
+                            MCUboot DFU.
                         </Alert>
                     )}
                     {isWritingSucceed && (
