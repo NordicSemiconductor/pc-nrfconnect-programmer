@@ -1,3 +1,10 @@
+## Unreleased
+
+### Changed
+
+-   Invalid MCUboot firmware warning no longer references a specific device (was
+    always Thingy91).
+
 ## 3.0.4 - 2022-09-05
 
 ### Fixed
