@@ -261,6 +261,7 @@ const parseElf = (filePath: string) => async (dispatch: TDispatch) => {
     logger.info('File was last modified at ', stats.mtime.toLocaleString());
     addMruFile(filePath);
     // License for elfy can be found at https://github.com/indutny/elfy
+    /* eslint-disable global-require */
     const elfy = require('elfy');
     const fs = require('fs');
     const fileData = fs.readFileSync(filePath);

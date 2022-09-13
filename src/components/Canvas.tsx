@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
+ */
+
 import './ColorOverview';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -24,15 +30,18 @@ const Canvas = () => {
     const resolution = useSelector(getResolution); // Exponent of boxMemorySize. Range is all ints from 8 to 16 (inclusive)
     const boxMemorySize = 2 ** resolution; // Ex. 1024 (Bytes)
     const boxDisplaySize = Math.floor(16 * Math.sqrt(2) ** (resolution - 12)); // Box size in px
+    const borderColor = 'white';
 
     const elf = useSelector(getElf); // Gets all info about the elf-file
-    const sections = elf.body.sections.slice(1); // First section is null, so it's discarded. This might not be the case for every elf-file...
-    const sectionMap: number[][] = initializeSectionMap();
-    const borderColor = 'white';
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const sections = elf!.body.sections.slice(1); // First section is null, so it's discarded. This might not be the case for every elf-file...
 
     const numBoxes = getNumBoxes();
     const boxesPerRow = Math.floor(canvasWidth / boxDisplaySize);
     const rows = Math.ceil(numBoxes / boxesPerRow);
+
+    const initialSectionMap: number[][] = initializeSectionMap();
 
     const rowBoxSize: number[] = [];
     initializeRowBoxSize();
@@ -81,14 +90,14 @@ const Canvas = () => {
      * as defined in the application design guide.
      * Undefined sections get a white color.
      *
-     * @param {number} sectionNumber Color generation seed > 0.
-     * @returns {string} Color in form "#rrggbb". Example: "#F44336".
+     * @param {number} sectionNum Color generation seed > 0.
+     * @returns {string} Color in form "#RRGGBB". Example: "#F44336".
      */
-    function getColorBySectionNumber(sectionNumber: number): string {
-        if (!(sectionNumber >= 0 && sectionNumber < sections.length)) {
+    function getColorBySectionNumber(sectionNum: number): string {
+        if (!(sectionNum >= 0 && sectionNum < sections.length)) {
             return '#FFFFFF';
         }
-        const index = sectionNumber % sectionColors.length;
+        const index = sectionNum % sectionColors.length;
         const color = sectionColors[index];
 
         return color;
@@ -99,10 +108,10 @@ const Canvas = () => {
     ) => {
         const rect = canvasRef.current?.getBoundingClientRect();
 
-        if (rect) {
+        if (rect && canvasRef.current && canvasRef.current.parentElement) {
             const yGlobal =
                 event.clientY -
-                canvasRef.current?.parentElement?.getBoundingClientRect().top;
+                canvasRef.current.parentElement.getBoundingClientRect().top;
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
 
@@ -121,7 +130,11 @@ const Canvas = () => {
             x -= rowBoxSize[gridX];
             if (x < 0) {
                 setSectionNumber(
-                    getSectionNumberByGridPosition(gridX, gridY, sectionMap)
+                    getSectionNumberByGridPosition(
+                        gridX,
+                        gridY,
+                        initialSectionMap
+                    )
                 );
 
                 break;
@@ -130,23 +143,19 @@ const Canvas = () => {
     }
 
     function getNumBoxes() {
-        let numBoxes = 0;
+        let newNumBoxes = 0;
         for (let i = 0; i < sections.length; i += 1) {
-            numBoxes += Math.ceil(sections[i].size / boxMemorySize);
+            newNumBoxes += Math.ceil(sections[i].size / boxMemorySize);
         }
-        return numBoxes;
+        return newNumBoxes;
     }
 
     function initializeSectionMap() {
-        const numBoxes = getNumBoxes();
-        const boxesPerRow = Math.floor(canvasWidth / boxDisplaySize);
-        const rows = Math.ceil(numBoxes / boxesPerRow);
-
         // This makes everything so much easier
         const newSectionMap: number[][] = []; // 2d array for storing section numbers
 
-        let sectionNumber = 0;
-        let sectionRemainingSize = sections[sectionNumber].size;
+        let sectionNumberIter = 0;
+        let sectionRemainingSize = sections[sectionNumberIter].size;
 
         // Fill the displayBoxes-array with data
         for (let y = 0; y < rows; y += 1) {
@@ -157,16 +166,16 @@ const Canvas = () => {
                     sectionRemainingSize -= boxMemorySize;
 
                     // It's also possible to just draw each box here... 🤔
-                    newSectionMap[y].push(sectionNumber);
+                    newSectionMap[y].push(sectionNumberIter);
                 }
                 if (sectionRemainingSize < 0) {
-                    sectionNumber += 1;
+                    sectionNumberIter += 1;
                     // Go to next section, if it exists
-                    if (!sections[sectionNumber]) {
+                    if (!sections[sectionNumberIter]) {
                         break;
                     }
                     sectionRemainingSize = Math.max(
-                        sections[sectionNumber].size,
+                        sections[sectionNumberIter].size,
                         0
                     ); // Set to 1 if empty
                 }
@@ -238,11 +247,15 @@ const Canvas = () => {
     }
 
     useEffect(() => {
-        setCanvasWidth(canvasRef.current?.parentElement?.clientWidth - 2);
-        setCanvasHeight(rows * maxBoxSize - 1);
-        const resizeListener = () => {
-            setCanvasWidth(canvasRef.current?.parentElement?.clientWidth - 2);
+        if (canvasRef.current && canvasRef.current.parentElement) {
+            setCanvasWidth(canvasRef.current.parentElement.clientWidth - 2);
             setCanvasHeight(rows * maxBoxSize - 1);
+        }
+        const resizeListener = () => {
+            if (canvasRef.current && canvasRef.current.parentElement) {
+                setCanvasWidth(canvasRef.current.parentElement.clientWidth - 2);
+                setCanvasHeight(rows * maxBoxSize - 1);
+            }
         };
         window.addEventListener('resize', resizeListener);
         return () => {
@@ -279,7 +292,7 @@ const Canvas = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [c, elf, resolution, canvasHeight, canvasWidth]);
 
-    const ref = useRef(null);
+    const ref = useRef<HTMLDivElement>(null);
     const [show, setShow] = useState(false);
     const [tooltipUpper, setTooltipUpper] = useState(false);
     const updateTooltipUpper = () => {

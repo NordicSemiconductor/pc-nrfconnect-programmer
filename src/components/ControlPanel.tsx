@@ -15,8 +15,8 @@ import {
     colors,
     Group,
     SidePanel,
-    Toggle,
     Slider,
+    Toggle,
     truncateMiddle,
 } from 'pc-nrfconnect-shared';
 import PropTypes from 'prop-types';
@@ -28,9 +28,9 @@ import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
 import {
+    getElf,
     getFileRegions,
     getMruFiles,
-    getElf,
     getZipFilePath,
 } from '../reducers/fileReducer';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
