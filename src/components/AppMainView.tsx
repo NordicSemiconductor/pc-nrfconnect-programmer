@@ -11,7 +11,10 @@ import { getElf, getLoaded, getZipFilePath } from '../reducers/fileReducer';
 import { getDeviceInfo, getSerialNumber } from '../reducers/targetReducer';
 import useOpenFileFromArgs from '../useOpenFileFromArgs';
 import { DeviceDefinition } from '../util/devices';
+import McuUpdateDialogView from './McuUpdateDialogView';
 import MemoryBoxView from './MemoryBoxView';
+import ModemUpdateDialogView from './ModemUpdateDialogView';
+import UserInputDialogView from './UserInputDialogView';
 import WarningView from './WarningView';
 
 function getTargetTitle(
@@ -61,6 +64,9 @@ const AppMainView = () => {
                     isTarget={!!serialNumber}
                 />
             </div>
+            <UserInputDialogView />
+            <ModemUpdateDialogView />
+            <McuUpdateDialogView />
         </div>
     );
 };

@@ -8,6 +8,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
 import { Region } from '../util/regions';
+import { ElfFile } from './elf';
 import type { RootState } from './types';
 
 type Loaded = {
@@ -25,7 +26,7 @@ export interface FileState {
     memMaps: MemoryMaps;
     mruFiles: string[];
     regions: Region[];
-    elf?: object;
+    elf?: ElfFile;
 }
 
 const initialState: FileState = {
@@ -54,7 +55,7 @@ const fileSlice = createSlice({
                 mruFiles: state.mruFiles,
             };
         },
-        elfParse(state, action: PayloadAction<object>) {
+        elfParse(state, action: PayloadAction<ElfFile>) {
             state.elf = action.payload;
         },
         fileParse(state, action: PayloadAction<FileParsePayload>) {
