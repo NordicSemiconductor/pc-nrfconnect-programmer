@@ -18,7 +18,7 @@ import '../../resources/css/canvas.scss';
 
 const Canvas = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [c, setContext] = useState<CanvasRenderingContext2D | null>(null); // Why could this be |null ?
+    const [c, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
     const [canvasWidth, setCanvasWidth] = useState(300);
     const [canvasHeight, setCanvasHeight] = useState(300);
@@ -30,7 +30,7 @@ const Canvas = () => {
     const resolution = useSelector(getResolution); // Exponent of boxMemorySize. Range is all ints from 8 to 16 (inclusive)
     const boxMemorySize = 2 ** resolution; // Ex. 1024 (Bytes)
     const boxDisplaySize = Math.floor(16 * Math.sqrt(2) ** (resolution - 12)); // Box size in px
-    const borderColor = 'white';
+    const borderColor = 'rgb(255, 255, 255)'; // White
 
     const elf = useSelector(getElf); // Gets all info about the elf-file
 
@@ -39,7 +39,7 @@ const Canvas = () => {
 
     const numBoxes = getNumBoxes();
     const boxesPerRow = Math.floor(canvasWidth / boxDisplaySize);
-    const rows = Math.ceil(numBoxes / boxesPerRow);
+    const rows = Math.ceil(numBoxes / boxesPerRow) + 1; // Show that the last row is empty, like in many text editors
 
     const initialSectionMap: number[][] = initializeSectionMap();
 
@@ -71,18 +71,15 @@ const Canvas = () => {
         y: number,
         sectionMap: number[][]
     ) {
-        if (x >= boxesPerRow || y >= rows) {
-            return -1;
+        if (
+            x < boxesPerRow &&
+            y < rows &&
+            sectionMap[y] !== undefined &&
+            sectionMap[y][x] !== undefined
+        ) {
+            return sectionMap[y][x];
         }
-
-        // Keep these two ifs separate to prevent an error if sectionMap[y] already is undefined
-        if (sectionMap[y] === undefined) {
-            return -1;
-        }
-        if (sectionMap[y][x] === undefined) {
-            return -1;
-        }
-        return sectionMap[y][x];
+        return -1;
     }
 
     /**
@@ -103,9 +100,9 @@ const Canvas = () => {
         return color;
     }
 
-    const handleOnMouseMove = (
+    function handleOnMouseMove(
         event: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-    ) => {
+    ) {
         const rect = canvasRef.current?.getBoundingClientRect();
 
         if (rect && canvasRef.current && canvasRef.current.parentElement) {
@@ -122,7 +119,7 @@ const Canvas = () => {
             updateTooltipUpper();
             updateSectionNumber(x, y);
         }
-    };
+    }
 
     function updateSectionNumber(x: number, y: number) {
         const gridY = Math.floor(y / maxBoxSize);
@@ -165,7 +162,6 @@ const Canvas = () => {
                     // Here is where the extra "inflated" box memory size comes from
                     sectionRemainingSize -= boxMemorySize;
 
-                    // It's also possible to just draw each box here... 🤔
                     newSectionMap[y].push(sectionNumberIter);
                 }
                 if (sectionRemainingSize < 0) {
@@ -186,7 +182,7 @@ const Canvas = () => {
     }
 
     async function drawBoxes() {
-        // Await async is used here because it prevents blinking/flashing when redrawing
+        // Await async is used here because it prevents flickering when redrawing
         const sectionMap = await initializeSectionMap();
 
         // Actually draw all the boxes
@@ -221,8 +217,9 @@ const Canvas = () => {
 
         c.beginPath();
         c.save();
-        c.translate(-0.5, -0.5);
+        c.translate(-0.5, -0.5); // Since lineWidth == 1, this will fill fit a one pixel wide line
 
+        // Two neighbouring boxes share a border, so only two sides need to be drawn for each box
         if (
             getSectionNumberByGridPosition(x, y, sectionMap) !==
             getSectionNumberByGridPosition(x, y + 1, sectionMap)
@@ -240,12 +237,11 @@ const Canvas = () => {
             c.lineTo(xPos + width, (y + 1) * height);
         }
 
-        // Leftmost and topmost borders only need to be drawn once, as they are contiguous
-
         c.restore();
         c.stroke();
     }
 
+    // Canvas resize
     useEffect(() => {
         if (canvasRef.current && canvasRef.current.parentElement) {
             setCanvasWidth(canvasRef.current.parentElement.clientWidth - 2);
@@ -278,14 +274,12 @@ const Canvas = () => {
             return;
         }
 
-        // Draws a background
-        c.beginPath();
-        c.fillStyle = 'rgb(255, 255, 255)';
-        c.fillRect(0, 0, canvasWidth, canvasHeight);
-        c.strokeStyle = borderColor;
+        // Clears the canvas
+        c.clearRect(0, 0, canvasWidth, canvasHeight);
 
-        // Makes drawn lines a bit longer, which is needed to pervent corners from coloring
-        c.lineCap = 'square';
+        c.lineCap = 'square'; // Makes drawn lines a bit longer, which is needed to pervent corners from partial coloring
+        c.lineWidth = 1;
+        c.strokeStyle = borderColor;
 
         drawBoxes();
 
@@ -327,7 +321,7 @@ const Canvas = () => {
                                 ? mousePos.y -
                                   (ref.current ? ref.current.clientHeight : 0) +
                                   58
-                                : mousePos.y + 60,
+                                : mousePos.y + 58,
                             width: 'fit-content',
                             height: 'fit-content',
                             pointerEvents: 'none',
