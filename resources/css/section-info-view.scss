@@ -10,7 +10,7 @@
     min-width: 155px;
     .fields {
         padding-top: 12px;
-        border-bottom: 1px solid #b0bec5;
+        border-bottom: 1px solid $gray-200;
     }
     div:last-child {
         border: none;
@@ -18,6 +18,6 @@
     p {
         text-align: left !important;
         padding-top: 0 !important;
-        color: #263238 !important;
+        color: $gray-900 !important;
     }
 }
