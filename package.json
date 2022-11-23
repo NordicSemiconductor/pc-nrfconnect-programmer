@@ -1,8 +1,9 @@
 {
     "name": "pc-nrfconnect-programmer",
     "version": "3.0.4",
-    "description": "Program a Nordic SoC with HEX files from nRF Connect",
     "displayName": "Programmer",
+    "description": "Tool for flash programming of nRF SoCs",
+    "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer",
     "repository": {
         "type": "git",
         "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer.git"
