@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
+import Form from 'react-bootstrap/Form';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +15,7 @@ import {
     colors,
     Group,
     SidePanel,
+    Slider,
     Toggle,
     truncateMiddle,
 } from 'pc-nrfconnect-shared';
@@ -26,6 +28,7 @@ import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
 import {
+    getElf,
     getFileRegions,
     getMruFiles,
     getZipFilePath,
@@ -41,6 +44,7 @@ import {
     getIsWritable,
     getTargetType,
 } from '../reducers/targetReducer';
+import { getResolution, upadateResolution } from '../reducers/userInputReducer';
 import { CommunicationType } from '../util/devices';
 
 const useRegisterDragEvents = () => {
@@ -215,6 +219,9 @@ const ControlPanel = () => {
         dispatch(targetActions.write());
     };
 
+    const resolution = useSelector(getResolution);
+    const elf = useSelector(getElf);
+
     return (
         <SidePanel className="control-panel">
             <Group heading="File">
@@ -352,6 +359,21 @@ const ControlPanel = () => {
                     </ol>
                 </div>
             </Group>
+            {elf && (
+                <Group>
+                    <Form.Label htmlFor="resolution">
+                        Minimum block size:{' '}
+                        {(2 ** resolution).toLocaleString('en')} bytes
+                    </Form.Label>
+                    <Slider
+                        ticks
+                        id="resolution"
+                        values={[resolution]}
+                        range={{ min: 8, max: 16 }} // 2^8 to 2^16, 256 to 65536 Bytes
+                        onChange={[value => dispatch(upadateResolution(value))]}
+                    />
+                </Group>
+            )}
         </SidePanel>
     );
 };

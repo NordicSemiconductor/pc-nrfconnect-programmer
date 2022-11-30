@@ -9,12 +9,14 @@ import Card from 'react-bootstrap/Card';
 import Popover from 'react-bootstrap/Popover';
 import PropTypes from 'prop-types';
 
+import Canvas from './Canvas';
 import DeviceInfoView from './DeviceInfoView';
 import MemoryView from './MemoryView';
 
 interface MemoryBoxViewProps {
     title: string;
     description?: string;
+    containsVisualization?: boolean;
     iconName?: string;
     isHolder?: boolean;
     isTarget?: boolean;
@@ -25,6 +27,7 @@ const MemoryBoxView = ({
     description,
     iconName,
     isHolder,
+    containsVisualization,
     isTarget,
 }: MemoryBoxViewProps) => {
     const [showOverlay, setShowOverlay] = useState(false);
@@ -41,10 +44,12 @@ const MemoryBoxView = ({
                     {isTarget && (
                         <span className="mdi mdi-information-outline target-info" />
                     )}
+
                     <span className={`glyphicon ${iconName}`} />
+                    {containsVisualization && '.elf'}
                 </Card.Title>
             </Card.Header>
-            {isTarget && showOverlay && (
+            {!containsVisualization && isTarget && showOverlay && (
                 <Popover
                     id="deviceInfo"
                     placement="bottom"
@@ -58,10 +63,15 @@ const MemoryBoxView = ({
             <Card.Body className={`panel-body ${isHolder && 'empty'} stacked`}>
                 {isHolder && (
                     <div className="memory-layout-container">
-                        <h1>
-                            <span className={`glyphicon ${iconName}`} />
-                        </h1>
-                        <p>{description}</p>
+                        {containsVisualization && <Canvas />}
+                        {!containsVisualization && (
+                            <>
+                                <h1>
+                                    <span className={`glyphicon ${iconName}`} />
+                                </h1>
+                                <p>{description}</p>
+                            </>
+                        )}
                     </div>
                 )}
                 {!isHolder && <MemoryView isTarget={isTarget as boolean} />}
@@ -76,6 +86,7 @@ MemoryBoxView.propTypes = {
     iconName: PropTypes.string,
     isHolder: PropTypes.bool,
     isTarget: PropTypes.bool,
+    containsVisualization: PropTypes.bool,
 };
 
 MemoryBoxView.defaultProps = {
@@ -83,6 +94,7 @@ MemoryBoxView.defaultProps = {
     iconName: null,
     isHolder: false,
     isTarget: false,
+    containsVisualization: false,
 };
 
 export default MemoryBoxView;

@@ -8,6 +8,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
 import { Region } from '../util/regions';
+import { ElfFile } from './elf';
 import type { RootState } from './types';
 
 type Loaded = {
@@ -25,6 +26,7 @@ export interface FileState {
     memMaps: MemoryMaps;
     mruFiles: string[];
     regions: Region[];
+    elf?: ElfFile;
 }
 
 const initialState: FileState = {
@@ -35,6 +37,7 @@ const initialState: FileState = {
     memMaps: [],
     mruFiles: [],
     regions: [],
+    elf: undefined,
 };
 
 interface FileParsePayload {
@@ -51,6 +54,9 @@ const fileSlice = createSlice({
                 ...initialState,
                 mruFiles: state.mruFiles,
             };
+        },
+        elfParse(state, action: PayloadAction<ElfFile>) {
+            state.elf = action.payload;
         },
         fileParse(state, action: PayloadAction<FileParsePayload>) {
             state.memMaps = action.payload.memMaps;
@@ -82,6 +88,7 @@ export default fileSlice.reducer;
 const {
     filesEmpty,
     fileParse,
+    elfParse,
     fileRegionsKnown,
     fileRegionNamesKnown,
     mruFilesLoadSuccess,
@@ -89,6 +96,7 @@ const {
     zipFileKnown,
 } = fileSlice.actions;
 
+export const getElf = (state: RootState) => state.app.file.elf;
 export const getLoaded = (state: RootState) => state.app.file.loaded;
 export const getMruFiles = (state: RootState) => state.app.file.mruFiles;
 export const getMcubootFilePath = (state: RootState) =>
@@ -99,6 +107,7 @@ export const getFileRegions = (state: RootState) => state.app.file.regions;
 export {
     filesEmpty,
     fileParse,
+    elfParse,
     fileRegionsKnown,
     fileRegionNamesKnown,
     mruFilesLoadSuccess,

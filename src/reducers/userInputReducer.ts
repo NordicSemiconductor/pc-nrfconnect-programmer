@@ -12,12 +12,14 @@ export interface UserInputState {
     message: string | null;
     choices: Record<string, string>;
     isRequired: boolean;
+    resolution: number;
 }
 
 const initialState: UserInputState = {
     message: null,
     choices: {},
     isRequired: false,
+    resolution: 12,
 };
 
 interface UserInputRequiredPayload {
@@ -43,17 +45,31 @@ const userInputSlice = createSlice({
         userInputCancelled() {
             return { ...initialState };
         },
+        upadateResolution(state, action: PayloadAction<number>) {
+            state.resolution = action.payload;
+        },
     },
 });
 
 export default userInputSlice.reducer;
 
-const { userInputRequired, userInputReceived, userInputCancelled } =
-    userInputSlice.actions;
+const {
+    userInputRequired,
+    userInputReceived,
+    userInputCancelled,
+    upadateResolution,
+} = userInputSlice.actions;
 
 export const getIsRequired = (state: RootState) =>
     state.app.userInput.isRequired;
 export const getMessage = (state: RootState) => state.app.userInput.message;
 export const getChoices = (state: RootState) => state.app.userInput.choices;
+export const getResolution = (state: RootState) =>
+    state.app.userInput.resolution;
 
-export { userInputRequired, userInputReceived, userInputCancelled };
+export {
+    userInputRequired,
+    userInputReceived,
+    userInputCancelled,
+    upadateResolution,
+};

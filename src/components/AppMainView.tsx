@@ -7,7 +7,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 
-import { getLoaded, getZipFilePath } from '../reducers/fileReducer';
+import { getElf, getLoaded, getZipFilePath } from '../reducers/fileReducer';
 import { getDeviceInfo, getSerialNumber } from '../reducers/targetReducer';
 import useOpenFileFromArgs from '../useOpenFileFromArgs';
 import { DeviceDefinition } from '../util/devices';
@@ -38,6 +38,7 @@ const AppMainView = () => {
     const zipFilePath = useSelector(getZipFilePath);
     const serialNumber = useSelector(getSerialNumber);
     const deviceInfo = useSelector(getDeviceInfo);
+    const elf = useSelector(getElf);
 
     useOpenFileFromArgs();
 
@@ -47,9 +48,10 @@ const AppMainView = () => {
             <div className="memory-box-container">
                 <MemoryBoxView
                     title="File memory layout"
-                    description="Drag & drop HEX/ZIP files here"
-                    iconName="mdi mdi-folder-open"
+                    description="Drag & drop HEX/ZIP/ELF files here"
+                    iconName="mdi mdi-file-outline"
                     isHolder={!hasFileContent(loaded) && !zipFilePath}
+                    containsVisualization={elf !== undefined}
                 />
                 <MemoryBoxView
                     title={
@@ -57,7 +59,7 @@ const AppMainView = () => {
                         'Device memory layout'
                     }
                     description="Connect a device to display memory contents"
-                    iconName="appicon-chip"
+                    iconName="mdi appicon-chip"
                     isHolder={!serialNumber}
                     isTarget={!!serialNumber}
                 />
