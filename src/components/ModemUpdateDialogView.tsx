@@ -37,7 +37,7 @@ const ModemUpdateDialogView = () => {
     const progressPercentage = useSelector(getProgressPercentage);
     const errorMsg = useSelector(getErrorMsg);
     const isMcuboot = useSelector(getIsMcuboot);
-    const expectedFwName = /mfw_nrf9160_\d+.\d+.\d+.zip/.test(modemFwName);
+    const expectedFwName = /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
 
     const dispatch = useDispatch();
     const onCancel = () => dispatch(modemWritingClose());
@@ -84,7 +84,7 @@ const ModemUpdateDialogView = () => {
                             >
                                 <br />
                                 Nordic official modem firmware files are named
-                                mrf_nrf9160_*.zip.
+                                mfw_nrf9160_X.X.X*.zip.
                                 <br />
                                 Modem firmware files can be downloaded from{' '}
                                 <a

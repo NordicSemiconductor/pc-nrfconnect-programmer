@@ -4,6 +4,12 @@
 
 -   Invalid MCUboot firmware warning no longer references a specific device (was
     always Thingy91).
+-   Warning about unexpected modem firmware filename does not trigger on default
+    copy naming.
+
+### Fixed
+
+-   Typo in warning about modem firmware filename.
 
 ## 3.0.4 - 2022-09-05
 
