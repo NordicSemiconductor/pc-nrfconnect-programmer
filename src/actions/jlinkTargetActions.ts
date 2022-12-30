@@ -78,13 +78,12 @@ export const loadProtectionStatus = async (
             )} core`
         );
 
-        const protectionStatus = (
+        const { protectionStatus } =
             await nrfdl.deviceControlGetProtectionStatus(
                 getDeviceLibContext(),
                 deviceId,
                 deviceCoreName
-            )
-        ).protectionStatus;
+            );
 
         logger.info(`Readback protection status: ${protectionStatus}`);
         return protectionStatus;

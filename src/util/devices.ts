@@ -254,7 +254,7 @@ const getDeviceDefinitionByFamily = (
 };
 
 const getProductId = (device: nrfdl.Device) => {
-    if (! device.serialPorts) return 0;
+    if (!device.serialPorts) return 0;
 
     return parseInt(
         device.serialPorts.reduce(
@@ -262,16 +262,17 @@ const getProductId = (device: nrfdl.Device) => {
             ''
         ),
         16
-    )
+    );
 };
 
 const identifyUsbByVersion = (device: nrfdl.Device) => {
-    if (! device.hwInfo || (device.hwInfo.deviceVersion?.length === 0)) return null;
+    if (!device.hwInfo || device.hwInfo.deviceVersion?.length === 0)
+        return null;
 
     return getDeviceDefinition(
         device.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
-    )
-}
+    );
+};
 
 const identifyUsbBySerialPort = (device: nrfdl.Device) => {
     const productId = getProductId(device);
@@ -326,7 +327,7 @@ export const updateCoreInfo = (
     protectionStatus: ProtectionStatus
 ): CoreDefinition => {
     // name is an operation name and shouldn't go into an object
-    const {name, ...coreInfo} = inputCoreInfo;
+    const { name, ...coreInfo } = inputCoreInfo;
 
     return {
         ...existingDefinition,
@@ -338,5 +339,5 @@ export const updateCoreInfo = (
         uicrSize: inputCoreInfo.codePageSize,
         ...coreInfo,
         protectionStatus,
-    }
+    };
 };

@@ -75,7 +75,7 @@ export const openDevice =
         const { serialPorts } = device;
 
         // not all devices will have serialPorts property (non-Nordic devices for example)
-        if (! serialPorts || serialPorts.length === 0) return;
+        if (!serialPorts || serialPorts.length === 0) return;
 
         const serialport = serialPorts[0];
         const { vendorId, productId } = serialport as SerialPort;
