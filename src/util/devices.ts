@@ -327,6 +327,7 @@ export const updateCoreInfo = (
     protectionStatus: ProtectionStatus
 ): CoreDefinition => {
     // name is an operation name and shouldn't go into an object
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { name, ...coreInfo } = inputCoreInfo;
 
     return {

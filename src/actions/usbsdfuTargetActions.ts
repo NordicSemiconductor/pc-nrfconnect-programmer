@@ -176,14 +176,16 @@ export const openDevice =
             // Add bootloader, softDevice, applications to regions
             const { imageInfoList } = fwInfo;
             imageInfoList.forEach((image: FWInfo.Image) => {
-                // TODO: fix type in nrfdl
                 const { imageType, imageLocation, version } = image;
+
+                if (!imageLocation) return;
+
                 const startAddress = imageLocation.address;
                 const regionSize =
-                    // TODO: fix type in nrfdl
                     imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
                         ? imageLocation.size - 0x1000
                         : imageLocation.size;
+
                 if (regionSize === 0) return;
 
                 const regionName =
