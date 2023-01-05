@@ -75,8 +75,8 @@ const defaultDfuImage: DfuImage = {
 /**
  * Check whether the device is Nordic USB device or not by providing vender Id and product Id
  *
- * @param {number} vid Vender Id
- * @param {number} pid Product Id
+ * @param {number} vid Vendor ID
+ * @param {number} pid Product ID
  * @returns {boolean} whether the device is Nordic USB device
  */
 export const isNordicUsb = (vid?: number, pid?: number) =>
@@ -176,14 +176,16 @@ export const openDevice =
             // Add bootloader, softDevice, applications to regions
             const { imageInfoList } = fwInfo;
             imageInfoList.forEach((image: FWInfo.Image) => {
-                // TODO: fix type in nrfdl
                 const { imageType, imageLocation, version } = image;
+
+                if (!imageLocation) return;
+
                 const startAddress = imageLocation.address;
                 const regionSize =
-                    // TODO: fix type in nrfdl
                     imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
                         ? imageLocation.size - 0x1000
                         : imageLocation.size;
+
                 if (regionSize === 0) return;
 
                 const regionName =
@@ -573,13 +575,18 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
             },
             ({ progressJson: progress }: Progress.CallbackParameters) => {
                 // Don't repeat percentage steps that have already been logged.
-                if (prevPercentage !== progress.progressPercentage) {
-                    const status = `${progress.message.replace('.', ':')} ${
-                        progress.progressPercentage
-                    }%`;
-                    logger.info(status);
-                    prevPercentage = progress.progressPercentage;
+                if (prevPercentage === progress.progressPercentage) {
+                    return;
                 }
+
+                const message = progress.message || '';
+
+                const status = `${message.replace('.', ':')} ${
+                    progress.progressPercentage
+                }%`;
+
+                logger.info(status);
+                prevPercentage = progress.progressPercentage;
             }
         );
     });

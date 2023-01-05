@@ -45,8 +45,8 @@ export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
 /**
  * Check whether the device is MCUboot device or not by providing vender Id and product Id
  *
- * @param {number} vid Vender Id
- * @param {number} pid Product Id
+ * @param {number} vid Vendor ID
+ * @param {number} pid Product ID
  * @returns {boolean} whether the device is MCUboot device
  */
 export const isMcuboot = (vid?: number, pid?: number) =>
@@ -73,6 +73,10 @@ export const openDevice =
         const { device: inputDevice } = getState().app.target;
         const device = inputDevice as Device;
         const { serialPorts } = device;
+
+        // not all devices will have serialPorts property (non-Nordic devices for example)
+        if (!serialPorts || serialPorts.length === 0) return;
+
         const serialport = serialPorts[0];
         const { vendorId, productId } = serialport as SerialPort;
         const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;

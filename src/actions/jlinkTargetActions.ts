@@ -51,10 +51,10 @@ import { updateFileAppRegions, updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
 /**
- * Check whether the device is JLink device or not by providing vender Id and product Id
+ * Check whether the device is JLink device or not by providing vendor ID and product ID
  *
- * @param {number} vid Vender Id
- * @param {number} pid Product Id
+ * @param {number} vid Vendor ID
+ * @param {number} pid Product ID
  * @returns {boolean} whether the device is JLink device
  */
 export const isJlink = (vid?: number, pid?: number) =>
@@ -77,14 +77,14 @@ export const loadProtectionStatus = async (
                 deviceCoreName
             )} core`
         );
-        // TODO: fix type in nrfdl: snake_case
-        const protectionStatus = (
+
+        const { protectionStatus } =
             await nrfdl.deviceControlGetProtectionStatus(
                 getDeviceLibContext(),
                 deviceId,
                 deviceCoreName
-            )
-        ).protection_status;
+            );
+
         logger.info(`Readback protection status: ${protectionStatus}`);
         return protectionStatus;
     } catch (error) {
@@ -208,9 +208,10 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
                     reject();
                 }
 
-                let memMap = MemoryMap.fromHex(
-                    (result as FirmwareReadResult).data
-                );
+                // todo: confirm if buffer is required (not other prop)
+                const buffer = (result as FirmwareReadResult).buffer || '';
+                let memMap = MemoryMap.fromHex(buffer);
+
                 const paddedArray = memMap.slicePad(
                     0,
                     coreInfo.romBaseAddr + coreInfo.romSize
@@ -432,7 +433,9 @@ const writeHex = (
                 resolve();
             },
             ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                const status = `${progress.message.replace('.', ':')} ${
+                const message = progress.message || '';
+
+                const status = `${message.replace('.', ':')} ${
                     progress.progressPercentage
                 }%`;
                 logger.info(status);

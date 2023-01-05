@@ -50,7 +50,7 @@ export const defaultCore: CoreDefinition = {
     mbrParamsOffset: 0x18,
     mbrBaseAddr: 0x0,
     mbrSize: 0x1000,
-    protectionStatus: 'PROTECTION_STATUS_SECURE_REGIONS',
+    protectionStatus: 'NRFDL_PROTECTION_STATUS_SECURE_REGIONS',
 };
 
 /**
@@ -253,21 +253,26 @@ const getDeviceDefinitionByFamily = (
     );
 };
 
-const getProductId = (device: nrfdl.Device) =>
-    parseInt(
+const getProductId = (device: nrfdl.Device) => {
+    if (!device.serialPorts) return 0;
+
+    return parseInt(
         device.serialPorts.reduce(
             (m, p) => (p.vendorId === '1915' ? p.productId : '') || m,
             ''
         ),
         16
     );
+};
 
-const identifyUsbByVersion = (device: nrfdl.Device) =>
-    device.hwInfo?.deviceVersion?.length > 0
-        ? getDeviceDefinition(
-              device.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
-          )
-        : null;
+const identifyUsbByVersion = (device: nrfdl.Device) => {
+    if (!device.hwInfo || device.hwInfo.deviceVersion?.length === 0)
+        return null;
+
+    return getDeviceDefinition(
+        device.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
+    );
+};
 
 const identifyUsbBySerialPort = (device: nrfdl.Device) => {
     const productId = getProductId(device);
@@ -320,14 +325,20 @@ export const updateCoreInfo = (
     coreNumber: number,
     inputCoreInfo: DeviceCoreInfo,
     protectionStatus: ProtectionStatus
-): CoreDefinition => ({
-    ...existingDefinition,
-    coreNumber,
-    romBaseAddr: inputCoreInfo.codeAddress,
-    romSize: inputCoreInfo.codeSize,
-    pageSize: inputCoreInfo.codePageSize,
-    uicrBaseAddr: inputCoreInfo.uicrAddress,
-    uicrSize: inputCoreInfo.codePageSize,
-    ...inputCoreInfo,
-    protectionStatus,
-});
+): CoreDefinition => {
+    // name is an operation name and shouldn't go into an object
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { name, ...coreInfo } = inputCoreInfo;
+
+    return {
+        ...existingDefinition,
+        coreNumber,
+        romBaseAddr: inputCoreInfo.codeAddress,
+        romSize: inputCoreInfo.codeSize,
+        pageSize: inputCoreInfo.codePageSize,
+        uicrBaseAddr: inputCoreInfo.uicrAddress,
+        uicrSize: inputCoreInfo.codePageSize,
+        ...coreInfo,
+        protectionStatus,
+    };
+};
