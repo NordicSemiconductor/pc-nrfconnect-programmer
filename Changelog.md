@@ -1,7 +1,8 @@
-## Unreleased
+## 3.0.5 - Unreleased
 
 ### Changed
 
+-   Update for compatibility with nRF Connect for Desktop v4.0.0
 -   Invalid MCUboot firmware warning no longer references a specific device (was
     always Thingy91).
 -   Warning about unexpected modem firmware filename does not trigger on default
