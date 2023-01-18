@@ -208,9 +208,11 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
                     reject();
                 }
 
-                // todo: confirm if buffer is required (not other prop)
                 const buffer = (result as FirmwareReadResult).buffer || '';
-                let memMap = MemoryMap.fromHex(buffer);
+
+                const hextText = Buffer.from(buffer, 'base64').toString('utf8');
+
+                let memMap = MemoryMap.fromHex(hextText);
 
                 const paddedArray = memMap.slicePad(
                     0,
