@@ -205,7 +205,8 @@ export const getRefreshEnabled = (state: RootState) =>
     !state.app.target.isMemLoaded &&
     !state.app.target.isLoading &&
     !state.app.target.isWriting &&
-    !state.app.target.isErasing;
+    !state.app.target.isErasing &&
+    !state.app.mcuboot.isMcuboot;
 
 export {
     targetTypeKnown,
