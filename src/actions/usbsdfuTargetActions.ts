@@ -629,15 +629,23 @@ export const write =
         logger.info('Performing DFU. This may take a few seconds');
         dispatch(writingStart());
 
+        const device = selectedDevice(getState());
+
         try {
-            const device = selectedDevice(getState());
-            if (!device) throw Error(`Failed to write due to device not found`);
+            if (!device) throw Error(`Device not found`);
             await operateDFU(device.id, images);
             dispatch(writingEnd());
+        } catch (error) {
+            logger.error(`Failed to write: ${describeError(error)}`);
+            return;
+        }
+        try {
             const reconnectedDevice = await waitForDevice(device.serialNumber);
             dispatch(targetDeviceKnown(reconnectedDevice));
             dispatch(openDevice());
-        } catch (error) {
-            logger.error(`Failed to write: ${describeError(error)}`);
+        } catch (err) {
+            logger.error(
+                `Failed to reconnect to device: ${describeError(err)}`
+            );
         }
     };
