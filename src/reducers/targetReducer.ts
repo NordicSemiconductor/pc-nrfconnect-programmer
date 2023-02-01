@@ -136,13 +136,17 @@ const targetSlice = createSlice({
         loadingEnd(state) {
             state.isLoading = false;
         },
+        selectDevice(_, action: PayloadAction<string>) {
+            return {
+                ...initialState,
+                serialNumber: action.payload,
+            };
+        },
+        deselectDevice() {
+            return { ...initialState };
+        },
     },
     extraReducers: {
-        'device/selectDevice': (_, action) => ({
-            ...initialState,
-            serialNumber: action.payload.serialNumber,
-        }),
-        'device/deselectDevice': () => ({ ...initialState }),
         // @ts-expect-error in TypeScript, this would need to be [counter.actions.increment.type]
         [filesEmpty]: state => {
             state.writtenAddress = 0;
@@ -172,6 +176,8 @@ const {
     erasingEnd,
     loadingStart,
     loadingEnd,
+    selectDevice,
+    deselectDevice,
 } = targetSlice.actions;
 
 export const getPort = (state: RootState) => state.app.target.port;
@@ -217,4 +223,6 @@ export {
     erasingEnd,
     loadingStart,
     loadingEnd,
+    selectDevice,
+    deselectDevice,
 };
