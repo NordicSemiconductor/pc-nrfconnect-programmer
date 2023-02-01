@@ -1,5 +1,9 @@
 ## 3.0.5 - Unreleased
 
+### Added
+
+-   Auto reconnect functionality
+
 ### Changed
 
 -   Update for compatibility with nRF Connect for Desktop v4.0.0
