@@ -554,7 +554,8 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
 
     const options = {
         title: 'Save memory as file',
-        defaultPath: `nRF_Connect_Programmer_${Date.now()}.hex`,
+        defaultPath: `nRF_Connect_Programmer_${Date.now()}`,
+        filters: [{ name: 'Hex', extensions: ['hex'] }],
     };
 
     // eslint-disable-next-line no-undef

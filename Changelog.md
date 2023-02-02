@@ -15,6 +15,7 @@
 ### Fixed
 
 -   Typo in warning about modem firmware filename.
+-   Always save file as hex file.
 
 ## 3.0.4 - 2022-09-05
 
