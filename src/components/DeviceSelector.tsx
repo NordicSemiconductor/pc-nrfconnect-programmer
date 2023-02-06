@@ -5,7 +5,7 @@
  */
 
 import { connect } from 'react-redux';
-import { Device, DeviceTraits } from '@nordicsemiconductor/nrf-device-lib-js';
+import { DeviceTraits } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Device as SharedDevice,
     DeviceSelector,
@@ -41,7 +41,7 @@ const mapState = () => ({
 const mapDispatch = (dispatch: TDispatch) => ({
     onDeviceIsReady: (device: SharedDevice) => {
         dispatch(selectDevice(device.serialNumber));
-        dispatch(openDevice(device as unknown as Device));
+        dispatch(openDevice(device));
     },
     onDeviceDeselected: () => {
         usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
