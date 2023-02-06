@@ -5,12 +5,12 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import Button from 'react-bootstrap/Button';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    Button,
     colors,
     Group,
     SidePanel,
@@ -160,7 +160,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                     </Dropdown.Item>
                 </Popover>
             </Overlay>
-            <Button variant="secondary" onClick={onClick}>
+            <Button className="btn-secondary w-100" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
                 Add file
             </Button>
@@ -219,18 +219,21 @@ const ControlPanel = () => {
         <SidePanel className="control-panel">
             <Group heading="File">
                 <Mru mruFiles={mruFiles} />
-                <Button variant="secondary" onClick={refreshAllFiles}>
+                <Button
+                    className="btn-secondary w-100"
+                    onClick={refreshAllFiles}
+                >
                     <span className="mdi mdi-refresh" />
                     Reload files
                 </Button>
-                <Button variant="secondary" onClick={closeFiles}>
+                <Button className="btn-secondary w-100" onClick={closeFiles}>
                     <span className="mdi mdi-minus-circle" />
                     Clear files
                 </Button>
             </Group>
             <Group heading="Device">
                 <Button
-                    variant="secondary"
+                    className="btn-secondary w-100"
                     key="performRecover"
                     onClick={performRecover}
                     disabled={
@@ -245,7 +248,7 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     key="performRecoverAndWrite"
-                    variant="secondary"
+                    className="btn-secondary w-100"
                     onClick={performRecoverAndWrite}
                     disabled={
                         isMcuboot ||
@@ -260,7 +263,7 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     key="performSaveAsFile"
-                    variant="secondary"
+                    className="btn-secondary w-100"
                     onClick={performSaveAsFile}
                     disabled={!isJLink || !targetIsMemLoaded}
                 >
@@ -269,7 +272,7 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     key="performReset"
-                    variant="secondary"
+                    className="btn-secondary w-100"
                     onClick={performReset}
                     disabled={!isJLink || !targetIsReady}
                 >
@@ -278,7 +281,7 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     key="performWrite"
-                    variant="secondary"
+                    className="btn-secondary w-100"
                     onClick={performWrite}
                     disabled={
                         !targetIsReady ||
@@ -296,7 +299,7 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     key="performJLinkRead"
-                    variant="secondary"
+                    className="btn-secondary w-100"
                     onClick={performJLinkRead}
                     disabled={
                         isMcuboot || !isJLink || !targetIsReady || isProtected
