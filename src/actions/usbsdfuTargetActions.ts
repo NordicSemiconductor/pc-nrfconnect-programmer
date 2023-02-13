@@ -26,7 +26,7 @@ import {
     sdfuOperations,
     selectedDevice,
     usageData,
-    waitForDevice,
+    waitForAutoReconnect,
 } from 'pc-nrfconnect-shared';
 
 import {
@@ -640,7 +640,7 @@ export const write =
             return;
         }
         try {
-            const reconnectedDevice = await waitForDevice(device.serialNumber);
+            const reconnectedDevice = await waitForAutoReconnect(dispatch);
             dispatch(targetDeviceKnown(reconnectedDevice));
             dispatch(openDevice());
         } catch (err) {
