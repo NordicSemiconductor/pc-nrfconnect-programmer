@@ -50,6 +50,9 @@ const mapDispatch = (dispatch: TDispatch) => ({
         dispatch(deselectDevice());
         logger.info('Target device closed');
     },
+    autoReconnectMCUBoot: {
+        timeout: 3000,
+    },
 });
 
 export default connect(mapState, mapDispatch)(DeviceSelector);
