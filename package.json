@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-programmer",
-    "version": "3.0.5",
+    "version": "3.0.6",
     "displayName": "Programmer",
     "description": "Tool for flash programming of nRF SoCs",
     "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer",
@@ -19,7 +19,8 @@
         "resources/icon.*",
         "resources/firmware/*.hex",
         "icon.png",
-        "LICENSE"
+        "LICENSE",
+        "Changelog.md"
     ],
     "scripts": {
         "watch": "run-p --silent --continue-on-error watch:*",
@@ -38,7 +39,7 @@
     },
     "devDependencies": {
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#v6.18.13",
+        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#v7",
         "react-timer-hook": "^3.0.5"
     },
     "dependencies": {},
