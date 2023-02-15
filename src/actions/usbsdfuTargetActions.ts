@@ -22,17 +22,17 @@ import {
     FwType,
     getDeviceLibContext,
     HashType,
+    isDeviceInDFUBootloader,
     logger,
     sdfuOperations,
     selectedDevice,
+    setForceAutoReconnect,
     usageData,
-    waitForAutoReconnect,
 } from 'pc-nrfconnect-shared';
 
 import {
     dfuImagesUpdate,
     loadingEnd,
-    targetDeviceKnown,
     targetInfoKnown,
     targetRegionsKnown,
     targetTypeKnown,
@@ -115,6 +115,14 @@ export const openDevice =
         );
 
         try {
+            if (!isDeviceInDFUBootloader(device)) {
+                dispatch(
+                    setForceAutoReconnect({
+                        timeout: 3000,
+                        when: 'BootLoaderMode',
+                    })
+                );
+            }
             const fwInfo: FWInfo.ReadResult = await readFwInfo(
                 getDeviceLibContext(),
                 device.id
@@ -639,13 +647,11 @@ export const write =
             logger.error(`Failed to write: ${describeError(error)}`);
             return;
         }
-        try {
-            const reconnectedDevice = await waitForAutoReconnect(dispatch);
-            dispatch(targetDeviceKnown(reconnectedDevice));
-            dispatch(openDevice());
-        } catch (err) {
-            logger.error(
-                `Failed to reconnect to device: ${describeError(err)}`
-            );
-        }
+
+        dispatch(
+            setForceAutoReconnect({
+                timeout: 3000,
+                when: 'always',
+            })
+        );
     };
