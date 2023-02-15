@@ -1,3 +1,14 @@
+## 3.0.7 - Unreleased
+
+### Added
+
+-   Reconnecting status in device selector.
+
+### Fixed
+
+-   Write button remains clickable in some cases when device is change to
+    bootloader.
+
 ## 3.0.6 - 2023-02-14
 
 ### Added
