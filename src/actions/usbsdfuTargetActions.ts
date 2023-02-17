@@ -120,6 +120,7 @@ export const openDevice =
                     setForceAutoReconnect({
                         timeout: 3000,
                         when: 'BootLoaderMode',
+                        once: true,
                     })
                 );
             }
@@ -641,17 +642,26 @@ export const write =
 
         try {
             if (!device) throw Error(`Device not found`);
+            // We might have more that one reboot of the device during the next operation
+            dispatch(
+                setForceAutoReconnect({
+                    timeout: 10000,
+                    when: 'always',
+                    once: false,
+                })
+            );
             await operateDFU(device.id, images);
             dispatch(writingEnd());
+
+            // Operation done reconnect one more time only
+            dispatch(
+                setForceAutoReconnect({
+                    timeout: 10000,
+                    when: 'always',
+                    once: true,
+                })
+            );
         } catch (error) {
             logger.error(`Failed to write: ${describeError(error)}`);
-            return;
         }
-
-        dispatch(
-            setForceAutoReconnect({
-                timeout: 3000,
-                when: 'always',
-            })
-        );
     };
