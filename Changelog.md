@@ -1,3 +1,10 @@
+## 3.0.7 - 2023-02-23
+
+### Fixed
+
+-   Writing some hex files used to fail if they had data near forbidden areas
+    like the UICR and similar.
+
 ## 3.0.6 - 2023-02-14
 
 ### Added

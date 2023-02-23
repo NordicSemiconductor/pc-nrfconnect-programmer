@@ -209,20 +209,19 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
                 }
 
                 const buffer = (result as FirmwareReadResult).buffer || '';
-
-                const hextText = Buffer.from(buffer, 'base64').toString('utf8');
-
-                let memMap = MemoryMap.fromHex(hextText);
+                const hexText = Buffer.from(buffer, 'base64').toString('utf8');
+                const memMap = MemoryMap.fromHex(hexText);
 
                 const paddedArray = memMap.slicePad(
                     0,
                     coreInfo.romBaseAddr + coreInfo.romSize
                 );
-                memMap = MemoryMap.fromPaddedUint8Array(paddedArray);
+                const paddedMemMap =
+                    MemoryMap.fromPaddedUint8Array(paddedArray);
                 logger.info(
                     `Reading memory for ${coreInfo.name} core completed`
                 );
-                resolve(memMap);
+                resolve(paddedMemMap);
             },
             () => {},
             null,
@@ -479,12 +478,12 @@ export const writeOneCore =
                 overlaps.delete(key);
             }
         });
+
         if (overlaps.size <= 0) {
             return undefined;
         }
-        const programRegions = MemoryMap.flattenOverlaps(overlaps).paginate(
-            coreInfo.pageSize
-        );
+
+        const programRegions = MemoryMap.flattenOverlaps(overlaps);
 
         await writeHex(deviceId, coreInfo, programRegions.asHexString());
         logger.info(`Writing procedure ends for ${coreInfo.name} core`);
