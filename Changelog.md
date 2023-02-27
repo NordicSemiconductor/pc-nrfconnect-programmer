@@ -2,8 +2,7 @@
 
 ### Fixed
 
--   Writing some hex files used to fail if they had data near forbidden areas
-    like the UICR and similar.
+-   Writing Asset Tracker hex file with UICR included to nRF91DK failed.
 
 ## 3.0.6 - 2023-02-14
 
