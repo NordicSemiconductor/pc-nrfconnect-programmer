@@ -1,3 +1,9 @@
+## Unreleased
+
+### Changed
+
+-   Alert banners related to file memory regions now yellow instead of red.
+
 ## 3.0.7 - 2023-02-23
 
 ### Fixed
