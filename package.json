@@ -39,10 +39,9 @@
     },
     "devDependencies": {
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "git+https://github.com/NordicSemiconductor/pc-nrfconnect-shared.git#fix/auto-reconnect-mcu-boot",
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#fix/auto-reconnect-mcu-boot-v3",
         "react-timer-hook": "^3.0.5"
     },
-    "dependencies": {},
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
     },
