@@ -114,12 +114,10 @@ export const openDevice =
             'PCA10059'
         );
 
-        console.log('switchToBootloaderMode');
         switchToBootloaderMode(
             openedDevice,
             dispatch,
             async device => {
-                console.log('switchToBootloaderMode OK');
                 const fwInfo: FWInfo.ReadResult = await readFwInfo(
                     getDeviceLibContext(),
                     device.id
