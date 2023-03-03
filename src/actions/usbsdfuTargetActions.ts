@@ -25,14 +25,14 @@ import {
     logger,
     sdfuOperations,
     selectedDevice,
+    setWaitForDevice,
+    switchToBootloaderMode,
     usageData,
-    waitForDevice,
 } from 'pc-nrfconnect-shared';
 
 import {
     dfuImagesUpdate,
     loadingEnd,
-    targetDeviceKnown,
     targetInfoKnown,
     targetRegionsKnown,
     targetTypeKnown,
@@ -91,9 +91,9 @@ export const isNordicUsb = (vid?: number, pid?: number) =>
  * @returns {Promise<void>} resolved promise
  */
 export const openDevice =
-    () => async (dispatch: TDispatch, getState: () => RootState) => {
+    () => (dispatch: TDispatch, getState: () => RootState) => {
         const { device: inputDevice } = getState().app.target;
-        const device = inputDevice as Device;
+        const openedDevice = inputDevice as Device;
 
         dispatch(
             targetTypeKnown({
@@ -114,118 +114,125 @@ export const openDevice =
             'PCA10059'
         );
 
-        try {
-            const fwInfo: FWInfo.ReadResult = await readFwInfo(
-                getDeviceLibContext(),
-                device.id
-            );
-            const deviceInfo = getDeviceInfoByUSB(device);
-            dispatch(targetInfoKnown(deviceInfo));
+        switchToBootloaderMode(
+            openedDevice,
+            dispatch,
+            async device => {
+                const fwInfo: FWInfo.ReadResult = await readFwInfo(
+                    getDeviceLibContext(),
+                    device.id
+                );
+                const deviceInfo = getDeviceInfoByUSB(device);
+                dispatch(targetInfoKnown(deviceInfo));
 
-            const appCoreNumber = 0;
-            const coreInfo = deviceInfo.cores[appCoreNumber];
+                const appCoreNumber = 0;
+                const coreInfo = deviceInfo.cores[appCoreNumber];
 
-            let regions: Region[] = [];
+                let regions: Region[] = [];
 
-            // Add FICR to regions
-            if (coreInfo.ficrBaseAddr) {
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: RegionName.FICR,
-                        version: 0,
-                        startAddress: coreInfo.ficrBaseAddr,
-                        regionSize: coreInfo.ficrSize,
-                        permission: RegionPermission.NONE,
-                    },
-                ];
+                // Add FICR to regions
+                if (coreInfo.ficrBaseAddr) {
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: RegionName.FICR,
+                            version: 0,
+                            startAddress: coreInfo.ficrBaseAddr,
+                            regionSize: coreInfo.ficrSize,
+                            permission: RegionPermission.NONE,
+                        },
+                    ];
+                }
+
+                // Add UICR to regions
+                if (coreInfo.uicrBaseAddr) {
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: RegionName.UICR,
+                            version: 0,
+                            startAddress: coreInfo.uicrBaseAddr,
+                            regionSize: coreInfo.uicrSize,
+                            permission: RegionPermission.NONE,
+                        },
+                    ];
+                }
+
+                // Add MBR to regions
+                if (coreInfo.uicrBaseAddr) {
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: RegionName.MBR,
+                            version: 0,
+                            startAddress: coreInfo.mbrBaseAddr,
+                            regionSize: coreInfo.mbrSize,
+                            color: RegionColor.MBR,
+                            permission: RegionPermission.NONE,
+                        },
+                    ];
+                }
+
+                // Add bootloader, softDevice, applications to regions
+                const { imageInfoList } = fwInfo;
+                imageInfoList.forEach((image: FWInfo.Image) => {
+                    const { imageType, imageLocation, version } = image;
+
+                    if (!imageLocation) return;
+
+                    const startAddress = imageLocation.address;
+                    const regionSize =
+                        imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
+                            ? imageLocation.size - 0x1000
+                            : imageLocation.size;
+
+                    if (regionSize === 0) return;
+
+                    const regionName =
+                        (<Partial<{ [key in FWInfo.ImageType]: RegionName }>>{
+                            NRFDL_IMAGE_TYPE_BOOTLOADER: RegionName.BOOTLOADER,
+                            NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionName.SOFTDEVICE,
+                            NRFDL_IMAGE_TYPE_APPLICATION:
+                                RegionName.APPLICATION,
+                        })[imageType] || RegionName.NONE;
+
+                    const color =
+                        (<Partial<{ [key in FWInfo.ImageType]: RegionColor }>>{
+                            NRFDL_IMAGE_TYPE_BOOTLOADER: RegionColor.BOOTLOADER,
+                            NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionColor.SOFTDEVICE,
+                            NRFDL_IMAGE_TYPE_APPLICATION:
+                                RegionColor.APPLICATION,
+                        })[imageType] || RegionColor.NONE;
+
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: regionName,
+                            version,
+                            startAddress,
+                            regionSize,
+                            color,
+                        },
+                    ];
+                });
+
+                dispatch(targetRegionsKnown(regions));
+                dispatch(updateFileRegions());
+                dispatch(canWrite());
+                dispatch(loadingEnd());
+            },
+            error => {
+                logger.error(
+                    `Error when fetching device versions: ${describeError(
+                        error
+                    )}`
+                );
             }
-
-            // Add UICR to regions
-            if (coreInfo.uicrBaseAddr) {
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: RegionName.UICR,
-                        version: 0,
-                        startAddress: coreInfo.uicrBaseAddr,
-                        regionSize: coreInfo.uicrSize,
-                        permission: RegionPermission.NONE,
-                    },
-                ];
-            }
-
-            // Add MBR to regions
-            if (coreInfo.uicrBaseAddr) {
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: RegionName.MBR,
-                        version: 0,
-                        startAddress: coreInfo.mbrBaseAddr,
-                        regionSize: coreInfo.mbrSize,
-                        color: RegionColor.MBR,
-                        permission: RegionPermission.NONE,
-                    },
-                ];
-            }
-
-            // Add bootloader, softDevice, applications to regions
-            const { imageInfoList } = fwInfo;
-            imageInfoList.forEach((image: FWInfo.Image) => {
-                const { imageType, imageLocation, version } = image;
-
-                if (!imageLocation) return;
-
-                const startAddress = imageLocation.address;
-                const regionSize =
-                    imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
-                        ? imageLocation.size - 0x1000
-                        : imageLocation.size;
-
-                if (regionSize === 0) return;
-
-                const regionName =
-                    (<Partial<{ [key in FWInfo.ImageType]: RegionName }>>{
-                        NRFDL_IMAGE_TYPE_BOOTLOADER: RegionName.BOOTLOADER,
-                        NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionName.SOFTDEVICE,
-                        NRFDL_IMAGE_TYPE_APPLICATION: RegionName.APPLICATION,
-                    })[imageType] || RegionName.NONE;
-
-                const color =
-                    (<Partial<{ [key in FWInfo.ImageType]: RegionColor }>>{
-                        NRFDL_IMAGE_TYPE_BOOTLOADER: RegionColor.BOOTLOADER,
-                        NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionColor.SOFTDEVICE,
-                        NRFDL_IMAGE_TYPE_APPLICATION: RegionColor.APPLICATION,
-                    })[imageType] || RegionColor.NONE;
-
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: regionName,
-                        version,
-                        startAddress,
-                        regionSize,
-                        color,
-                    },
-                ];
-            });
-
-            dispatch(targetRegionsKnown(regions));
-            dispatch(updateFileRegions());
-            dispatch(canWrite());
-            dispatch(loadingEnd());
-        } catch (versionError) {
-            logger.error(
-                `Error when fetching device versions: ${describeError(
-                    versionError
-                )}`
-            );
-        }
+        );
     };
 
 /**
@@ -633,19 +640,26 @@ export const write =
 
         try {
             if (!device) throw Error(`Device not found`);
+            // We might have more that one reboot of the device during the next operation
+            dispatch(
+                setWaitForDevice({
+                    timeout: 10000,
+                    when: 'always',
+                    once: false,
+                })
+            );
             await operateDFU(device.id, images);
             dispatch(writingEnd());
+
+            // Operation done reconnect one more time only
+            dispatch(
+                setWaitForDevice({
+                    timeout: 10000,
+                    when: 'always',
+                    once: true,
+                })
+            );
         } catch (error) {
             logger.error(`Failed to write: ${describeError(error)}`);
-            return;
-        }
-        try {
-            const reconnectedDevice = await waitForDevice(device.serialNumber);
-            dispatch(targetDeviceKnown(reconnectedDevice));
-            dispatch(openDevice());
-        } catch (err) {
-            logger.error(
-                `Failed to reconnect to device: ${describeError(err)}`
-            );
         }
     };

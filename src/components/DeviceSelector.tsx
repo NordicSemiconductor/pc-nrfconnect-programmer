@@ -9,7 +9,6 @@ import { DeviceTraits } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Device as SharedDevice,
     DeviceSelector,
-    DeviceSetup,
     logger,
     usageData,
 } from 'pc-nrfconnect-shared';
@@ -29,17 +28,12 @@ const deviceListing: DeviceTraits = {
     nordicDfu: true,
 };
 
-const deviceSetup: DeviceSetup = {
-    needSerialport: true,
-};
-
 const mapState = () => ({
     deviceListing,
-    deviceSetup,
 });
 
 const mapDispatch = (dispatch: TDispatch) => ({
-    onDeviceIsReady: (device: SharedDevice) => {
+    onDeviceSelected: (device: SharedDevice) => {
         dispatch(selectDevice(device.serialNumber));
         dispatch(openDevice(device));
     },
