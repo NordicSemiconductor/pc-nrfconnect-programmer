@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
-import { Alert } from 'pc-nrfconnect-shared';
+import { Alert, NumberInlineInput, Slider } from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
@@ -38,6 +38,13 @@ const McuUpdateDialogView = () => {
     const zipFilePath = useSelector(getZipFilePath);
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
+
+    const [timeout, setTimeout] = useState(40);
+    const range = {
+        min: 20,
+        max: 120,
+        step: 5,
+    };
 
     const dispatch = useDispatch();
     const onCancel = () => dispatch(mcubootWritingClose());
@@ -117,6 +124,19 @@ const McuUpdateDialogView = () => {
                                 'Failed. Check the log below for more details...'}
                         </Alert>
                     )}
+                </Form.Group>
+                <Form.Group>
+                    <NumberInlineInput
+                        // RAM NET core Flash timeout
+                        value={timeout}
+                        range={range}
+                        onChange={value => setTimeout(value)}
+                    />
+                    <Slider
+                        values={[timeout]}
+                        onChange={[value => setTimeout(value)]}
+                        range={range}
+                    />
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer>
