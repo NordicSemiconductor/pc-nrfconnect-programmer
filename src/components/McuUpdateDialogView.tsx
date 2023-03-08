@@ -78,8 +78,9 @@ const McuUpdateDialogView = () => {
         if (!showDelayTimeout || !device) return;
 
         const timeout =
-            getPersistentStore().get(`programmer:device:${device.serialNumber}`)
-                ?.flashTimeout ?? NET_CORE_UPLOAD_DELAY;
+            getPersistentStore().get(
+                `firmwareProgram:device:${device.serialNumber}`
+            )?.flashTimeout ?? NET_CORE_UPLOAD_DELAY;
         setUploadDelay(timeout);
     }, [device, showDelayTimeout]);
 
@@ -100,7 +101,7 @@ const McuUpdateDialogView = () => {
             if (!device) return;
             setUploadDelay(timeout);
             getPersistentStore().set(
-                `programmer:device:${device.serialNumber}`,
+                `firmwareProgram:device:${device.serialNumber}`,
                 {
                     flashTimeout: timeout,
                 }
