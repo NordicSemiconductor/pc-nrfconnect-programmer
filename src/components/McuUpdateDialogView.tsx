@@ -5,13 +5,21 @@
  */
 
 import React, { useState } from 'react';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
+import FormLabel from 'react-bootstrap/FormLabel';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
-import { Alert, NumberInlineInput, Slider } from 'pc-nrfconnect-shared';
+import {
+    Alert,
+    Dialog,
+    DialogButton,
+    NumberInlineInput,
+    Slider,
+    Spinner,
+} from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
@@ -26,7 +34,12 @@ import {
     getProgressPercentage,
     mcubootWritingClose,
 } from '../reducers/mcubootReducer';
+import { timerTimeToSeconds } from '../util/helpers';
 
+const TOOLTIP_TEXT =
+    'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Should be increased for the older Thingy:53 devices';
+
+// todo: show overlay trigger only if connected device is Thingy:53
 const McuUpdateDialogView = () => {
     const errorMsg = useSelector(getErrorMsg);
     const isVisible = useSelector(getIsReady);
@@ -38,6 +51,8 @@ const McuUpdateDialogView = () => {
     const zipFilePath = useSelector(getZipFilePath);
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
+
+    const writingHasStarted = isWriting || isWritingFail || isWritingSucceed;
 
     const [timeout, setTimeout] = useState(40);
     const range = {
@@ -63,21 +78,25 @@ const McuUpdateDialogView = () => {
     }
 
     return (
-        <Modal show={isVisible} onHide={onCancel} backdrop="static">
-            <Modal.Header>
-                <Modal.Title className="modem-dialog-title">
-                    MCUboot DFU
-                </Modal.Title>
-                {isWriting && <span className="mdi mdi-refresh icon-spin" />}
-            </Modal.Header>
-            <Modal.Body>
+        <Dialog
+            isVisible={isVisible}
+            onHide={onCancel}
+            closeOnUnfocus={false}
+            className="mcu-update-dialog"
+        >
+            <Dialog.Header title="MCUboot DFU" />
+            <Dialog.Body>
                 <Form.Group>
-                    <Form.Label>Firmware</Form.Label>
-                    <div>{mcubootFwPath || zipFilePath}</div>
+                    <Form.Label className="mb-0">
+                        <strong>Firmware:</strong>
+                    </Form.Label>
+                    <p>{mcubootFwPath || zipFilePath}</p>
                 </Form.Group>
                 <Form.Group>
-                    <Form.Label>Status</Form.Label>
-                    <div>{progressMsg}</div>
+                    <Form.Label>
+                        <strong>Status:</strong>
+                        <span>{` ${progressMsg}`}</span>
+                    </Form.Label>
                     <ProgressBar
                         hidden={!isWriting}
                         animated
@@ -85,18 +104,60 @@ const McuUpdateDialogView = () => {
                         label={`${progressPercentage}%`}
                     />
                 </Form.Group>
+                {!writingHasStarted && (
+                    <Form.Group>
+                        <FormLabel className="flex-row w-100">
+                            <div className="d-flex flex-row justify-content-between mb-2">
+                                <div>
+                                    <strong>
+                                        Delay duration after image upload
+                                    </strong>
+                                    <OverlayTrigger
+                                        placement="bottom-end"
+                                        overlay={
+                                            <Tooltip id="tooltip-delay-info">
+                                                <div className="info text-left">
+                                                    <span>{TOOLTIP_TEXT}</span>
+                                                </div>
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <span className="mdi mdi-information-outline info-icon ml-1" />
+                                    </OverlayTrigger>
+                                </div>
+                                <div className="d-flex">
+                                    <NumberInlineInput
+                                        value={timeout}
+                                        range={range}
+                                        onChange={value => setTimeout(value)}
+                                    />
+                                    <span>sec</span>
+                                </div>
+                            </div>
+                            <Slider
+                                values={[timeout]}
+                                onChange={[value => setTimeout(value)]}
+                                range={range}
+                            />
+                        </FormLabel>
+                    </Form.Group>
+                )}
                 <Form.Group>
-                    {!isWriting && !isWritingSucceed && !isWritingFail && (
+                    {!writingHasStarted && (
                         <Alert variant="warning">
-                            <p>You are now programming via MCUboot.</p>
-                            <p>
-                                The device will be recovered if you proceed to
-                                write.
-                            </p>
-                            <p>
-                                Make sure the device is in{' '}
-                                <strong>MCUboot mode</strong>.
-                            </p>
+                            <div>
+                                <p className="mb-0">
+                                    You are now programming via MCUboot.
+                                </p>
+                                <p className="mb-0">
+                                    The device will be recovered if you proceed
+                                    to write.
+                                </p>
+                                <p className="mb-0">
+                                    Make sure the device is in{' '}
+                                    <strong>MCUboot mode</strong>.
+                                </p>
+                            </div>
                         </Alert>
                     )}
                     {!isFirmwareValid && (
@@ -107,14 +168,9 @@ const McuUpdateDialogView = () => {
                     )}
                     {isWritingSucceed && (
                         <Alert variant="success">
-                            Completed successfully in
-                            {` ${
-                                days * 24 * 60 * 60 +
-                                hours * 60 * 60 +
-                                minutes * 60 +
-                                seconds
-                            } `}
-                            seconds.
+                            Completed successfully in {` `}
+                            {timerTimeToSeconds(seconds, minutes, hours, days)}
+                            {` `} seconds.
                         </Alert>
                     )}
                     {isWritingFail && (
@@ -125,40 +181,24 @@ const McuUpdateDialogView = () => {
                         </Alert>
                     )}
                 </Form.Group>
-                <Form.Group>
-                    <NumberInlineInput
-                        // RAM NET core Flash timeout
-                        value={timeout}
-                        range={range}
-                        onChange={value => setTimeout(value)}
-                    />
-                    <Slider
-                        values={[timeout]}
-                        onChange={[value => setTimeout(value)]}
-                        range={range}
-                    />
-                </Form.Group>
-            </Modal.Body>
-            <Modal.Footer>
+            </Dialog.Body>
+            <Dialog.Footer>
+                {isWriting && <Spinner />}
+
                 {!isWritingSucceed && (
-                    <Button
+                    <DialogButton
                         variant="primary"
-                        className="core-btn"
                         onClick={onWriteStart}
                         disabled={isWriting}
                     >
                         Write
-                    </Button>
+                    </DialogButton>
                 )}
-                <Button
-                    className="core-btn"
-                    onClick={onCancel}
-                    disabled={isWriting}
-                >
+                <DialogButton onClick={onCancel} disabled={isWriting}>
                     Close
-                </Button>
-            </Modal.Footer>
-        </Modal>
+                </DialogButton>
+            </Dialog.Footer>
+        </Dialog>
     );
 };
 
