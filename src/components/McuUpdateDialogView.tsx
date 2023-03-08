@@ -63,7 +63,7 @@ const McuUpdateDialogView = () => {
     const [showDelayTimeout, setShowDelayTimeout] = useState(false);
     const uploadDelayRange = {
         min: 20,
-        max: 120,
+        max: 180,
         step: 5,
     };
 
