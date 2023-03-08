@@ -94,7 +94,7 @@ const McuUpdateDialogView = () => {
         reset();
         start();
         dispatch(performUpdate(showDelayTimeout ? uploadDelay : null));
-    }, [dispatch, uploadDelay, reset, start]);
+    }, [reset, start, dispatch, showDelayTimeout, uploadDelay]);
 
     const updateUploadDelayTimeout = useCallback(
         (timeout: number) => {
