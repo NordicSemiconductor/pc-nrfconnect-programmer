@@ -4,14 +4,20 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import FormLabel from 'react-bootstrap/FormLabel';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
-import { Alert, NumberInlineInput, Slider } from 'pc-nrfconnect-shared';
+import {
+    Alert,
+    getPersistentStore,
+    NumberInlineInput,
+    Slider,
+} from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
@@ -26,6 +32,7 @@ import {
     getProgressPercentage,
     mcubootWritingClose,
 } from '../reducers/mcubootReducer';
+import { getDevice } from '../reducers/targetReducer';
 
 const McuUpdateDialogView = () => {
     const errorMsg = useSelector(getErrorMsg);
@@ -39,12 +46,25 @@ const McuUpdateDialogView = () => {
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
 
-    const [timeout, setTimeout] = useState(40);
-    const range = {
+    const device = useSelector(getDevice);
+
+    const [flashTimeout, setFlashTimeout] = useState<number | null>(null);
+    const flashTimeoutRange = {
         min: 20,
         max: 120,
         step: 5,
     };
+
+    useEffect(() => {
+        const isThingy53 =
+            device?.usb?.device.descriptor.idProduct === 0x5300 &&
+            device?.usb?.device.descriptor.idVendor === 0x1915;
+        const timeout =
+            getPersistentStore().get(
+                `programmer:device:${device?.serialNumber}`
+            )?.flashTimeout ?? 40;
+        setFlashTimeout(isThingy53 ? timeout : null);
+    }, [device]);
 
     const dispatch = useDispatch();
     const onCancel = () => dispatch(mcubootWritingClose());
@@ -52,11 +72,25 @@ const McuUpdateDialogView = () => {
     const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
         useStopwatch({ autoStart: true });
 
-    const onWriteStart = () => {
+    const onWriteStart = useCallback(() => {
         reset();
         start();
-        dispatch(performUpdate());
-    };
+        dispatch(performUpdate(flashTimeout));
+    }, [dispatch, flashTimeout, reset, start]);
+
+    const updateFlashTimeout = useCallback(
+        (timeout: number) => {
+            if (!device) return;
+            setFlashTimeout(timeout);
+            getPersistentStore().set(
+                `programmer:device:${device.serialNumber}`,
+                {
+                    flashTimeout: timeout,
+                }
+            );
+        },
+        [device]
+    );
 
     if (isRunning && (isWritingSucceed || isWritingFail)) {
         pause();
@@ -125,19 +159,24 @@ const McuUpdateDialogView = () => {
                         </Alert>
                     )}
                 </Form.Group>
-                <Form.Group>
-                    <NumberInlineInput
-                        // RAM NET core Flash timeout
-                        value={timeout}
-                        range={range}
-                        onChange={value => setTimeout(value)}
-                    />
-                    <Slider
-                        values={[timeout]}
-                        onChange={[value => setTimeout(value)]}
-                        range={range}
-                    />
-                </Form.Group>
+                {flashTimeout && (
+                    <Form.Group>
+                        <FormLabel className="flex-row">
+                            RAM NET core Flash timeout
+                            <NumberInlineInput
+                                value={flashTimeout}
+                                range={flashTimeoutRange}
+                                onChange={value => updateFlashTimeout(value)}
+                            />
+                            seconds
+                        </FormLabel>
+                        <Slider
+                            values={[flashTimeout]}
+                            onChange={[value => updateFlashTimeout(value)]}
+                            range={flashTimeoutRange}
+                        />
+                    </Form.Group>
+                )}
             </Modal.Body>
             <Modal.Footer>
                 {!isWritingSucceed && (

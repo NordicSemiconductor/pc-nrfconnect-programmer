@@ -171,7 +171,8 @@ export const canWrite =
     };
 
 export const performUpdate =
-    () => (dispatch: TDispatch, getState: () => RootState) =>
+    (flashTimeout: number | null) =>
+    (dispatch: TDispatch, getState: () => RootState) =>
         new Promise<void>(resolve => {
             const { device: inputDevice } = getState().app.target;
             const device = inputDevice as Device;
@@ -227,6 +228,11 @@ export const performUpdate =
                 firmwareFormat,
                 dfuFilePath as string,
                 completeCallback,
-                progressCallback
+                progressCallback,
+                {
+                    verify: null,
+                    mcuEndState: 'NRFDL_MCU_STATE_APPLICATION',
+                    // netCoreUploadDelay: flashTimeout,
+                }
             );
         });

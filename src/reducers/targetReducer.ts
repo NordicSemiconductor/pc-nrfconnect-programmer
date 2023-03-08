@@ -192,6 +192,7 @@ export const getIsRecoverable = (state: RootState) =>
     state.app.target.isRecoverable;
 export const getIsWritable = (state: RootState) => state.app.target.isWritable;
 export const getDeviceInfo = (state: RootState) => state.app.target.deviceInfo;
+export const getDevice = (state: RootState) => state.app.target.device;
 export const getRegions = (state: RootState) => state.app.target.regions;
 export const getSerialNumber = (state: RootState) =>
     state.app.target.serialNumber;
