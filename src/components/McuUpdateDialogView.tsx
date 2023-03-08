@@ -93,7 +93,7 @@ const McuUpdateDialogView = () => {
     const onWriteStart = useCallback(() => {
         reset();
         start();
-        dispatch(performUpdate(uploadDelay));
+        dispatch(performUpdate(showDelayTimeout ? uploadDelay : null));
     }, [dispatch, uploadDelay, reset, start]);
 
     const updateUploadDelayTimeout = useCallback(

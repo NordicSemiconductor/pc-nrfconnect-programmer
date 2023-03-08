@@ -171,7 +171,7 @@ export const canWrite =
     };
 
 export const performUpdate =
-    (flashTimeout: number | null) =>
+    (netCoreUploadDelay: number | null) =>
     (dispatch: TDispatch, getState: () => RootState) =>
         new Promise<void>(resolve => {
             const { device: inputDevice } = getState().app.target;
@@ -232,7 +232,7 @@ export const performUpdate =
                 {
                     verify: null,
                     mcuEndState: 'NRFDL_MCU_STATE_APPLICATION',
-                    // netCoreUploadDelay: flashTimeout,
+                    netCoreUploadDelay,
                 }
             );
         });
