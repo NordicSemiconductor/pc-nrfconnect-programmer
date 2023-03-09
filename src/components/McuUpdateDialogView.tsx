@@ -14,12 +14,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useStopwatch } from 'react-timer-hook';
 import {
     Alert,
+    classNames,
     Dialog,
     DialogButton,
     getPersistentStore,
     NumberInlineInput,
     Slider,
     Spinner,
+    Toggle,
 } from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/mcubootTargetActions';
@@ -39,10 +41,10 @@ import { getDevice } from '../reducers/targetReducer';
 import { timerTimeToSeconds } from '../util/helpers';
 
 const TOOLTIP_TEXT =
-    'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Should be increased for the older Thingy:53 devices';
+    'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
 
 const NET_CORE_UPLOAD_DELAY = 40;
-// todo: show overlay trigger only if connected device is Thingy:53
+
 const McuUpdateDialogView = () => {
     const errorMsg = useSelector(getErrorMsg);
     const isVisible = useSelector(getIsReady);
@@ -60,7 +62,8 @@ const McuUpdateDialogView = () => {
     const device = useSelector(getDevice);
 
     const [uploadDelay, setUploadDelay] = useState(NET_CORE_UPLOAD_DELAY);
-    const [showDelayTimeout, setShowDelayTimeout] = useState(false);
+    const [keepDefaultTimeout, setKeepDefaultTimeout] = useState(true);
+    const [showDelayTimeout, setShowDelayTimeout] = useState(true);
     const uploadDelayRange = {
         min: 20,
         max: 300,
@@ -68,6 +71,7 @@ const McuUpdateDialogView = () => {
     };
 
     useEffect(() => {
+        // note: check may be redundant as Thingy:91 has a different modal
         const isThingy53 =
             device?.usb?.device.descriptor.idProduct === 0x5300 &&
             device?.usb?.device.descriptor.idVendor === 0x1915;
@@ -82,6 +86,10 @@ const McuUpdateDialogView = () => {
                 `firmwareProgram:device:${device.serialNumber}`
             )?.netCoreUploadDelay ?? NET_CORE_UPLOAD_DELAY;
         setUploadDelay(timeout);
+
+        if (timeout !== NET_CORE_UPLOAD_DELAY) {
+            setKeepDefaultTimeout(false);
+        }
     }, [device, showDelayTimeout]);
 
     const dispatch = useDispatch();
@@ -109,6 +117,13 @@ const McuUpdateDialogView = () => {
         },
         [device]
     );
+
+    const toggleDefaultTimeoutUI = (shouldKeep: boolean) => {
+        setKeepDefaultTimeout(shouldKeep);
+        if (shouldKeep) {
+            updateUploadDelayTimeout(NET_CORE_UPLOAD_DELAY);
+        }
+    };
 
     if (isRunning && (isWritingSucceed || isWritingFail)) {
         pause();
@@ -142,33 +157,45 @@ const McuUpdateDialogView = () => {
                     />
                 </Form.Group>
                 {!writingHasStarted && showDelayTimeout && (
-                    <Form.Group>
-                        <FormLabel className="flex-row w-100">
+                    <Form.Group className="upload-delay p-3">
+                        <div className="d-flex justify-content-between">
+                            <Form.Label className="mb-0">
+                                <strong>
+                                    Keep default delay after image upload
+                                </strong>
+                                <OverlayTrigger
+                                    placement="bottom-end"
+                                    overlay={
+                                        <Tooltip id="tooltip-delay-info">
+                                            <div className="info text-left">
+                                                <span>{TOOLTIP_TEXT}</span>
+                                            </div>
+                                        </Tooltip>
+                                    }
+                                >
+                                    <span className="mdi mdi-information-outline info-icon ml-1" />
+                                </OverlayTrigger>
+                            </Form.Label>
+                            <Toggle
+                                onToggle={toggleDefaultTimeoutUI}
+                                isToggled={keepDefaultTimeout}
+                            />
+                        </div>
+                        <FormLabel
+                            className={classNames(
+                                'w-100 mt-3 mb-0',
+                                keepDefaultTimeout ? 'd-none' : 'd-block'
+                            )}
+                        >
                             <div className="d-flex flex-row justify-content-between mb-2">
                                 <div>
-                                    <strong>
-                                        Delay duration after image upload
-                                    </strong>
-                                    <OverlayTrigger
-                                        placement="bottom-end"
-                                        overlay={
-                                            <Tooltip id="tooltip-delay-info">
-                                                <div className="info text-left">
-                                                    <span>{TOOLTIP_TEXT}</span>
-                                                </div>
-                                            </Tooltip>
-                                        }
-                                    >
-                                        <span className="mdi mdi-information-outline info-icon ml-1" />
-                                    </OverlayTrigger>
+                                    <strong>Set delay duration</strong>
                                 </div>
                                 <div className="d-flex">
                                     <NumberInlineInput
                                         value={uploadDelay}
                                         range={uploadDelayRange}
-                                        onChange={value =>
-                                            updateUploadDelayTimeout(value)
-                                        }
+                                        onChange={updateUploadDelayTimeout}
                                     />
                                     <span>sec</span>
                                 </div>
@@ -180,6 +207,14 @@ const McuUpdateDialogView = () => {
                                 ]}
                                 range={uploadDelayRange}
                             />
+
+                            {uploadDelay !== NET_CORE_UPLOAD_DELAY && (
+                                <p className="note">
+                                    Note: recommended delay for <i>most</i> of
+                                    the devices is {NET_CORE_UPLOAD_DELAY}{' '}
+                                    seconds.
+                                </p>
+                            )}
                         </FormLabel>
                     </Form.Group>
                 )}

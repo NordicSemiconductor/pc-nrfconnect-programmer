@@ -11,4 +11,13 @@
     .alert:last-of-type {
         margin-bottom: 0;
     }
+
+    .upload-delay {
+        border: 1px solid $gray-100;
+
+        .note {
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+    }
 }
