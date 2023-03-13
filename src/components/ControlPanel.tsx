@@ -160,7 +160,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                     </Dropdown.Item>
                 </Popover>
             </Overlay>
-            <Button className="btn-secondary w-100" onClick={onClick}>
+            <Button variant="secondary" className="w-100" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
                 Add file
             </Button>
@@ -220,20 +220,26 @@ const ControlPanel = () => {
             <Group heading="File">
                 <Mru mruFiles={mruFiles} />
                 <Button
-                    className="btn-secondary w-100"
+                    variant="secondary"
+                    className="w-100"
                     onClick={refreshAllFiles}
                 >
                     <span className="mdi mdi-refresh" />
                     Reload files
                 </Button>
-                <Button className="btn-secondary w-100" onClick={closeFiles}>
+                <Button
+                    variant="secondary"
+                    className="w-100"
+                    onClick={closeFiles}
+                >
                     <span className="mdi mdi-minus-circle" />
                     Clear files
                 </Button>
             </Group>
             <Group heading="Device">
                 <Button
-                    className="btn-secondary w-100"
+                    variant="secondary"
+                    className="w-100"
                     key="performRecover"
                     onClick={performRecover}
                     disabled={
@@ -247,8 +253,9 @@ const ControlPanel = () => {
                     Erase all
                 </Button>
                 <Button
+                    variant="secondary"
                     key="performRecoverAndWrite"
-                    className="btn-secondary w-100"
+                    className="w-100"
                     onClick={performRecoverAndWrite}
                     disabled={
                         isMcuboot ||
@@ -262,8 +269,9 @@ const ControlPanel = () => {
                     Erase & write
                 </Button>
                 <Button
+                    variant="secondary"
                     key="performSaveAsFile"
-                    className="btn-secondary w-100"
+                    className="w-100"
                     onClick={performSaveAsFile}
                     disabled={!isJLink || !targetIsMemLoaded}
                 >
@@ -272,7 +280,8 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     key="performReset"
-                    className="btn-secondary w-100"
+                    variant="secondary"
+                    className="w-100"
                     onClick={performReset}
                     disabled={!isJLink || !targetIsReady}
                 >
@@ -281,7 +290,8 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     key="performWrite"
-                    className="btn-secondary w-100"
+                    variant="secondary"
+                    className="w-100"
                     onClick={performWrite}
                     disabled={
                         !targetIsReady ||
@@ -298,8 +308,9 @@ const ControlPanel = () => {
                     Write
                 </Button>
                 <Button
+                    variant="secondary"
                     key="performJLinkRead"
-                    className="btn-secondary w-100"
+                    className="w-100"
                     onClick={performJLinkRead}
                     disabled={
                         isMcuboot || !isJLink || !targetIsReady || isProtected
