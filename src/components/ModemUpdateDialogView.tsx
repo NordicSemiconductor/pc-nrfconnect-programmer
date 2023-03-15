@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
-import { useStopwatch } from 'react-timer-hook';
-import { Alert } from 'pc-nrfconnect-shared';
+import { Alert, useStopwatch } from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/modemTargetActions';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
@@ -42,8 +41,9 @@ const ModemUpdateDialogView = () => {
     const dispatch = useDispatch();
     const onCancel = () => dispatch(modemWritingClose());
 
-    const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
-        useStopwatch({ autoStart: true });
+    const { time, start, pause, reset } = useStopwatch({
+        autoStart: false,
+    });
 
     const onWriteStart = () => {
         reset();
@@ -51,9 +51,11 @@ const ModemUpdateDialogView = () => {
         dispatch(performUpdate());
     };
 
-    if (isRunning && (isWritingSucceed || isWritingFail)) {
-        pause();
-    }
+    useEffect(() => {
+        if (isWritingSucceed || isWritingFail) {
+            pause();
+        }
+    }, [isWritingFail, isWritingSucceed, pause]);
 
     const temporarilySkippingProgressBar = true;
 
@@ -135,12 +137,7 @@ const ModemUpdateDialogView = () => {
                     {isWritingSucceed && !isWriting && (
                         <Alert variant="success">
                             Completed successfully in
-                            {` ${
-                                days * 24 * 60 * 60 +
-                                hours * 60 * 60 +
-                                minutes * 60 +
-                                seconds
-                            } `}
+                            {` ${Math.round(time / 1000)} `}
                             seconds.
                         </Alert>
                     )}
@@ -154,15 +151,13 @@ const ModemUpdateDialogView = () => {
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-                {!isWritingSucceed && (
-                    <Button
-                        variant="primary"
-                        onClick={onWriteStart}
-                        disabled={isWriting}
-                    >
-                        Write
-                    </Button>
-                )}
+                <Button
+                    variant="primary"
+                    onClick={onWriteStart}
+                    disabled={isWriting || isWritingSucceed || isWritingFail}
+                >
+                    Write
+                </Button>
                 <Button
                     variant="secondary"
                     onClick={onCancel}

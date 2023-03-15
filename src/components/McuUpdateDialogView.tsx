@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormLabel from 'react-bootstrap/FormLabel';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
-import { useStopwatch } from 'react-timer-hook';
 import {
     Alert,
     classNames,
@@ -22,6 +21,7 @@ import {
     Slider,
     Spinner,
     Toggle,
+    useStopwatch,
 } from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/mcubootTargetActions';
@@ -38,7 +38,6 @@ import {
     mcubootWritingClose,
 } from '../reducers/mcubootReducer';
 import { getDevice } from '../reducers/targetReducer';
-import { timerTimeToSeconds } from '../util/helpers';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
@@ -46,6 +45,7 @@ const TOOLTIP_TEXT =
 const NET_CORE_UPLOAD_DELAY = 40;
 
 const McuUpdateDialogView = () => {
+    const [keepDialogOpen, setKeepDialogOpen] = useState(false);
     const errorMsg = useSelector(getErrorMsg);
     const isVisible = useSelector(getIsReady);
     const isWriting = useSelector(getIsWriting);
@@ -93,30 +93,32 @@ const McuUpdateDialogView = () => {
     }, [device, showDelayTimeout]);
 
     const dispatch = useDispatch();
-    const onCancel = () => dispatch(mcubootWritingClose());
+    const onCancel = () => {
+        setKeepDialogOpen(false);
+        dispatch(mcubootWritingClose());
+    };
 
-    const { seconds, minutes, hours, days, isRunning, start, pause, reset } =
-        useStopwatch({ autoStart: true });
+    const { time, start, pause, reset } = useStopwatch({
+        autoStart: false,
+    });
 
-    const onWriteStart = useCallback(() => {
+    const onWriteStart = () => {
         reset();
         start();
+        setKeepDialogOpen(true);
         dispatch(performUpdate(showDelayTimeout ? uploadDelay : null));
-    }, [reset, start, dispatch, showDelayTimeout, uploadDelay]);
+    };
 
-    const updateUploadDelayTimeout = useCallback(
-        (timeout: number) => {
-            if (!device) return;
-            setUploadDelay(timeout);
-            getPersistentStore().set(
-                `firmwareProgram:device:${device.serialNumber}`,
-                {
-                    netCoreUploadDelay: timeout,
-                }
-            );
-        },
-        [device]
-    );
+    const updateUploadDelayTimeout = (timeout: number) => {
+        if (!device) return;
+        setUploadDelay(timeout);
+        getPersistentStore().set(
+            `firmwareProgram:device:${device.serialNumber}`,
+            {
+                netCoreUploadDelay: timeout,
+            }
+        );
+    };
 
     const toggleDefaultTimeoutUI = (shouldKeep: boolean) => {
         setKeepDefaultTimeout(shouldKeep);
@@ -125,13 +127,15 @@ const McuUpdateDialogView = () => {
         }
     };
 
-    if (isRunning && (isWritingSucceed || isWritingFail)) {
-        pause();
-    }
+    useEffect(() => {
+        if (isWritingSucceed || isWritingFail) {
+            pause();
+        }
+    }, [isWritingFail, isWritingSucceed, pause]);
 
     return (
         <Dialog
-            isVisible={isVisible}
+            isVisible={isVisible || keepDialogOpen}
             onHide={onCancel}
             closeOnUnfocus={false}
             className="mcu-update-dialog"
@@ -245,7 +249,7 @@ const McuUpdateDialogView = () => {
                     {isWritingSucceed && (
                         <Alert variant="success">
                             Completed successfully in {` `}
-                            {timerTimeToSeconds(seconds, minutes, hours, days)}
+                            {` ${Math.round(time / 1000)} `}
                             {` `} seconds.
                         </Alert>
                     )}
@@ -260,16 +264,13 @@ const McuUpdateDialogView = () => {
             </Dialog.Body>
             <Dialog.Footer>
                 {isWriting && <Spinner />}
-
-                {!isWritingSucceed && (
-                    <DialogButton
-                        variant="primary"
-                        onClick={onWriteStart}
-                        disabled={isWriting}
-                    >
-                        Write
-                    </DialogButton>
-                )}
+                <DialogButton
+                    variant="primary"
+                    onClick={onWriteStart}
+                    disabled={isWriting || isWritingSucceed || isWritingFail}
+                >
+                    Write
+                </DialogButton>
                 <DialogButton onClick={onCancel} disabled={isWriting}>
                     Close
                 </DialogButton>
