@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormLabel from 'react-bootstrap/FormLabel';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -102,26 +102,23 @@ const McuUpdateDialogView = () => {
         autoStart: false,
     });
 
-    const onWriteStart = useCallback(() => {
+    const onWriteStart = () => {
         reset();
         start();
         setKeepDialogOpen(true);
         dispatch(performUpdate(showDelayTimeout ? uploadDelay : null));
-    }, [reset, start, dispatch, showDelayTimeout, uploadDelay]);
+    };
 
-    const updateUploadDelayTimeout = useCallback(
-        (timeout: number) => {
-            if (!device) return;
-            setUploadDelay(timeout);
-            getPersistentStore().set(
-                `firmwareProgram:device:${device.serialNumber}`,
-                {
-                    netCoreUploadDelay: timeout,
-                }
-            );
-        },
-        [device]
-    );
+    const updateUploadDelayTimeout = (timeout: number) => {
+        if (!device) return;
+        setUploadDelay(timeout);
+        getPersistentStore().set(
+            `firmwareProgram:device:${device.serialNumber}`,
+            {
+                netCoreUploadDelay: timeout,
+            }
+        );
+    };
 
     const toggleDefaultTimeoutUI = (shouldKeep: boolean) => {
         setKeepDefaultTimeout(shouldKeep);

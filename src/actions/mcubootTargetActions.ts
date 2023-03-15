@@ -229,13 +229,6 @@ export const performUpdate =
                 dfuFilePath as string,
                 completeCallback,
                 progressCallback,
-                netCoreUploadDelay === null
-                    ? ({
-                          mcuEndState: 'NRFDL_MCU_STATE_APPLICATION',
-                      } as nrfdl.ProgramOptionals)
-                    : ({
-                          mcuEndState: 'NRFDL_MCU_STATE_APPLICATION',
-                          netCoreUploadDelay,
-                      } as nrfdl.ProgramOptionals)
+                netCoreUploadDelay !== null ? { netCoreUploadDelay } : undefined
             );
         });
