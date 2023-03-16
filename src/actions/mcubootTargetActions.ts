@@ -212,7 +212,6 @@ export const performUpdate =
                 progressJson: progress,
             }: nrfdl.Progress.CallbackParameters) => {
                 let updatedProgress: MCUBootProcessUpdatePayload = progress;
-                console.log(updatedProgress);
                 if (progress.operation === 'erase_image') {
                     updatedProgress = {
                         ...progress,
