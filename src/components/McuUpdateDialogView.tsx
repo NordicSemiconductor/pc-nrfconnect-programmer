@@ -154,9 +154,6 @@ const McuUpdateDialogView = () => {
           )
         : progressPercentage;
 
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
     return (
         <Dialog
             isVisible={isVisible || keepDialogOpen}
