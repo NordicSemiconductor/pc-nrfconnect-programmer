@@ -106,11 +106,11 @@ const McuUpdateDialogView = () => {
 
     const { time, start, pause, reset } = useStopwatch({
         autoStart: false,
-        resolution: 500,
+        resolution: 200,
     });
 
     if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
-        setNetCoreUploadDelayOffset(Math.floor(time / 1000));
+        setNetCoreUploadDelayOffset(Math.floor(time));
     }
 
     const onWriteStart = () => {
@@ -148,8 +148,7 @@ const McuUpdateDialogView = () => {
         ? Math.min(
               100,
               Math.round(
-                  ((Math.round(time / 1000) - netCoreUploadDelayOffset) /
-                      timeoutValue) *
+                  ((time - netCoreUploadDelayOffset) / (timeoutValue * 1000)) *
                       100
               )
           )
