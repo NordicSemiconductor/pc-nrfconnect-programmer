@@ -5,6 +5,7 @@
 -   Reconnecting status in device selector.
 -   Custom control to set net core upload delay
 -   Persist net core upload delay for each device serial number
+-   Progress on net core upload delay
 
 ### Fixed
 
