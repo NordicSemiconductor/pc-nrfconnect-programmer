@@ -35,6 +35,8 @@ import {
     getIsWritingSucceed,
     getProgressMsg,
     getProgressPercentage,
+    getTimeoutStarted,
+    getTimeoutValue,
     mcubootWritingClose,
 } from '../reducers/mcubootReducer';
 import { getDevice } from '../reducers/targetReducer';
@@ -56,6 +58,10 @@ const McuUpdateDialogView = () => {
     const zipFilePath = useSelector(getZipFilePath);
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
+    const timeoutStarted = useSelector(getTimeoutStarted);
+    const timeoutValue = useSelector(getTimeoutValue);
+    const [netCoreUploadDelayOffset, setNetCoreUploadDelayOffset] =
+        useState(-1);
 
     const writingHasStarted = isWriting || isWritingFail || isWritingSucceed;
 
@@ -100,7 +106,12 @@ const McuUpdateDialogView = () => {
 
     const { time, start, pause, reset } = useStopwatch({
         autoStart: false,
+        resolution: 200,
     });
+
+    if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
+        setNetCoreUploadDelayOffset(Math.floor(time));
+    }
 
     const onWriteStart = () => {
         reset();
@@ -133,6 +144,16 @@ const McuUpdateDialogView = () => {
         }
     }, [isWritingFail, isWritingSucceed, pause]);
 
+    const progress = timeoutStarted
+        ? Math.min(
+              100,
+              Math.round(
+                  ((time - netCoreUploadDelayOffset) / (timeoutValue * 1000)) *
+                      100
+              )
+          )
+        : progressPercentage;
+
     return (
         <Dialog
             isVisible={isVisible || keepDialogOpen}
@@ -156,8 +177,8 @@ const McuUpdateDialogView = () => {
                     <ProgressBar
                         hidden={!isWriting}
                         animated
-                        now={progressPercentage}
-                        label={`${progressPercentage}%`}
+                        now={progress}
+                        label={`${progress}%`}
                     />
                 </Form.Group>
                 {!writingHasStarted && showDelayTimeout && (

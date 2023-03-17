@@ -26,6 +26,8 @@ export interface McubootState {
     progressStep: number;
     progressOperation: string;
     errorMsg: string;
+    timeoutStarted?: boolean;
+    timeoutValue?: number;
 }
 
 const initialState: McubootState = {
@@ -43,6 +45,8 @@ const initialState: McubootState = {
     progressStep: 0,
     progressOperation: MCUBOOT_DFU_NOT_STARTED,
     errorMsg: '',
+    timeoutStarted: false,
+    timeoutValue: 0,
 };
 
 interface MCUBootPortKnownPayload {
@@ -50,12 +54,14 @@ interface MCUBootPortKnownPayload {
     port2?: string;
 }
 
-interface MCUBootProcessUpdatePayload {
+export interface MCUBootProcessUpdatePayload {
     message?: string;
     progressPercentage?: number;
     duration?: number;
     step?: number;
     operation?: string;
+    timeoutStarted?: boolean;
+    timeoutValue?: number;
 }
 
 const mcubootSlice = createSlice({
@@ -80,6 +86,8 @@ const mcubootSlice = createSlice({
             state.progressPercentage = action.payload.progressPercentage ?? 0;
             state.progressDuration = action.payload.duration ?? 0;
             state.progressOperation = action.payload.operation ?? '';
+            state.timeoutStarted = action.payload.timeoutStarted ?? false;
+            state.timeoutValue = action.payload.timeoutValue ?? 0;
         },
         mcubootWritingReady(state) {
             state.progressMsg = MCUBOOT_DFU_NOT_STARTED;
@@ -141,6 +149,10 @@ export const getProgressMsg = (state: RootState) =>
     state.app.mcuboot.progressMsg;
 export const getProgressPercentage = (state: RootState) =>
     state.app.mcuboot.progressPercentage;
+export const getTimeoutStarted = (state: RootState) =>
+    state.app.mcuboot.timeoutStarted ?? false;
+export const getTimeoutValue = (state: RootState) =>
+    state.app.mcuboot.timeoutValue ?? 0;
 export const getErrorMsg = (state: RootState) => state.app.mcuboot.errorMsg;
 export const getIsWriting = (state: RootState) => state.app.mcuboot.isWriting;
 export const getIsWritingFail = (state: RootState) =>

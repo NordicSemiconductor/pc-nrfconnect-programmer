@@ -18,6 +18,7 @@ import {
     mcubootKnown,
     mcubootPortKnown,
     mcubootProcessUpdate,
+    MCUBootProcessUpdatePayload,
     mcubootWritingFail,
     mcubootWritingStart,
     mcubootWritingSucceed,
@@ -210,12 +211,26 @@ export const performUpdate =
             const progressCallback = ({
                 progressJson: progress,
             }: nrfdl.Progress.CallbackParameters) => {
-                let updatedProgress = progress;
+                let updatedProgress: MCUBootProcessUpdatePayload = progress;
                 if (progress.operation === 'erase_image') {
                     updatedProgress = {
                         ...progress,
                         message: `${progress.message} This will take some time.`,
                     };
+                }
+                if (
+                    progress.message?.match(
+                        /Waiting [0-9]+ seconds to let RAM NET Core flash succeed./
+                    )
+                ) {
+                    const timeouts = progress.message.match(/\d+/g);
+                    if (timeouts?.length === 1) {
+                        updatedProgress = {
+                            ...progress,
+                            timeoutStarted: true,
+                            timeoutValue: parseInt(timeouts[0], 10),
+                        };
+                    }
                 }
                 dispatch(mcubootProcessUpdate(updatedProgress));
             };
