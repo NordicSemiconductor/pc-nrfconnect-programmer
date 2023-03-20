@@ -13,6 +13,7 @@ import {
     Button,
     colors,
     Group,
+    selectedDevice,
     SidePanel,
     Toggle,
     truncateMiddle,
@@ -174,6 +175,7 @@ Mru.propTypes = {
 
 const ControlPanel = () => {
     const fileRegionSize = useSelector(getFileRegions)?.length;
+    const isDeviceSelected = useSelector(selectedDevice) !== undefined;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
     const autoReset = useSelector(getAutoReset);
@@ -243,6 +245,7 @@ const ControlPanel = () => {
                     key="performRecover"
                     onClick={performRecover}
                     disabled={
+                        !isDeviceSelected ||
                         isMcuboot ||
                         !isJLink ||
                         !targetIsReady ||
@@ -258,6 +261,7 @@ const ControlPanel = () => {
                     className="w-100"
                     onClick={performRecoverAndWrite}
                     disabled={
+                        !isDeviceSelected ||
                         isMcuboot ||
                         !isJLink ||
                         !targetIsReady ||
@@ -273,7 +277,9 @@ const ControlPanel = () => {
                     key="performSaveAsFile"
                     className="w-100"
                     onClick={performSaveAsFile}
-                    disabled={!isJLink || !targetIsMemLoaded}
+                    disabled={
+                        !isDeviceSelected || !isJLink || !targetIsMemLoaded
+                    }
                 >
                     <span className="mdi mdi-floppy" />
                     Save as file
@@ -283,7 +289,7 @@ const ControlPanel = () => {
                     variant="secondary"
                     className="w-100"
                     onClick={performReset}
-                    disabled={!isJLink || !targetIsReady}
+                    disabled={!isDeviceSelected || !isJLink || !targetIsReady}
                 >
                     <span className="mdi mdi-record" />
                     Reset
@@ -294,6 +300,7 @@ const ControlPanel = () => {
                     className="w-100"
                     onClick={performWrite}
                     disabled={
+                        !isDeviceSelected ||
                         !targetIsReady ||
                         !targetIsWritable ||
                         (isJLink && !zipFile)
@@ -313,7 +320,11 @@ const ControlPanel = () => {
                     className="w-100"
                     onClick={performJLinkRead}
                     disabled={
-                        isMcuboot || !isJLink || !targetIsReady || isProtected
+                        !isDeviceSelected ||
+                        isMcuboot ||
+                        !isJLink ||
+                        !targetIsReady ||
+                        isProtected
                     }
                 >
                     <span className="mdi mdi-refresh" />

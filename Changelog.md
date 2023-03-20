@@ -11,6 +11,7 @@
 
 -   Write button remains clickable in some cases when device is change to
     bootloader.
+-   Relevant buttons will not remain active when device is deselected
 
 ### Changed
 
