@@ -570,6 +570,7 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
             fs.writeFile(filePath, data, err => {
                 if (err) {
                     logger.error(`Failed to save file: ${describeError(err)}`);
+                    return;
                 }
                 logger.info(`File is successfully saved at ${filePath}`);
             });
