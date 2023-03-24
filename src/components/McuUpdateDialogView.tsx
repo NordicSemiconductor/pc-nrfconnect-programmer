@@ -44,7 +44,7 @@ import { getDevice } from '../reducers/targetReducer';
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
 
-const NET_CORE_UPLOAD_DELAY = 40;
+const NET_CORE_UPLOAD_DELAY = 120;
 
 const McuUpdateDialogView = () => {
     const [keepDialogOpen, setKeepDialogOpen] = useState(false);
@@ -65,6 +65,7 @@ const McuUpdateDialogView = () => {
 
     const writingHasStarted = isWriting || isWritingFail || isWritingSucceed;
 
+    const dispatch = useDispatch();
     const device = useSelector(getDevice);
 
     const [uploadDelay, setUploadDelay] = useState(NET_CORE_UPLOAD_DELAY);
@@ -75,6 +76,11 @@ const McuUpdateDialogView = () => {
         max: 300,
         step: 5,
     };
+
+    const { time, start, pause, reset } = useStopwatch({
+        autoStart: false,
+        resolution: 200,
+    });
 
     useEffect(() => {
         // note: check may be redundant as Thingy:91 has a different modal
@@ -98,20 +104,18 @@ const McuUpdateDialogView = () => {
         }
     }, [device, showDelayTimeout]);
 
-    const dispatch = useDispatch();
+    useEffect(() => {
+        if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
+            setNetCoreUploadDelayOffset(Math.floor(time));
+        } else if (!timeoutStarted) {
+            setNetCoreUploadDelayOffset(-1);
+        }
+    }, [netCoreUploadDelayOffset, timeoutStarted, time]);
+
     const onCancel = () => {
         setKeepDialogOpen(false);
         dispatch(mcubootWritingClose());
     };
-
-    const { time, start, pause, reset } = useStopwatch({
-        autoStart: false,
-        resolution: 200,
-    });
-
-    if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
-        setNetCoreUploadDelayOffset(Math.floor(time));
-    }
 
     const onWriteStart = () => {
         reset();
