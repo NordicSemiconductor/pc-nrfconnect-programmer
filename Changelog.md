@@ -6,6 +6,8 @@
 -   Custom control to set net core upload delay
 -   Persist net core upload delay for each device serial number
 -   Progress on net core upload delay
+-   Linux: If a device fails to be identified based on parameters which point to
+    a missing nrf-udev installation, recommend user to install nrf-udev.
 
 ### Fixed
 
@@ -13,6 +15,8 @@
     bootloader.
 -   USB DFU memory layout now updates after device reboots due to programming
 -   USB DFU memory layout updates if programming fails
+-   Linux: Apps would crash when identifying certain devices if nrf-udev
+    installation was missing.
 
 ### Changed
 
