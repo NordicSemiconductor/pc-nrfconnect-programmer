@@ -39,7 +39,7 @@
     },
     "devDependencies": {
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v27"
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v28"
     },
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
