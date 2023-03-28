@@ -11,6 +11,8 @@
 
 -   Write button remains clickable in some cases when device is change to
     bootloader.
+-   USB DFU memory layout now updates after device reboots due to programming
+-   USB DFU memory layout updates if programming fails
 
 ### Changed
 
