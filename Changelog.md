@@ -5,6 +5,7 @@
 -   `OpenFile` and `SaveFile` must be closed before one can interact with the
     app window
 -   Updated MCUBoot Dialog UI look and feel.
+-   Updated Modem DFU dialog
 
 ### Fixed
 
