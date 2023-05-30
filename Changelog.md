@@ -8,7 +8,7 @@
 
 ### Fixed
 
--   Text in MCUBoot Dialog no longer overflow if to long but wraps.
+-   Text in MCUBoot Dialog no longer overflow if too long but wraps.
 
 ## 3.0.8 - 30-03-23
 
