@@ -1,3 +1,10 @@
+## 3.0.9 - UNRELEASED
+
+### Changed
+
+-   `OpenFile` and `SaveFile` must be closed before one can interact with the
+    app window
+
 ## 3.0.8 - 30-03-23
 
 ### Added

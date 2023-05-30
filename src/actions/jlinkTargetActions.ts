@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { dialog } from '@electron/remote';
+import { dialog, getCurrentWindow } from '@electron/remote';
 import nrfdl, {
     Device,
     FirmwareReadResult,
@@ -576,7 +576,7 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
             });
         }
     };
-    dialog.showSaveDialog(options).then(save);
+    dialog.showSaveDialog(getCurrentWindow(), options).then(save);
 };
 
 const updateCoresWithNrfdl = async (
