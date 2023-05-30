@@ -64,6 +64,8 @@ const ModemUpdateDialogView = () => {
         }
     }, [isWritingFail, isWritingSucceed, pause]);
 
+    const temporarilySkippingProgressBar = true;
+
     return (
         <GenericDialog
             title={`Modem DFU ${isMcuboot ? ' via MCUboot' : ''}`}
@@ -130,7 +132,7 @@ const ModemUpdateDialogView = () => {
                         <b>Status</b>
                     </Form.Label>
                     <div>{progressMsg}</div>
-                    {isWriting && (
+                    {isWriting && !temporarilySkippingProgressBar && (
                         <ProgressBar
                             hidden={!isWriting}
                             animated
