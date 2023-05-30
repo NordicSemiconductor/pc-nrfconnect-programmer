@@ -1,8 +1,9 @@
 ## 3.0.9 - UNRELEASED
 
-### Fixed
+### Changed
 
--   `OpenFile` and `SaveFile` dialogs are now modal to the app window
+-   `OpenFile` and `SaveFile` must be closed before one can interact with the
+    app window
 
 ## 3.0.8 - 30-03-23
 
