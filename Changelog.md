@@ -9,6 +9,8 @@
 ### Fixed
 
 -   Text in MCUBoot Dialog no longer overflow if too long but wraps.
+-   `MCUBoot` Dialog show the wrong state if a device reboots/disconnects while
+    programming is still ongoing and `Auto Reconnect` is Enabled
 
 ## 3.0.8 - 30-03-23
 

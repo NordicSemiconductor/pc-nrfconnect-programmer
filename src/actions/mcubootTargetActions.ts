@@ -6,10 +6,12 @@
 
 import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
+    clearWaitForDevice,
     describeError,
     Device,
     getDeviceLibContext,
     logger,
+    setWaitForDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
 
@@ -201,6 +203,7 @@ export const performUpdate =
             };
 
             const completeCallback = (error: nrfdl.Error | undefined) => {
+                dispatch(clearWaitForDevice());
                 if (error) return errorCallback(error);
                 logger.info('MCUboot DFU completed successfully!');
                 dispatch(mcubootWritingSucceed());
@@ -235,6 +238,14 @@ export const performUpdate =
                 dispatch(mcubootProcessUpdate(updatedProgress));
             };
 
+            // Operation might reboot the device and if auto reconnect is on we will get unexpected behavior
+            dispatch(
+                setWaitForDevice({
+                    timeout: 99999999999999, // Wait 'indefinitely' as we will cancel the wait when programming is complete
+                    when: 'always',
+                    once: false,
+                })
+            );
             dispatch(mcubootWritingStart());
             nrfdl.firmwareProgram(
                 getDeviceLibContext(),
