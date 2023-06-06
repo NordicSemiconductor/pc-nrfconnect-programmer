@@ -4,6 +4,11 @@
 
 -   `OpenFile` and `SaveFile` must be closed before one can interact with the
     app window
+-   Updated MCUBoot Dialog UI look and feel.
+
+### Fixed
+
+-   Text in MCUBoot Dialog no longer overflow if too long but wraps.
 
 ## 3.0.8 - 30-03-23
 

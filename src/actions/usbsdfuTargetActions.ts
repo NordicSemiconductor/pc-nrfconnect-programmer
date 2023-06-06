@@ -5,7 +5,6 @@
  */
 
 import {
-    Device,
     deviceControlReset,
     Error,
     firmwareProgram,
@@ -18,6 +17,7 @@ import MemoryMap from 'nrf-intel-hex';
 import {
     defaultInitPacket,
     describeError,
+    Device,
     DfuImage,
     FwType,
     getDeviceLibContext,
@@ -118,120 +118,125 @@ export const openDevice =
     };
 
 const refreshMemoryLayout = (staleDevice: Device) => (dispatch: TDispatch) => {
-    switchToBootloaderMode(
-        staleDevice,
-        dispatch,
-        async device => {
-            const fwInfo: FWInfo.ReadResult = await readFwInfo(
-                getDeviceLibContext(),
-                device.id
-            );
-            const deviceInfo = getDeviceInfoByUSB(device);
-            dispatch(targetInfoKnown(deviceInfo));
+    dispatch(
+        switchToBootloaderMode(
+            staleDevice,
+            async device => {
+                const fwInfo: FWInfo.ReadResult = await readFwInfo(
+                    getDeviceLibContext(),
+                    device.id
+                );
+                const deviceInfo = getDeviceInfoByUSB(device);
+                dispatch(targetInfoKnown(deviceInfo));
 
-            const appCoreNumber = 0;
-            const coreInfo = deviceInfo.cores[appCoreNumber];
+                const appCoreNumber = 0;
+                const coreInfo = deviceInfo.cores[appCoreNumber];
 
-            let regions: Region[] = [];
+                let regions: Region[] = [];
 
-            // Add FICR to regions
-            if (coreInfo.ficrBaseAddr) {
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: RegionName.FICR,
-                        version: 0,
-                        startAddress: coreInfo.ficrBaseAddr,
-                        regionSize: coreInfo.ficrSize,
-                        permission: RegionPermission.NONE,
-                    },
-                ];
+                // Add FICR to regions
+                if (coreInfo.ficrBaseAddr) {
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: RegionName.FICR,
+                            version: 0,
+                            startAddress: coreInfo.ficrBaseAddr,
+                            regionSize: coreInfo.ficrSize,
+                            permission: RegionPermission.NONE,
+                        },
+                    ];
+                }
+
+                // Add UICR to regions
+                if (coreInfo.uicrBaseAddr) {
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: RegionName.UICR,
+                            version: 0,
+                            startAddress: coreInfo.uicrBaseAddr,
+                            regionSize: coreInfo.uicrSize,
+                            permission: RegionPermission.NONE,
+                        },
+                    ];
+                }
+
+                // Add MBR to regions
+                if (coreInfo.uicrBaseAddr) {
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: RegionName.MBR,
+                            version: 0,
+                            startAddress: coreInfo.mbrBaseAddr,
+                            regionSize: coreInfo.mbrSize,
+                            color: RegionColor.MBR,
+                            permission: RegionPermission.NONE,
+                        },
+                    ];
+                }
+
+                // Add bootloader, softDevice, applications to regions
+                const { imageInfoList } = fwInfo;
+                imageInfoList.forEach((image: FWInfo.Image) => {
+                    const { imageType, imageLocation, version } = image;
+
+                    if (!imageLocation) return;
+
+                    const startAddress = imageLocation.address;
+                    const regionSize =
+                        imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
+                            ? imageLocation.size - 0x1000
+                            : imageLocation.size;
+
+                    if (regionSize === 0) return;
+
+                    const regionName =
+                        (<Partial<{ [key in FWInfo.ImageType]: RegionName }>>{
+                            NRFDL_IMAGE_TYPE_BOOTLOADER: RegionName.BOOTLOADER,
+                            NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionName.SOFTDEVICE,
+                            NRFDL_IMAGE_TYPE_APPLICATION:
+                                RegionName.APPLICATION,
+                        })[imageType] || RegionName.NONE;
+
+                    const color =
+                        (<Partial<{ [key in FWInfo.ImageType]: RegionColor }>>{
+                            NRFDL_IMAGE_TYPE_BOOTLOADER: RegionColor.BOOTLOADER,
+                            NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionColor.SOFTDEVICE,
+                            NRFDL_IMAGE_TYPE_APPLICATION:
+                                RegionColor.APPLICATION,
+                        })[imageType] || RegionColor.NONE;
+
+                    regions = [
+                        ...regions,
+                        {
+                            ...defaultRegion,
+                            name: regionName,
+                            version,
+                            startAddress,
+                            regionSize,
+                            color,
+                        },
+                    ];
+                });
+
+                dispatch(targetRegionsKnown(regions));
+                dispatch(updateFileRegions());
+                dispatch(canWrite());
+                dispatch(loadingEnd());
+            },
+            error => {
+                logger.error(
+                    `Error when fetching device versions: ${describeError(
+                        error
+                    )}`
+                );
             }
-
-            // Add UICR to regions
-            if (coreInfo.uicrBaseAddr) {
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: RegionName.UICR,
-                        version: 0,
-                        startAddress: coreInfo.uicrBaseAddr,
-                        regionSize: coreInfo.uicrSize,
-                        permission: RegionPermission.NONE,
-                    },
-                ];
-            }
-
-            // Add MBR to regions
-            if (coreInfo.uicrBaseAddr) {
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: RegionName.MBR,
-                        version: 0,
-                        startAddress: coreInfo.mbrBaseAddr,
-                        regionSize: coreInfo.mbrSize,
-                        color: RegionColor.MBR,
-                        permission: RegionPermission.NONE,
-                    },
-                ];
-            }
-
-            // Add bootloader, softDevice, applications to regions
-            const { imageInfoList } = fwInfo;
-            imageInfoList.forEach((image: FWInfo.Image) => {
-                const { imageType, imageLocation, version } = image;
-
-                if (!imageLocation) return;
-
-                const startAddress = imageLocation.address;
-                const regionSize =
-                    imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
-                        ? imageLocation.size - 0x1000
-                        : imageLocation.size;
-
-                if (regionSize === 0) return;
-
-                const regionName =
-                    (<Partial<{ [key in FWInfo.ImageType]: RegionName }>>{
-                        NRFDL_IMAGE_TYPE_BOOTLOADER: RegionName.BOOTLOADER,
-                        NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionName.SOFTDEVICE,
-                        NRFDL_IMAGE_TYPE_APPLICATION: RegionName.APPLICATION,
-                    })[imageType] || RegionName.NONE;
-
-                const color =
-                    (<Partial<{ [key in FWInfo.ImageType]: RegionColor }>>{
-                        NRFDL_IMAGE_TYPE_BOOTLOADER: RegionColor.BOOTLOADER,
-                        NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionColor.SOFTDEVICE,
-                        NRFDL_IMAGE_TYPE_APPLICATION: RegionColor.APPLICATION,
-                    })[imageType] || RegionColor.NONE;
-
-                regions = [
-                    ...regions,
-                    {
-                        ...defaultRegion,
-                        name: regionName,
-                        version,
-                        startAddress,
-                        regionSize,
-                        color,
-                    },
-                ];
-            });
-
-            dispatch(targetRegionsKnown(regions));
-            dispatch(updateFileRegions());
-            dispatch(canWrite());
-            dispatch(loadingEnd());
-        },
-        error => {
-            logger.error(
-                `Error when fetching device versions: ${describeError(error)}`
-            );
-        }
+        )
     );
 };
 
