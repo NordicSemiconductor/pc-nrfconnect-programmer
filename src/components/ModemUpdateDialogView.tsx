@@ -127,14 +127,14 @@ const ModemUpdateDialogView = () => {
                 </Form.Group>
                 <Form.Group>
                     <Form.Label>
-                        <b>Status</b>
+                        <strong>Status:</strong>
+                        <span>{` ${progressMsg}`}</span>
                     </Form.Label>
                     {isWriting && (
                         <ProgressBar
                             hidden={!isWriting}
-                            animated
                             now={progressPercentage}
-                            label={`${progressPercentage}%`}
+                            style={{ height: '4px' }}
                         />
                     )}
                 </Form.Group>
