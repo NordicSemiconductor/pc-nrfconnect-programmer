@@ -197,9 +197,8 @@ const McuUpdateDialogView = () => {
                 </Form.Label>
                 <ProgressBar
                     hidden={!isWriting}
-                    animated
                     now={progress}
-                    label={`${progress}%`}
+                    style={{ height: '4px' }}
                 />
             </Form.Group>
             {!writingHasStarted && showDelayTimeout && (
@@ -249,7 +248,8 @@ const McuUpdateDialogView = () => {
                         <Slider
                             values={[uploadDelay]}
                             onChange={[
-                                value => updateUploadDelayTimeout(value),
+                                (value: number) =>
+                                    updateUploadDelayTimeout(value),
                             ]}
                             range={uploadDelayRange}
                         />

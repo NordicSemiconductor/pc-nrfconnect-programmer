@@ -50,17 +50,7 @@ export const programDfuModem =
                 progressJson: progress,
             }: nrfdl.Progress.CallbackParameters) => {
                 let updatedProgress = progress;
-                // temporary until new nRF Command Line Tools comes out which includes proper progress callbacks again
-                const skipProgressReport = true;
-                if (skipProgressReport) {
-                    updatedProgress = {
-                        ...progress,
-                        message: 'Uploading image. This might take some time.',
-                    };
-                    dispatch(modemProcessUpdate(updatedProgress));
-                    return;
-                }
-                // For now we will not get these progress callbacks, until this is fixed in nRF Command Line Tools
+
                 if (progress.operation === 'erase_image') {
                     updatedProgress = {
                         ...progress,
