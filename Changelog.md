@@ -1,5 +1,9 @@
 ## 3.0.9 - UNRELEASED
 
+### Added
+
+-   Progress bar to ModemFirmware DFU dialog
+
 ### Changed
 
 -   `OpenFile` and `SaveFile` must be closed before one can interact with the
