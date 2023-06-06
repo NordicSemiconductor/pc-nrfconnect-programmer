@@ -4,13 +4,16 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect } from 'react';
-import Button from 'react-bootstrap/Button';
+import React, { useCallback, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, useStopwatch } from 'pc-nrfconnect-shared';
+import {
+    Alert,
+    DialogButton,
+    GenericDialog,
+    useStopwatch,
+} from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/modemTargetActions';
 import { getIsMcuboot } from '../reducers/mcubootReducer';
@@ -39,7 +42,11 @@ const ModemUpdateDialogView = () => {
     const expectedFwName = /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
 
     const dispatch = useDispatch();
-    const onCancel = () => dispatch(modemWritingClose());
+    const onCancel = useCallback(() => {
+        if (!isWriting) {
+            dispatch(modemWritingClose());
+        }
+    }, [dispatch, isWriting]);
 
     const { time, start, pause, reset } = useStopwatch({
         autoStart: false,
@@ -60,15 +67,35 @@ const ModemUpdateDialogView = () => {
     const temporarilySkippingProgressBar = true;
 
     return (
-        <Modal show={isVisible} onHide={onCancel} backdrop="static">
-            <Modal.Header>
-                <Modal.Title className="modem-dialog-title">
-                    Modem DFU
-                    {isMcuboot && ' via MCUboot'}
-                </Modal.Title>
-                {isWriting && <span className="mdi mdi-refresh icon-spin" />}
-            </Modal.Header>
-            <Modal.Body>
+        <GenericDialog
+            title={`Modem DFU ${isMcuboot ? ' via MCUboot' : ''}`}
+            showSpinner={isWriting}
+            onHide={onCancel}
+            closeOnEsc
+            closeOnUnfocus
+            footer={
+                <>
+                    <DialogButton
+                        variant="primary"
+                        onClick={onWriteStart}
+                        disabled={
+                            isWriting || isWritingSucceed || isWritingFail
+                        }
+                    >
+                        Write
+                    </DialogButton>
+                    <DialogButton
+                        variant="secondary"
+                        onClick={onCancel}
+                        disabled={isWriting}
+                    >
+                        Close
+                    </DialogButton>
+                </>
+            }
+            isVisible={isVisible}
+        >
+            <>
                 <Form.Group>
                     <Form.Label>
                         <b>Modem firmware</b>
@@ -120,15 +147,15 @@ const ModemUpdateDialogView = () => {
                         !isWritingSucceed &&
                         !isWritingFail && (
                             <Alert variant="warning">
-                                <p>
+                                <p className="mb-0">
                                     You are now performing modem DFU via
                                     MCUboot.
                                 </p>
-                                <p>
+                                <p className="mb-0">
                                     The device will be overwritten if you
                                     proceed to write.
                                 </p>
-                                <p>
+                                <p className="mb-0">
                                     Make sure the device is in{' '}
                                     <strong>MCUboot mode</strong>.
                                 </p>
@@ -149,24 +176,8 @@ const ModemUpdateDialogView = () => {
                         </Alert>
                     )}
                 </Form.Group>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button
-                    variant="primary"
-                    onClick={onWriteStart}
-                    disabled={isWriting || isWritingSucceed || isWritingFail}
-                >
-                    Write
-                </Button>
-                <Button
-                    variant="secondary"
-                    onClick={onCancel}
-                    disabled={isWriting}
-                >
-                    Close
-                </Button>
-            </Modal.Footer>
-        </Modal>
+            </>
+        </GenericDialog>
     );
 };
 
