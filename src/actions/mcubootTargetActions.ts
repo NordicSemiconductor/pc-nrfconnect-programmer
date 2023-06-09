@@ -28,6 +28,7 @@ import {
 import { modemKnown } from '../reducers/modemReducer';
 import {
     loadingEnd,
+    targetDeviceKnown,
     targetTypeKnown,
     targetWritableKnown,
 } from '../reducers/targetReducer';
@@ -244,6 +245,7 @@ export const performUpdate =
                     timeout: 99999999999999, // Wait 'indefinitely' as we will cancel the wait when programming is complete
                     when: 'always',
                     once: false,
+                    onSuccess: d => dispatch(targetDeviceKnown(d)),
                 })
             );
             dispatch(mcubootWritingStart());
