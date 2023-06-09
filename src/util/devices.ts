@@ -66,7 +66,7 @@ export enum DeviceFamily {
 
 export interface DeviceDefinition {
     family: DeviceFamily;
-    type?: string;
+    type?: string | null;
     cores: CoreDefinition[];
 }
 
@@ -210,6 +210,10 @@ export const McubootProductIds = [
     0x520f, 0x9100,
     // Thingy53
     0x530c,
+    // nPM1300
+    0x53ab,
+    // nPM1300-Serial-Recovery
+    0x53ac,
 ];
 
 /**

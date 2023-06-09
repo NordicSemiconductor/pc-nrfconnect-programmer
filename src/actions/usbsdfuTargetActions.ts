@@ -5,7 +5,6 @@
  */
 
 import {
-    Device,
     deviceControlReset,
     Error,
     firmwareProgram,
@@ -18,6 +17,7 @@ import MemoryMap from 'nrf-intel-hex';
 import {
     defaultInitPacket,
     describeError,
+    Device,
     DfuImage,
     FwType,
     getDeviceLibContext,
@@ -114,9 +114,13 @@ export const openDevice =
             'PCA10059'
         );
 
+        dispatch(refreshMemoryLayout(openedDevice));
+    };
+
+const refreshMemoryLayout = (staleDevice: Device) => (dispatch: TDispatch) => {
+    dispatch(
         switchToBootloaderMode(
-            openedDevice,
-            dispatch,
+            staleDevice,
             async device => {
                 const fwInfo: FWInfo.ReadResult = await readFwInfo(
                     getDeviceLibContext(),
@@ -232,8 +236,9 @@ export const openDevice =
                     )}`
                 );
             }
-        );
-    };
+        )
+    );
+};
 
 /**
  * Reset device to Application mode
@@ -535,6 +540,9 @@ const handleHash = (image: DfuImage, hashType: number): DfuImage => {
     } as DfuImage;
 };
 
+const nrfdlErrorSdfuExtSdVersionFailure = (error: unknown) =>
+    (error as { error_code: number }).error_code === 514;
+
 /**
  * Operate DFU process with update all the images on the target device
  *
@@ -548,7 +556,7 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
 
     let prevPercentage: number;
 
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve, reject) => {
         firmwareProgram(
             getDeviceLibContext(),
             deviceId,
@@ -557,10 +565,7 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
             zipBuffer,
             (error?: Error) => {
                 if (error) {
-                    if (
-                        error.errorCode === 514
-                        // 'NRFDL_ERR_SDFU_EXT_SD_VERSION_FAILURE'
-                    ) {
+                    if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
                         logger.error('Failed to write to the target device');
                         logger.error(
                             'The required SoftDevice version does not match'
@@ -568,7 +573,7 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
                     } else {
                         logger.error(describeError(error));
                     }
-                    throw error;
+                    reject(error);
                 } else {
                     // if (restImages.length === 0) {
                     logger.info(
@@ -606,6 +611,16 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
  */
 export const write =
     () => async (dispatch: TDispatch, getState: () => RootState) => {
+        const device = selectedDevice(getState());
+
+        if (!device) {
+            logger.error(
+                `Failed to write: ${describeError('Device not found')}`
+            );
+
+            return;
+        }
+
         dispatch(updateFileBlRegion());
         dispatch(updateFileAppRegions());
         dispatch(createDfuImages());
@@ -636,10 +651,7 @@ export const write =
         logger.info('Performing DFU. This may take a few seconds');
         dispatch(writingStart());
 
-        const device = selectedDevice(getState());
-
         try {
-            if (!device) throw Error(`Device not found`);
             // We might have more that one reboot of the device during the next operation
             dispatch(
                 setWaitForDevice({
@@ -657,9 +669,13 @@ export const write =
                     timeout: 10000,
                     when: 'always',
                     once: true,
+                    onSuccess: programmedDevice =>
+                        dispatch(refreshMemoryLayout(programmedDevice)),
                 })
             );
         } catch (error) {
             logger.error(`Failed to write: ${describeError(error)}`);
+            dispatch(writingEnd());
+            dispatch(refreshMemoryLayout(device));
         }
     };

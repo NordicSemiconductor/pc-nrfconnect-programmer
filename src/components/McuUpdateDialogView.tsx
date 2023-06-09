@@ -14,12 +14,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
     classNames,
-    Dialog,
     DialogButton,
+    GenericDialog,
     getPersistentStore,
     NumberInlineInput,
     Slider,
-    Spinner,
     Toggle,
     useStopwatch,
 } from 'pc-nrfconnect-shared';
@@ -44,7 +43,7 @@ import { getDevice } from '../reducers/targetReducer';
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
 
-const NET_CORE_UPLOAD_DELAY = 40;
+const NET_CORE_UPLOAD_DELAY = 120;
 
 const McuUpdateDialogView = () => {
     const [keepDialogOpen, setKeepDialogOpen] = useState(false);
@@ -65,6 +64,7 @@ const McuUpdateDialogView = () => {
 
     const writingHasStarted = isWriting || isWritingFail || isWritingSucceed;
 
+    const dispatch = useDispatch();
     const device = useSelector(getDevice);
 
     const [uploadDelay, setUploadDelay] = useState(NET_CORE_UPLOAD_DELAY);
@@ -75,6 +75,11 @@ const McuUpdateDialogView = () => {
         max: 300,
         step: 5,
     };
+
+    const { time, start, pause, reset } = useStopwatch({
+        autoStart: false,
+        resolution: 200,
+    });
 
     useEffect(() => {
         // note: check may be redundant as Thingy:91 has a different modal
@@ -98,20 +103,18 @@ const McuUpdateDialogView = () => {
         }
     }, [device, showDelayTimeout]);
 
-    const dispatch = useDispatch();
+    useEffect(() => {
+        if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
+            setNetCoreUploadDelayOffset(Math.floor(time));
+        } else if (!timeoutStarted) {
+            setNetCoreUploadDelayOffset(-1);
+        }
+    }, [netCoreUploadDelayOffset, timeoutStarted, time]);
+
     const onCancel = () => {
         setKeepDialogOpen(false);
         dispatch(mcubootWritingClose());
     };
-
-    const { time, start, pause, reset } = useStopwatch({
-        autoStart: false,
-        resolution: 200,
-    });
-
-    if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
-        setNetCoreUploadDelayOffset(Math.floor(time));
-    }
 
     const onWriteStart = () => {
         reset();
@@ -155,148 +158,149 @@ const McuUpdateDialogView = () => {
         : progressPercentage;
 
     return (
-        <Dialog
+        <GenericDialog
+            title="MCUboot DFU"
             isVisible={isVisible || keepDialogOpen}
             onHide={onCancel}
+            showSpinner={isWriting}
             closeOnUnfocus={false}
             className="mcu-update-dialog"
+            footer={
+                <>
+                    <DialogButton
+                        variant="primary"
+                        onClick={onWriteStart}
+                        disabled={
+                            isWriting || isWritingSucceed || isWritingFail
+                        }
+                    >
+                        Write
+                    </DialogButton>
+                    <DialogButton onClick={onCancel} disabled={isWriting}>
+                        Close
+                    </DialogButton>
+                </>
+            }
         >
-            <Dialog.Header title="MCUboot DFU" />
-            <Dialog.Body>
-                <Form.Group>
-                    <Form.Label className="mb-0">
-                        <strong>Firmware:</strong>
-                    </Form.Label>
-                    <p>{mcubootFwPath || zipFilePath}</p>
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label>
-                        <strong>Status:</strong>
-                        <span>{` ${progressMsg}`}</span>
-                    </Form.Label>
-                    <ProgressBar
-                        hidden={!isWriting}
-                        animated
-                        now={progress}
-                        label={`${progress}%`}
-                    />
-                </Form.Group>
-                {!writingHasStarted && showDelayTimeout && (
-                    <Form.Group className="upload-delay p-3">
-                        <div className="d-flex justify-content-between">
-                            <Form.Label className="mb-0">
-                                <strong>
-                                    Keep default delay after image upload
-                                </strong>
-                                <OverlayTrigger
-                                    placement="bottom-end"
-                                    overlay={
-                                        <Tooltip id="tooltip-delay-info">
-                                            <div className="info text-left">
-                                                <span>{TOOLTIP_TEXT}</span>
-                                            </div>
-                                        </Tooltip>
-                                    }
-                                >
-                                    <span className="mdi mdi-information-outline info-icon ml-1" />
-                                </OverlayTrigger>
-                            </Form.Label>
-                            <Toggle
-                                onToggle={toggleDefaultTimeoutUI}
-                                isToggled={keepDefaultTimeout}
-                            />
-                        </div>
-                        <FormLabel
-                            className={classNames(
-                                'w-100 mt-3 mb-0',
-                                keepDefaultTimeout ? 'd-none' : 'd-block'
-                            )}
-                        >
-                            <div className="d-flex flex-row justify-content-between mb-2">
-                                <div>
-                                    <strong>Set delay duration</strong>
-                                </div>
-                                <div className="d-flex">
-                                    <NumberInlineInput
-                                        value={uploadDelay}
-                                        range={uploadDelayRange}
-                                        onChange={updateUploadDelayTimeout}
-                                    />
-                                    <span>sec</span>
-                                </div>
-                            </div>
-                            <Slider
-                                values={[uploadDelay]}
-                                onChange={[
-                                    value => updateUploadDelayTimeout(value),
-                                ]}
-                                range={uploadDelayRange}
-                            />
-
-                            {uploadDelay !== NET_CORE_UPLOAD_DELAY && (
-                                <p className="note">
-                                    Note: recommended delay for <i>most</i> of
-                                    the devices is {NET_CORE_UPLOAD_DELAY}{' '}
-                                    seconds.
-                                </p>
-                            )}
-                        </FormLabel>
-                    </Form.Group>
-                )}
-                <Form.Group>
-                    {!writingHasStarted && (
-                        <Alert variant="warning">
+            <Form.Group>
+                <Form.Label className="mb-0">
+                    <strong>Firmware:</strong>
+                    <span>{` ${mcubootFwPath || zipFilePath}`}</span>
+                </Form.Label>
+            </Form.Group>
+            <Form.Group>
+                <Form.Label>
+                    <strong>Status:</strong>
+                    <span>{` ${progressMsg}`}</span>
+                </Form.Label>
+                <ProgressBar
+                    hidden={!isWriting}
+                    now={progress}
+                    style={{ height: '4px' }}
+                />
+            </Form.Group>
+            {!writingHasStarted && showDelayTimeout && (
+                <Form.Group className="upload-delay p-3">
+                    <div className="d-flex justify-content-between">
+                        <Form.Label className="mb-0">
+                            <strong>
+                                Keep default delay after image upload
+                            </strong>
+                            <OverlayTrigger
+                                placement="bottom-end"
+                                overlay={
+                                    <Tooltip id="tooltip-delay-info">
+                                        <div className="info text-left">
+                                            <span>{TOOLTIP_TEXT}</span>
+                                        </div>
+                                    </Tooltip>
+                                }
+                            >
+                                <span className="mdi mdi-information-outline info-icon ml-1" />
+                            </OverlayTrigger>
+                        </Form.Label>
+                        <Toggle
+                            onToggle={toggleDefaultTimeoutUI}
+                            isToggled={keepDefaultTimeout}
+                        />
+                    </div>
+                    <FormLabel
+                        className={classNames(
+                            'w-100 mt-3 mb-0',
+                            keepDefaultTimeout ? 'd-none' : 'd-block'
+                        )}
+                    >
+                        <div className="d-flex flex-row justify-content-between mb-2">
                             <div>
-                                <p className="mb-0">
-                                    You are now programming via MCUboot.
-                                </p>
-                                <p className="mb-0">
-                                    The device will be recovered if you proceed
-                                    to write.
-                                </p>
-                                <p className="mb-0">
-                                    Make sure the device is in{' '}
-                                    <strong>MCUboot mode</strong>.
-                                </p>
+                                <strong>Set delay duration</strong>
                             </div>
-                        </Alert>
-                    )}
-                    {!isFirmwareValid && (
-                        <Alert variant="warning">
-                            The selected HEX file appears to be invalid for
-                            MCUboot DFU.
-                        </Alert>
-                    )}
-                    {isWritingSucceed && (
-                        <Alert variant="success">
-                            Completed successfully in {` `}
-                            {` ${Math.round(time / 1000)} `}
-                            {` `} seconds.
-                        </Alert>
-                    )}
-                    {isWritingFail && (
-                        <Alert label="Error" variant="danger">
-                            <br />
-                            {errorMsg ||
-                                'Failed. Check the log below for more details...'}
-                        </Alert>
-                    )}
+                            <div className="d-flex">
+                                <NumberInlineInput
+                                    value={uploadDelay}
+                                    range={uploadDelayRange}
+                                    onChange={updateUploadDelayTimeout}
+                                />
+                                <span>sec</span>
+                            </div>
+                        </div>
+                        <Slider
+                            values={[uploadDelay]}
+                            onChange={[
+                                (value: number) =>
+                                    updateUploadDelayTimeout(value),
+                            ]}
+                            range={uploadDelayRange}
+                        />
+
+                        {uploadDelay !== NET_CORE_UPLOAD_DELAY && (
+                            <p className="note">
+                                Note: recommended delay for <i>most</i> of the
+                                devices is {NET_CORE_UPLOAD_DELAY} seconds.
+                            </p>
+                        )}
+                    </FormLabel>
                 </Form.Group>
-            </Dialog.Body>
-            <Dialog.Footer>
-                {isWriting && <Spinner />}
-                <DialogButton
-                    variant="primary"
-                    onClick={onWriteStart}
-                    disabled={isWriting || isWritingSucceed || isWritingFail}
-                >
-                    Write
-                </DialogButton>
-                <DialogButton onClick={onCancel} disabled={isWriting}>
-                    Close
-                </DialogButton>
-            </Dialog.Footer>
-        </Dialog>
+            )}
+            <Form.Group>
+                {!writingHasStarted && (
+                    <Alert variant="warning">
+                        <div>
+                            <p className="mb-0">
+                                You are now programming via MCUboot.
+                            </p>
+                            <p className="mb-0">
+                                The device will be recovered if you proceed to
+                                write.
+                            </p>
+                            <p className="mb-0">
+                                Make sure the device is in{' '}
+                                <strong>MCUboot mode</strong>.
+                            </p>
+                        </div>
+                    </Alert>
+                )}
+                {!isFirmwareValid && (
+                    <Alert variant="warning">
+                        The selected HEX file appears to be invalid for MCUboot
+                        DFU.
+                    </Alert>
+                )}
+                {isWritingSucceed && (
+                    <Alert variant="success">
+                        Completed successfully in {` `}
+                        {` ${Math.round(time / 1000)} `}
+                        {` `} seconds.
+                    </Alert>
+                )}
+                {isWritingFail && (
+                    <Alert label="Error" variant="danger">
+                        <br />
+                        {errorMsg ||
+                            'Failed. Check the log below for more details...'}
+                    </Alert>
+                )}
+            </Form.Group>
+        </GenericDialog>
     );
 };
 

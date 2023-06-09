@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { dialog } from '@electron/remote';
+import { dialog, getCurrentWindow } from '@electron/remote';
 import nrfdl, {
     Device,
     FirmwareReadResult,
@@ -570,12 +570,13 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
             fs.writeFile(filePath, data, err => {
                 if (err) {
                     logger.error(`Failed to save file: ${describeError(err)}`);
+                    return;
                 }
                 logger.info(`File is successfully saved at ${filePath}`);
             });
         }
     };
-    dialog.showSaveDialog(options).then(save);
+    dialog.showSaveDialog(getCurrentWindow(), options).then(save);
 };
 
 const updateCoresWithNrfdl = async (
