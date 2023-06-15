@@ -1,31 +1,31 @@
-## 3.0.9 - UNRELEASED
+## 3.0.9 - 15-06-23
 
 ### Added
 
--   Progress bar to ModemFirmware DFU dialog
+-   Progress bar to ModemFirmware DFU dialog.
 
 ### Changed
 
 -   `OpenFile` and `SaveFile` must be closed before one can interact with the
-    app window
+    app window.
 -   Updated MCUBoot Dialog UI look and feel.
--   Updated Modem DFU dialog
+-   Updated Modem DFU dialog.
 
 ### Fixed
 
 -   Text in MCUBoot Dialog no longer overflow if too long but wraps.
 -   `MCUBoot` Dialog show the wrong state if a device reboots/disconnects while
-    programming is still ongoing and `Auto Reconnect` is Enabled
--   Write button will not remain active when device is deselected
+    programming is still ongoing and `Auto Reconnect` is Enabled.
+-   Write button will not remain active when device is deselected.
 
 ## 3.0.8 - 30-03-23
 
 ### Added
 
 -   Reconnecting status in device selector.
--   Custom control to set net core upload delay
--   Persist net core upload delay for each device serial number
--   Progress on net core upload delay
+-   Custom control to set net core upload delay.
+-   Persist net core upload delay for each device serial number.
+-   Progress on net core upload delay.
 -   Linux: If a device fails to be identified based on parameters which point to
     a missing nrf-udev installation, recommend user to install nrf-udev.
 
@@ -33,9 +33,9 @@
 
 -   Write button remains clickable in some cases when device is change to
     bootloader.
--   USB DFU memory layout now updates after device reboots due to programming
--   USB DFU memory layout updates if programming fails
--   Linux: Apps would crash when identifying certain devices if nrf-udev
+-   USB DFU memory layout now updates after device reboots due to programming.
+-   USB DFU memory layout updates if programming fails.
+-   Linux: Apps would crash when identifying certain devices if nrf-udev.
     installation was missing.
 
 ### Changed
@@ -52,13 +52,13 @@
 
 ### Added
 
--   nRF7002 support
+-   nRF7002 support.
 
 ## 3.0.5 - 2023-02-13
 
 ### Added
 
--   Auto reconnect functionality
+-   Auto reconnect functionality.
 
 ### Changed
 
