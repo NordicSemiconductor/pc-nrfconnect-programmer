@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { connect } from 'react-redux';
-import { DeviceTraits } from '@nordicsemiconductor/nrf-device-lib-js';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     Device as SharedDevice,
     DeviceSelector,
@@ -15,35 +15,35 @@ import {
 
 import { openDevice } from '../actions/targetActions';
 import EventAction from '../actions/usageDataActions';
-import { mcubootWritingClose } from '../reducers/mcubootReducer';
-import { modemWritingClose } from '../reducers/modemReducer';
-import { deselectDevice, selectDevice } from '../reducers/targetReducer';
-import { TDispatch } from '../reducers/types';
+import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
+import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
+import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
+import { deselectDevice } from '../reducers/targetReducer';
 
-const deviceListing: DeviceTraits = {
-    nordicUsb: true,
-    serialPorts: true,
-    jlink: true,
-    mcuBoot: true,
-    nordicDfu: true,
+export default () => {
+    const dispatch = useDispatch();
+    const autoRead = useSelector(getAutoRead);
+    const autoReset = useSelector(getAutoReset);
+
+    return (
+        <DeviceSelector
+            onDeviceSelected={(device: SharedDevice) => {
+                dispatch(openDevice(device, autoRead, autoReset));
+            }}
+            onDeviceDeselected={() => {
+                usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
+                dispatch(setShowMcuBootProgrammingDialog(false));
+                dispatch(setShowModemProgrammingDialog(false));
+                dispatch(deselectDevice());
+                logger.info('Target device closed');
+            }}
+            deviceListing={{
+                nordicUsb: true,
+                serialPorts: true,
+                jlink: true,
+                mcuBoot: true,
+                nordicDfu: true,
+            }}
+        />
+    );
 };
-
-const mapState = () => ({
-    deviceListing,
-});
-
-const mapDispatch = (dispatch: TDispatch) => ({
-    onDeviceSelected: (device: SharedDevice) => {
-        dispatch(selectDevice(device.serialNumber));
-        dispatch(openDevice(device));
-    },
-    onDeviceDeselected: () => {
-        usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
-        dispatch(mcubootWritingClose());
-        dispatch(modemWritingClose());
-        dispatch(deselectDevice());
-        logger.info('Target device closed');
-    },
-});
-
-export default connect(mapState, mapDispatch)(DeviceSelector);

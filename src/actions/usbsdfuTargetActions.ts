@@ -4,14 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import {
-    deviceControlReset,
-    Error,
-    firmwareProgram,
-    FWInfo,
-    Progress,
-    readFwInfo,
-} from '@nordicsemiconductor/nrf-device-lib-js';
 import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';
 import {
@@ -20,8 +12,9 @@ import {
     describeError,
     Device,
     DfuImage,
+    FWInfoImageType,
     FwType,
-    getDeviceLibContext,
+    getDeviceLib,
     HashType,
     logger,
     sdfuOperations,
@@ -31,25 +24,21 @@ import {
     usageData,
 } from 'pc-nrfconnect-shared';
 
+import { FileState } from '../reducers/fileReducer';
 import {
-    dfuImagesUpdate,
     loadingEnd,
     targetInfoKnown,
     targetRegionsKnown,
-    targetTypeKnown,
     targetWritableKnown,
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import {
-    CommunicationType,
     DeviceDefinition,
     DeviceFamily,
     getDeviceInfoByUSB,
     NordicFwIds,
-    USBProductIds,
-    VendorId,
 } from '../util/devices';
 import {
     defaultRegion,
@@ -73,26 +62,12 @@ const defaultDfuImage: DfuImage = {
     firmwareImage: Buffer.alloc(0),
 };
 
-export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
-    const { device: inputDevice } = getState().app.target;
-    const openedDevice = inputDevice as Device;
-
-    dispatch(
-        targetTypeKnown({
-            targetType: CommunicationType.USBSDFU,
-            isRecoverable: false,
-        })
-    );
-    logger.info(
-        'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
-    );
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_FAMILY, DeviceFamily.NRF52);
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_BOARD_VERSION, 'PCA10059');
-
-    dispatch(refreshMemoryLayout(openedDevice));
-};
-
+export const openDevice =
+    (device: Device): AppThunk =>
+    dispatch => {
+        logger.info(
+            'Using nrfutil-device to communicate with target via USB SDFU protocol'
+        );
         usageData.sendUsageData(
             EventAction.OPEN_DEVICE_FAMILY,
             DeviceFamily.NRF52
@@ -103,21 +78,21 @@ export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
             'PCA10059'
         );
 
-        dispatch(refreshMemoryLayout(openedDevice));
+        dispatch(refreshMemoryLayout(device));
     };
 
 const refreshMemoryLayout =
-    (staleDevice: Device): AppThunk =>
+    (device: Device): AppThunk =>
     dispatch => {
         dispatch(
             switchToBootloaderMode(
-                staleDevice,
-                async device => {
-                    const fwInfo: FWInfo.ReadResult = await readFwInfo(
-                        getDeviceLibContext(),
-                        device.id
-                    );
-                    const deviceInfo = getDeviceInfoByUSB(device);
+                device,
+                async deviceInBootLoader => {
+                    await (await getDeviceLib()).fwInfo(deviceInBootLoader);
+                    const fwInfo = await (
+                        await getDeviceLib()
+                    ).fwInfo(deviceInBootLoader);
+                    const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
                     dispatch(targetInfoKnown(deviceInfo));
 
                     const appCoreNumber = 0;
@@ -173,7 +148,7 @@ const refreshMemoryLayout =
 
                     // Add bootloader, softDevice, applications to regions
                     const { imageInfoList } = fwInfo;
-                    imageInfoList.forEach((image: FWInfo.Image) => {
+                    imageInfoList.forEach(image => {
                         const { imageType, imageLocation, version } = image;
 
                         if (!imageLocation) return;
@@ -189,7 +164,7 @@ const refreshMemoryLayout =
                         const regionName =
                             (<
                                 Partial<{
-                                    [key in FWInfo.ImageType]: RegionName;
+                                    [key in FWInfoImageType]: RegionName;
                                 }>
                             >{
                                 NRFDL_IMAGE_TYPE_BOOTLOADER:
@@ -203,7 +178,7 @@ const refreshMemoryLayout =
                         const color =
                             (<
                                 Partial<{
-                                    [key in FWInfo.ImageType]: RegionColor;
+                                    [key in FWInfoImageType]: RegionColor;
                                 }>
                             >{
                                 NRFDL_IMAGE_TYPE_BOOTLOADER:
@@ -243,13 +218,12 @@ const refreshMemoryLayout =
         );
     };
 
-export const resetDevice = (): AppThunk<RootState> => (_, getState) => {
-    const { device: inputDevice } = getState().app.target;
-    const device = inputDevice as Device;
-
-    deviceControlReset(getDeviceLibContext(), device.id);
-};
-
+export const resetDevice = (device: Device) =>
+    getDeviceLib().then(deviceLib =>
+        deviceLib.reset(device).then(() => {
+            logger.info(`Resetting device completed`);
+        })
+    );
 /**
  * Create DFU image by given region name and firmware type
  * @param {string} regionName the name of region
@@ -295,26 +269,32 @@ const createDfuImages = (file: FileState) => {
  *
  * @returns {Promise<void>} resolved promise
  */
-export const canWrite =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        // Disable write button
+export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
+    const device = selectedDevice(getState());
+
+    if (!device) {
         dispatch(targetWritableKnown(false));
+        return;
+    }
 
-        // Check if there are writable regions.
-        // If not, then return.
-        const { detectedRegionNames } = getState().app.file;
-        if (!detectedRegionNames.size) {
-            return;
-        }
+    // Disable write button
+    dispatch(targetWritableKnown(false));
 
-        // Check if any file is added
-        if (!getState().app.file.memMaps.length) {
-            return;
-        }
+    // Check if there are writable regions.
+    // If not, then return.
+    const { detectedRegionNames } = getState().app.file;
+    if (!detectedRegionNames.size) {
+        return;
+    }
 
-        // Enable write button if all above items have been checked
-        dispatch(targetWritableKnown(true));
-    };
+    // Check if any file is added
+    if (!getState().app.file.memMaps.length) {
+        return;
+    }
+
+    // Enable write button if all above items have been checked
+    dispatch(targetWritableKnown(true));
+};
 
 /**
  * Calculate hash 256
@@ -453,8 +433,8 @@ const handleSdReq = (
  * @returns {DfuImage} the updated DFU image
  */
 const handleUserInput =
-    (imageInput: DfuImage) =>
-    async (dispatch: TDispatch): Promise<DfuImage> => {
+    (imageInput: DfuImage): AppThunk<RootState, Promise<DfuImage>> =>
+    async (dispatch): Promise<DfuImage> => {
         let image = imageInput;
         let sdReq;
 
@@ -463,10 +443,8 @@ const handleUserInput =
             if (!image.initPacket.sdReq) {
                 const message =
                     'Please select the SoftDevice required by the application firmware:';
-                sdReq = await userInputActions.getUserInput(
-                    dispatch,
-                    message,
-                    NordicFwIds
+                sdReq = await dispatch(
+                    userInputActions.getUserInput(message, NordicFwIds)
                 );
                 sdReq = typeof sdReq === 'string' ? parseInt(sdReq, 16) : sdReq;
             }
@@ -528,28 +506,36 @@ const handleHash = (image: DfuImage, hashType: number): DfuImage => {
 const nrfdlErrorSdfuExtSdVersionFailure = (error: unknown) =>
     (error as { error_code: number }).error_code === 514;
 
-/**
- * Operate DFU process with update all the images on the target device
- *
- * @param {number} deviceId the Id of device
- * @param {DfuImage[]} inputDfuImages the list of DFU image
- *
- * @returns {Promise<void>} resolved promise
- */
-const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
+const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
 
     let prevPercentage: number;
 
     return new Promise<void>((resolve, reject) => {
-        firmwareProgram(
-            getDeviceLibContext(),
-            deviceId,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_SDFU_ZIP',
-            zipBuffer,
-            (error?: Error) => {
-                if (error) {
+        getDeviceLib().then(deviceLib => {
+            deviceLib
+                .programBuffer(device, zipBuffer, 'zip', progress => {
+                    // Don't repeat percentage steps that have already been logged.
+                    if (prevPercentage === progress.progressPercentage) {
+                        return;
+                    }
+
+                    const message = progress.message || '';
+
+                    const status = `${message.replace('.', ':')} ${
+                        progress.progressPercentage
+                    }%`;
+
+                    logger.info(status);
+                    prevPercentage = progress.progressPercentage;
+                })
+                .then(() => {
+                    logger.info(
+                        'All dfu images have been written to the target device'
+                    );
+                    resolve();
+                })
+                .catch(error => {
                     if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
                         logger.error('Failed to write to the target device');
                         logger.error(
@@ -559,97 +545,72 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
                         logger.error(describeError(error));
                     }
                     reject(error);
-                } else {
-                    // if (restImages.length === 0) {
-                    logger.info(
-                        'All dfu images have been written to the target device'
-                    );
-                    resolve();
-                    // return;
-                    // }
-                    // return operateDFU(deviceId, restImages);
-                }
-            },
-            ({ progressJson: progress }: Progress.CallbackParameters) => {
-                // Don't repeat percentage steps that have already been logged.
-                if (prevPercentage === progress.progressPercentage) {
-                    return;
-                }
-
-                const message = progress.message || '';
-
-                const status = `${message.replace('.', ':')} ${
-                    progress.progressPercentage
-                }%`;
-
-                logger.info(status);
-                prevPercentage = progress.progressPercentage;
-            }
-        );
+                });
+        });
     });
 };
 
-export const write = (): AppThunk<RootState> => async (dispatch, getState) => {
-    const device = selectedDevice(getState());
+export const write =
+    (device: Device): AppThunk<RootState> =>
+    async (dispatch, getState) => {
+        if (!device) {
+            logger.error(`Failed to write: Device not found}`);
 
-    if (!device) {
-        logger.error(`Failed to write: ${describeError('Device not found')}`);
+            return;
+        }
 
-        return;
-    }
+        dispatch(updateFileBlRegion());
+        dispatch(updateFileAppRegions());
+        const dfuImages = createDfuImages(getState().app.file);
 
-    dispatch(updateFileBlRegion());
-    dispatch(updateFileAppRegions());
-    const dfuImages = createDfuImages(getState().app.file);
+        const fileRegions = getState().app.file.regions;
+        const fileMemMaps = getState().app.file.memMaps;
+        const fileOverlaps = MemoryMap.overlapMemoryMaps(fileMemMaps);
+        const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
+        const { deviceInfo } = getState().app.target;
+        const hwVersion = parseInt(deviceInfo?.family?.slice(3) ?? '0', 10);
 
-    const fileRegions = getState().app.file.regions;
-    const fileMemMaps = getState().app.file.memMaps;
-    const fileOverlaps = MemoryMap.overlapMemoryMaps(fileMemMaps);
-    const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
-    const { deviceInfo } = getState().app.target;
-    const hwVersion = parseInt(deviceInfo?.family?.slice(3) ?? '0', 10);
+        let images = dfuImages
+            ?.map(image => handleImage(image, fileRegions, fileMemMap))
+            .map(image => handleHwVersion(image, hwVersion))
+            .map(image =>
+                handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
+            )
+            .map(image => handleHash(image, HashType.SHA256));
 
-    let images = dfuImages
-        ?.map(image => handleImage(image, fileRegions, fileMemMap))
-        .map(image => handleHwVersion(image, hwVersion))
-        .map(image =>
-            handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
-        )
-        .map(image => handleHash(image, HashType.SHA256));
-
-    images = await Promise.all(
-        images.map(image => dispatch(handleUserInput(image)))
-    );
-
-    // Start writing after handling images since user may cancel userInput
-    logger.info('Performing DFU. This may take a few seconds');
-    dispatch(writingStart());
-
-    try {
-        // We might have more that one reboot of the device during the next operation
-        dispatch(
-            setWaitForDevice({
-                timeout: 10000,
-                when: 'always',
-                once: false,
-            })
+        images = await Promise.all(
+            images.map(image => dispatch(handleUserInput(image)))
         );
-        await operateDFU(device, images);
-        dispatch(writingEnd());
 
-        // Operation done reconnect one more time only
-        dispatch(
-            setWaitForDevice({
-                timeout: 10000,
-                when: 'always',
-                once: true,
-                onSuccess: programmedDevice =>
-                    dispatch(refreshMemoryLayout(programmedDevice)),
-            })
-        );
-    } catch (error) {
-        logger.error(`Failed to write: ${describeError(error)}`);
-        dispatch(writingEnd());
-        dispatch(refreshMemoryLayout(device));
-    }
-};
+        // Start writing after handling images since user may cancel userInput
+        logger.info('Performing DFU. This may take a few seconds');
+        dispatch(writingStart());
+
+        try {
+            // We might have more that one reboot of the device during the next operation
+            dispatch(
+                setWaitForDevice({
+                    timeout: 10000,
+                    when: 'always',
+                    once: false,
+                })
+            );
+            await operateDFU(device, images);
+            dispatch(writingEnd());
+
+            // Operation done reconnect one more time only
+            dispatch(
+                setWaitForDevice({
+                    timeout: 10000,
+                    when: 'always',
+                    once: true,
+                    onSuccess: programmedDevice =>
+                        dispatch(refreshMemoryLayout(programmedDevice)),
+                })
+            );
+        } catch (error) {
+            logger.error(`Failed to write: ${describeError(error)}`);
+            dispatch(writingEnd());
+            dispatch(refreshMemoryLayout(device));
+        }
+    };

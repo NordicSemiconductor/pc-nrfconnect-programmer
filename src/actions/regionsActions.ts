@@ -12,7 +12,7 @@ import {
 } from '../reducers/fileReducer';
 import { RootState } from '../reducers/types';
 import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
-import { CoreDefinition, coreFriendlyName } from '../util/devices';
+import { CoreDefinition } from '../util/devices';
 import {
     defaultRegion,
     getFileRegions,
@@ -157,11 +157,7 @@ export const updateFileRegions =
 
         let regions: Region[] = [];
         cores.forEach((core: CoreDefinition) => {
-            logger.info(
-                `Update files regions according to ${coreFriendlyName(
-                    core.name
-                )} core`
-            );
+            logger.info(`Update files regions according to ${core.name} core`);
             regions = [...regions, ...getFileRegions(file.memMaps, core)];
         });
 

@@ -6,11 +6,11 @@
 
 /* eslint-disable no-bitwise */
 
-import { FWInfo } from '@nordicsemiconductor/nrf-device-lib-js';
 import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
 import { logger } from 'pc-nrfconnect-shared';
+import { SemanticVersion } from 'pc-nrfconnect-shared/typings/generated/src/Nrfutil/sandboxTypes';
 
-import { CoreDefinition, coreFriendlyName, DeviceDefinition } from './devices';
+import { CoreDefinition, DeviceDefinition } from './devices';
 import { hexpad2 } from './hexpad';
 
 const SOFTDEVICE_MAGIC_START = 0x1000;
@@ -64,7 +64,7 @@ export enum RegionColor {
  */
 export interface Region {
     name: RegionName;
-    version?: number | FWInfo.SemanticVersion | string;
+    version?: number | SemanticVersion | string;
     startAddress: number;
     regionSize: number;
     color: RegionColor;
@@ -633,9 +633,7 @@ export const getCoreRegions = (
     memMaps: MemoryMaps,
     coreInfo: CoreDefinition
 ): Region[] => {
-    logger.info(
-        `Parse memory regions for ${coreFriendlyName(coreInfo.name)} core`
-    );
+    logger.info(`Parse memory regions for ${coreInfo.name} core`);
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     const regions = getRegionsFromOverlaps(overlaps, coreInfo);
 

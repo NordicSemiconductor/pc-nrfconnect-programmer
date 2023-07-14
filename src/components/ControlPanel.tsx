@@ -12,17 +12,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     colors,
+    getDeviceLib,
     Group,
+    logger,
     selectedDevice,
     SidePanel,
     Toggle,
     truncateMiddle,
 } from 'pc-nrfconnect-shared';
-import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
 import * as jlinkTargetActions from '../actions/jlinkTargetActions';
-import * as mcubootTargetActions from '../actions/mcubootTargetActions';
 import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
@@ -31,18 +31,18 @@ import {
     getMruFiles,
     getZipFilePath,
 } from '../reducers/fileReducer';
-import { getIsMcuboot } from '../reducers/mcubootReducer';
-import { getIsModem } from '../reducers/modemReducer';
-import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
+import {
+    getAutoRead,
+    getAutoReset,
+    getForceMcuBoot,
+    setForceMcuBoot,
+} from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
     getIsMemLoaded,
     getIsReady,
-    getIsRecoverable,
     getIsWritable,
-    getTargetType,
 } from '../reducers/targetReducer';
-import { CommunicationType } from '../util/devices';
 
 const useRegisterDragEvents = () => {
     const dispatch = useDispatch();
@@ -105,7 +105,6 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
         setShow(!show);
         setTarget(event.target as HTMLElement);
     };
-    // (eventKey: string | null, e: React.SyntheticEvent<unknown>) => void
     const onSelect = (filePath: string | null) => {
         if (filePath) {
             openFile(filePath);
@@ -169,53 +168,32 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
     );
 };
 
-Mru.propTypes = {
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
-
 const ControlPanel = () => {
+    const dispatch = useDispatch();
+
+    const device = useSelector(selectedDevice);
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const isDeviceSelected = useSelector(selectedDevice) !== undefined;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
     const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
-    const targetIsRecoverable = useSelector(getIsRecoverable);
     const targetIsMemLoaded = useSelector(getIsMemLoaded);
     const isProtected = !!useSelector(getDeviceInfo)?.cores.find(
         c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
     );
-    const targetIsReady = useSelector(getIsReady);
-    const isJLink = useSelector(getTargetType) === CommunicationType.JLINK;
-    const isUsbSerial =
-        useSelector(getTargetType) === CommunicationType.USBSDFU;
-    const isMcuboot = useSelector(getIsMcuboot);
-    const isModem = useSelector(getIsModem);
     const zipFile = useSelector(getZipFilePath);
+    const forceMcuBoot = useSelector(getForceMcuBoot);
 
-    const dispatch = useDispatch();
-    const closeFiles = () => dispatch(fileActions.closeFiles());
+    const targetIsReady = useSelector(getIsReady) && !!device;
+    const isJLink = !!device?.traits.jlink;
+    const isUsbSerial = !!device?.traits.nordicDfu;
+    const isMcuBoot = !!device?.traits.mcuBoot;
+    const isModem = !!device?.traits.modem;
+
+    const targetIsRecoverable = isJLink;
+
     const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
-    const toggleAutoRead = () => dispatch(settingsActions.toggleAutoRead());
-    const toggleAutoReset = () => dispatch(settingsActions.toggleAutoReset());
-    const toggleMcuboot = () => dispatch(mcubootTargetActions.toggleMcuboot());
-    const performRecover = () => dispatch(jlinkTargetActions.recover());
-    const performRecoverAndWrite = () =>
-        dispatch(jlinkTargetActions.recoverAndWrite());
-    const performSaveAsFile = () => dispatch(jlinkTargetActions.saveAsFile());
-    const performJLinkRead = () => dispatch(jlinkTargetActions.read());
-    const performReset = () => {
-        if (isUsbSerial) {
-            dispatch(usbsdfuTargetActions.resetDevice());
-        } else {
-            dispatch(jlinkTargetActions.resetDevice());
-        }
-    };
-    const performWrite = () => {
-        // Refresh all files in case that some files have been updated right before write action.
-        refreshAllFiles();
-        dispatch(targetActions.write());
-    };
 
     return (
         <SidePanel className="control-panel">
@@ -232,7 +210,7 @@ const ControlPanel = () => {
                 <Button
                     variant="secondary"
                     className="w-100"
-                    onClick={closeFiles}
+                    onClick={() => dispatch(fileActions.closeFiles())}
                 >
                     <span className="mdi mdi-minus-circle" />
                     Clear files
@@ -243,10 +221,21 @@ const ControlPanel = () => {
                     variant="secondary"
                     className="w-100"
                     key="performRecover"
-                    onClick={performRecover}
+                    onClick={() => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+                        dispatch(
+                            jlinkTargetActions.recover(
+                                device,
+                                autoRead,
+                                autoReset
+                            )
+                        );
+                    }}
                     disabled={
-                        !isDeviceSelected ||
-                        isMcuboot ||
+                        isMcuBoot ||
                         !isJLink ||
                         !targetIsReady ||
                         !targetIsRecoverable
@@ -259,10 +248,22 @@ const ControlPanel = () => {
                     variant="secondary"
                     key="performRecoverAndWrite"
                     className="w-100"
-                    onClick={performRecoverAndWrite}
+                    onClick={() => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+
+                        dispatch(
+                            jlinkTargetActions.recoverAndWrite(
+                                device,
+                                autoRead,
+                                autoReset
+                            )
+                        );
+                    }}
                     disabled={
-                        !isDeviceSelected ||
-                        isMcuboot ||
+                        isMcuBoot ||
                         !isJLink ||
                         !targetIsReady ||
                         !fileRegionSize ||
@@ -276,10 +277,14 @@ const ControlPanel = () => {
                     variant="secondary"
                     key="performSaveAsFile"
                     className="w-100"
-                    onClick={performSaveAsFile}
-                    disabled={
-                        !isDeviceSelected || !isJLink || !targetIsMemLoaded
-                    }
+                    onClick={() => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+                        dispatch(jlinkTargetActions.saveAsFile());
+                    }}
+                    disabled={!isJLink || !targetIsMemLoaded}
                 >
                     <span className="mdi mdi-floppy" />
                     Save as file
@@ -288,8 +293,22 @@ const ControlPanel = () => {
                     key="performReset"
                     variant="secondary"
                     className="w-100"
-                    onClick={performReset}
-                    disabled={!isDeviceSelected || !isJLink || !targetIsReady}
+                    onClick={() => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+
+                        if (isUsbSerial) {
+                            getDeviceLib().then(deviceLib =>
+                                deviceLib.reset(device)
+                            );
+                            dispatch(usbsdfuTargetActions.resetDevice(device));
+                        } else {
+                            dispatch(jlinkTargetActions.resetDevice(device));
+                        }
+                    }}
+                    disabled={!isJLink || !targetIsReady}
                 >
                     <span className="mdi mdi-record" />
                     Reset
@@ -298,7 +317,17 @@ const ControlPanel = () => {
                     key="performWrite"
                     variant="secondary"
                     className="w-100"
-                    onClick={performWrite}
+                    onClick={() => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+                        // Refresh all files in case that some files have been updated right before write action.
+                        refreshAllFiles();
+                        dispatch(
+                            targetActions.write(device, autoRead, autoReset)
+                        );
+                    }}
                     disabled={
                         !isDeviceSelected ||
                         !targetIsReady ||
@@ -318,10 +347,17 @@ const ControlPanel = () => {
                     variant="secondary"
                     key="performJLinkRead"
                     className="w-100"
-                    onClick={performJLinkRead}
+                    onClick={() => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+
+                        dispatch(jlinkTargetActions.read(device, autoReset));
+                    }}
                     disabled={
                         !isDeviceSelected ||
-                        isMcuboot ||
+                        isMcuBoot ||
                         !isJLink ||
                         !targetIsReady ||
                         isProtected
@@ -330,8 +366,10 @@ const ControlPanel = () => {
                     <span className="mdi mdi-refresh" />
                     Read
                 </Button>
+            </Group>
+            <Group heading="Jlink Settings">
                 <Toggle
-                    onToggle={() => toggleAutoRead()}
+                    onToggle={() => dispatch(settingsActions.toggleAutoRead())}
                     isToggled={autoRead}
                     label="Auto read memory"
                     barColor={colors.gray700}
@@ -339,7 +377,7 @@ const ControlPanel = () => {
                 />
                 <Toggle
                     isToggled={autoReset}
-                    onToggle={() => toggleAutoReset()}
+                    onToggle={() => dispatch(settingsActions.toggleAutoReset())}
                     title="Reset device after read/write operations"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
@@ -354,9 +392,12 @@ const ControlPanel = () => {
                         )}
                     </>
                 </Toggle>
+            </Group>
+            <Group heading="MCUboot Settings">
                 <Toggle
-                    onToggle={() => toggleMcuboot()}
-                    isToggled={isMcuboot}
+                    onToggle={() => dispatch(setForceMcuBoot(!forceMcuBoot))}
+                    isToggled={forceMcuBoot || isMcuBoot}
+                    disabled={isMcuBoot}
                     label="Enable MCUboot"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}

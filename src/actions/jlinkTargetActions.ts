@@ -5,112 +5,82 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
-import nrfdl, {
-    Device,
-    FirmwareReadResult,
-    ProtectionStatus,
-} from '@nordicsemiconductor/nrf-device-lib-js';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import {
     AppThunk,
     describeError,
-    getDeviceLibContext,
+    Device,
+    DeviceCore,
+    getDeviceLib,
     logger,
+    ProtectionStatus,
+    selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
 
-import { modemKnown } from '../reducers/modemReducer';
-import { getAutoReset } from '../reducers/settingsReducer';
 import {
     erasingEnd,
     erasingStart,
     loadingEnd,
     loadingStart,
     targetContentsKnown,
+    targetContentsUnknown,
     targetInfoKnown,
     targetRegionsKnown,
-    targetTypeKnown,
     targetWritableKnown,
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import {
-    CommunicationType,
     CoreDefinition,
-    coreFriendlyName,
     DeviceDefinition,
-    DeviceFamily,
     getDeviceInfoByJlink,
     updateCoreInfo,
-    VendorId,
 } from '../util/devices';
-import sequence from '../util/promise';
 import { getTargetRegions } from '../util/regions';
 import { updateFileAppRegions, updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
-/**
- * Check whether the device is JLink device or not by providing vendor ID and product ID
- *
- * @param {number} vid Vendor ID
- * @param {number} pid Product ID
- * @returns {boolean} whether the device is JLink device
- */
-export const isJlink = (vid?: number, pid?: number) =>
-    vid && pid && vid === VendorId.SEGGER;
-
-/**
- * Load protection status of the core
- *
- * @param {number}deviceId the Id of the device
- * @param {string} deviceCoreName the name of the core
- * @returns{Promise<ProtectionStatus>} the protection status
- */
-export const loadProtectionStatus = async (
-    deviceId: number,
-    deviceCoreName: nrfdl.DeviceCore
-): Promise<ProtectionStatus> => {
-    try {
+export const getProtectionStatus = (
+    device: Device,
+    deviceCoreName: DeviceCore
+): Promise<ProtectionStatus> =>
+    new Promise<ProtectionStatus>((resolve, reject) => {
         logger.info(
-            `Loading readback protection status for ${coreFriendlyName(
-                deviceCoreName
-            )} core`
+            `Reading readback protection status for ${deviceCoreName} core`
         );
 
-        const { protectionStatus } =
-            await nrfdl.deviceControlGetProtectionStatus(
-                getDeviceLibContext(),
-                deviceId,
-                deviceCoreName
-            );
-
-        logger.info(`Readback protection status: ${protectionStatus}`);
-        return protectionStatus;
-    } catch (error) {
-        const errorMessage = `Failed to load readback protection status: ${describeError(
-            error
-        )}`;
-        usageData.sendErrorReport(errorMessage);
-        throw Error(errorMessage);
-    }
-};
+        getDeviceLib().then(deviceLib => {
+            deviceLib
+                .getProtectionStatus(device, deviceCoreName)
+                .then(result => {
+                    logger.info(
+                        `Readback protection status: ${result.protectionStatus}`
+                    );
+                    resolve(result.protectionStatus);
+                })
+                .catch(error => {
+                    const errorMessage = `Failed to load readback protection status: ${describeError(
+                        error
+                    )}`;
+                    usageData.sendErrorReport(errorMessage);
+                    reject(new Error(errorMessage));
+                });
+        });
+    });
 
 export const openDevice =
-    (): AppThunk<RootState> => async (dispatch, getState) => {
-        const { device: inputDevice } = getState().app.target;
-        const device = inputDevice as Device;
-
+    (
+        device: Device,
+        autoRead: boolean,
+        autoReset: boolean
+    ): AppThunk<RootState> =>
+    async dispatch => {
         dispatch(loadingStart());
-        dispatch(
-            targetTypeKnown({
-                targetType: CommunicationType.JLINK,
-                isRecoverable: true,
-            })
-        );
         logger.info(
-            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via JLink'
+            'Using nrfutil device to communicate with target via JLink'
         );
 
         logDeviceInfo(device);
@@ -118,12 +88,7 @@ export const openDevice =
         deviceInfo = await updateCoresWithNrfdl(device, deviceInfo);
 
         // Update modem target info according to detected device info
-        const isModem = deviceInfo.family
-            .toLowerCase()
-            .includes(DeviceFamily.NRF91.toLowerCase());
-
-        dispatch(modemKnown(isModem));
-
+        const isModem = device.traits.modem;
         if (isModem) logger.info('Modem detected');
 
         dispatch(targetInfoKnown(deviceInfo));
@@ -140,8 +105,7 @@ export const openDevice =
         dispatch(loadingEnd());
         logger.info('Device is loaded and ready for further operation');
 
-        const { autoRead } = getState().app.settings;
-        if (autoRead) await dispatch(read());
+        if (autoRead) await dispatch(read(device, autoReset));
     };
 
 /**
@@ -177,52 +141,38 @@ const logDeviceInfo = (device: Device) => {
     );
 };
 
-/**
- * Get device memory map by calling nrf-device-lib and reading the entire non-volatile memory
- * const getDeviceMemMap = async (serialNumber, coreInfo, fullRead = true) => {
- *
- * @param {number} deviceId the Id of the device
- * @param {CoreDefinition} coreInfo the information of the core
- * @returns {void}
- */
-const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
+const getDeviceMemMap = async (device: Device, coreInfo: CoreDefinition) =>
     (await new Promise((resolve, reject) => {
         logger.info(`Reading memory for ${coreInfo.name} core`);
-        nrfdl.firmwareRead(
-            getDeviceLibContext(),
-            deviceId,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_INTEL_HEX',
-            result => {
-                if ((result as nrfdl.Error).message) {
-                    usageData.sendErrorReport(
-                        `Failed to get device memory map: ${describeError(
-                            result
-                        )}`
-                    );
-                    reject();
-                }
+        getDeviceLib()
+            .then(deviceLib =>
+                deviceLib
+                    .firmwareRead(device, coreInfo.name)
+                    .then(hexBuffer => {
+                        const hexText = hexBuffer.toString('utf8');
+                        const memMap = MemoryMap.fromHex(hexText);
 
-                const buffer = (result as FirmwareReadResult).buffer || '';
-                const hexText = Buffer.from(buffer, 'base64').toString('utf8');
-                const memMap = MemoryMap.fromHex(hexText);
-
-                const paddedArray = memMap.slicePad(
-                    0,
-                    coreInfo.romBaseAddr + coreInfo.romSize
-                );
-                const paddedMemMap =
-                    MemoryMap.fromPaddedUint8Array(paddedArray);
-                logger.info(
-                    `Reading memory for ${coreInfo.name} core completed`
-                );
-                resolve(paddedMemMap);
-            },
-            () => {},
-            null,
-            null,
-            coreInfo.name
-        );
+                        const paddedArray = memMap.slicePad(
+                            0,
+                            coreInfo.romBaseAddr + coreInfo.romSize
+                        );
+                        const paddedMemMap =
+                            MemoryMap.fromPaddedUint8Array(paddedArray);
+                        logger.info(
+                            `Reading memory for ${coreInfo.name} core completed`
+                        );
+                        resolve(paddedMemMap);
+                    })
+                    .catch(error => {
+                        usageData.sendErrorReport(
+                            `Failed to get device memory map: ${describeError(
+                                error
+                            )}`
+                        );
+                        reject(error);
+                    })
+            )
+            .catch(reject);
     })) as MemoryMap;
 
 /*
@@ -237,17 +187,24 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
  * unfortunately the casuistics are just too complex.
  */
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
+    const device = selectedDevice(getState());
+
+    if (!device) {
+        dispatch(targetWritableKnown(false));
+        return;
+    }
+
     // TODO: get the UICR address from the target definition. This value
     // works for nRF51s and nRF52s, but other targets might use a different one!!!
     const appState = getState().app;
     const { isErased, isMemLoaded } = appState.target;
-    const { isMcuboot } = appState.mcuboot;
+    const isMcuboot = !!device.traits.mcuBoot;
     const {
         memMaps: fileMemMaps,
         mcubootFilePath,
         zipFilePath,
     } = appState.file;
-    const { isModem } = appState.modem;
+    const isModem = device.traits.modem;
 
     // If MCU is enabled and MCU firmware is detected
     if (isMcuboot && mcubootFilePath) {
@@ -279,229 +236,230 @@ const updateTargetRegions =
         dispatch(updateFileAppRegions());
     };
 
-export const read = (): AppThunk<RootState> => async (dispatch, getState) => {
-    dispatch(loadingStart());
-    const { device: inputDevice, deviceInfo: inputDeviceInfo } =
-        getState().app.target;
-    const device = inputDevice as Device;
-    const deviceInfo = inputDeviceInfo as DeviceDefinition;
+export const read =
+    (device: Device, autoReset: boolean): AppThunk<RootState> =>
+    async (dispatch, getState) => {
+        const deviceInfo = getState().app.target.deviceInfo;
 
-    // Read from the device
-    if (
-        deviceInfo.cores.find(
-            c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
-        )
-    ) {
-        logger.info(
-            'Skipped reading, since at least one core has app readback protection'
-        );
-    } else {
-        let memMap: MemoryMap[];
-        let mergedMemMap;
+        if (!deviceInfo) {
+            logger.error('No device info loaded');
+            return;
+        }
+
+        dispatch(loadingStart());
+        // Read from the device
+        if (
+            deviceInfo.cores.find(
+                c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
+            )
+        ) {
+            logger.info(
+                'Skipped reading, since at least one core has app readback protection'
+            );
+            return;
+        }
+
         try {
-            memMap = (await sequence(
-                getDeviceMemMap,
-                [],
-                deviceInfo.cores.map(c => [device.id, c])
-            )) as MemoryMap[];
-            mergedMemMap = MemoryMap.flattenOverlaps(
+            const promises = deviceInfo.cores.map(core =>
+                getDeviceMemMap(device, core)
+            );
+
+            const memMap: MemoryMap[] = [];
+            await promises?.reduce((accumulatorPromise, promise) =>
+                accumulatorPromise
+                    .then(map => {
+                        memMap.push(map);
+                        return promise;
+                    })
+                    .catch(Promise.reject)
+            );
+
+            const mergedMemMap = MemoryMap.flattenOverlaps(
                 MemoryMap.overlapMemoryMaps(
                     memMap.filter(m => m).map(m => ['', m])
                 )
             );
+
+            dispatch(
+                targetContentsKnown({
+                    targetMemMap: mergedMemMap,
+                    isMemLoaded: true,
+                })
+            );
+            dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
         } catch (error) {
+            dispatch(targetContentsUnknown());
             logger.error('Error when reading device');
             return;
         }
-        dispatch(
-            targetContentsKnown({
-                targetMemMap: mergedMemMap,
-                isMemLoaded: true,
-            })
-        );
-        dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
-    }
 
-    dispatch(canWrite());
-    dispatch(loadingEnd());
+        dispatch(canWrite());
+        dispatch(loadingEnd());
 
-    const autoReset = getAutoReset(getState());
-    if (autoReset) dispatch(resetDevice());
-};
-
-/**
- * Recover one core
- * @param {number} deviceId the Id of the device
- * @param {CoreDefinition} coreInfo the information of one core
- * @returns {void}
- */
-export const recoverOneCore =
-    (deviceId: number, coreInfo: CoreDefinition) =>
-    async (dispatch: TDispatch) => {
-        dispatch(erasingStart());
-        logger.info(`Recovering ${coreInfo.name} core`);
-
-        try {
-            await nrfdl.deviceControlRecover(
-                getDeviceLibContext(),
-                deviceId,
-                coreInfo.name
-            );
-            logger.info(`Recovering ${coreInfo.name} core completed`);
-            return;
-        } catch (error) {
-            usageData.sendErrorReport(
-                `Failed to recover ${coreInfo.name} core: ${describeError(
-                    error
-                )}`
-            );
-        }
+        if (autoReset) resetDevice(device);
     };
 
-export const recover =
-    (continueToWrite = false): AppThunk<RootState> =>
-    async (dispatch, getState) => {
-        const { device: inputDevice, deviceInfo: inputDeviceInfo } =
-            getState().app.target;
-        const { id: deviceId } = inputDevice as Device;
-        const { cores } = inputDeviceInfo as DeviceDefinition;
-        const results: unknown[] = [];
+const recoverOneCore = async (device: Device, coreInfo: CoreDefinition) => {
+    logger.info(`Recovering ${coreInfo.name} core`);
 
-        const argsArray = cores.map((c: CoreDefinition) => [deviceId, c]);
-        await sequence(
-            (id: number, coreInfo: CoreDefinition) =>
-                dispatch(recoverOneCore(id, coreInfo)),
-            results,
-            argsArray
+    try {
+        await (await getDeviceLib()).recover(device, coreInfo.name);
+        logger.info(`Recovering ${coreInfo.name} core completed`);
+        return;
+    } catch (error) {
+        usageData.sendErrorReport(
+            `Failed to recover ${coreInfo.name} core: ${describeError(error)}`
+        );
+    }
+};
+
+export const recover =
+    (
+        device: Device,
+        autoRead: boolean,
+        autoReset: boolean,
+        continueToWrite = false
+    ): AppThunk<RootState> =>
+    async (dispatch, getState) => {
+        const deviceInfo = getState().app.target.deviceInfo;
+        const promises = deviceInfo?.cores.map(core => {
+            dispatch(erasingStart());
+            return recoverOneCore(device, core);
+        });
+
+        await promises?.reduce(
+            (accumulatorPromise, promise) =>
+                accumulatorPromise.then(() => promise).catch(Promise.reject),
+            Promise.resolve()
         );
 
         dispatch(erasingEnd());
         logger.info('Device recovery completed');
 
-        if (!continueToWrite) await dispatch(openDevice());
+        if (!continueToWrite)
+            await dispatch(openDevice(device, autoRead, autoReset));
     };
 
-/**
- * Write firmware in intel HEX format to the device
- * @param {number} deviceId the Id of the device
- * @param {CoreDefinition} coreInfo the information of each core
- * @param {string} hexFileString the converted string of the intel HEX file
- *
- * @returns {void}
- */
 const writeHex = (
-    deviceId: number,
+    device: Device,
     coreInfo: CoreDefinition,
     hexFileString: string
 ) =>
-    new Promise<void>(resolve => {
+    new Promise<void>((resolve, reject) => {
         logger.info(`Writing HEX to ${coreInfo.name} core`);
 
-        nrfdl.firmwareProgram(
-            getDeviceLibContext(),
-            deviceId,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_INTEL_HEX',
-            Buffer.from(hexFileString, 'utf8'),
-            err => {
-                if (err)
+        getDeviceLib().then(deviceLib =>
+            deviceLib
+                .programBuffer(
+                    device,
+                    Buffer.from(hexFileString, 'utf8'),
+                    'hex',
+                    progress => {
+                        const message = progress.message || '';
+
+                        const status = `${message.replace('.', ':')} ${
+                            progress.progressPercentage
+                        }%`;
+                        logger.info(status);
+                    }
+                )
+                .then(resolve)
+                .catch(error => {
                     usageData.sendErrorReport(
                         `Device programming failed with error: ${describeError(
-                            err
+                            error
                         )}`
                     );
-                logger.info(`Writing HEX to ${coreInfo.name} core completed`);
-                resolve();
-            },
-            ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                const message = progress.message || '';
-
-                const status = `${message.replace('.', ':')} ${
-                    progress.progressPercentage
-                }%`;
-                logger.info(status);
-            },
-            null,
-            coreInfo.name
+                    logger.info(
+                        `Writing HEX to ${coreInfo.name} core completed`
+                    );
+                    reject(error); // This is new behavior
+                })
         );
     });
 
-/**
- * Write one core
- *
- * @param {number} deviceId the Id of the device
- * @param {CoreDefinition} coreInfo the information of one core
- * @returns {void}
- */
-export const writeOneCore =
-    (deviceId: number, coreInfo: CoreDefinition) =>
-    async (dispatch: TDispatch, getState: () => RootState) => {
-        logger.info(`Writing procedure starts for ${coreInfo.name} core`);
-        dispatch(writingStart());
-        const { memMaps } = getState().app.file;
+const writeOneCore = async (
+    device: Device,
+    coreInfo: CoreDefinition,
+    memMaps: MemoryMaps
+) => {
+    logger.info(`Writing procedure starts for ${coreInfo.name} core`);
 
-        // Parse input files and filter program regions with core start address and size
-        const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
-        overlaps.forEach((overlap, key) => {
-            const overlapStartAddr = key;
-            const overlapSize = overlap[0][1].length;
+    // Parse input files and filter program regions with core start address and size
+    const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
+    overlaps.forEach((overlap, key) => {
+        const overlapStartAddr = key;
+        const overlapSize = overlap[0][1].length;
 
-            const isInCore =
-                overlapStartAddr >= coreInfo.romBaseAddr &&
-                overlapStartAddr + overlapSize <=
-                    coreInfo.romBaseAddr + coreInfo.romSize;
-            const isUicr =
-                overlapStartAddr >= coreInfo.uicrBaseAddr &&
-                overlapStartAddr + overlapSize <=
-                    coreInfo.uicrBaseAddr + coreInfo.pageSize;
-            if (!isInCore && !isUicr) {
-                overlaps.delete(key);
-            }
+        const isInCore =
+            overlapStartAddr >= coreInfo.romBaseAddr &&
+            overlapStartAddr + overlapSize <=
+                coreInfo.romBaseAddr + coreInfo.romSize;
+        const isUicr =
+            overlapStartAddr >= coreInfo.uicrBaseAddr &&
+            overlapStartAddr + overlapSize <=
+                coreInfo.uicrBaseAddr + coreInfo.pageSize;
+        if (!isInCore && !isUicr) {
+            overlaps.delete(key);
+        }
+    });
+
+    if (overlaps.size <= 0) {
+        return undefined;
+    }
+
+    const programRegions = MemoryMap.flattenOverlaps(overlaps);
+
+    await writeHex(device, coreInfo, programRegions.asHexString());
+    logger.info(`Writing procedure ends for ${coreInfo.name} core`);
+};
+
+export const write =
+    (
+        device: Device,
+        autoRead: boolean,
+        autoReset: boolean
+    ): AppThunk<RootState> =>
+    async (dispatch, getState) => {
+        const memMaps = getState().app.file.memMaps;
+        const deviceInfo = getState().app.target.deviceInfo;
+
+        const promises = deviceInfo?.cores.map(core => {
+            dispatch(writingStart());
+            return writeOneCore(device, core, memMaps);
         });
 
-        if (overlaps.size <= 0) {
-            return undefined;
-        }
+        await promises?.reduce(
+            (accumulatorPromise, promise) =>
+                accumulatorPromise.then(() => promise).catch(Promise.reject),
+            Promise.resolve()
+        );
 
-        const programRegions = MemoryMap.flattenOverlaps(overlaps);
+        dispatch(writingEnd());
 
-        await writeHex(deviceId, coreInfo, programRegions.asHexString());
-        logger.info(`Writing procedure ends for ${coreInfo.name} core`);
+        if (autoReset) await resetDevice(device);
+        await dispatch(openDevice(device, autoRead, autoReset));
+        dispatch(canWrite());
     };
 
-export const write = (): AppThunk<RootState> => async (dispatch, getState) => {
-    const { device: inputDevice, deviceInfo: inputDeviceInfo } =
-        getState().app.target;
-    const { id: deviceId } = inputDevice as Device;
-    const { cores } = inputDeviceInfo as DeviceDefinition;
-    const results: unknown[] = [];
-    const argsArray = cores.map(c => [deviceId, c]);
-    await sequence(
-        (id: number, coreInfo: CoreDefinition) =>
-            dispatch(writeOneCore(id, coreInfo)),
-        results,
-        argsArray
+export const recoverAndWrite =
+    (
+        device: Device,
+        autoRead: boolean,
+        autoReset: boolean
+    ): AppThunk<RootState, Promise<void>> =>
+    async dispatch => {
+        const continueToWrite = true;
+        await dispatch(recover(device, autoRead, continueToWrite));
+        await dispatch(write(device, autoRead, autoReset));
+    };
+
+export const resetDevice = (device: Device) =>
+    getDeviceLib().then(deviceLib =>
+        deviceLib.reset(device).then(() => {
+            logger.info(`Resetting device completed`);
+        })
     );
-    dispatch(writingEnd());
-    const autoReset = getAutoReset(getState());
-    if (autoReset) await dispatch(resetDevice());
-    await dispatch(openDevice());
-    dispatch(canWrite());
-};
-
-export const recoverAndWrite = (): AppThunk => async dispatch => {
-    const continueToWrite = true;
-    await dispatch(recover(continueToWrite));
-    await dispatch(write());
-};
-
-export const resetDevice = (): AppThunk<RootState> => async (_, getState) => {
-    const { device: inputDevice } = getState().app.target;
-    const device = inputDevice as Device;
-
-    await nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
-    logger.info(`Resetting device completed`);
-};
 
 export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
     const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
@@ -545,18 +503,17 @@ const updateCoresWithNrfdl = async (
     const cores = await Promise.all(
         deviceInfo.cores.map(async (core, index) => {
             try {
-                const protectionStatus = await loadProtectionStatus(
-                    device.id,
+                const protectionStatus = await getProtectionStatus(
+                    device,
                     core.name
                 );
                 if (protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
                     return core;
                 }
-                const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
-                    getDeviceLibContext(),
-                    device.id,
-                    core.name
-                );
+                const deviceCoreInfo = await (
+                    await getDeviceLib()
+                ).coreInfo(device, core.name);
+
                 return updateCoreInfo(
                     core,
                     index,

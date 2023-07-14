@@ -26,7 +26,7 @@ export const loadSettings = (): AppThunk => dispatch => {
     }
 
     setSettings(settings);
-    dispatch(settingsLoad(settings));
+    dispatch(settingsLoad({ ...settings, forceMcuBoot: false }));
 };
 
 export const toggleAutoRead =

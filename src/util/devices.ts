@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import nrfdl, {
+import {
     DeviceCore,
     DeviceCoreInfo,
     ProtectionStatus,
-} from '@nordicsemiconductor/nrf-device-lib-js';
+} from 'pc-nrfconnect-shared';
+import { NrfutilDevice } from 'pc-nrfconnect-shared/typings/generated/src/Nrfutil/deviceTypes';
 
 import range from './range';
 
@@ -35,7 +36,7 @@ export type CoreDefinition = {
  * Default definition of device core
  */
 export const defaultCore: CoreDefinition = {
-    name: 'NRFDL_DEVICE_CORE_APPLICATION',
+    name: 'Application',
     coreNumber: 0,
     romBaseAddr: 0x0,
     romSize: 0x100000, // 1 MB
@@ -125,7 +126,7 @@ export const deviceDefinitions: DeviceDefinition[] = [
             {
                 ...defaultCore,
                 coreNumber: 0,
-                name: 'NRFDL_DEVICE_CORE_APPLICATION',
+                name: 'Application',
                 romBaseAddr: 0x0,
                 romSize: 0x100000, // 1 MB
                 ficrBaseAddr: 0xff0000,
@@ -134,7 +135,7 @@ export const deviceDefinitions: DeviceDefinition[] = [
             {
                 ...defaultCore,
                 coreNumber: 1,
-                name: 'NRFDL_DEVICE_CORE_NETWORK',
+                name: 'Network',
                 romBaseAddr: 0x1000000,
                 romSize: 0x40000, // 256 KB
                 ficrBaseAddr: 0x1ff0000,
@@ -143,13 +144,6 @@ export const deviceDefinitions: DeviceDefinition[] = [
         ],
     },
 ];
-
-export const coreFriendlyName = (coreName: DeviceCore) =>
-    ({
-        NRFDL_DEVICE_CORE_APPLICATION: 'Application',
-        NRFDL_DEVICE_CORE_MODEM: 'Modem',
-        NRFDL_DEVICE_CORE_NETWORK: 'Network',
-    }[coreName] ?? coreName);
 
 /**
  * Nordic SoftDevice Id referring to pc-nrfutil
@@ -257,7 +251,7 @@ const getDeviceDefinitionByFamily = (
     );
 };
 
-const getProductId = (device: nrfdl.Device) => {
+const getProductId = (device: NrfutilDevice) => {
     if (!device.serialPorts) return 0;
 
     return parseInt(
@@ -269,7 +263,7 @@ const getProductId = (device: nrfdl.Device) => {
     );
 };
 
-const identifyUsbByVersion = (device: nrfdl.Device) => {
+const identifyUsbByVersion = (device: NrfutilDevice) => {
     if (!device.hwInfo || device.hwInfo.deviceVersion?.length === 0)
         return null;
 
@@ -278,7 +272,7 @@ const identifyUsbByVersion = (device: nrfdl.Device) => {
     );
 };
 
-const identifyUsbBySerialPort = (device: nrfdl.Device) => {
+const identifyUsbBySerialPort = (device: NrfutilDevice) => {
     const productId = getProductId(device);
 
     // nRF52
@@ -295,14 +289,14 @@ const identifyUsbBySerialPort = (device: nrfdl.Device) => {
 };
 
 // Get device info by calling version command
-export const getDeviceInfoByUSB = (device: nrfdl.Device) =>
+export const getDeviceInfoByUSB = (device: NrfutilDevice) =>
     identifyUsbByVersion(device) ||
     identifyUsbBySerialPort(device) ||
     defaultDeviceDefinition;
 
 // Get device info by calling @nordicsemiconductor/nrf-device-lib-js
 export const getDeviceInfoByJlink = (
-    device: nrfdl.Device
+    device: NrfutilDevice
 ): DeviceDefinition => {
     const type = device.jlink?.deviceVersion;
     const family = device.jlink?.deviceFamily as DeviceFamily;

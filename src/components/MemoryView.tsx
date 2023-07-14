@@ -6,10 +6,11 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { selectedDevice } from 'pc-nrfconnect-shared';
 import PropTypes from 'prop-types';
 
 import { getZipFilePath } from '../reducers/fileReducer';
-import { getIsMcuboot } from '../reducers/mcubootReducer';
+import { getForceMcuBoot } from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
     getIsErasing,
@@ -46,11 +47,12 @@ interface MemoryViewProps {
 }
 
 const MemoryView = ({ isTarget }: MemoryViewProps) => {
+    const device = useSelector(selectedDevice);
     const regions = useSelector((state: RootState) =>
         isTarget ? state.app.target.regions : state.app.file.regions
     );
     const zipFilePath = useSelector(getZipFilePath);
-    const isMcuboot = useSelector(getIsMcuboot);
+    const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
     const isLoading = useSelector(getIsLoading);
@@ -82,28 +84,32 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                     {isTarget && isErasing && (
                         <div className="erase-indicator striped active" />
                     )}
-                    {isTarget && refreshEnabled && (
-                        <div className="centering-container">
-                            {!isProtected && (
-                                <div className="read-indicator">
-                                    <p>Device is connected</p>
-                                    <p>
-                                        Press <strong>READ</strong> button to
-                                        read the memory
-                                    </p>
-                                </div>
-                            )}
-                            {isProtected && (
-                                <div className="read-indicator">
-                                    <p>Device is protected</p>
-                                    <p>
-                                        Press <strong>Erase all</strong> button
-                                        to recover the protected memory
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    {isTarget &&
+                        refreshEnabled &&
+                        device?.traits.jlink &&
+                        !device?.traits.mcuBoot && (
+                            <div className="centering-container">
+                                {!isProtected && (
+                                    <div className="read-indicator">
+                                        <p>Device is connected</p>
+                                        <p>
+                                            Press <strong>READ</strong> button
+                                            to read the memory
+                                        </p>
+                                    </div>
+                                )}
+                                {isProtected && (
+                                    <div className="read-indicator">
+                                        <p>Device is protected</p>
+                                        <p>
+                                            Press <strong>Erase all</strong>{' '}
+                                            button to recover the protected
+                                            memory
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     {isTarget && isMcuboot && (
                         <div className="centering-container">
                             <div className="read-indicator">
