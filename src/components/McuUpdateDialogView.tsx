@@ -185,9 +185,7 @@ const McuUpdateDialogView = () => {
             <Form.Group>
                 <Form.Label className="mb-0">
                     <strong>Firmware:</strong>
-                </Form.Label>
-                <Form.Label className="mb-0">
-                    {mcubootFwPath || zipFilePath}
+                    <span>{` ${mcubootFwPath || zipFilePath}`}</span>
                 </Form.Label>
             </Form.Group>
             <Form.Group>
