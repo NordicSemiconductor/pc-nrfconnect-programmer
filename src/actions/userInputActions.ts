@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { logger } from 'pc-nrfconnect-shared';
+import { AppThunk, logger } from 'pc-nrfconnect-shared';
 
-import { TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 import {
     userInputCancelled,
     userInputReceived,
@@ -15,25 +15,26 @@ import {
 
 let userInputCallback: ((input?: string) => void) | undefined;
 
-export function getUserInput(
-    dispatch: TDispatch,
-    message: string,
-    choices: Record<string, string>
-) {
-    return new Promise((resolve, reject) => {
-        userInputCallback = input => {
-            if (input) {
-                resolve(input);
-            } else {
-                reject(new Error('Cancelled by user.'));
-            }
-        };
-        dispatch(userInputRequired({ message, choices }));
-    });
-}
+export const getUserInput =
+    (
+        message: string,
+        choices: Record<string, string>
+    ): AppThunk<RootState, Promise<string>> =>
+    dispatch =>
+        new Promise((resolve, reject) => {
+            userInputCallback = input => {
+                if (input) {
+                    resolve(input);
+                } else {
+                    reject(new Error('Cancelled by user.'));
+                }
+            };
+            dispatch(userInputRequired({ message, choices }));
+        });
 
-export function receiveUserInput(input?: string) {
-    return (dispatch: TDispatch) => {
+export const receiveUserInput =
+    (input?: string): AppThunk =>
+    dispatch => {
         dispatch(userInputReceived());
         if (userInputCallback) {
             userInputCallback(input);
@@ -42,11 +43,8 @@ export function receiveUserInput(input?: string) {
             logger.error('Received user input, but no callback exists.');
         }
     };
-}
 
-export function cancelUserInput() {
-    return (dispatch: TDispatch) => {
-        logger.info('User input has been cancelled.');
-        dispatch(userInputCancelled());
-    };
-}
+export const cancelUserInput = (): AppThunk => dispatch => {
+    logger.info('User input has been cancelled.');
+    dispatch(userInputCancelled());
+};

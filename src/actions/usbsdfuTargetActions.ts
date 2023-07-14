@@ -15,6 +15,7 @@ import {
 import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';
 import {
+    AppThunk,
     defaultInitPacket,
     describeError,
     Device,
@@ -40,7 +41,7 @@ import {
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
-import { RootState, TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 import {
     CommunicationType,
     DeviceDefinition,
@@ -72,38 +73,26 @@ const defaultDfuImage: DfuImage = {
     firmwareImage: Buffer.alloc(0),
 };
 
-/**
- * Check whether the device is Nordic USB device or not by providing vender Id and product Id
- *
- * @param {number} vid Vendor ID
- * @param {number} pid Product ID
- * @returns {boolean} whether the device is Nordic USB device
- */
-export const isNordicUsb = (vid?: number, pid?: number) =>
-    vid &&
-    pid &&
-    vid === VendorId.NORDIC_SEMICONDUCTOR &&
-    USBProductIds.includes(pid);
+export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
+    const { device: inputDevice } = getState().app.target;
+    const openedDevice = inputDevice as Device;
 
-/**
- * Display some information about a devkit. Called on a devkit connection.
- *
- * @returns {Promise<void>} resolved promise
- */
-export const openDevice =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const { device: inputDevice } = getState().app.target;
-        const openedDevice = inputDevice as Device;
+    dispatch(
+        targetTypeKnown({
+            targetType: CommunicationType.USBSDFU,
+            isRecoverable: false,
+        })
+    );
+    logger.info(
+        'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
+    );
+    usageData.sendUsageData(EventAction.OPEN_DEVICE_FAMILY, DeviceFamily.NRF52);
+    usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
+    usageData.sendUsageData(EventAction.OPEN_DEVICE_BOARD_VERSION, 'PCA10059');
 
-        dispatch(
-            targetTypeKnown({
-                targetType: CommunicationType.USBSDFU,
-                isRecoverable: false,
-            })
-        );
-        logger.info(
-            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
-        );
+    dispatch(refreshMemoryLayout(openedDevice));
+};
+
         usageData.sendUsageData(
             EventAction.OPEN_DEVICE_FAMILY,
             DeviceFamily.NRF52
@@ -117,134 +106,144 @@ export const openDevice =
         dispatch(refreshMemoryLayout(openedDevice));
     };
 
-const refreshMemoryLayout = (staleDevice: Device) => (dispatch: TDispatch) => {
-    dispatch(
-        switchToBootloaderMode(
-            staleDevice,
-            async device => {
-                const fwInfo: FWInfo.ReadResult = await readFwInfo(
-                    getDeviceLibContext(),
-                    device.id
-                );
-                const deviceInfo = getDeviceInfoByUSB(device);
-                dispatch(targetInfoKnown(deviceInfo));
+const refreshMemoryLayout =
+    (staleDevice: Device): AppThunk =>
+    dispatch => {
+        dispatch(
+            switchToBootloaderMode(
+                staleDevice,
+                async device => {
+                    const fwInfo: FWInfo.ReadResult = await readFwInfo(
+                        getDeviceLibContext(),
+                        device.id
+                    );
+                    const deviceInfo = getDeviceInfoByUSB(device);
+                    dispatch(targetInfoKnown(deviceInfo));
 
-                const appCoreNumber = 0;
-                const coreInfo = deviceInfo.cores[appCoreNumber];
+                    const appCoreNumber = 0;
+                    const coreInfo = deviceInfo.cores[appCoreNumber];
 
-                let regions: Region[] = [];
+                    let regions: Region[] = [];
 
-                // Add FICR to regions
-                if (coreInfo.ficrBaseAddr) {
-                    regions = [
-                        ...regions,
-                        {
-                            ...defaultRegion,
-                            name: RegionName.FICR,
-                            version: 0,
-                            startAddress: coreInfo.ficrBaseAddr,
-                            regionSize: coreInfo.ficrSize,
-                            permission: RegionPermission.NONE,
-                        },
-                    ];
+                    // Add FICR to regions
+                    if (coreInfo.ficrBaseAddr) {
+                        regions = [
+                            ...regions,
+                            {
+                                ...defaultRegion,
+                                name: RegionName.FICR,
+                                version: 0,
+                                startAddress: coreInfo.ficrBaseAddr,
+                                regionSize: coreInfo.ficrSize,
+                                permission: RegionPermission.NONE,
+                            },
+                        ];
+                    }
+
+                    // Add UICR to regions
+                    if (coreInfo.uicrBaseAddr) {
+                        regions = [
+                            ...regions,
+                            {
+                                ...defaultRegion,
+                                name: RegionName.UICR,
+                                version: 0,
+                                startAddress: coreInfo.uicrBaseAddr,
+                                regionSize: coreInfo.uicrSize,
+                                permission: RegionPermission.NONE,
+                            },
+                        ];
+                    }
+
+                    // Add MBR to regions
+                    if (coreInfo.uicrBaseAddr) {
+                        regions = [
+                            ...regions,
+                            {
+                                ...defaultRegion,
+                                name: RegionName.MBR,
+                                version: 0,
+                                startAddress: coreInfo.mbrBaseAddr,
+                                regionSize: coreInfo.mbrSize,
+                                color: RegionColor.MBR,
+                                permission: RegionPermission.NONE,
+                            },
+                        ];
+                    }
+
+                    // Add bootloader, softDevice, applications to regions
+                    const { imageInfoList } = fwInfo;
+                    imageInfoList.forEach((image: FWInfo.Image) => {
+                        const { imageType, imageLocation, version } = image;
+
+                        if (!imageLocation) return;
+
+                        const startAddress = imageLocation.address;
+                        const regionSize =
+                            imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
+                                ? imageLocation.size - 0x1000
+                                : imageLocation.size;
+
+                        if (regionSize === 0) return;
+
+                        const regionName =
+                            (<
+                                Partial<{
+                                    [key in FWInfo.ImageType]: RegionName;
+                                }>
+                            >{
+                                NRFDL_IMAGE_TYPE_BOOTLOADER:
+                                    RegionName.BOOTLOADER,
+                                NRFDL_IMAGE_TYPE_SOFTDEVICE:
+                                    RegionName.SOFTDEVICE,
+                                NRFDL_IMAGE_TYPE_APPLICATION:
+                                    RegionName.APPLICATION,
+                            })[imageType] || RegionName.NONE;
+
+                        const color =
+                            (<
+                                Partial<{
+                                    [key in FWInfo.ImageType]: RegionColor;
+                                }>
+                            >{
+                                NRFDL_IMAGE_TYPE_BOOTLOADER:
+                                    RegionColor.BOOTLOADER,
+                                NRFDL_IMAGE_TYPE_SOFTDEVICE:
+                                    RegionColor.SOFTDEVICE,
+                                NRFDL_IMAGE_TYPE_APPLICATION:
+                                    RegionColor.APPLICATION,
+                            })[imageType] || RegionColor.NONE;
+
+                        regions = [
+                            ...regions,
+                            {
+                                ...defaultRegion,
+                                name: regionName,
+                                version,
+                                startAddress,
+                                regionSize,
+                                color,
+                            },
+                        ];
+                    });
+
+                    dispatch(targetRegionsKnown(regions));
+                    dispatch(updateFileRegions());
+                    dispatch(canWrite());
+                    dispatch(loadingEnd());
+                },
+                error => {
+                    logger.error(
+                        `Error when fetching device versions: ${describeError(
+                            error
+                        )}`
+                    );
                 }
+            )
+        );
+    };
 
-                // Add UICR to regions
-                if (coreInfo.uicrBaseAddr) {
-                    regions = [
-                        ...regions,
-                        {
-                            ...defaultRegion,
-                            name: RegionName.UICR,
-                            version: 0,
-                            startAddress: coreInfo.uicrBaseAddr,
-                            regionSize: coreInfo.uicrSize,
-                            permission: RegionPermission.NONE,
-                        },
-                    ];
-                }
-
-                // Add MBR to regions
-                if (coreInfo.uicrBaseAddr) {
-                    regions = [
-                        ...regions,
-                        {
-                            ...defaultRegion,
-                            name: RegionName.MBR,
-                            version: 0,
-                            startAddress: coreInfo.mbrBaseAddr,
-                            regionSize: coreInfo.mbrSize,
-                            color: RegionColor.MBR,
-                            permission: RegionPermission.NONE,
-                        },
-                    ];
-                }
-
-                // Add bootloader, softDevice, applications to regions
-                const { imageInfoList } = fwInfo;
-                imageInfoList.forEach((image: FWInfo.Image) => {
-                    const { imageType, imageLocation, version } = image;
-
-                    if (!imageLocation) return;
-
-                    const startAddress = imageLocation.address;
-                    const regionSize =
-                        imageType === 'NRFDL_IMAGE_TYPE_SOFTDEVICE'
-                            ? imageLocation.size - 0x1000
-                            : imageLocation.size;
-
-                    if (regionSize === 0) return;
-
-                    const regionName =
-                        (<Partial<{ [key in FWInfo.ImageType]: RegionName }>>{
-                            NRFDL_IMAGE_TYPE_BOOTLOADER: RegionName.BOOTLOADER,
-                            NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionName.SOFTDEVICE,
-                            NRFDL_IMAGE_TYPE_APPLICATION:
-                                RegionName.APPLICATION,
-                        })[imageType] || RegionName.NONE;
-
-                    const color =
-                        (<Partial<{ [key in FWInfo.ImageType]: RegionColor }>>{
-                            NRFDL_IMAGE_TYPE_BOOTLOADER: RegionColor.BOOTLOADER,
-                            NRFDL_IMAGE_TYPE_SOFTDEVICE: RegionColor.SOFTDEVICE,
-                            NRFDL_IMAGE_TYPE_APPLICATION:
-                                RegionColor.APPLICATION,
-                        })[imageType] || RegionColor.NONE;
-
-                    regions = [
-                        ...regions,
-                        {
-                            ...defaultRegion,
-                            name: regionName,
-                            version,
-                            startAddress,
-                            regionSize,
-                            color,
-                        },
-                    ];
-                });
-
-                dispatch(targetRegionsKnown(regions));
-                dispatch(updateFileRegions());
-                dispatch(canWrite());
-                dispatch(loadingEnd());
-            },
-            error => {
-                logger.error(
-                    `Error when fetching device versions: ${describeError(
-                        error
-                    )}`
-                );
-            }
-        )
-    );
-};
-
-/**
- * Reset device to Application mode
- * @returns {Promise<void>} resolved promise
- */
-export const resetDevice = () => (_: TDispatch, getState: () => RootState) => {
+export const resetDevice = (): AppThunk<RootState> => (_, getState) => {
     const { device: inputDevice } = getState().app.target;
     const device = inputDevice as Device;
 
@@ -270,40 +269,26 @@ const createDfuImage = (regionName: string, fwType: number) => {
     return dfuImage;
 };
 
-/**
- * Create DFU image list by given detected region names
- *
- * @returns {Promise<void>} resolved promise
- */
-const createDfuImages =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        let dfuImages: DfuImage[] = [];
-        getState().app.file.detectedRegionNames.forEach(regionName => {
-            switch (regionName) {
-                case RegionName.BOOTLOADER:
-                    dfuImages = [
-                        ...dfuImages,
-                        createDfuImage(regionName, FwType.BOOTLOADER),
-                    ];
-                    break;
-                case RegionName.SOFTDEVICE:
-                    dfuImages = [
-                        ...dfuImages,
-                        createDfuImage(regionName, FwType.SOFTDEVICE),
-                    ];
-                    break;
-                case RegionName.APPLICATION:
-                    dfuImages = [
-                        ...dfuImages,
-                        createDfuImage(regionName, FwType.APPLICATION),
-                    ];
-                    break;
-                default:
-                    break;
-            }
-        });
-        dispatch(dfuImagesUpdate(dfuImages));
-    };
+const createDfuImages = (file: FileState) => {
+    const dfuImages: DfuImage[] = [];
+    file.detectedRegionNames.forEach(regionName => {
+        switch (regionName) {
+            case RegionName.BOOTLOADER:
+                dfuImages.push(createDfuImage(regionName, FwType.BOOTLOADER));
+                break;
+            case RegionName.SOFTDEVICE:
+                dfuImages.push(createDfuImage(regionName, FwType.SOFTDEVICE));
+                break;
+            case RegionName.APPLICATION:
+                dfuImages.push(createDfuImage(regionName, FwType.APPLICATION));
+                break;
+            default:
+                break;
+        }
+    });
+
+    return dfuImages;
+};
 
 /**
  * Check if the files can be written to the target device
@@ -604,78 +589,67 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
     });
 };
 
-/**
- * Write files to target device
- *
- * @returns {Promise<void>} resolved promise
- */
-export const write =
-    () => async (dispatch: TDispatch, getState: () => RootState) => {
-        const device = selectedDevice(getState());
+export const write = (): AppThunk<RootState> => async (dispatch, getState) => {
+    const device = selectedDevice(getState());
 
-        if (!device) {
-            logger.error(
-                `Failed to write: ${describeError('Device not found')}`
-            );
+    if (!device) {
+        logger.error(`Failed to write: ${describeError('Device not found')}`);
 
-            return;
-        }
+        return;
+    }
 
-        dispatch(updateFileBlRegion());
-        dispatch(updateFileAppRegions());
-        dispatch(createDfuImages());
+    dispatch(updateFileBlRegion());
+    dispatch(updateFileAppRegions());
+    const dfuImages = createDfuImages(getState().app.file);
 
-        const fileRegions = getState().app.file.regions;
-        const fileMemMaps = getState().app.file.memMaps;
-        const fileOverlaps = MemoryMap.overlapMemoryMaps(fileMemMaps);
-        const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
-        const { deviceInfo } = getState().app.target;
-        const hwVersion = parseInt(deviceInfo?.family?.slice(3) ?? '0', 10);
-        const { dfuImages } = getState().app.target;
+    const fileRegions = getState().app.file.regions;
+    const fileMemMaps = getState().app.file.memMaps;
+    const fileOverlaps = MemoryMap.overlapMemoryMaps(fileMemMaps);
+    const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
+    const { deviceInfo } = getState().app.target;
+    const hwVersion = parseInt(deviceInfo?.family?.slice(3) ?? '0', 10);
 
-        let images = dfuImages
-            ?.map(image => handleImage(image, fileRegions, fileMemMap))
-            .map(image => handleHwVersion(image, hwVersion))
-            .map(image =>
-                handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
-            )
-            .map(image => handleHash(image, HashType.SHA256));
-        images = await Promise.all(
-            images?.map(async image =>
-                dispatch(await handleUserInput(image))
-            ) as Promise<DfuImage>[]
+    let images = dfuImages
+        ?.map(image => handleImage(image, fileRegions, fileMemMap))
+        .map(image => handleHwVersion(image, hwVersion))
+        .map(image =>
+            handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
+        )
+        .map(image => handleHash(image, HashType.SHA256));
+
+    images = await Promise.all(
+        images.map(image => dispatch(handleUserInput(image)))
+    );
+
+    // Start writing after handling images since user may cancel userInput
+    logger.info('Performing DFU. This may take a few seconds');
+    dispatch(writingStart());
+
+    try {
+        // We might have more that one reboot of the device during the next operation
+        dispatch(
+            setWaitForDevice({
+                timeout: 10000,
+                when: 'always',
+                once: false,
+            })
         );
-        dispatch(dfuImagesUpdate(images));
+        await operateDFU(device, images);
+        dispatch(writingEnd());
 
-        // Start writing after handling images since user may cancel userInput
-        logger.info('Performing DFU. This may take a few seconds');
-        dispatch(writingStart());
-
-        try {
-            // We might have more that one reboot of the device during the next operation
-            dispatch(
-                setWaitForDevice({
-                    timeout: 10000,
-                    when: 'always',
-                    once: false,
-                })
-            );
-            await operateDFU(device.id, images);
-            dispatch(writingEnd());
-
-            // Operation done reconnect one more time only
-            dispatch(
-                setWaitForDevice({
-                    timeout: 10000,
-                    when: 'always',
-                    once: true,
-                    onSuccess: programmedDevice =>
-                        dispatch(refreshMemoryLayout(programmedDevice)),
-                })
-            );
-        } catch (error) {
-            logger.error(`Failed to write: ${describeError(error)}`);
-            dispatch(writingEnd());
-            dispatch(refreshMemoryLayout(device));
-        }
-    };
+        // Operation done reconnect one more time only
+        dispatch(
+            setWaitForDevice({
+                timeout: 10000,
+                when: 'always',
+                once: true,
+                onSuccess: programmedDevice =>
+                    dispatch(refreshMemoryLayout(programmedDevice)),
+            })
+        );
+    } catch (error) {
+        logger.error(`Failed to write: ${describeError(error)}`);
+        dispatch(writingEnd());
+        dispatch(refreshMemoryLayout(device));
+    }
+};

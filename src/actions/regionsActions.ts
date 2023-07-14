@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { logger } from 'pc-nrfconnect-shared';
+import { AppThunk, logger } from 'pc-nrfconnect-shared';
 
 import {
     fileRegionNamesKnown,
     fileRegionsKnown,
 } from '../reducers/fileReducer';
-import { RootState, TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
 import { CoreDefinition, coreFriendlyName } from '../util/devices';
 import {
@@ -22,8 +22,8 @@ import {
 } from '../util/regions';
 
 const updateDetectedRegionNames =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const fileRegions = getState().app.file.regions;
+    (fileRegions: Region[]): AppThunk =>
+    dispatch => {
         const regionChecklist = [
             RegionName.APPLICATION,
             RegionName.SOFTDEVICE,
@@ -46,7 +46,7 @@ const updateDetectedRegionNames =
 // then the user should give input instead.
 // (Or fix getting softdevice id from bootloader)
 export const updateFileAppRegions =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState> => (dispatch, getState) => {
         let fileRegions = getState().app.file.regions;
         const targetRegions = getState().app.target.regions;
         const targetBootloaderRegion = targetRegions?.find(
@@ -106,7 +106,7 @@ export const updateFileAppRegions =
 // Update Bootloader region in parsed files
 // Regard the Bootloader as a whole when there are gaps found in the Bootloader
 export const updateFileBlRegion =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState> => (dispatch, getState) => {
         const fileRegions = getState().app.file.regions;
         const { cores } = { ...getState().app.target.deviceInfo };
         const blRegions = fileRegions.filter(
@@ -149,7 +149,7 @@ export const updateFileBlRegion =
     };
 
 export const updateFileRegions =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState> => (dispatch, getState) => {
         dispatch(fileWarningRemove());
 
         const { file, target } = getState().app;
@@ -191,5 +191,5 @@ export const updateFileRegions =
         }
 
         dispatch(fileRegionsKnown(regions));
-        dispatch(updateDetectedRegionNames());
+        dispatch(updateDetectedRegionNames(regions));
     };

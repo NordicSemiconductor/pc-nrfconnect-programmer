@@ -6,6 +6,7 @@
 
 import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
+    AppThunk,
     describeError,
     getDeviceLibContext,
     logger,
@@ -19,10 +20,11 @@ import {
     modemWritingStart,
     modemWritingSucceed,
 } from '../reducers/modemReducer';
-import { RootState, TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 
 export const programDfuModem =
-    (fileName: string) => (dispatch: TDispatch, getState: () => RootState) =>
+    (fileName: string): AppThunk<RootState> =>
+    (dispatch, getState) =>
         new Promise<void>(resolve => {
             const { device: inputDevice } = getState().app.target;
             const { id: deviceId } = inputDevice as Device;
@@ -78,7 +80,7 @@ export const programDfuModem =
         });
 
 export const performUpdate =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState> => (dispatch, getState) => {
         dispatch(modemWritingStart());
         dispatch(modemProcessUpdate({ message: MODEM_DFU_STARTING }));
 

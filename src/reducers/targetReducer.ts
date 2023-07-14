@@ -29,7 +29,6 @@ export interface TargetState {
     readonly regions?: Region[]; // TODO: Define region
     readonly warnings?: string[];
     readonly writtenAddress?: number;
-    readonly dfuImages?: DfuImage[]; // TODO: Define image
     readonly isMemLoaded: boolean;
     readonly isWritable: boolean;
     readonly isRecoverable: boolean;
@@ -49,7 +48,6 @@ const initialState: TargetState = {
     regions: [],
     warnings: [],
     writtenAddress: 0,
-    dfuImages: [],
     isMemLoaded: false,
     isWritable: false,
     isRecoverable: false,
@@ -109,9 +107,6 @@ const targetSlice = createSlice({
         targetWritableKnown(state, action: PayloadAction<boolean>) {
             state.isWritable = action.payload;
         },
-        dfuImagesUpdate(state, action: PayloadAction<any[]>) {
-            state.dfuImages = action.payload;
-        },
         writeProgress(state, action: PayloadAction<number>) {
             state.writtenAddress = action.payload;
             state.isWriting = true;
@@ -168,7 +163,6 @@ const {
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,
-    dfuImagesUpdate,
     writeProgress,
     writingStart,
     writingEnd,
@@ -217,7 +211,6 @@ export {
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,
-    dfuImagesUpdate,
     writeProgress,
     writingStart,
     writingEnd,
