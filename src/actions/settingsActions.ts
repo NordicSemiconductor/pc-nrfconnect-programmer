@@ -4,33 +4,33 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
+import { AppThunk } from 'pc-nrfconnect-shared';
+
 import {
     settingsLoad,
     toggleAutoRead as toggleAutoReadAction,
     toggleAutoReset as toggleAutoResetAction,
 } from '../reducers/settingsReducer';
-import { RootState, TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 import { getSettings, setSettings } from '../store';
 
-export function loadSettings() {
-    return (dispatch: TDispatch) => {
-        const settings = getSettings();
+export const loadSettings = (): AppThunk => dispatch => {
+    const settings = getSettings();
 
-        if (!settings.autoRead) {
-            settings.autoRead = false;
-        }
+    if (!settings.autoRead) {
+        settings.autoRead = false;
+    }
 
-        if (settings.autoReset == null) {
-            settings.autoReset = true;
-        }
+    if (settings.autoReset == null) {
+        settings.autoReset = true;
+    }
 
-        setSettings(settings);
-        dispatch(settingsLoad(settings));
-    };
-}
+    setSettings(settings);
+    dispatch(settingsLoad(settings));
+};
 
-export function toggleAutoRead() {
-    return (dispatch: TDispatch, getState: () => RootState) => {
+export const toggleAutoRead =
+    (): AppThunk<RootState> => (dispatch, getState) => {
         dispatch(toggleAutoReadAction());
         const settings = getSettings();
 
@@ -41,10 +41,9 @@ export function toggleAutoRead() {
             autoRead: getState().app.settings.autoRead,
         });
     };
-}
 
-export function toggleAutoReset() {
-    return (dispatch: TDispatch, getState: () => RootState) => {
+export const toggleAutoReset =
+    (): AppThunk<RootState> => (dispatch, getState) => {
         dispatch(toggleAutoResetAction());
         const settings = getSettings();
 
@@ -55,4 +54,3 @@ export function toggleAutoReset() {
             autoReset: getState().app.settings.autoReset,
         });
     };
-}
