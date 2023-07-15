@@ -15,7 +15,6 @@ import {
     Alert,
     classNames,
     clearWaitForDevice,
-    describeError,
     DialogButton,
     GenericDialog,
     getPersistentStore,
@@ -47,7 +46,7 @@ const McuUpdateDialogView = () => {
         useState<WithRequired<Progress, 'message'>>();
     const [writing, setWriting] = useState(false);
     const [writingFail, setWritingFail] = useState(false);
-    const [writingSucceed, setWritingSuccess] = useState(false);
+    const [writingSucceed, setWritingSucceed] = useState(false);
     const [writingFailError, setWritingFailError] = useState<string>();
     const [timeoutStarted, setTimeoutStarted] = useState(false);
     const [timeoutValue, setTimeoutValue] = useState(0);
@@ -89,6 +88,18 @@ const McuUpdateDialogView = () => {
     }, [device]);
 
     useEffect(() => {
+        if (!isVisible) {
+            setProgress(undefined);
+            setWriting(false);
+            setWritingSucceed(false);
+            setWritingFail(false);
+            setWritingFailError(undefined);
+            setTimeoutStarted(false);
+            setTimeoutValue(0);
+        }
+    }, [isVisible]);
+
+    useEffect(() => {
         if (!showDelayTimeout || !device) return;
 
         const timeout =
@@ -111,6 +122,7 @@ const McuUpdateDialogView = () => {
     }, [netCoreUploadDelayOffset, timeoutStarted, time]);
 
     const onCancel = () => {
+        dispatch(clearWaitForDevice());
         dispatch(setShowMcuBootProgrammingDialog(false));
     };
 
@@ -125,6 +137,7 @@ const McuUpdateDialogView = () => {
             return;
         }
 
+        setWriting(true);
         reset();
         start();
 
@@ -135,47 +148,46 @@ const McuUpdateDialogView = () => {
                 once: false,
             })
         );
-        dispatch(
-            performUpdate(
-                device,
-                fwPath,
-                programmingProgress => {
-                    let updatedProgress: WithRequired<Progress, 'message'> = {
-                        ...programmingProgress,
-                        message: 'Starting...',
-                    };
 
-                    if (programmingProgress.operation === 'erase_image') {
-                        updatedProgress = {
-                            ...programmingProgress,
-                            message: `${programmingProgress.message} This will take some time.`,
-                        };
+        performUpdate(
+            device,
+            fwPath,
+            programmingProgress => {
+                let updatedProgress: WithRequired<Progress, 'message'> = {
+                    ...programmingProgress,
+                    message: programmingProgress.message ?? '',
+                };
+
+                if (programmingProgress.operation === 'erase_image') {
+                    updatedProgress = {
+                        ...programmingProgress,
+                        message: `${programmingProgress.message} This will take some time.`,
+                    };
+                }
+                if (
+                    programmingProgress.message?.match(
+                        /Waiting [0-9]+ seconds to let RAM NET Core flash succeed./
+                    )
+                ) {
+                    const timeouts = programmingProgress.message.match(/\d+/g);
+                    if (timeouts?.length === 1) {
+                        setTimeoutStarted(true);
+                        setTimeoutValue(parseInt(timeouts[0], 10));
                     }
-                    if (
-                        programmingProgress.message?.match(
-                            /Waiting [0-9]+ seconds to let RAM NET Core flash succeed./
-                        )
-                    ) {
-                        const timeouts =
-                            programmingProgress.message.match(/\d+/g);
-                        if (timeouts?.length === 1) {
-                            setTimeoutStarted(true);
-                            setTimeoutValue(parseInt(timeouts[0], 10));
-                        }
-                    }
-                    setProgress(updatedProgress);
-                },
-                showDelayTimeout ? uploadDelay : undefined
-            )
+                }
+                setProgress(updatedProgress);
+            },
+            showDelayTimeout ? uploadDelay : undefined
         )
-            .then(() => setWritingSuccess(true))
+            .then(() => {
+                setWritingSucceed(true);
+            })
             .catch(error => {
-                setWritingFailError(describeError(error));
+                setWritingFailError(error.message);
                 setWritingFail(true);
             })
             .finally(() => {
                 dispatch(canWrite());
-                dispatch(clearWaitForDevice());
                 setWriting(false);
             });
     };
@@ -243,11 +255,13 @@ const McuUpdateDialogView = () => {
                     <span>{` ${mcubootFwPath || zipFilePath}`}</span>
                 </Form.Label>
             </Form.Group>
-            {progress && (
+            {writing && (
                 <Form.Group>
                     <Form.Label>
-                        <strong>Status:</strong>
-                        <span>{` ${progress.message}`}</span>
+                        <strong>Status: </strong>
+                        <span>{` ${
+                            progress ? progress.message : 'Starting...'
+                        }`}</span>
                     </Form.Label>
                     <ProgressBar
                         hidden={!writing}
@@ -344,9 +358,8 @@ const McuUpdateDialogView = () => {
                     </Alert>
                 )}
                 {writingFail && (
-                    <Alert label="Error" variant="danger">
-                        <br />
-                        {writingFailError ||
+                    <Alert variant="danger">
+                        {writingFailError?.trim() ||
                             'Failed. Check the log below for more details...'}
                     </Alert>
                 )}

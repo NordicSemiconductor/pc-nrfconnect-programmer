@@ -10,7 +10,6 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Alert,
-    describeError,
     DialogButton,
     GenericDialog,
     logger,
@@ -44,6 +43,16 @@ const ModemUpdateDialogView = () => {
     const expectedFwName =
         !modemFwName || /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
 
+    useEffect(() => {
+        if (!isVisible) {
+            setProgress(undefined);
+            setWriting(false);
+            setWritingSucceed(false);
+            setWritingFail(false);
+            setWritingFailError(undefined);
+        }
+    }, [isVisible]);
+
     const dispatch = useDispatch();
     const onCancel = useCallback(() => {
         if (!writing) {
@@ -75,7 +84,7 @@ const ModemUpdateDialogView = () => {
         performUpdate(device, modemFwName, programmingProgress => {
             let updatedProgress: WithRequired<Progress, 'message'> = {
                 ...programmingProgress,
-                message: 'Starting...',
+                message: programmingProgress.message ?? '',
             };
 
             if (programmingProgress.operation === 'erase_image') {
@@ -97,7 +106,7 @@ const ModemUpdateDialogView = () => {
         })
             .then(() => setWritingSucceed(true))
             .catch(error => {
-                setWritingFailError(describeError(error));
+                setWritingFailError(error.message);
                 setWritingFail(true);
             })
             .finally(() => setWriting(false));
@@ -176,7 +185,7 @@ const ModemUpdateDialogView = () => {
                 {writing && (
                     <Form.Group>
                         <Form.Label>
-                            <strong>Status:</strong>
+                            <strong>Status: </strong>
                             <span>{`${
                                 progress ? progress.message : 'Starting...'
                             }`}</span>
@@ -218,9 +227,8 @@ const ModemUpdateDialogView = () => {
                         </Alert>
                     )}
                     {writingFail && !writing && (
-                        <Alert label="Error" variant="danger">
-                            <br />
-                            {writingFailError ||
+                        <Alert variant="danger">
+                            {writingFailError?.trim() ||
                                 'Failed. Check the log below for more details...'}
                         </Alert>
                     )}
