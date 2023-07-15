@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { AppThunk, Device, logger, usageData } from 'pc-nrfconnect-shared';
+import {
+    AppThunk,
+    Device,
+    logger,
+    selectedDevice,
+    usageData,
+} from 'pc-nrfconnect-shared';
 
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
@@ -72,8 +78,8 @@ export const openDevice =
     };
 
 export const updateTargetWritable =
-    (device?: Device): AppThunk<RootState> =>
-    (dispatch, getState) => {
+    (): AppThunk<RootState> => (dispatch, getState) => {
+        const device = selectedDevice(getState());
         const {
             file: { zipFilePath },
         } = getState().app;
@@ -82,7 +88,10 @@ export const updateTargetWritable =
             dispatch(jlinkTargetActions.canWrite());
         } else if (device?.traits.nordicDfu) {
             dispatch(usbsdfuTargetActions.canWrite());
-        } else if (getState().app.settings.forceMcuBoot) {
+        } else if (
+            device?.traits.mcuBoot ||
+            getState().app.settings.forceMcuBoot
+        ) {
             dispatch(mcubootTargetActions.canWrite());
         } else if (
             zipFilePath &&
