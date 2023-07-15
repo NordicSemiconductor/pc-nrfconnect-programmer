@@ -246,8 +246,6 @@ export const read =
             return;
         }
 
-        dispatch(loadingStart());
-        // Read from the device
         if (
             deviceInfo.cores.find(
                 c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
@@ -259,20 +257,24 @@ export const read =
             return;
         }
 
+        dispatch(loadingStart());
+        // Read from the device
+
         try {
             const promises = deviceInfo.cores.map(core =>
                 getDeviceMemMap(device, core)
             );
 
             const memMap: MemoryMap[] = [];
-            await promises?.reduce((accumulatorPromise, promise) =>
-                accumulatorPromise
+            const p = promises.reduce((previousPromise, nextPromise) =>
+                previousPromise
                     .then(map => {
                         memMap.push(map);
-                        return promise;
+                        return nextPromise;
                     })
                     .catch(Promise.reject)
             );
+            memMap.push(await p);
 
             const mergedMemMap = MemoryMap.flattenOverlaps(
                 MemoryMap.overlapMemoryMaps(
@@ -287,16 +289,18 @@ export const read =
                 })
             );
             dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
+
+            dispatch(canWrite());
+            dispatch(loadingEnd());
+
+            if (autoReset) resetDevice(device);
         } catch (error) {
+            console.log(error);
             dispatch(targetContentsUnknown());
+            dispatch(canWrite());
+            dispatch(loadingEnd());
             logger.error('Error when reading device');
-            return;
         }
-
-        dispatch(canWrite());
-        dispatch(loadingEnd());
-
-        if (autoReset) resetDevice(device);
     };
 
 const recoverOneCore = async (device: Device, coreInfo: CoreDefinition) => {
@@ -363,15 +367,17 @@ const writeHex = (
                         logger.info(status);
                     }
                 )
-                .then(resolve)
+                .then(() => {
+                    logger.info(
+                        `Writing HEX to ${coreInfo.name} core completed`
+                    );
+                    resolve();
+                })
                 .catch(error => {
                     usageData.sendErrorReport(
                         `Device programming failed with error: ${describeError(
                             error
                         )}`
-                    );
-                    logger.info(
-                        `Writing HEX to ${coreInfo.name} core completed`
                     );
                     reject(error); // This is new behavior
                 })
