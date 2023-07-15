@@ -13,7 +13,6 @@ import {
     describeError,
     ErrorDialogActions,
     logger,
-    selectedDevice,
 } from 'pc-nrfconnect-shared';
 
 import {
@@ -105,7 +104,6 @@ const updateCoreInfo = (): AppThunk<RootState> => (dispatch, getState) => {
 export const removeFile =
     (filePath: string): AppThunk<RootState> =>
     (dispatch, getState) => {
-        const device = selectedDevice(getState());
         const { loaded, memMaps } = getState().app.file;
         const newLoaded = { ...loaded };
         const newMemMaps = memMaps.filter(element => element[0] !== filePath);
@@ -114,7 +112,7 @@ export const removeFile =
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
         dispatch(updateFileRegions());
-        dispatch(updateTargetWritable(device));
+        dispatch(updateTargetWritable());
     };
 
 export const closeFiles = (): AppThunk<RootState> => (dispatch, getState) => {
