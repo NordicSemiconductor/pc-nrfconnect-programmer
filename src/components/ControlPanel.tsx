@@ -173,7 +173,6 @@ const ControlPanel = () => {
 
     const device = useSelector(selectedDevice);
     const fileRegionSize = useSelector(getFileRegions)?.length;
-    const isDeviceSelected = useSelector(selectedDevice) !== undefined;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
     const autoReset = useSelector(getAutoReset);
@@ -329,7 +328,6 @@ const ControlPanel = () => {
                         );
                     }}
                     disabled={
-                        !isDeviceSelected ||
                         !targetIsReady ||
                         !targetIsWritable ||
                         (isJLink && !zipFile)
@@ -356,11 +354,7 @@ const ControlPanel = () => {
                         dispatch(jlinkTargetActions.read(device, autoReset));
                     }}
                     disabled={
-                        !isDeviceSelected ||
-                        isMcuBoot ||
-                        !isJLink ||
-                        !targetIsReady ||
-                        isProtected
+                        isMcuBoot || !isJLink || !targetIsReady || isProtected
                     }
                 >
                     <span className="mdi mdi-refresh" />
@@ -383,7 +377,7 @@ const ControlPanel = () => {
                     handleColor={colors.gray300}
                 >
                     <>
-                        Auto Reset
+                        Auto reset
                         {isJLink && isModem && autoReset && (
                             <span
                                 title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
