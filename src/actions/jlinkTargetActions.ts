@@ -436,13 +436,15 @@ export const write =
             return writeOneCore(device, core, memMaps);
         });
 
-        await promises?.reduce(
-            (accumulatorPromise, promise) =>
-                accumulatorPromise.then(() => promise).catch(Promise.reject),
-            Promise.resolve()
-        );
-
-        dispatch(writingEnd());
+        await promises
+            ?.reduce(
+                (accumulatorPromise, promise) =>
+                    accumulatorPromise
+                        .then(() => promise)
+                        .catch(Promise.reject),
+                Promise.resolve()
+            )
+            .finally(() => dispatch(writingEnd()));
 
         if (autoReset) await resetDevice(device);
         await dispatch(openDevice(device, autoRead, autoReset));
