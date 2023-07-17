@@ -365,7 +365,8 @@ const writeHex = (
                             progress.progressPercentage
                         }%`;
                         logger.info(status);
-                    }
+                    },
+                    coreInfo.name
                 )
                 .then(() => {
                     logger.info(
