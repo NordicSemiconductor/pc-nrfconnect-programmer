@@ -12,9 +12,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Button,
     colors,
-    getDeviceLib,
     Group,
     logger,
+    reset,
     selectedDevice,
     SidePanel,
     Toggle,
@@ -299,9 +299,7 @@ const ControlPanel = () => {
                         }
 
                         if (isUsbSerial) {
-                            getDeviceLib().then(deviceLib =>
-                                deviceLib.reset(device)
-                            );
+                            reset(device);
                             dispatch(usbsdfuTargetActions.resetDevice(device));
                         } else {
                             dispatch(jlinkTargetActions.resetDevice(device));

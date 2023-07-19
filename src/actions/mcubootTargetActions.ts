@@ -8,8 +8,8 @@ import {
     AppThunk,
     describeError,
     Device,
-    getDeviceLib,
     logger,
+    program,
     Progress,
     selectedDevice,
     usageData,
@@ -96,25 +96,22 @@ export const performUpdate = (
     new Promise<void>((resolve, reject) => {
         logger.info(`Writing ${dfuFilePath} to device ${device.serialNumber}`);
 
-        getDeviceLib().then(deviceLib => {
-            deviceLib
-                .program(device, dfuFilePath, onProgress, undefined, {
-                    netCoreUploadDelay,
-                })
-                .then(() => {
-                    logger.info('MCUboot DFU completed successfully!');
-                    resolve();
-                })
-                .catch(error => {
-                    let errorMsg = describeError(error);
-                    logger.error(`MCUboot DFU failed with error: ${errorMsg}`);
-                    // To be fixed in nrfdl
-                    if (error.error_code === 0x25b) {
-                        errorMsg =
-                            'Please make sure that the device is in MCUboot mode and try again.';
-                    }
-                    logger.error(errorMsg);
-                    reject(new Error(errorMsg));
-                });
-        });
+        program(device, dfuFilePath, onProgress, undefined, {
+            netCoreUploadDelay,
+        })
+            .then(() => {
+                logger.info('MCUboot DFU completed successfully!');
+                resolve();
+            })
+            .catch(error => {
+                let errorMsg = describeError(error);
+                logger.error(`MCUboot DFU failed with error: ${errorMsg}`);
+                // To be fixed in nrfdl
+                if (error.error_code === 0x25b) {
+                    errorMsg =
+                        'Please make sure that the device is in MCUboot mode and try again.';
+                }
+                logger.error(errorMsg);
+                reject(new Error(errorMsg));
+            });
     });

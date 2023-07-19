@@ -14,9 +14,11 @@ import {
     DfuImage,
     FWInfoImageType,
     FwType,
-    getDeviceLib,
+    getFwInfo,
     HashType,
     logger,
+    programBuffer,
+    reset,
     sdfuOperations,
     selectedDevice,
     setWaitForDevice,
@@ -88,10 +90,7 @@ const refreshMemoryLayout =
             switchToBootloaderMode(
                 device,
                 async deviceInBootLoader => {
-                    await (await getDeviceLib()).fwInfo(deviceInBootLoader);
-                    const fwInfo = await (
-                        await getDeviceLib()
-                    ).fwInfo(deviceInBootLoader);
+                    const fwInfo = await getFwInfo(deviceInBootLoader);
                     const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
                     dispatch(targetInfoKnown(deviceInfo));
 
@@ -219,11 +218,10 @@ const refreshMemoryLayout =
     };
 
 export const resetDevice = (device: Device) =>
-    getDeviceLib().then(deviceLib =>
-        deviceLib.reset(device).then(() => {
-            logger.info(`Resetting device completed`);
-        })
-    );
+    reset(device).then(() => {
+        logger.info(`Resetting device completed`);
+    });
+
 /**
  * Create DFU image by given region name and firmware type
  * @param {string} regionName the name of region
@@ -512,41 +510,38 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
     let prevPercentage: number;
 
     return new Promise<void>((resolve, reject) => {
-        getDeviceLib().then(deviceLib => {
-            deviceLib
-                .programBuffer(device, zipBuffer, 'zip', progress => {
-                    // Don't repeat percentage steps that have already been logged.
-                    if (prevPercentage === progress.progressPercentage) {
-                        return;
-                    }
+        programBuffer(device, zipBuffer, 'zip', progress => {
+            // Don't repeat percentage steps that have already been logged.
+            if (prevPercentage === progress.progressPercentage) {
+                return;
+            }
 
-                    const message = progress.message || '';
+            const message = progress.message || '';
 
-                    const status = `${message.replace('.', ':')} ${
-                        progress.progressPercentage
-                    }%`;
+            const status = `${message.replace('.', ':')} ${
+                progress.progressPercentage
+            }%`;
 
-                    logger.info(status);
-                    prevPercentage = progress.progressPercentage;
-                })
-                .then(() => {
-                    logger.info(
-                        'All dfu images have been written to the target device'
+            logger.info(status);
+            prevPercentage = progress.progressPercentage;
+        })
+            .then(() => {
+                logger.info(
+                    'All dfu images have been written to the target device'
+                );
+                resolve();
+            })
+            .catch(error => {
+                if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
+                    logger.error('Failed to write to the target device');
+                    logger.error(
+                        'The required SoftDevice version does not match'
                     );
-                    resolve();
-                })
-                .catch(error => {
-                    if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
-                        logger.error('Failed to write to the target device');
-                        logger.error(
-                            'The required SoftDevice version does not match'
-                        );
-                    } else {
-                        logger.error(describeError(error));
-                    }
-                    reject(error);
-                });
-        });
+                } else {
+                    logger.error(describeError(error));
+                }
+                reject(error);
+            });
     });
 };
 

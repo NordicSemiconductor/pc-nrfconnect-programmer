@@ -11,10 +11,13 @@ import {
     AppThunk,
     describeError,
     Device,
-    DeviceCore,
-    getDeviceLib,
+    firmwareRead,
+    getCoreInfo,
+    getProtectionStatus,
     logger,
-    ProtectionStatus,
+    programBuffer,
+    recover as nrfUtilRecover,
+    reset,
     selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
@@ -42,34 +45,6 @@ import {
 import { getTargetRegions } from '../util/regions';
 import { updateFileAppRegions, updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
-
-export const getProtectionStatus = (
-    device: Device,
-    deviceCoreName: DeviceCore
-): Promise<ProtectionStatus> =>
-    new Promise<ProtectionStatus>((resolve, reject) => {
-        logger.info(
-            `Reading readback protection status for ${deviceCoreName} core`
-        );
-
-        getDeviceLib().then(deviceLib => {
-            deviceLib
-                .getProtectionStatus(device, deviceCoreName)
-                .then(result => {
-                    logger.info(
-                        `Readback protection status: ${result.protectionStatus}`
-                    );
-                    resolve(result.protectionStatus);
-                })
-                .catch(error => {
-                    const errorMessage = `Failed to load readback protection status: ${describeError(
-                        error
-                    )}`;
-                    usageData.sendErrorReport(errorMessage);
-                    reject(new Error(errorMessage));
-                });
-        });
-    });
 
 export const openDevice =
     (
@@ -141,39 +116,32 @@ const logDeviceInfo = (device: Device) => {
     );
 };
 
-const getDeviceMemMap = async (device: Device, coreInfo: CoreDefinition) =>
-    (await new Promise((resolve, reject) => {
+const getDeviceMemMap = (device: Device, coreInfo: CoreDefinition) =>
+    new Promise<MemoryMap>((resolve, reject) => {
         logger.info(`Reading memory for ${coreInfo.name} core`);
-        getDeviceLib()
-            .then(deviceLib =>
-                deviceLib
-                    .firmwareRead(device, coreInfo.name)
-                    .then(hexBuffer => {
-                        const hexText = hexBuffer.toString('utf8');
-                        const memMap = MemoryMap.fromHex(hexText);
+        firmwareRead(device, coreInfo.name)
+            .then(hexBuffer => {
+                const hexText = hexBuffer.toString('utf8');
+                const memMap = MemoryMap.fromHex(hexText);
 
-                        const paddedArray = memMap.slicePad(
-                            0,
-                            coreInfo.romBaseAddr + coreInfo.romSize
-                        );
-                        const paddedMemMap =
-                            MemoryMap.fromPaddedUint8Array(paddedArray);
-                        logger.info(
-                            `Reading memory for ${coreInfo.name} core completed`
-                        );
-                        resolve(paddedMemMap);
-                    })
-                    .catch(error => {
-                        usageData.sendErrorReport(
-                            `Failed to get device memory map: ${describeError(
-                                error
-                            )}`
-                        );
-                        reject(error);
-                    })
-            )
-            .catch(reject);
-    })) as MemoryMap;
+                const paddedArray = memMap.slicePad(
+                    0,
+                    coreInfo.romBaseAddr + coreInfo.romSize
+                );
+                const paddedMemMap =
+                    MemoryMap.fromPaddedUint8Array(paddedArray);
+                logger.info(
+                    `Reading memory for ${coreInfo.name} core completed`
+                );
+                resolve(paddedMemMap);
+            })
+            .catch(error => {
+                usageData.sendErrorReport(
+                    `Failed to get device memory map: ${describeError(error)}`
+                );
+                reject(error);
+            });
+    });
 
 /*
  * Check if the files can be written to the target device
@@ -307,7 +275,7 @@ const recoverOneCore = async (device: Device, coreInfo: CoreDefinition) => {
     logger.info(`Recovering ${coreInfo.name} core`);
 
     try {
-        await (await getDeviceLib()).recover(device, coreInfo.name);
+        await nrfUtilRecover(device, coreInfo.name);
         logger.info(`Recovering ${coreInfo.name} core completed`);
         return;
     } catch (error) {
@@ -353,37 +321,32 @@ const writeHex = (
     new Promise<void>((resolve, reject) => {
         logger.info(`Writing HEX to ${coreInfo.name} core`);
 
-        getDeviceLib().then(deviceLib =>
-            deviceLib
-                .programBuffer(
-                    device,
-                    Buffer.from(hexFileString, 'utf8'),
-                    'hex',
-                    progress => {
-                        const message = progress.message || '';
+        programBuffer(
+            device,
+            Buffer.from(hexFileString, 'utf8'),
+            'hex',
+            progress => {
+                const message = progress.message || '';
 
-                        const status = `${message.replace('.', ':')} ${
-                            progress.progressPercentage
-                        }%`;
-                        logger.info(status);
-                    },
-                    coreInfo.name
-                )
-                .then(() => {
-                    logger.info(
-                        `Writing HEX to ${coreInfo.name} core completed`
-                    );
-                    resolve();
-                })
-                .catch(error => {
-                    usageData.sendErrorReport(
-                        `Device programming failed with error: ${describeError(
-                            error
-                        )}`
-                    );
-                    reject(error); // This is new behavior
-                })
-        );
+                const status = `${message.replace('.', ':')} ${
+                    progress.progressPercentage
+                }%`;
+                logger.info(status);
+            },
+            coreInfo.name
+        )
+            .then(() => {
+                logger.info(`Writing HEX to ${coreInfo.name} core completed`);
+                resolve();
+            })
+            .catch(error => {
+                usageData.sendErrorReport(
+                    `Device programming failed with error: ${describeError(
+                        error
+                    )}`
+                );
+                reject(error); // This is new behavior
+            });
     });
 
 const writeOneCore = async (
@@ -456,16 +419,14 @@ export const recoverAndWrite =
     ): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
         const continueToWrite = true;
-        await dispatch(recover(device, autoRead, continueToWrite));
+        await dispatch(recover(device, autoRead, autoReset, continueToWrite));
         await dispatch(write(device, autoRead, autoReset));
     };
 
 export const resetDevice = (device: Device) =>
-    getDeviceLib().then(deviceLib =>
-        deviceLib.reset(device).then(() => {
-            logger.info(`Resetting device completed`);
-        })
-    );
+    reset(device).then(() => {
+        logger.info(`Resetting device completed`);
+    });
 
 export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
     const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
@@ -506,30 +467,52 @@ const updateCoresWithNrfdl = async (
     device: Device,
     deviceInfo: DeviceDefinition
 ): Promise<DeviceDefinition> => {
-    const cores = await Promise.all(
-        deviceInfo.cores.map(async (core, index) => {
-            try {
-                const protectionStatus = await getProtectionStatus(
-                    device,
-                    core.name
-                );
-                if (protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
-                    return core;
-                }
-                const deviceCoreInfo = await (
-                    await getDeviceLib()
-                ).coreInfo(device, core.name);
+    const updateCore = async (core: CoreDefinition, index: number) => {
+        try {
+            logger.info(
+                `Reading readback protection status for ${core.name} core`
+            );
 
-                return updateCoreInfo(
-                    core,
-                    index,
-                    deviceCoreInfo,
-                    protectionStatus
-                );
-            } catch (e) {
+            const result = await getProtectionStatus(device, core.name);
+
+            logger.info(
+                `Readback protection status for ${core.name} core: ${result.protectionStatus}`
+            );
+
+            if (result.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
                 return core;
             }
-        })
+            const deviceCoreInfo = await getCoreInfo(device, core.name);
+
+            return updateCoreInfo(
+                core,
+                index,
+                deviceCoreInfo,
+                result.protectionStatus
+            );
+        } catch (error) {
+            const errorMessage = `Failed to load readback protection status: ${describeError(
+                error
+            )}`;
+            usageData.sendErrorReport(errorMessage);
+            return core;
+        }
+    };
+
+    const cores: CoreDefinition[] = [];
+
+    await deviceInfo.cores.reduce(
+        (previousPromise, core, index) =>
+            previousPromise
+                .then(() =>
+                    updateCore(core, index).then(coreDefinition => {
+                        cores.push(coreDefinition);
+                        return Promise.resolve();
+                    })
+                )
+                .catch(Promise.reject),
+        Promise.resolve()
     );
+
     return { ...deviceInfo, cores };
 };
