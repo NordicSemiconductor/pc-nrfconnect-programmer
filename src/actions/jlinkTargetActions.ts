@@ -261,20 +261,20 @@ export const read =
         // Read from the device
 
         try {
-            const promises = deviceInfo.cores.map(core =>
-                getDeviceMemMap(device, core)
-            );
-
             const memMap: MemoryMap[] = [];
-            const p = promises.reduce((previousPromise, nextPromise) =>
-                previousPromise
-                    .then(map => {
-                        memMap.push(map);
-                        return nextPromise;
-                    })
-                    .catch(Promise.reject)
+
+            await deviceInfo.cores.reduce(
+                (accumulatorPromise, core) =>
+                    accumulatorPromise
+                        .then(() =>
+                            getDeviceMemMap(device, core).then(map => {
+                                memMap.push(map);
+                                return Promise.resolve();
+                            })
+                        )
+                        .catch(Promise.reject),
+                Promise.resolve()
             );
-            memMap.push(await p);
 
             const mergedMemMap = MemoryMap.flattenOverlaps(
                 MemoryMap.overlapMemoryMaps(
@@ -326,14 +326,15 @@ export const recover =
     ): AppThunk<RootState> =>
     async (dispatch, getState) => {
         const deviceInfo = getState().app.target.deviceInfo;
-        const promises = deviceInfo?.cores.map(core => {
-            dispatch(erasingStart());
-            return recoverOneCore(device, core);
-        });
 
-        await promises?.reduce(
-            (accumulatorPromise, promise) =>
-                accumulatorPromise.then(() => promise).catch(Promise.reject),
+        await deviceInfo?.cores.reduce(
+            (accumulatorPromise, core) =>
+                accumulatorPromise
+                    .then(() => {
+                        dispatch(erasingStart());
+                        return recoverOneCore(device, core);
+                    })
+                    .catch(Promise.reject),
             Promise.resolve()
         );
 
@@ -431,16 +432,12 @@ export const write =
         const memMaps = getState().app.file.memMaps;
         const deviceInfo = getState().app.target.deviceInfo;
 
-        const promises = deviceInfo?.cores.map(core => {
-            dispatch(writingStart());
-            return writeOneCore(device, core, memMaps);
-        });
-
-        await promises
-            ?.reduce(
-                (accumulatorPromise, promise) =>
+        dispatch(writingStart());
+        await deviceInfo?.cores
+            .reduce(
+                (accumulatorPromise, core) =>
                     accumulatorPromise
-                        .then(() => promise)
+                        .then(() => writeOneCore(device, core, memMaps))
                         .catch(Promise.reject),
                 Promise.resolve()
             )
