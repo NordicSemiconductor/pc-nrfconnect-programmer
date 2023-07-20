@@ -15,7 +15,7 @@
     },
     "nrfutil": {
         "device": [
-            "1.2.0"
+            "1.2.1"
         ]
     },
     "main": "dist/bundle.js",
@@ -44,7 +44,7 @@
     },
     "devDependencies": {
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/nrfutil-device"
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/nrfutil-device-clean"
     },
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
