@@ -52,6 +52,9 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
         isTarget ? state.app.target.regions : state.app.file.regions
     );
     const zipFilePath = useSelector(getZipFilePath);
+    const isJLink = useSelector(getForceMcuBoot) || !!device?.traits.jlink;
+    const isNordicDfu =
+        useSelector(getForceMcuBoot) || !!device?.traits.nordicDfu;
     const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
@@ -84,32 +87,28 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                     {isTarget && isErasing && (
                         <div className="erase-indicator striped active" />
                     )}
-                    {isTarget &&
-                        refreshEnabled &&
-                        device?.traits.jlink &&
-                        !device?.traits.mcuBoot && (
-                            <div className="centering-container">
-                                {!isProtected && (
-                                    <div className="read-indicator">
-                                        <p>Device is connected</p>
-                                        <p>
-                                            Press <strong>READ</strong> button
-                                            to read the memory
-                                        </p>
-                                    </div>
-                                )}
-                                {isProtected && (
-                                    <div className="read-indicator">
-                                        <p>Device is protected</p>
-                                        <p>
-                                            Press <strong>Erase all</strong>{' '}
-                                            button to recover the protected
-                                            memory
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                    {isTarget && refreshEnabled && isJLink && !isMcuboot && (
+                        <div className="centering-container">
+                            {!isProtected && (
+                                <div className="read-indicator">
+                                    <p>Device is connected</p>
+                                    <p>
+                                        Press <strong>READ</strong> button to
+                                        read the memory
+                                    </p>
+                                </div>
+                            )}
+                            {isProtected && (
+                                <div className="read-indicator">
+                                    <p>Device is protected</p>
+                                    <p>
+                                        Press <strong>Erase all</strong> button
+                                        to recover the protected memory
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     {isTarget && isMcuboot && (
                         <div className="centering-container">
                             <div className="read-indicator">
@@ -117,6 +116,13 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                                 <p>
                                     Memory layout is not available via MCUboot
                                 </p>
+                            </div>
+                        </div>
+                    )}
+                    {isTarget && !isMcuboot && !isJLink && !isNordicDfu && (
+                        <div className="centering-container">
+                            <div className="read-indicatorv  tw-break-words tw-text-center">
+                                <p>Device is connected</p>
                             </div>
                         </div>
                     )}
