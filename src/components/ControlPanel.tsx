@@ -387,7 +387,12 @@ const ControlPanel = () => {
             </Group>
             <Group heading="MCUboot Settings">
                 <Toggle
-                    onToggle={() => dispatch(setForceMcuBoot(!forceMcuBoot))}
+                    onToggle={v => {
+                        dispatch(setForceMcuBoot(v));
+                        if (device) {
+                            dispatch(targetActions.updateTargetWritable());
+                        }
+                    }}
                     isToggled={forceMcuBoot || isMcuBoot}
                     disabled={isMcuBoot}
                     label="Enable MCUboot"
