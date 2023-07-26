@@ -25,7 +25,6 @@ export interface TargetState {
     readonly isErasing: boolean;
     readonly isErased: boolean;
     readonly isLoading: boolean;
-    readonly isProtected: boolean;
 }
 
 const initialState: TargetState = {
@@ -41,7 +40,6 @@ const initialState: TargetState = {
     isErasing: false,
     isErased: false,
     isLoading: false,
-    isProtected: false,
 };
 
 interface TargetPortChangedPayload {
@@ -158,8 +156,7 @@ export const getRegions = (state: RootState) => state.app.target.regions;
 export const getIsWriting = (state: RootState) => state.app.target.isWriting;
 export const getIsErasing = (state: RootState) => state.app.target.isErasing;
 export const getIsLoading = (state: RootState) => state.app.target.isLoading;
-export const getIsProtected = (state: RootState) =>
-    state.app.target.isProtected;
+
 export const getRefreshEnabled = (state: RootState) =>
     !state.app.target.isMemLoaded &&
     !state.app.target.isLoading &&
