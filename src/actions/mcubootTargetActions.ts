@@ -96,6 +96,7 @@ export const performUpdate = (
     new Promise<void>((resolve, reject) => {
         logger.info(`Writing ${dfuFilePath} to device ${device.serialNumber}`);
 
+        // TODO: Fix force mcuboot trait when possible from CLI
         program(device, dfuFilePath, onProgress, undefined, {
             netCoreUploadDelay,
         })
