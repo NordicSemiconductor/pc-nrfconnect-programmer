@@ -13,6 +13,11 @@
     "engines": {
         "nrfconnect": ">=4.0.0"
     },
+    "nrfutil": {
+        "device": [
+            "1.2.2"
+        ]
+    },
     "main": "dist/bundle.js",
     "files": [
         "dist/",
@@ -39,7 +44,7 @@
     },
     "devDependencies": {
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v50"
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v75"
     },
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
