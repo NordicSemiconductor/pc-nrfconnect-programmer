@@ -9,6 +9,7 @@ import { readFile, stat, Stats, statSync } from 'fs';
 import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
 import { basename } from 'path';
 import {
+    AppThunk,
     describeError,
     ErrorDialogActions,
     logger,
@@ -22,7 +23,7 @@ import {
     zipFileKnown,
 } from '../reducers/fileReducer';
 import { targetInfoKnown } from '../reducers/targetReducer';
-import { RootState, TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 import { fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
 import {
@@ -34,75 +35,75 @@ import { updateFileRegions } from './regionsActions';
 import { updateTargetWritable } from './targetActions';
 
 // Update core info when file actions happen and not when the device is selected
-const updateCoreInfo =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        const { target, file } = getState().app;
-        const { family, type } = { ...target.deviceInfo };
+const updateCoreInfo = (): AppThunk<RootState> => (dispatch, getState) => {
+    const { target, file } = getState().app;
+    const { family, type } = { ...target.deviceInfo };
 
-        // If device is selected, device family and device type will not be null
-        // and so will not assume target cores by file regions.
-        if (family !== DeviceFamily.UNKNOWN || type !== 'UNKNOWN') {
-            return;
-        }
+    // If device is selected, device family and device type will not be null
+    // and so will not assume target cores by file regions.
+    if (family !== DeviceFamily.UNKNOWN || type !== 'UNKNOWN') {
+        return;
+    }
 
-        // Display multiple cores if at least one of the regions matches
-        // the requirements of nRF5340
-        const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
-        const startAddresses = [...overlaps.keys()].sort().reverse();
-        const { cores } = getDeviceDefinition('nRF5340');
-        const networkCore = cores[1];
-        const { romBaseAddr: netwrokRomBaseAddr, romSize: networkRomSize } =
-            networkCore;
-        if (
-            startAddresses.find(
-                s =>
-                    s >= netwrokRomBaseAddr &&
-                    s <= netwrokRomBaseAddr + networkRomSize
-            )
-        ) {
-            dispatch(
-                targetInfoKnown({
-                    ...defaultDeviceDefinition,
-                    cores: [
-                        {
-                            ...cores[0],
-                            romBaseAddr: 0x0,
-                            romSize: 0x100000, // 1 MB
-                        },
-                        {
-                            ...cores[1],
-                            romBaseAddr: 0x1000000,
-                            romSize: 0x40000, // 256 KB
-                        },
-                    ],
-                })
-            );
-            return;
-        }
+    // Display multiple cores if at least one of the regions matches
+    // the requirements of nRF5340
+    const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
+    const startAddresses = [...overlaps.keys()].sort().reverse();
+    const { cores } = getDeviceDefinition('nRF5340');
+    const networkCore = cores[1];
+    const { romBaseAddr: netwrokRomBaseAddr, romSize: networkRomSize } =
+        networkCore;
+    if (
+        startAddresses.find(
+            s =>
+                s >= netwrokRomBaseAddr &&
+                s <= netwrokRomBaseAddr + networkRomSize
+        )
+    ) {
+        dispatch(
+            targetInfoKnown({
+                ...defaultDeviceDefinition,
+                cores: [
+                    {
+                        ...cores[0],
+                        romBaseAddr: 0x0,
+                        romSize: 0x100000, // 1 MB
+                    },
+                    {
+                        ...cores[1],
+                        romBaseAddr: 0x1000000,
+                        romSize: 0x40000, // 256 KB
+                    },
+                ],
+            })
+        );
+        return;
+    }
 
-        // Display 1 MB memory size or display to end address if the end address is greater than 1 MB
-        const lastStartAddress = startAddresses[startAddresses.length - 1];
-        const lastOverlap = overlaps.get(lastStartAddress) as Overlap;
-        if (lastOverlap) {
-            const lastEndAddress =
-                lastStartAddress + (lastOverlap[0][1]?.length ?? 0);
-            dispatch(
-                targetInfoKnown({
-                    ...defaultDeviceDefinition,
-                    cores: [
-                        {
-                            ...cores[0],
-                            romBaseAddr: 0x0,
-                            romSize: Math.max(lastEndAddress, 0x100000), // 1 MB
-                        },
-                    ],
-                })
-            );
-        }
-    };
+    // Display 1 MB memory size or display to end address if the end address is greater than 1 MB
+    const lastStartAddress = startAddresses[startAddresses.length - 1];
+    const lastOverlap = overlaps.get(lastStartAddress) as Overlap;
+    if (lastOverlap) {
+        const lastEndAddress =
+            lastStartAddress + (lastOverlap[0][1]?.length ?? 0);
+        dispatch(
+            targetInfoKnown({
+                ...defaultDeviceDefinition,
+                cores: [
+                    {
+                        ...cores[0],
+                        romBaseAddr: 0x0,
+                        romSize: Math.max(lastEndAddress, 0x100000), // 1 MB
+                    },
+                ],
+            })
+        );
+    }
+};
 
 export const removeFile =
-    (filePath: string) => (dispatch: TDispatch, getState: () => RootState) => {
+    (filePath: string): AppThunk<RootState> =>
+    (dispatch, getState) => {
         const { loaded, memMaps } = getState().app.file;
         const newLoaded = { ...loaded };
         const newMemMaps = memMaps.filter(element => element[0] !== filePath);
@@ -114,20 +115,19 @@ export const removeFile =
         dispatch(updateTargetWritable());
     };
 
-export const closeFiles =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        dispatch(fileWarningRemove());
-        dispatch(filesEmpty());
-        dispatch(updateFileRegions());
+export const closeFiles = (): AppThunk<RootState> => (dispatch, getState) => {
+    dispatch(fileWarningRemove());
+    dispatch(filesEmpty());
+    dispatch(updateFileRegions());
 
-        // Initialize the state of deviceInfo if no device is selected
-        if (!getState().app.target.deviceInfo?.type) {
-            dispatch(targetInfoKnown(defaultDeviceDefinition));
-        }
-        dispatch(updateTargetWritable());
-    };
+    // Initialize the state of deviceInfo if no device is selected
+    if (!getState().app.target.deviceInfo?.type) {
+        dispatch(targetInfoKnown(defaultDeviceDefinition));
+    }
+    dispatch(updateTargetWritable());
+};
 
-export const loadMruFiles = () => (dispatch: TDispatch) => {
+export const loadMruFiles = (): AppThunk => dispatch => {
     const files = getMruFiles();
     dispatch(mruFilesLoadSuccess(files));
 };
@@ -144,30 +144,32 @@ const addMruFile = (filename: string) => {
     }
 };
 
-const parseZipFile = (filePath: string) => async (dispatch: TDispatch) => {
-    const stats = await new Promise<Stats>((resolve, reject) => {
-        stat(filePath, (statsError, result) => {
-            if (statsError) {
-                logger.error(
-                    `Could not open ZIP file: ${describeError(statsError)}`
-                );
-                dispatch(
-                    ErrorDialogActions.showDialog(describeError(statsError))
-                );
-                removeMruFile(filePath);
-                return reject();
-            }
-            return resolve(result);
+const parseZipFile =
+    (filePath: string): AppThunk<RootState, Promise<void>> =>
+    async dispatch => {
+        const stats = await new Promise<Stats>((resolve, reject) => {
+            stat(filePath, (statsError, result) => {
+                if (statsError) {
+                    logger.error(
+                        `Could not open ZIP file: ${describeError(statsError)}`
+                    );
+                    dispatch(
+                        ErrorDialogActions.showDialog(describeError(statsError))
+                    );
+                    removeMruFile(filePath);
+                    return reject();
+                }
+                return resolve(result);
+            });
         });
-    });
-    logger.info('Checking ZIP file: ', filePath);
-    logger.info('File was last modified at ', stats.mtime.toLocaleString());
-    addMruFile(filePath);
-};
+        logger.info('Checking ZIP file: ', filePath);
+        logger.info('File was last modified at ', stats.mtime.toLocaleString());
+        addMruFile(filePath);
+    };
 
 const parseHexFile =
-    (filePath: string) =>
-    async (dispatch: TDispatch, getState: () => RootState) => {
+    (filePath: string): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         const { loaded, memMaps } = getState().app.file;
         if (loaded[filePath]) {
             return;
@@ -240,8 +242,8 @@ const parseHexFile =
     };
 
 export const openFile =
-    (...params: string[]) =>
-    async (dispatch: TDispatch): Promise<unknown> => {
+    (...params: string[]): AppThunk<RootState, Promise<unknown>> =>
+    async (dispatch): Promise<unknown> => {
         const filePath = params[0];
         if (!filePath) return dispatch(loadMruFiles());
 
@@ -265,7 +267,7 @@ export const openFile =
         }
     };
 
-export const openFileDialog = () => (dispatch: TDispatch) => {
+export const openFileDialog = (): AppThunk => dispatch => {
     const dialogOptions = {
         title: 'Select a HEX / ZIP file',
         filters: [
@@ -286,7 +288,7 @@ export const openFileDialog = () => (dispatch: TDispatch) => {
 };
 
 export const refreshAllFiles =
-    () => (dispatch: TDispatch, getState: () => RootState) =>
+    (): AppThunk<RootState, Promise<void>> => (dispatch, getState) =>
         Promise.all(
             Object.keys(getState().app.file.loaded).map(async filePath => {
                 const entry = getState().app.file.loaded[filePath];
@@ -308,4 +310,4 @@ export const refreshAllFiles =
                     );
                 }
             })
-        );
+        ).then(() => Promise.resolve());

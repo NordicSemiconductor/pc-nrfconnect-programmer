@@ -13,6 +13,7 @@ import nrfdl, {
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import {
+    AppThunk,
     describeError,
     getDeviceLibContext,
     logger,
@@ -34,7 +35,7 @@ import {
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
-import { RootState, TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 import {
     CommunicationType,
     CoreDefinition,
@@ -103,7 +104,7 @@ export const loadProtectionStatus = async (
  * @returns {void}
  */
 export const openDevice =
-    () => async (dispatch: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
         const { device: inputDevice } = getState().app.target;
         const device = inputDevice as Device;
 
@@ -120,7 +121,7 @@ export const openDevice =
 
         logDeviceInfo(device);
         let deviceInfo = getDeviceInfoByJlink(device);
-        deviceInfo = await updateCoresWithNrfdl(dispatch, device, deviceInfo);
+        deviceInfo = await updateCoresWithNrfdl(device, deviceInfo);
 
         // Update modem target info according to detected device info
         const isModem = deviceInfo.family
@@ -243,43 +244,42 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
  *
  * @returns {void}
  */
-export const canWrite =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        // TODO: get the UICR address from the target definition. This value
-        // works for nRF51s and nRF52s, but other targets might use a different one!!!
-        const appState = getState().app;
-        const { isErased, isMemLoaded } = appState.target;
-        const { isMcuboot } = appState.mcuboot;
-        const {
-            memMaps: fileMemMaps,
-            mcubootFilePath,
-            zipFilePath,
-        } = appState.file;
-        const { isModem } = appState.modem;
+export const canWrite = (): AppThunk => (dispatch, getState) => {
+    // TODO: get the UICR address from the target definition. This value
+    // works for nRF51s and nRF52s, but other targets might use a different one!!!
+    const appState = getState().app;
+    const { isErased, isMemLoaded } = appState.target;
+    const { isMcuboot } = appState.mcuboot;
+    const {
+        memMaps: fileMemMaps,
+        mcubootFilePath,
+        zipFilePath,
+    } = appState.file;
+    const { isModem } = appState.modem;
 
-        // If MCU is enabled and MCU firmware is detected
-        if (isMcuboot && mcubootFilePath) {
-            dispatch(targetWritableKnown(true));
-            return;
-        }
-
-        if (zipFilePath && (isMcuboot || isModem)) {
-            dispatch(targetWritableKnown(true));
-            return;
-        }
-
-        // If the device has been erased or the memory has been loaded and firmware is selected
-        if ((!isErased && !isMemLoaded) || !fileMemMaps.length) {
-            dispatch(targetWritableKnown(false));
-            return;
-        }
-
+    // If MCU is enabled and MCU firmware is detected
+    if (isMcuboot && mcubootFilePath) {
         dispatch(targetWritableKnown(true));
-    };
+        return;
+    }
+
+    if (zipFilePath && (isMcuboot || isModem)) {
+        dispatch(targetWritableKnown(true));
+        return;
+    }
+
+    // If the device has been erased or the memory has been loaded and firmware is selected
+    if ((!isErased && !isMemLoaded) || !fileMemMaps.length) {
+        dispatch(targetWritableKnown(false));
+        return;
+    }
+
+    dispatch(targetWritableKnown(true));
+};
 
 const updateTargetRegions =
-    (memMap: MemoryMap, deviceInfo: DeviceDefinition) =>
-    (dispatch: TDispatch) => {
+    (memMap: MemoryMap, deviceInfo: DeviceDefinition): AppThunk =>
+    dispatch => {
         const memMaps: MemoryMaps = [['', memMap]];
         const regions = getTargetRegions(memMaps, deviceInfo);
 
@@ -292,7 +292,7 @@ const updateTargetRegions =
  * @returns {void}
  */
 export const read =
-    () => async (dispatch: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
         dispatch(loadingStart());
         const { device: inputDevice, deviceInfo: inputDeviceInfo } =
             getState().app.target;
@@ -349,8 +349,11 @@ export const read =
  * @returns {void}
  */
 export const recoverOneCore =
-    (deviceId: number, coreInfo: CoreDefinition) =>
-    async (dispatch: TDispatch) => {
+    (
+        deviceId: number,
+        coreInfo: CoreDefinition
+    ): AppThunk<RootState, Promise<void>> =>
+    async dispatch => {
         dispatch(erasingStart());
         logger.info(`Recovering ${coreInfo.name} core`);
 
@@ -379,8 +382,8 @@ export const recoverOneCore =
  * @returns {void}
  */
 export const recover =
-    (continueToWrite = false) =>
-    async (dispatch: TDispatch, getState: () => RootState) => {
+    (continueToWrite = false): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         const { device: inputDevice, deviceInfo: inputDeviceInfo } =
             getState().app.target;
         const { id: deviceId } = inputDevice as Device;
@@ -454,8 +457,11 @@ const writeHex = (
  * @returns {void}
  */
 export const writeOneCore =
-    (deviceId: number, coreInfo: CoreDefinition) =>
-    async (dispatch: TDispatch, getState: () => RootState) => {
+    (
+        deviceId: number,
+        coreInfo: CoreDefinition
+    ): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         logger.info(`Writing procedure starts for ${coreInfo.name} core`);
         dispatch(writingStart());
         const { memMaps } = getState().app.file;
@@ -480,7 +486,7 @@ export const writeOneCore =
         });
 
         if (overlaps.size <= 0) {
-            return undefined;
+            return;
         }
 
         const programRegions = MemoryMap.flattenOverlaps(overlaps);
@@ -495,7 +501,7 @@ export const writeOneCore =
  * @returns {void}
  */
 export const write =
-    () => async (dispatch: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
         const { device: inputDevice, deviceInfo: inputDeviceInfo } =
             getState().app.target;
         const { id: deviceId } = inputDevice as Device;
@@ -520,18 +526,19 @@ export const write =
  *
  * @returns {void}
  */
-export const recoverAndWrite = () => async (dispatch: TDispatch) => {
-    const continueToWrite = true;
-    await dispatch(recover(continueToWrite));
-    await dispatch(write());
-};
+export const recoverAndWrite =
+    (): AppThunk<RootState, Promise<void>> => async dispatch => {
+        const continueToWrite = true;
+        await dispatch(recover(continueToWrite));
+        await dispatch(write());
+    };
 
 /**
  * Reset device to Application mode
  * @returns {Promise<void>} resolved promise
  */
 export const resetDevice =
-    () => async (_: TDispatch, getState: () => RootState) => {
+    (): AppThunk<RootState, Promise<void>> => async (_, getState) => {
         const { device: inputDevice } = getState().app.target;
         const device = inputDevice as Device;
 
@@ -544,7 +551,7 @@ export const resetDevice =
  *
  * @returns {void}
  */
-export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
+export const saveAsFile = (): AppThunk => (_, getState) => {
     const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
     const deviceInfo = inputDeviceInfo as DeviceDefinition;
     const maxAddress = Math.max(
@@ -580,7 +587,6 @@ export const saveAsFile = () => (_: TDispatch, getState: () => RootState) => {
 };
 
 const updateCoresWithNrfdl = async (
-    dispatch: TDispatch,
     device: Device,
     deviceInfo: DeviceDefinition
 ): Promise<DeviceDefinition> => {

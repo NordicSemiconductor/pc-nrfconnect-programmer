@@ -6,6 +6,7 @@
 
 import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
+    AppThunk,
     describeError,
     getDeviceLibContext,
     logger,
@@ -19,10 +20,11 @@ import {
     modemWritingStart,
     modemWritingSucceed,
 } from '../reducers/modemReducer';
-import { RootState, TDispatch } from '../reducers/types';
+import { RootState } from '../reducers/types';
 
 export const programDfuModem =
-    (fileName: string) => (dispatch: TDispatch, getState: () => RootState) =>
+    (fileName: string): AppThunk<RootState, Promise<void>> =>
+    (dispatch, getState) =>
         new Promise<void>(resolve => {
             const { device: inputDevice } = getState().app.target;
             const { id: deviceId } = inputDevice as Device;
@@ -77,22 +79,19 @@ export const programDfuModem =
             );
         });
 
-export const performUpdate =
-    () => (dispatch: TDispatch, getState: () => RootState) => {
-        dispatch(modemWritingStart());
-        dispatch(modemProcessUpdate({ message: MODEM_DFU_STARTING }));
+export const performUpdate = (): AppThunk => (dispatch, getState) => {
+    dispatch(modemWritingStart());
+    dispatch(modemProcessUpdate({ message: MODEM_DFU_STARTING }));
 
-        const { modemFwName: fileName } = getState().app.modem;
-        const { serialNumber } = getState().app.target;
+    const { modemFwName: fileName } = getState().app.modem;
+    const { serialNumber } = getState().app.target;
 
-        if (!serialNumber) {
-            logger.error(
-                'Modem DFU does not start due to missing serialNumber'
-            );
-            return;
-        }
-        logger.info('Modem DFU starts to write...');
-        logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
+    if (!serialNumber) {
+        logger.error('Modem DFU does not start due to missing serialNumber');
+        return;
+    }
+    logger.info('Modem DFU starts to write...');
+    logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
 
-        dispatch(programDfuModem(fileName));
-    };
+    dispatch(programDfuModem(fileName));
+};
