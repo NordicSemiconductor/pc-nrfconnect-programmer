@@ -13,11 +13,6 @@
     "engines": {
         "nrfconnect": ">=4.0.0"
     },
-    "nrfutil": {
-        "device": [
-            "1.2.2"
-        ]
-    },
     "main": "dist/bundle.js",
     "files": [
         "dist/",
