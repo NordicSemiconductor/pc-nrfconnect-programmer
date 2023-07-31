@@ -37,7 +37,6 @@ export interface TargetState {
     readonly isErasing: boolean;
     readonly isErased: boolean;
     readonly isLoading: boolean;
-    readonly isProtected: boolean;
 }
 
 const initialState: TargetState = {
@@ -57,7 +56,6 @@ const initialState: TargetState = {
     isErasing: false,
     isErased: false,
     isLoading: false,
-    isProtected: false,
 };
 
 interface TargetTypeKnownPayload {
@@ -199,8 +197,7 @@ export const getSerialNumber = (state: RootState) =>
 export const getIsWriting = (state: RootState) => state.app.target.isWriting;
 export const getIsErasing = (state: RootState) => state.app.target.isErasing;
 export const getIsLoading = (state: RootState) => state.app.target.isLoading;
-export const getIsProtected = (state: RootState) =>
-    state.app.target.isProtected;
+
 export const getRefreshEnabled = (state: RootState) =>
     state.app.target.targetType === CommunicationType.JLINK &&
     !state.app.target.isMemLoaded &&
