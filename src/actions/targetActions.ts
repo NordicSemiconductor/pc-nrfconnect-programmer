@@ -14,7 +14,11 @@ import {
 
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
-import { loadingStart, targetWritableKnown } from '../reducers/targetReducer';
+import {
+    loadingEnd,
+    loadingStart,
+    targetWritableKnown,
+} from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
@@ -43,23 +47,24 @@ export const openDevice =
             return;
         }
 
-        logger.error(
-            `Unsupported device.
-            The detected device could not be recognized as
-            neither JLink device nor Nordic USB device.`
+        logger.warn('No operations possible for device.');
+        logger.warn(
+            `If the device is a MCUBoot device make sure it is in the bootloader mode`
         );
         if (process.platform === 'linux') {
-            logger.error(
-                'Please make sure J-Link Software and nrf-udev are installed. ' +
+            logger.warn(
+                'If the device is a JLink device, please make sure J-Link Software and nrf-udev are installed. ' +
                     'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
             );
         }
         if (process.platform === 'darwin') {
-            logger.error(
-                'Please make sure J-Link Software is installed. ' +
+            logger.warn(
+                'If the device is a JLink device, please make sure J-Link Software is installed. ' +
                     'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
             );
         }
+
+        dispatch(loadingEnd());
     };
 
 export const updateTargetWritable =

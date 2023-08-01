@@ -51,7 +51,9 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
         isTarget ? state.app.target.regions : state.app.file.regions
     );
     const zipFilePath = useSelector(getZipFilePath);
-    const isJLink = !useSelector(getForceMcuBoot) && !!device?.traits.jlink;
+    const isJLink = useSelector(getForceMcuBoot) || !!device?.traits.jlink;
+    const isNordicDfu =
+        useSelector(getForceMcuBoot) || !!device?.traits.nordicDfu;
     const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
@@ -113,6 +115,13 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                                 <p>
                                     Memory layout is not available via MCUboot
                                 </p>
+                            </div>
+                        </div>
+                    )}
+                    {isTarget && !isMcuboot && !isJLink && !isNordicDfu && (
+                        <div className="centering-container">
+                            <div className="read-indicatorv  tw-break-words tw-text-center">
+                                <p>Device is connected</p>
                             </div>
                         </div>
                     )}

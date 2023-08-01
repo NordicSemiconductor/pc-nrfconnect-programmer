@@ -6,9 +6,10 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectedDevice } from 'pc-nrfconnect-shared';
+import { Alert, selectedDevice } from 'pc-nrfconnect-shared';
 
 import { getLoaded, getZipFilePath } from '../reducers/fileReducer';
+import { getForceMcuBoot } from '../reducers/settingsReducer';
 import { getDeviceInfo } from '../reducers/targetReducer';
 import useOpenFileFromArgs from '../useOpenFileFromArgs';
 import { DeviceDefinition } from '../util/devices';
@@ -39,12 +40,40 @@ const AppMainView = () => {
     const zipFilePath = useSelector(getZipFilePath);
     const device = useSelector(selectedDevice);
     const deviceInfo = useSelector(getDeviceInfo);
+    const forcedMCUBoot = useSelector(getForceMcuBoot);
 
     useOpenFileFromArgs();
 
     return (
         <div className="app-main-view">
             <WarningView />
+            {device &&
+                !device.traits.jlink &&
+                !device.traits.mcuBoot &&
+                !forcedMCUBoot &&
+                !device.traits.nordicDfu && (
+                    <div className="warning-view tw-flex tw-flex-col tw-gap-2">
+                        <Alert variant="danger" label="Error: ">
+                            No operation possible.
+                        </Alert>
+                        <Alert variant="warning" label="Caution: ">
+                            If the device is a MCUBoot device make sure it is in
+                            the bootloader mode.
+                        </Alert>
+                        {process.platform === 'linux' && (
+                            <Alert variant="warning" label="Caution: ">
+                                If the device is a JLink device, please make
+                                sure J-Link Software and nrf-udev are installed
+                            </Alert>
+                        )}
+                        {process.platform === 'darwin' && (
+                            <Alert variant="warning" label="Caution: ">
+                                If the device is a JLink device, please make
+                                sure J-Link Software is installed
+                            </Alert>
+                        )}
+                    </div>
+                )}
             <div className="memory-box-container">
                 <MemoryBoxView
                     title="File memory layout"
