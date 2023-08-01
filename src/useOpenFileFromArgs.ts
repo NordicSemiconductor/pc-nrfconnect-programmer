@@ -7,12 +7,11 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import * as fs from 'fs';
-import { logger } from 'pc-nrfconnect-shared';
+import { AppThunk, logger } from 'pc-nrfconnect-shared';
 
 import * as fileActions from './actions/fileActions';
-import { TDispatch } from './reducers/types';
 
-const openFileFromArgs = (dispatch: TDispatch) => {
+const openFileFromArgs = (): AppThunk => dispatch => {
     const { argv } = process;
 
     const fileIndex = argv.findIndex(arg => arg === '--filePath');
@@ -36,6 +35,6 @@ export default () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        openFileFromArgs(dispatch);
+        dispatch(openFileFromArgs());
     }, [dispatch]);
 };
