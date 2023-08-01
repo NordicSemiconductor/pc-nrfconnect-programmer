@@ -31,8 +31,8 @@ import {
     usageData,
 } from 'pc-nrfconnect-shared';
 
+import { FileState } from '../reducers/fileReducer';
 import {
-    dfuImagesUpdate,
     loadingEnd,
     targetInfoKnown,
     targetRegionsKnown,
@@ -278,40 +278,26 @@ const createDfuImage = (regionName: string, fwType: number) => {
     return dfuImage;
 };
 
-/**
- * Create DFU image list by given detected region names
- *
- * @returns {Promise<void>} resolved promise
- */
-const createDfuImages = (): AppThunk<RootState> => (dispatch, getState) => {
-    let dfuImages: DfuImage[] = [];
-    getState().app.file.detectedRegionNames.forEach(regionName => {
+const createDfuImages = (file: FileState) => {
+    const dfuImages: DfuImage[] = [];
+    file.detectedRegionNames.forEach(regionName => {
         switch (regionName) {
             case RegionName.BOOTLOADER:
-                dfuImages = [
-                    ...dfuImages,
-                    createDfuImage(regionName, FwType.BOOTLOADER),
-                ];
+                dfuImages.push(createDfuImage(regionName, FwType.BOOTLOADER));
                 break;
             case RegionName.SOFTDEVICE:
-                dfuImages = [
-                    ...dfuImages,
-                    createDfuImage(regionName, FwType.SOFTDEVICE),
-                ];
+                dfuImages.push(createDfuImage(regionName, FwType.SOFTDEVICE));
                 break;
             case RegionName.APPLICATION:
-                dfuImages = [
-                    ...dfuImages,
-                    createDfuImage(regionName, FwType.APPLICATION),
-                ];
+                dfuImages.push(createDfuImage(regionName, FwType.APPLICATION));
                 break;
             default:
                 break;
         }
     });
-    dispatch(dfuImagesUpdate(dfuImages));
-};
 
+    return dfuImages;
+};
 /**
  * Check if the files can be written to the target device
  *
@@ -627,7 +613,7 @@ export const write =
 
         dispatch(updateFileBlRegion());
         dispatch(updateFileAppRegions());
-        dispatch(createDfuImages());
+        const dfuImages = createDfuImages(getState().app.file);
 
         const fileRegions = getState().app.file.regions;
         const fileMemMaps = getState().app.file.memMaps;
@@ -635,7 +621,6 @@ export const write =
         const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
         const { deviceInfo } = getState().app.target;
         const hwVersion = parseInt(deviceInfo?.family?.slice(3) ?? '0', 10);
-        const { dfuImages } = getState().app.target;
 
         let images = dfuImages
             ?.map(image => handleImage(image, fileRegions, fileMemMap))
@@ -649,7 +634,6 @@ export const write =
                 dispatch(await handleUserInput(image))
             ) as Promise<DfuImage>[]
         );
-        dispatch(dfuImagesUpdate(images));
 
         // Start writing after handling images since user may cancel userInput
         logger.info('Performing DFU. This may take a few seconds');
