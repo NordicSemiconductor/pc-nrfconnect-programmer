@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
-import { Device, DfuImage } from 'pc-nrfconnect-shared';
+import { Device } from 'pc-nrfconnect-shared';
 
 import {
     CommunicationType,
@@ -29,7 +27,6 @@ export interface TargetState {
     readonly regions?: Region[]; // TODO: Define region
     readonly warnings?: string[];
     readonly writtenAddress?: number;
-    readonly dfuImages?: DfuImage[]; // TODO: Define image
     readonly isMemLoaded: boolean;
     readonly isWritable: boolean;
     readonly isRecoverable: boolean;
@@ -48,7 +45,6 @@ const initialState: TargetState = {
     regions: [],
     warnings: [],
     writtenAddress: 0,
-    dfuImages: [],
     isMemLoaded: false,
     isWritable: false,
     isRecoverable: false,
@@ -107,9 +103,7 @@ const targetSlice = createSlice({
         targetWritableKnown(state, action: PayloadAction<boolean>) {
             state.isWritable = action.payload;
         },
-        dfuImagesUpdate(state, action: PayloadAction<any[]>) {
-            state.dfuImages = action.payload;
-        },
+
         writeProgress(state, action: PayloadAction<number>) {
             state.writtenAddress = action.payload;
             state.isWriting = true;
@@ -166,7 +160,6 @@ const {
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,
-    dfuImagesUpdate,
     writeProgress,
     writingStart,
     writingEnd,
@@ -214,7 +207,6 @@ export {
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,
-    dfuImagesUpdate,
     writeProgress,
     writingStart,
     writingEnd,
