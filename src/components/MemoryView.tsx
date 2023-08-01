@@ -7,7 +7,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectedDevice } from 'pc-nrfconnect-shared';
-import PropTypes from 'prop-types';
 
 import { getZipFilePath } from '../reducers/fileReducer';
 import { getForceMcuBoot } from '../reducers/settingsReducer';
@@ -129,10 +128,6 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
             ))}
         </>
     );
-};
-
-MemoryView.propTypes = {
-    isTarget: PropTypes.bool.isRequired,
 };
 
 export default MemoryView;

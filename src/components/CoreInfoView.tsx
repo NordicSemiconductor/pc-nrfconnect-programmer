@@ -6,7 +6,6 @@
 
 import React from 'react';
 import { DeviceCore } from '@nordicsemiconductor/nrf-device-lib-js';
-import PropTypes from 'prop-types';
 
 import { coreFriendlyName } from '../util/devices';
 import { hexpad8 } from '../util/hexpad';
@@ -39,15 +38,5 @@ const CoreInfoView = ({ name, romBaseAddr, romSize }: CoreInfoViewProps) => (
         </div>
     </>
 );
-
-CoreInfoView.propTypes = {
-    name: PropTypes.string,
-    romBaseAddr: PropTypes.number.isRequired,
-    romSize: PropTypes.number.isRequired,
-};
-
-CoreInfoView.defaultProps = {
-    name: null,
-};
 
 export default CoreInfoView;

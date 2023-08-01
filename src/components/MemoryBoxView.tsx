@@ -7,7 +7,6 @@
 import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Popover from 'react-bootstrap/Popover';
-import PropTypes from 'prop-types';
 
 import DeviceInfoView from './DeviceInfoView';
 import MemoryView from './MemoryView';
@@ -68,21 +67,6 @@ const MemoryBoxView = ({
             </Card.Body>
         </Card>
     );
-};
-
-MemoryBoxView.propTypes = {
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    iconName: PropTypes.string,
-    isHolder: PropTypes.bool,
-    isTarget: PropTypes.bool,
-};
-
-MemoryBoxView.defaultProps = {
-    description: null,
-    iconName: null,
-    isHolder: false,
-    isTarget: false,
 };
 
 export default MemoryBoxView;

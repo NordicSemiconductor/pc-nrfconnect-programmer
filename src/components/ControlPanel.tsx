@@ -19,7 +19,6 @@ import {
     Toggle,
     truncateMiddle,
 } from 'pc-nrfconnect-shared';
-import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
 import * as jlinkTargetActions from '../actions/jlinkTargetActions';
@@ -105,7 +104,6 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
         setShow(!show);
         setTarget(event.target as HTMLElement);
     };
-    // (eventKey: string | null, e: React.SyntheticEvent<unknown>) => void
     const onSelect = (filePath: string | null) => {
         if (filePath) {
             openFile(filePath);
@@ -169,11 +167,9 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
     );
 };
 
-Mru.propTypes = {
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
-
 const ControlPanel = () => {
+    const dispatch = useDispatch();
+
     const device = useSelector(selectedDevice);
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
@@ -194,12 +190,7 @@ const ControlPanel = () => {
 
     const targetIsRecoverable = isJLink;
 
-    const dispatch = useDispatch();
-    const closeFiles = () => dispatch(fileActions.closeFiles());
     const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
-    const toggleAutoRead = () => dispatch(settingsActions.toggleAutoRead());
-    const toggleAutoReset = () => dispatch(settingsActions.toggleAutoReset());
-    const performSaveAsFile = () => dispatch(jlinkTargetActions.saveAsFile());
 
     return (
         <SidePanel className="control-panel">
@@ -216,7 +207,7 @@ const ControlPanel = () => {
                 <Button
                     variant="secondary"
                     className="w-100"
-                    onClick={closeFiles}
+                    onClick={() => dispatch(fileActions.closeFiles())}
                 >
                     <span className="mdi mdi-minus-circle" />
                     Clear files
@@ -271,8 +262,14 @@ const ControlPanel = () => {
                     variant="secondary"
                     key="performSaveAsFile"
                     className="w-100"
-                    onClick={performSaveAsFile}
-                    disabled={!targetIsReady || !isJLink || !targetIsMemLoaded}
+                    onClick={() => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+                        dispatch(jlinkTargetActions.saveAsFile());
+                    }}
+                    disabled={!isJLink || !targetIsMemLoaded}
                 >
                     <span className="mdi mdi-floppy" />
                     Save as file
@@ -345,7 +342,7 @@ const ControlPanel = () => {
                     Read
                 </Button>
                 <Toggle
-                    onToggle={() => toggleAutoRead()}
+                    onToggle={() => dispatch(settingsActions.toggleAutoRead())}
                     isToggled={autoRead}
                     label="Auto read memory"
                     barColor={colors.gray700}
@@ -353,13 +350,13 @@ const ControlPanel = () => {
                 />
                 <Toggle
                     isToggled={autoReset}
-                    onToggle={() => toggleAutoReset()}
+                    onToggle={() => dispatch(settingsActions.toggleAutoReset())}
                     title="Reset device after read/write operations"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
                 >
                     <>
-                        Auto Reset
+                        Auto reset
                         {isJLink && isModem && autoReset && (
                             <span
                                 title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."

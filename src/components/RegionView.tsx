@@ -10,7 +10,6 @@ import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch } from 'react-redux';
 import { colors } from 'pc-nrfconnect-shared';
-import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
 import { CoreDefinition } from '../util/devices';
@@ -23,8 +22,8 @@ interface RegionViewProps {
     active?: boolean;
     striped?: boolean;
     hoverable?: boolean;
-    region: Region;
-    core: CoreDefinition;
+    region?: Region;
+    core?: CoreDefinition;
 }
 
 const RegionView = ({
@@ -111,22 +110,4 @@ const RegionView = ({
         </div>
     );
 };
-
-RegionView.propTypes = {
-    width: PropTypes.number.isRequired,
-    active: PropTypes.bool,
-    striped: PropTypes.bool,
-    hoverable: PropTypes.bool,
-    region: PropTypes.instanceOf(Object),
-    core: PropTypes.instanceOf(Object),
-};
-
-RegionView.defaultProps = {
-    active: false,
-    striped: false,
-    hoverable: false,
-    region: null,
-    core: null,
-};
-
 export default RegionView;

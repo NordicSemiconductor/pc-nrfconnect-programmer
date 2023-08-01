@@ -38,7 +38,7 @@ export const openDevice =
             return;
         }
         if (device.traits.nordicDfu) {
-            usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicUsb');
+            usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicDfu');
             dispatch(usbsdfuTargetActions.openDevice(device));
             return;
         }
@@ -62,28 +62,31 @@ export const openDevice =
         }
     };
 
-export const updateTargetWritable = (): AppThunk => (dispatch, getState) => {
-    const device = selectedDevice(getState());
+export const updateTargetWritable =
+    (): AppThunk<RootState> => (dispatch, getState) => {
+        const device = selectedDevice(getState());
+        const {
+            file: { zipFilePath },
+        } = getState().app;
 
-    const {
-        file: { zipFilePath },
-    } = getState().app;
-
-    if (device?.traits.jlink) {
-        dispatch(jlinkTargetActions.canWrite());
-    } else if (device?.traits.nordicDfu) {
-        dispatch(usbsdfuTargetActions.canWrite());
-    } else if (device?.traits.mcuBoot || getState().app.settings.forceMcuBoot) {
-        dispatch(mcubootTargetActions.canWrite());
-    } else if (
-        zipFilePath &&
-        (device?.traits.mcuBoot || device?.traits.modem)
-    ) {
-        dispatch(targetWritableKnown(true));
-    } else {
-        dispatch(targetWritableKnown(false));
-    }
-};
+        if (device?.traits.jlink) {
+            dispatch(jlinkTargetActions.canWrite());
+        } else if (device?.traits.nordicDfu) {
+            dispatch(usbsdfuTargetActions.canWrite());
+        } else if (
+            device?.traits.mcuBoot ||
+            getState().app.settings.forceMcuBoot
+        ) {
+            dispatch(mcubootTargetActions.canWrite());
+        } else if (
+            zipFilePath &&
+            (device?.traits.mcuBoot || device?.traits.modem)
+        ) {
+            dispatch(targetWritableKnown(true));
+        } else {
+            dispatch(targetWritableKnown(false));
+        }
+    };
 
 export const write =
     (device: Device): AppThunk<RootState> =>

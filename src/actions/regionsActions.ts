@@ -22,8 +22,8 @@ import {
 } from '../util/regions';
 
 const updateDetectedRegionNames =
-    (): AppThunk<RootState> => (dispatch, getState) => {
-        const fileRegions = getState().app.file.regions;
+    (fileRegions: Region[]): AppThunk =>
+    dispatch => {
         const regionChecklist = [
             RegionName.APPLICATION,
             RegionName.SOFTDEVICE,
@@ -191,5 +191,5 @@ export const updateFileRegions =
         }
 
         dispatch(fileRegionsKnown(regions));
-        dispatch(updateDetectedRegionNames());
+        dispatch(updateDetectedRegionNames(regions));
     };

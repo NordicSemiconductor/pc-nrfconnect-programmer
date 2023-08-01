@@ -5,7 +5,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { CoreDefinition } from '../util/devices';
 import { Region } from '../util/regions';
@@ -109,12 +108,5 @@ const CoreView = ({ core, active }: CoreViewProps) => {
     // eslint-disable-next-line react/jsx-no-useless-fragment -- RegionViews is an array and requires a fragment
     return <>{regionViews}</>;
 };
-
-CoreView.propTypes = {
-    core: PropTypes.shape({}).isRequired,
-    active: PropTypes.bool.isRequired,
-};
-
-CoreView.defaultProps = {};
 
 export default CoreView;
