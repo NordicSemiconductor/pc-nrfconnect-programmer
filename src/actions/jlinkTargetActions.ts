@@ -244,7 +244,7 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
  *
  * @returns {void}
  */
-export const canWrite = (): AppThunk => (dispatch, getState) => {
+export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     // TODO: get the UICR address from the target definition. This value
     // works for nRF51s and nRF52s, but other targets might use a different one!!!
     const appState = getState().app;
@@ -551,7 +551,7 @@ export const resetDevice =
  *
  * @returns {void}
  */
-export const saveAsFile = (): AppThunk => (_, getState) => {
+export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
     const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
     const deviceInfo = inputDeviceInfo as DeviceDefinition;
     const maxAddress = Math.max(

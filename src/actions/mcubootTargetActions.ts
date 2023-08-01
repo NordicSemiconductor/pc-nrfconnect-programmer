@@ -73,7 +73,7 @@ export const isMcubootModem = (vid?: number, pid?: number) =>
     vid === VendorId.NORDIC_SEMICONDUCTOR &&
     ModemProductIds.includes(pid);
 
-export const openDevice = (): AppThunk => (dispatch, getState) => {
+export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
     const { device: inputDevice } = getState().app.target;
     const device = inputDevice as Device;
     const { serialPorts } = device;
@@ -146,7 +146,7 @@ export const toggleMcuboot = (): AppThunk => (dispatch, getState) => {
     dispatch(canWrite());
 };
 
-export const canWrite = (): AppThunk => (dispatch, getState) => {
+export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     // Disable write button
     dispatch(targetWritableKnown(false));
 
