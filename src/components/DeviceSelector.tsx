@@ -17,7 +17,7 @@ import { openDevice } from '../actions/targetActions';
 import EventAction from '../actions/usageDataActions';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
-import { deselectDevice, selectDevice } from '../reducers/targetReducer';
+import { deselectDevice } from '../reducers/targetReducer';
 
 export default () => {
     const dispatch = useDispatch();
@@ -25,7 +25,6 @@ export default () => {
     return (
         <DeviceSelector
             onDeviceSelected={(device: SharedDevice) => {
-                dispatch(selectDevice(device.serialNumber));
                 dispatch(openDevice(device));
             }}
             onDeviceDeselected={() => {

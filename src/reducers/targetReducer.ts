@@ -126,7 +126,6 @@ const {
     erasingEnd,
     loadingStart,
     loadingEnd,
-    selectDevice,
     deselectDevice,
 } = targetSlice.actions;
 
@@ -161,6 +160,5 @@ export {
     erasingEnd,
     loadingStart,
     loadingEnd,
-    selectDevice,
     deselectDevice,
 };
