@@ -6,10 +6,11 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { selectedDevice } from 'pc-nrfconnect-shared';
 import PropTypes from 'prop-types';
 
 import { getZipFilePath } from '../reducers/fileReducer';
-import { getIsMcuboot } from '../reducers/mcubootReducer';
+import { getForceMcuBoot } from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
     getIsErasing,
@@ -46,11 +47,13 @@ interface MemoryViewProps {
 }
 
 const MemoryView = ({ isTarget }: MemoryViewProps) => {
+    const device = useSelector(selectedDevice);
     const regions = useSelector((state: RootState) =>
         isTarget ? state.app.target.regions : state.app.file.regions
     );
     const zipFilePath = useSelector(getZipFilePath);
-    const isMcuboot = useSelector(getIsMcuboot);
+    const isJLink = !useSelector(getForceMcuBoot) && !!device?.traits.jlink;
+    const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
     const isLoading = useSelector(getIsLoading);
@@ -82,7 +85,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                     {isTarget && isErasing && (
                         <div className="erase-indicator striped active" />
                     )}
-                    {isTarget && refreshEnabled && (
+                    {isTarget && refreshEnabled && isJLink && (
                         <div className="centering-container">
                             {!isProtected && (
                                 <div className="read-indicator">

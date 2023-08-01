@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import nrfdl, { SerialPort } from '@nordicsemiconductor/nrf-device-lib-js';
+import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     AppThunk,
     clearWaitForDevice,
@@ -12,89 +12,36 @@ import {
     Device,
     getDeviceLibContext,
     logger,
+    selectedDevice,
     setWaitForDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
 
 import {
     mcubootFirmwareValid,
-    mcubootKnown,
     mcubootProcessUpdate,
     MCUBootProcessUpdatePayload,
     mcubootWritingFail,
     mcubootWritingStart,
     mcubootWritingSucceed,
 } from '../reducers/mcubootReducer';
-import { modemKnown } from '../reducers/modemReducer';
-import {
-    loadingEnd,
-    targetTypeKnown,
-    targetWritableKnown,
-} from '../reducers/targetReducer';
+import { loadingEnd, targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
-import {
-    CommunicationType,
-    DeviceFamily,
-    McubootProductIds,
-    ModemProductIds,
-    VendorId,
-} from '../util/devices';
+import { DeviceFamily } from '../util/devices';
 import { updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
 export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
 
-/**
- * Check whether the device is MCUboot device or not by providing vender Id and product Id
- *
- * @param {number} vid Vendor ID
- * @param {number} pid Product ID
- * @returns {boolean} whether the device is MCUboot device
- */
-export const isMcuboot = (vid?: number, pid?: number) =>
-    vid &&
-    pid &&
-    vid === VendorId.NORDIC_SEMICONDUCTOR &&
-    McubootProductIds.includes(pid);
-
-/**
- * Check whether the device is MCUboot device with modem or not by providing vender Id and product Id
- *
- * @param {number} vid Vender Id
- * @param {number} pid Product Id
- * @returns {boolean} whether the device is MCUboot device with modem
- */
-export const isMcubootModem = (vid?: number, pid?: number) =>
-    vid &&
-    pid &&
-    vid === VendorId.NORDIC_SEMICONDUCTOR &&
-    ModemProductIds.includes(pid);
-
 export const openDevice =
     (device: Device): AppThunk =>
     dispatch => {
-        const { serialPorts } = device;
+        if (!device.serialPorts || device.serialPorts.length === 0) return;
 
-        // not all devices will have serialPorts property (non-Nordic devices for example)
-        if (!serialPorts || serialPorts.length === 0) return;
-
-        const serialport = serialPorts[0];
-        const { vendorId, productId } = serialport as SerialPort;
-        const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
-        const pid = productId ? parseInt(productId.toString(), 16) : undefined;
-
-        dispatch(
-            targetTypeKnown({
-                targetType: CommunicationType.MCUBOOT,
-                isRecoverable: false,
-            })
-        );
-        dispatch(mcubootKnown(true));
-        if (isMcubootModem(vid, pid)) {
+        if (device.traits.modem) {
             // Only Thingy91 matches the condition
             // Update when a new Nordic USB device has both mcuboot and modem
-            dispatch(modemKnown(true));
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_FAMILY,
                 DeviceFamily.NRF91
@@ -110,7 +57,6 @@ export const openDevice =
         } else {
             // Only Thingy53 matches the condition
             // Update when a new Nordic USB device has mcuboot without modem
-            dispatch(modemKnown(false));
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_FAMILY,
                 DeviceFamily.NRF53
@@ -129,29 +75,24 @@ export const openDevice =
         dispatch(loadingEnd());
     };
 
-export const toggleMcuboot =
-    (): AppThunk<RootState> => (dispatch, getState) => {
-        const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
-
-        if (isMcubootTarget) {
-            dispatch(mcubootKnown(false));
-        } else {
-            dispatch(mcubootKnown(true));
-        }
-
-        dispatch(canWrite());
-    };
-
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
+    const device = selectedDevice(getState());
+
+    if (!device) {
+        dispatch(targetWritableKnown(false));
+        return;
+    }
+
     // Disable write button
     dispatch(targetWritableKnown(false));
 
     // Check if mcu firmware is detected.
     // Check if target is MCU target.
     const { mcubootFilePath, zipFilePath } = getState().app.file;
-    const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
+    const isMcuboot =
+        !!device.traits.mcuBoot || getState().app.settings.forceMcuBoot;
 
-    if ((mcubootFilePath || zipFilePath) && isMcubootTarget) {
+    if ((mcubootFilePath || zipFilePath) && isMcuboot) {
         // Check if firmware is valid for Thingy91
         // So far there is no strict rule for checking it
         // Therefore set it always true

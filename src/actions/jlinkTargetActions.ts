@@ -17,10 +17,10 @@ import {
     describeError,
     getDeviceLibContext,
     logger,
+    selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
 
-import { modemKnown } from '../reducers/modemReducer';
 import { getAutoReset } from '../reducers/settingsReducer';
 import {
     erasingEnd,
@@ -30,36 +30,22 @@ import {
     targetContentsKnown,
     targetInfoKnown,
     targetRegionsKnown,
-    targetTypeKnown,
     targetWritableKnown,
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import {
-    CommunicationType,
     CoreDefinition,
     coreFriendlyName,
     DeviceDefinition,
-    DeviceFamily,
     getDeviceInfoByJlink,
     updateCoreInfo,
-    VendorId,
 } from '../util/devices';
 import sequence from '../util/promise';
 import { getTargetRegions } from '../util/regions';
 import { updateFileAppRegions, updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
-
-/**
- * Check whether the device is JLink device or not by providing vendor ID and product ID
- *
- * @param {number} vid Vendor ID
- * @param {number} pid Product ID
- * @returns {boolean} whether the device is JLink device
- */
-export const isJlink = (vid?: number, pid?: number) =>
-    vid && pid && vid === VendorId.SEGGER;
 
 /**
  * Load protection status of the core
@@ -101,12 +87,6 @@ export const openDevice =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
         dispatch(loadingStart());
-        dispatch(
-            targetTypeKnown({
-                targetType: CommunicationType.JLINK,
-                isRecoverable: true,
-            })
-        );
         logger.info(
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via JLink'
         );
@@ -116,12 +96,7 @@ export const openDevice =
         deviceInfo = await updateCoresWithNrfdl(device, deviceInfo);
 
         // Update modem target info according to detected device info
-        const isModem = deviceInfo.family
-            .toLowerCase()
-            .includes(DeviceFamily.NRF91.toLowerCase());
-
-        dispatch(modemKnown(isModem));
-
+        const isModem = !!device.traits.modem;
         if (isModem) logger.info('Modem detected');
 
         dispatch(targetInfoKnown(deviceInfo));
@@ -237,17 +212,24 @@ const getDeviceMemMap = async (deviceId: number, coreInfo: CoreDefinition) =>
  * @returns {void}
  */
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
+    const device = selectedDevice(getState());
+
+    if (!device) {
+        dispatch(targetWritableKnown(false));
+        return;
+    }
+
     // TODO: get the UICR address from the target definition. This value
     // works for nRF51s and nRF52s, but other targets might use a different one!!!
     const appState = getState().app;
     const { isErased, isMemLoaded } = appState.target;
-    const { isMcuboot } = appState.mcuboot;
+    const isMcuboot = !!device.traits.mcuBoot;
     const {
         memMaps: fileMemMaps,
         mcubootFilePath,
         zipFilePath,
     } = appState.file;
-    const { isModem } = appState.modem;
+    const isModem = device.traits.modem;
 
     // If MCU is enabled and MCU firmware is detected
     if (isMcuboot && mcubootFilePath) {
