@@ -12,7 +12,6 @@ import { modemWritingReady } from '../reducers/modemReducer';
 import {
     loadingStart,
     targetDeviceKnown,
-    targetPortChanged,
     targetWritableKnown,
 } from '../reducers/targetReducer';
 import { CommunicationType } from '../util/devices';
@@ -27,7 +26,7 @@ export const openDevice =
         dispatch(loadingStart());
         dispatch(targetDeviceKnown(device));
 
-        const { serialNumber, serialPorts } = device;
+        const { serialPorts } = device;
         const serialport = serialPorts?.slice(0)[0];
 
         let vendorId;
@@ -37,13 +36,6 @@ export const openDevice =
         }
         const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
         const pid = productId ? parseInt(productId.toString(), 16) : undefined;
-
-        dispatch(
-            targetPortChanged({
-                serialNumber,
-                path: serialport?.comName ?? undefined,
-            })
-        );
 
         if (device.traits.jlink || jlinkTargetActions.isJlink()) {
             dispatch(jlinkTargetActions.openDevice());

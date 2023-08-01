@@ -8,7 +8,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { getLoaded, getZipFilePath } from '../reducers/fileReducer';
-import { getDeviceInfo, getSerialNumber } from '../reducers/targetReducer';
+import { getDevice, getDeviceInfo } from '../reducers/targetReducer';
 import useOpenFileFromArgs from '../useOpenFileFromArgs';
 import { DeviceDefinition } from '../util/devices';
 import McuUpdateDialogView from './McuUpdateDialogView';
@@ -36,7 +36,7 @@ function hasFileContent(loaded: Record<string, unknown>) {
 const AppMainView = () => {
     const loaded = useSelector(getLoaded);
     const zipFilePath = useSelector(getZipFilePath);
-    const serialNumber = useSelector(getSerialNumber);
+    const device = useSelector(getDevice);
     const deviceInfo = useSelector(getDeviceInfo);
 
     useOpenFileFromArgs();
@@ -53,13 +53,13 @@ const AppMainView = () => {
                 />
                 <MemoryBoxView
                     title={
-                        getTargetTitle(serialNumber, deviceInfo) ||
+                        getTargetTitle(device?.serialNumber, deviceInfo) ||
                         'Device memory layout'
                     }
                     description="Connect a device to display memory contents"
                     iconName="appicon-chip"
-                    isHolder={!serialNumber}
-                    isTarget={!!serialNumber}
+                    isHolder={!device?.serialNumber}
+                    isTarget={!!device?.serialNumber}
                 />
             </div>
             <UserInputDialogView />

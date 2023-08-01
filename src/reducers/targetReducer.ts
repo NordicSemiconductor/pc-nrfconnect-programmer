@@ -19,8 +19,6 @@ import type { RootState } from './types';
 
 export interface TargetState {
     readonly targetType: CommunicationType;
-    readonly port?: string;
-    readonly serialNumber?: string;
     readonly deviceInfo?: DeviceDefinition;
     readonly device?: Device;
     readonly memMap?: MemoryMap;
@@ -38,8 +36,6 @@ export interface TargetState {
 
 const initialState: TargetState = {
     targetType: CommunicationType.UNKNOWN,
-    port: undefined,
-    serialNumber: undefined,
     deviceInfo: defaultDeviceDefinition,
     memMap: undefined,
     regions: [],
@@ -57,11 +53,6 @@ const initialState: TargetState = {
 interface TargetTypeKnownPayload {
     targetType: CommunicationType;
     isRecoverable: boolean;
-}
-
-interface TargetPortChangedPayload {
-    serialNumber: string;
-    path?: string;
 }
 
 interface TargetContentsKnownPayload {
@@ -82,13 +73,6 @@ const targetSlice = createSlice({
         },
         targetDeviceKnown(state, action: PayloadAction<Device>) {
             state.device = action.payload;
-        },
-        targetPortChanged(
-            state,
-            action: PayloadAction<TargetPortChangedPayload>
-        ) {
-            state.serialNumber = action.payload.serialNumber;
-            state.port = action.payload.path;
         },
         targetContentsKnown(
             state,
@@ -156,7 +140,6 @@ const {
     targetTypeKnown,
     targetInfoKnown,
     targetDeviceKnown,
-    targetPortChanged,
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,
@@ -171,7 +154,6 @@ const {
     deselectDevice,
 } = targetSlice.actions;
 
-export const getPort = (state: RootState) => state.app.target.port;
 export const getTargetType = (state: RootState) => state.app.target.targetType;
 export const getIsReady = (state: RootState) =>
     !state.app.target.isLoading &&
@@ -185,8 +167,6 @@ export const getIsWritable = (state: RootState) => state.app.target.isWritable;
 export const getDeviceInfo = (state: RootState) => state.app.target.deviceInfo;
 export const getDevice = (state: RootState) => state.app.target.device;
 export const getRegions = (state: RootState) => state.app.target.regions;
-export const getSerialNumber = (state: RootState) =>
-    state.app.target.serialNumber;
 export const getIsWriting = (state: RootState) => state.app.target.isWriting;
 export const getIsErasing = (state: RootState) => state.app.target.isErasing;
 export const getIsLoading = (state: RootState) => state.app.target.isLoading;
@@ -203,7 +183,6 @@ export {
     targetTypeKnown,
     targetInfoKnown,
     targetDeviceKnown,
-    targetPortChanged,
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,

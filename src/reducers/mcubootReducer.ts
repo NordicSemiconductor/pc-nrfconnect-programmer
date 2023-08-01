@@ -18,8 +18,6 @@ export interface McubootState {
     isWriting: boolean;
     isWritingSucceed: boolean;
     isWritingFail: boolean;
-    port?: string;
-    port2?: string;
     progressMsg: string;
     progressPercentage: number;
     progressDuration: number;
@@ -37,8 +35,6 @@ const initialState: McubootState = {
     isWriting: false,
     isWritingSucceed: false,
     isWritingFail: false,
-    port: undefined,
-    port2: undefined,
     progressMsg: MCUBOOT_DFU_NOT_STARTED,
     progressPercentage: 0,
     progressDuration: 0,
@@ -48,11 +44,6 @@ const initialState: McubootState = {
     timeoutStarted: false,
     timeoutValue: 0,
 };
-
-interface MCUBootPortKnownPayload {
-    port?: string;
-    port2?: string;
-}
 
 export interface MCUBootProcessUpdatePayload {
     message?: string;
@@ -70,13 +61,6 @@ const mcubootSlice = createSlice({
     reducers: {
         mcubootKnown(state, action: PayloadAction<boolean>) {
             state.isMcuboot = action.payload;
-        },
-        mcubootPortKnown(
-            state,
-            action: PayloadAction<MCUBootPortKnownPayload>
-        ) {
-            state.port = action.payload.port;
-            state.port2 = action.payload.port2;
         },
         mcubootProcessUpdate(
             state,
@@ -130,7 +114,6 @@ export default mcubootSlice.reducer;
 
 const {
     mcubootKnown,
-    mcubootPortKnown,
     mcubootProcessUpdate,
     mcubootWritingReady,
     mcubootWritingClose,
@@ -164,7 +147,6 @@ export const getIsMcuboot = (state: RootState) => state.app.mcuboot.isMcuboot;
 
 export {
     mcubootKnown,
-    mcubootPortKnown,
     mcubootProcessUpdate,
     mcubootWritingReady,
     mcubootWritingClose,

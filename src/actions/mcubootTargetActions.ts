@@ -19,7 +19,6 @@ import {
 import {
     mcubootFirmwareValid,
     mcubootKnown,
-    mcubootPortKnown,
     mcubootProcessUpdate,
     MCUBootProcessUpdatePayload,
     mcubootWritingFail,
@@ -120,12 +119,6 @@ export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
             'PCA20053'
         );
     }
-    dispatch(
-        mcubootPortKnown({
-            port: first(serialPorts)?.comName ?? undefined,
-            port2: last(serialPorts)?.comName ?? undefined,
-        })
-    );
     dispatch(updateFileRegions());
     dispatch(canWrite());
     dispatch(loadingEnd());
@@ -133,15 +126,12 @@ export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
 
 export const toggleMcuboot =
     (): AppThunk<RootState> => (dispatch, getState) => {
-        const { port } = getState().app.target;
         const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
 
         if (isMcubootTarget) {
             dispatch(mcubootKnown(false));
-            dispatch(mcubootPortKnown({}));
         } else {
             dispatch(mcubootKnown(true));
-            dispatch(mcubootPortKnown({ port }));
         }
 
         dispatch(canWrite());

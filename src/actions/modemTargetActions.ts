@@ -85,16 +85,18 @@ export const performUpdate =
         dispatch(modemProcessUpdate({ message: MODEM_DFU_STARTING }));
 
         const { modemFwName: fileName } = getState().app.modem;
-        const { serialNumber } = getState().app.target;
+        const { device } = getState().app.target;
 
-        if (!serialNumber) {
+        if (!device?.serialNumber) {
             logger.error(
                 'Modem DFU does not start due to missing serialNumber'
             );
             return;
         }
         logger.info('Modem DFU starts to write...');
-        logger.info(`Writing ${fileName} to device ${serialNumber || ''}`);
+        logger.info(
+            `Writing ${fileName} to device ${device?.serialNumber || ''}`
+        );
 
         dispatch(programDfuModem(fileName));
     };
