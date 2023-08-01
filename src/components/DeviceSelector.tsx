@@ -15,7 +15,7 @@ import {
 
 import { openDevice } from '../actions/targetActions';
 import EventAction from '../actions/usageDataActions';
-import { mcubootWritingClose } from '../reducers/mcubootReducer';
+import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { modemWritingClose } from '../reducers/modemReducer';
 import { deselectDevice, selectDevice } from '../reducers/targetReducer';
 
@@ -30,7 +30,7 @@ export default () => {
             }}
             onDeviceDeselected={() => {
                 usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
-                dispatch(mcubootWritingClose());
+                dispatch(setShowMcuBootProgrammingDialog(false));
                 dispatch(modemWritingClose());
                 dispatch(deselectDevice());
                 logger.info('Target device closed');
