@@ -235,7 +235,10 @@ const ControlPanel = () => {
                         dispatch(jlinkTargetActions.recover(device));
                     }}
                     disabled={
-                        !isJLink || !targetIsReady || !targetIsRecoverable
+                        isMcuboot ||
+                        !isJLink ||
+                        !targetIsReady ||
+                        !targetIsRecoverable
                     }
                 >
                     <span className="mdi mdi-eraser" />
