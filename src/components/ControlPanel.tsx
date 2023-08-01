@@ -19,7 +19,6 @@ import {
     Toggle,
     truncateMiddle,
 } from 'pc-nrfconnect-shared';
-import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
 import * as jlinkTargetActions from '../actions/jlinkTargetActions';
@@ -105,7 +104,6 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
         setShow(!show);
         setTarget(event.target as HTMLElement);
     };
-    // (eventKey: string | null, e: React.SyntheticEvent<unknown>) => void
     const onSelect = (filePath: string | null) => {
         if (filePath) {
             openFile(filePath);
@@ -167,10 +165,6 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
             </Button>
         </>
     );
-};
-
-Mru.propTypes = {
-    mruFiles: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 const ControlPanel = () => {

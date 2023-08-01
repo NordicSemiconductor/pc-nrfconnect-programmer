@@ -6,7 +6,6 @@
 
 import React from 'react';
 import { basename } from 'path';
-import PropTypes from 'prop-types';
 
 import { hexpad8 } from '../util/hexpad';
 
@@ -55,16 +54,5 @@ const RegionInfoView = ({
         </div>
     </>
 );
-
-RegionInfoView.propTypes = {
-    name: PropTypes.string,
-    startAddress: PropTypes.number.isRequired,
-    regionSize: PropTypes.number.isRequired,
-    fileNames: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
-
-RegionInfoView.defaultProps = {
-    name: null,
-};
 
 export default RegionInfoView;
