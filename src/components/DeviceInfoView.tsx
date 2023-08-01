@@ -8,15 +8,10 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectedDevice } from 'pc-nrfconnect-shared';
 
-import {
-    getDeviceInfo,
-    getIsMemLoaded,
-    getPort,
-} from '../reducers/targetReducer';
+import { getDeviceInfo, getIsMemLoaded } from '../reducers/targetReducer';
 
 const DeviceInfoView = () => {
     const device = useSelector(selectedDevice);
-    const port = useSelector(getPort);
     const deviceInfo = useSelector(getDeviceInfo);
     const isMemLoaded = useSelector(getIsMemLoaded);
 
@@ -37,10 +32,10 @@ const DeviceInfoView = () => {
                     <p>{device?.serialNumber}</p>
                 </div>
             )}
-            {port && (
+            {device?.serialport?.comName && (
                 <div>
                     <h5>Port</h5>
-                    <p>{port}</p>
+                    <p>{device.serialport.comName}</p>
                 </div>
             )}
             <div>
