@@ -38,7 +38,7 @@ export const openDevice =
             return;
         }
         if (device.traits.nordicDfu) {
-            usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicUsb');
+            usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicDfu');
             dispatch(usbsdfuTargetActions.openDevice(device));
             return;
         }
