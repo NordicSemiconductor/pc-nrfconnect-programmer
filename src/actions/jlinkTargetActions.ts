@@ -97,17 +97,9 @@ export const loadProtectionStatus = async (
     }
 };
 
-/**
- * Display some information about a DevKit. Called on a DevKit connection.
- * This also triggers reading the whole memory contents of the device.
- *
- * @returns {void}
- */
 export const openDevice =
-    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
-        const { device: inputDevice } = getState().app.target;
-        const device = inputDevice as Device;
-
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         dispatch(loadingStart());
         dispatch(
             targetTypeKnown({
@@ -147,7 +139,7 @@ export const openDevice =
         logger.info('Device is loaded and ready for further operation');
 
         const { autoRead } = getState().app.settings;
-        if (autoRead) await dispatch(read());
+        if (autoRead) await dispatch(read(device));
     };
 
 /**
@@ -287,16 +279,11 @@ const updateTargetRegions =
         dispatch(updateFileAppRegions());
     };
 
-/**
- * Read device flash memory
- * @returns {void}
- */
 export const read =
-    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         dispatch(loadingStart());
-        const { device: inputDevice, deviceInfo: inputDeviceInfo } =
-            getState().app.target;
-        const device = inputDevice as Device;
+        const inputDeviceInfo = getState().app.target.deviceInfo;
         const deviceInfo = inputDeviceInfo as DeviceDefinition;
 
         // Read from the device
@@ -339,7 +326,7 @@ export const read =
         dispatch(loadingEnd());
 
         const autoReset = getAutoReset(getState());
-        if (autoReset) dispatch(resetDevice());
+        if (autoReset) resetDevice(device);
     };
 
 /**
@@ -374,23 +361,18 @@ export const recoverOneCore =
         }
     };
 
-/**
- * Recover all cores one by one
- *
- *
- * @param {boolean} continueToWrite if a write action is operated right after the recover, the read action is not needed
- * @returns {void}
- */
 export const recover =
-    (continueToWrite = false): AppThunk<RootState, Promise<void>> =>
+    (
+        device: Device,
+        continueToWrite = false
+    ): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        const { device: inputDevice, deviceInfo: inputDeviceInfo } =
-            getState().app.target;
-        const { id: deviceId } = inputDevice as Device;
+        const inputDeviceInfo = getState().app.target.deviceInfo;
+
         const { cores } = inputDeviceInfo as DeviceDefinition;
         const results: unknown[] = [];
 
-        const argsArray = cores.map((c: CoreDefinition) => [deviceId, c]);
+        const argsArray = cores.map((c: CoreDefinition) => [device.id, c]);
         await sequence(
             (id: number, coreInfo: CoreDefinition) =>
                 dispatch(recoverOneCore(id, coreInfo)),
@@ -401,7 +383,7 @@ export const recover =
         dispatch(erasingEnd());
         logger.info('Device recovery completed');
 
-        if (!continueToWrite) await dispatch(openDevice());
+        if (!continueToWrite) await dispatch(openDevice(device));
     };
 
 /**
@@ -495,19 +477,13 @@ export const writeOneCore =
         logger.info(`Writing procedure ends for ${coreInfo.name} core`);
     };
 
-/**
- * Write provided file(s) to the device
- *
- * @returns {void}
- */
 export const write =
-    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
-        const { device: inputDevice, deviceInfo: inputDeviceInfo } =
-            getState().app.target;
-        const { id: deviceId } = inputDevice as Device;
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
+        const inputDeviceInfo = getState().app.target.deviceInfo;
         const { cores } = inputDeviceInfo as DeviceDefinition;
         const results: unknown[] = [];
-        const argsArray = cores.map(c => [deviceId, c]);
+        const argsArray = cores.map(c => [device.id, c]);
         await sequence(
             (id: number, coreInfo: CoreDefinition) =>
                 dispatch(writeOneCore(id, coreInfo)),
@@ -516,35 +492,23 @@ export const write =
         );
         dispatch(writingEnd());
         const autoReset = getAutoReset(getState());
-        if (autoReset) await dispatch(resetDevice());
-        await dispatch(openDevice());
+        if (autoReset) await resetDevice(device);
+        await dispatch(openDevice(device));
         dispatch(canWrite());
     };
 
-/**
- * Erase all on device and write file to it.
- *
- * @returns {void}
- */
 export const recoverAndWrite =
-    (): AppThunk<RootState, Promise<void>> => async dispatch => {
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async dispatch => {
         const continueToWrite = true;
-        await dispatch(recover(continueToWrite));
-        await dispatch(write());
+        await dispatch(recover(device, continueToWrite));
+        await dispatch(write(device));
     };
 
-/**
- * Reset device to Application mode
- * @returns {Promise<void>} resolved promise
- */
-export const resetDevice =
-    (): AppThunk<RootState, Promise<void>> => async (_, getState) => {
-        const { device: inputDevice } = getState().app.target;
-        const device = inputDevice as Device;
-
-        await nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
-        logger.info(`Resetting device completed`);
-    };
+export const resetDevice = async (device: Device) => {
+    await nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
+    logger.info(`Resetting device completed`);
+};
 
 /**
  * Save the content from the device memory as hex file.

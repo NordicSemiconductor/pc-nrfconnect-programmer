@@ -23,12 +23,9 @@ import {
 import { RootState } from '../reducers/types';
 
 export const programDfuModem =
-    (fileName: string): AppThunk<RootState, Promise<void>> =>
-    (dispatch, getState) =>
+    (device: Device, fileName: string): AppThunk<RootState, Promise<void>> =>
+    dispatch =>
         new Promise<void>(resolve => {
-            const { device: inputDevice } = getState().app.target;
-            const { id: deviceId } = inputDevice as Device;
-
             const errorCallback = (error: nrfdl.Error) => {
                 let errorMsg = describeError(error);
                 logger.error(`Modem DFU failed with error: ${errorMsg}`);
@@ -70,7 +67,7 @@ export const programDfuModem =
 
             nrfdl.firmwareProgram(
                 getDeviceLibContext(),
-                deviceId,
+                device.id,
                 'NRFDL_FW_FILE',
                 'NRFDL_FW_NRF91_MODEM',
                 fileName,
@@ -80,12 +77,12 @@ export const programDfuModem =
         });
 
 export const performUpdate =
-    (): AppThunk<RootState> => (dispatch, getState) => {
+    (device: Device): AppThunk<RootState> =>
+    (dispatch, getState) => {
         dispatch(modemWritingStart());
         dispatch(modemProcessUpdate({ message: MODEM_DFU_STARTING }));
 
         const { modemFwName: fileName } = getState().app.modem;
-        const { device } = getState().app.target;
 
         if (!device?.serialNumber) {
             logger.error(
@@ -98,5 +95,5 @@ export const performUpdate =
             `Writing ${fileName} to device ${device?.serialNumber || ''}`
         );
 
-        dispatch(programDfuModem(fileName));
+        dispatch(programDfuModem(device, fileName));
     };

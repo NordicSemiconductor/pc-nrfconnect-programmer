@@ -12,6 +12,8 @@ import {
     Alert,
     DialogButton,
     GenericDialog,
+    logger,
+    selectedDevice,
     useStopwatch,
 } from 'pc-nrfconnect-shared';
 
@@ -30,6 +32,7 @@ import {
 } from '../reducers/modemReducer';
 
 const ModemUpdateDialogView = () => {
+    const device = useSelector(selectedDevice);
     const isVisible = useSelector(getIsReady);
     const isWriting = useSelector(getIsWriting);
     const isWritingSucceed = useSelector(getIsWritingSucceed);
@@ -53,9 +56,14 @@ const ModemUpdateDialogView = () => {
     });
 
     const onWriteStart = () => {
+        if (!device) {
+            logger.error('No target device!');
+            return;
+        }
+
         reset();
         start();
-        dispatch(performUpdate());
+        dispatch(performUpdate(device));
     };
 
     useEffect(() => {
