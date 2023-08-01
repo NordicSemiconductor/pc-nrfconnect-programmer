@@ -11,34 +11,28 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
+import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Alert,
     classNames,
+    clearWaitForDevice,
     DialogButton,
     GenericDialog,
     getPersistentStore,
     logger,
     NumberInlineInput,
     selectedDevice,
+    setWaitForDevice,
     Slider,
     Toggle,
     useStopwatch,
 } from 'pc-nrfconnect-shared';
 
-import { performUpdate } from '../actions/mcubootTargetActions';
+import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
 import {
-    getErrorMsg,
-    getIsFirmwareValid,
-    getIsReady,
-    getIsWriting,
-    getIsWritingFail,
-    getIsWritingSucceed,
-    getProgressMsg,
-    getProgressPercentage,
-    getTimeoutStarted,
-    getTimeoutValue,
-    mcubootWritingClose,
+    getShowMcuBootProgrammingDialog,
+    setShowMcuBootProgrammingDialog,
 } from '../reducers/mcubootReducer';
 
 const TOOLTIP_TEXT =
@@ -47,26 +41,25 @@ const TOOLTIP_TEXT =
 const NET_CORE_UPLOAD_DELAY = 120;
 
 const McuUpdateDialogView = () => {
-    const [keepDialogOpen, setKeepDialogOpen] = useState(false);
-    const errorMsg = useSelector(getErrorMsg);
-    const isVisible = useSelector(getIsReady);
-    const isWriting = useSelector(getIsWriting);
-    const isWritingFail = useSelector(getIsWritingFail);
-    const isWritingSucceed = useSelector(getIsWritingSucceed);
-    const isFirmwareValid = useSelector(getIsFirmwareValid);
+    const [progress, setProgress] = useState<nrfdl.Progress.Operation>();
+    const [writing, setWriting] = useState(false);
+    const [writingFail, setWritingFail] = useState(false);
+    const [writingSucceed, setWritingSucceed] = useState(false);
+    const [writingFailError, setWritingFailError] = useState<string>();
+    const [timeoutStarted, setTimeoutStarted] = useState(false);
+    const [timeoutValue, setTimeoutValue] = useState(0);
+
+    const device = useSelector(selectedDevice);
+    const isVisible = useSelector(getShowMcuBootProgrammingDialog);
     const mcubootFwPath = useSelector(getMcubootFilePath);
     const zipFilePath = useSelector(getZipFilePath);
-    const progressMsg = useSelector(getProgressMsg);
-    const progressPercentage = useSelector(getProgressPercentage);
-    const timeoutStarted = useSelector(getTimeoutStarted);
-    const timeoutValue = useSelector(getTimeoutValue);
+
     const [netCoreUploadDelayOffset, setNetCoreUploadDelayOffset] =
         useState(-1);
 
-    const writingHasStarted = isWriting || isWritingFail || isWritingSucceed;
+    const writingHasStarted = writing || writingFail || writingSucceed;
 
     const dispatch = useDispatch();
-    const device = useSelector(selectedDevice);
 
     const [uploadDelay, setUploadDelay] = useState(NET_CORE_UPLOAD_DELAY);
     const [keepDefaultTimeout, setKeepDefaultTimeout] = useState(true);
@@ -91,6 +84,18 @@ const McuUpdateDialogView = () => {
     }, [device]);
 
     useEffect(() => {
+        if (!isVisible) {
+            setProgress(undefined);
+            setWriting(false);
+            setWritingSucceed(false);
+            setWritingFail(false);
+            setWritingFailError(undefined);
+            setTimeoutStarted(false);
+            setTimeoutValue(0);
+        }
+    }, [isVisible]);
+
+    useEffect(() => {
         if (!showDelayTimeout || !device) return;
 
         const timeout =
@@ -113,8 +118,8 @@ const McuUpdateDialogView = () => {
     }, [netCoreUploadDelayOffset, timeoutStarted, time]);
 
     const onCancel = () => {
-        setKeepDialogOpen(false);
-        dispatch(mcubootWritingClose());
+        dispatch(clearWaitForDevice());
+        dispatch(setShowMcuBootProgrammingDialog(false));
     };
 
     const onWriteStart = () => {
@@ -123,10 +128,60 @@ const McuUpdateDialogView = () => {
             return;
         }
 
+        setWriting(true);
         reset();
         start();
-        setKeepDialogOpen(true);
-        dispatch(performUpdate(device, showDelayTimeout ? uploadDelay : null));
+
+        dispatch(
+            setWaitForDevice({
+                timeout: 99999999999999, // Wait 'indefinitely' as we will cancel the wait when programming is complete
+                when: 'always',
+                once: false,
+            })
+        );
+
+        performUpdate(
+            device,
+            programmingProgress => {
+                let updatedProgress: nrfdl.Progress.Operation = {
+                    ...programmingProgress,
+                    message: programmingProgress.message ?? '',
+                };
+
+                if (programmingProgress.operation === 'erase_image') {
+                    updatedProgress = {
+                        ...programmingProgress,
+                        message: `${programmingProgress.message} This will take some time.`,
+                    };
+                }
+                if (
+                    programmingProgress.message?.match(
+                        /Waiting [0-9]+ seconds to let RAM NET Core flash succeed./
+                    )
+                ) {
+                    const timeouts = programmingProgress.message.match(/\d+/g);
+                    if (timeouts?.length === 1) {
+                        setTimeoutStarted(true);
+                        setTimeoutValue(parseInt(timeouts[0], 10));
+                    }
+                }
+                setProgress(updatedProgress);
+            },
+            mcubootFwPath,
+            zipFilePath,
+            showDelayTimeout ? uploadDelay : undefined
+        )
+            .then(() => {
+                setWritingSucceed(true);
+            })
+            .catch(error => {
+                setWritingFailError(error.message);
+                setWritingFail(true);
+            })
+            .finally(() => {
+                dispatch(canWrite());
+                setWriting(false);
+            });
     };
 
     const updateUploadDelayTimeout = (timeout: number) => {
@@ -148,12 +203,12 @@ const McuUpdateDialogView = () => {
     };
 
     useEffect(() => {
-        if (isWritingSucceed || isWritingFail) {
+        if (writingSucceed || writingFail) {
             pause();
         }
-    }, [isWritingFail, isWritingSucceed, pause]);
+    }, [writingFail, writingSucceed, pause]);
 
-    const progress = timeoutStarted
+    const timerProgress = timeoutStarted
         ? Math.min(
               100,
               Math.round(
@@ -161,14 +216,14 @@ const McuUpdateDialogView = () => {
                       100
               )
           )
-        : progressPercentage;
+        : progress?.progressPercentage ?? 0;
 
     return (
         <GenericDialog
             title="MCUboot DFU"
-            isVisible={isVisible || keepDialogOpen}
+            isVisible={isVisible}
             onHide={onCancel}
-            showSpinner={isWriting}
+            showSpinner={writing}
             closeOnUnfocus={false}
             className="mcu-update-dialog"
             footer={
@@ -176,13 +231,11 @@ const McuUpdateDialogView = () => {
                     <DialogButton
                         variant="primary"
                         onClick={onWriteStart}
-                        disabled={
-                            isWriting || isWritingSucceed || isWritingFail
-                        }
+                        disabled={writing || writingSucceed || writingFail}
                     >
                         Write
                     </DialogButton>
-                    <DialogButton onClick={onCancel} disabled={isWriting}>
+                    <DialogButton onClick={onCancel} disabled={writing}>
                         Close
                     </DialogButton>
                 </>
@@ -194,17 +247,21 @@ const McuUpdateDialogView = () => {
                     <span>{` ${mcubootFwPath || zipFilePath}`}</span>
                 </Form.Label>
             </Form.Group>
-            <Form.Group>
-                <Form.Label>
-                    <strong>Status:</strong>
-                    <span>{` ${progressMsg}`}</span>
-                </Form.Label>
-                <ProgressBar
-                    hidden={!isWriting}
-                    now={progress}
-                    style={{ height: '4px' }}
-                />
-            </Form.Group>
+            {writing && (
+                <Form.Group>
+                    <Form.Label>
+                        <strong>Status: </strong>
+                        <span>{` ${
+                            progress ? progress.message : 'Starting...'
+                        }`}</span>
+                    </Form.Label>
+                    <ProgressBar
+                        hidden={!writing}
+                        now={timerProgress}
+                        style={{ height: '4px' }}
+                    />
+                </Form.Group>
+            )}
             {!writingHasStarted && showDelayTimeout && (
                 <Form.Group className="upload-delay p-3">
                     <div className="d-flex justify-content-between">
@@ -232,11 +289,11 @@ const McuUpdateDialogView = () => {
                     </div>
                     <FormLabel
                         className={classNames(
-                            'w-100 mt-3 mb-0',
+                            'w-100 mb-0 mt-3',
                             keepDefaultTimeout ? 'd-none' : 'd-block'
                         )}
                     >
-                        <div className="d-flex flex-row justify-content-between mb-2">
+                        <div className="d-flex justify-content-between mb-2 flex-row">
                             <div>
                                 <strong>Set delay duration</strong>
                             </div>
@@ -285,23 +342,16 @@ const McuUpdateDialogView = () => {
                         </div>
                     </Alert>
                 )}
-                {!isFirmwareValid && (
-                    <Alert variant="warning">
-                        The selected HEX file appears to be invalid for MCUboot
-                        DFU.
-                    </Alert>
-                )}
-                {isWritingSucceed && (
+                {writingSucceed && (
                     <Alert variant="success">
                         Completed successfully in {` `}
                         {` ${Math.round(time / 1000)} `}
                         {` `} seconds.
                     </Alert>
                 )}
-                {isWritingFail && (
-                    <Alert label="Error" variant="danger">
-                        <br />
-                        {errorMsg ||
+                {writingFail && (
+                    <Alert variant="danger">
+                        {writingFailError?.trim() ||
                             'Failed. Check the log below for more details...'}
                     </Alert>
                 )}

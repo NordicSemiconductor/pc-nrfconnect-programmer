@@ -12,7 +12,7 @@ import {
     usageData,
 } from 'pc-nrfconnect-shared';
 
-import { mcubootWritingReady } from '../reducers/mcubootReducer';
+import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { modemWritingReady } from '../reducers/modemReducer';
 import { loadingStart, targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
@@ -95,7 +95,7 @@ export const write =
             return;
         }
         if (device.traits.mcuBoot || getState().app.settings.forceMcuBoot) {
-            dispatch(mcubootWritingReady());
+            dispatch(setShowMcuBootProgrammingDialog(true));
             return;
         }
         if (device.traits.jlink) {
