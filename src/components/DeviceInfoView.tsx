@@ -6,29 +6,35 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { selectedDevice } from 'pc-nrfconnect-shared';
 
 import {
     getDeviceInfo,
     getIsMemLoaded,
     getPort,
-    getSerialNumber,
-    getTargetType,
 } from '../reducers/targetReducer';
-import { CommunicationType } from '../util/devices';
 
 const DeviceInfoView = () => {
-    const serialNumber = useSelector(getSerialNumber);
+    const device = useSelector(selectedDevice);
     const port = useSelector(getPort);
-    const targetType = useSelector(getTargetType);
     const deviceInfo = useSelector(getDeviceInfo);
     const isMemLoaded = useSelector(getIsMemLoaded);
 
+    let targetType = 'UNKNOWN';
+    if (device?.traits?.mcuBoot) {
+        targetType = 'MCUBOOT';
+    } else if (device?.traits?.nordicDfu) {
+        targetType = 'USBSDFU';
+    } else if (device?.traits?.jlink) {
+        targetType = 'JLINK';
+    }
+
     return (
         <div className="memory-details">
-            {serialNumber && (
+            {device?.serialNumber && (
                 <div>
                     <h5>Serial Number</h5>
-                    <p>{serialNumber}</p>
+                    <p>{device?.serialNumber}</p>
                 </div>
             )}
             {port && (
@@ -47,7 +53,7 @@ const DeviceInfoView = () => {
                     <p>{deviceInfo.cores.length}</p>
                 </div>
             )}
-            {targetType === CommunicationType.JLINK && (
+            {device?.traits.jlink && (
                 <div>
                     <h5>Device memory is loaded?</h5>
                     <p>{isMemLoaded ? 'Yes' : 'No'}</p>

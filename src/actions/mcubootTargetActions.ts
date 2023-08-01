@@ -131,20 +131,21 @@ export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
     dispatch(loadingEnd());
 };
 
-export const toggleMcuboot = (): AppThunk => (dispatch, getState) => {
-    const { port } = getState().app.target;
-    const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
+export const toggleMcuboot =
+    (): AppThunk<RootState> => (dispatch, getState) => {
+        const { port } = getState().app.target;
+        const { isMcuboot: isMcubootTarget } = getState().app.mcuboot;
 
-    if (isMcubootTarget) {
-        dispatch(mcubootKnown(false));
-        dispatch(mcubootPortKnown({}));
-    } else {
-        dispatch(mcubootKnown(true));
-        dispatch(mcubootPortKnown({ port }));
-    }
+        if (isMcubootTarget) {
+            dispatch(mcubootKnown(false));
+            dispatch(mcubootPortKnown({}));
+        } else {
+            dispatch(mcubootKnown(true));
+            dispatch(mcubootPortKnown({ port }));
+        }
 
-    dispatch(canWrite());
-};
+        dispatch(canWrite());
+    };
 
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     // Disable write button
