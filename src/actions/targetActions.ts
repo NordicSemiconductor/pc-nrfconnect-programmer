@@ -13,7 +13,7 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
-import { modemWritingReady } from '../reducers/modemReducer';
+import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import { loadingStart, targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import * as jlinkTargetActions from './jlinkTargetActions';
@@ -91,7 +91,7 @@ export const write =
         const zipFilePath = getState().app.file.zipFilePath;
 
         if (device.traits.modem && zipFilePath) {
-            dispatch(modemWritingReady(zipFilePath));
+            dispatch(setShowModemProgrammingDialog(true));
             return;
         }
         if (device.traits.mcuBoot || getState().app.settings.forceMcuBoot) {
