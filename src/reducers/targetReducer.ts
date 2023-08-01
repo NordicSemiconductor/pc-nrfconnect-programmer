@@ -7,17 +7,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
 
-import {
-    CommunicationType,
-    defaultDeviceDefinition,
-    DeviceDefinition,
-} from '../util/devices';
+import { defaultDeviceDefinition, DeviceDefinition } from '../util/devices';
 import { Region } from '../util/regions';
 import { fileParse, filesEmpty } from './fileReducer';
 import type { RootState } from './types';
 
 export interface TargetState {
-    readonly targetType: CommunicationType;
     readonly deviceInfo?: DeviceDefinition;
     readonly memMap?: MemoryMap;
     readonly regions?: Region[]; // TODO: Define region
@@ -25,7 +20,6 @@ export interface TargetState {
     readonly writtenAddress?: number;
     readonly isMemLoaded: boolean;
     readonly isWritable: boolean;
-    readonly isRecoverable: boolean;
     readonly isWriting: boolean;
     readonly isErasing: boolean;
     readonly isErased: boolean;
@@ -33,7 +27,6 @@ export interface TargetState {
 }
 
 const initialState: TargetState = {
-    targetType: CommunicationType.UNKNOWN,
     deviceInfo: defaultDeviceDefinition,
     memMap: undefined,
     regions: [],
@@ -41,17 +34,11 @@ const initialState: TargetState = {
     writtenAddress: 0,
     isMemLoaded: false,
     isWritable: false,
-    isRecoverable: false,
     isWriting: false,
     isErasing: false,
     isErased: false,
     isLoading: false,
 };
-
-interface TargetTypeKnownPayload {
-    targetType: CommunicationType;
-    isRecoverable: boolean;
-}
 
 interface TargetContentsKnownPayload {
     targetMemMap: MemoryMap;
@@ -62,10 +49,6 @@ const targetSlice = createSlice({
     name: 'target',
     initialState,
     reducers: {
-        targetTypeKnown(state, action: PayloadAction<TargetTypeKnownPayload>) {
-            state.targetType = action.payload.targetType;
-            state.isRecoverable = action.payload.isRecoverable;
-        },
         targetInfoKnown(state, action: PayloadAction<DeviceDefinition>) {
             state.deviceInfo = action.payload;
         },
@@ -132,7 +115,6 @@ const targetSlice = createSlice({
 export default targetSlice.reducer;
 
 const {
-    targetTypeKnown,
     targetInfoKnown,
     targetContentsKnown,
     targetRegionsKnown,
@@ -148,15 +130,12 @@ const {
     deselectDevice,
 } = targetSlice.actions;
 
-export const getTargetType = (state: RootState) => state.app.target.targetType;
 export const getIsReady = (state: RootState) =>
     !state.app.target.isLoading &&
     !state.app.target.isWriting &&
     !state.app.target.isErasing;
 export const getIsMemLoaded = (state: RootState) =>
     state.app.target.isMemLoaded;
-export const getIsRecoverable = (state: RootState) =>
-    state.app.target.isRecoverable;
 export const getIsWritable = (state: RootState) => state.app.target.isWritable;
 export const getDeviceInfo = (state: RootState) => state.app.target.deviceInfo;
 export const getRegions = (state: RootState) => state.app.target.regions;
@@ -165,15 +144,12 @@ export const getIsErasing = (state: RootState) => state.app.target.isErasing;
 export const getIsLoading = (state: RootState) => state.app.target.isLoading;
 
 export const getRefreshEnabled = (state: RootState) =>
-    state.app.target.targetType === CommunicationType.JLINK &&
     !state.app.target.isMemLoaded &&
     !state.app.target.isLoading &&
     !state.app.target.isWriting &&
-    !state.app.target.isErasing &&
-    !state.app.mcuboot.isMcuboot;
+    !state.app.target.isErasing;
 
 export {
-    targetTypeKnown,
     targetInfoKnown,
     targetContentsKnown,
     targetRegionsKnown,

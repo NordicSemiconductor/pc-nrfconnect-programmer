@@ -18,7 +18,6 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/modemTargetActions';
-import { getIsMcuboot } from '../reducers/mcubootReducer';
 import {
     getErrorMsg,
     getIsReady,
@@ -30,6 +29,7 @@ import {
     getProgressPercentage,
     modemWritingClose,
 } from '../reducers/modemReducer';
+import { getForceMcuBoot } from '../reducers/settingsReducer';
 
 const ModemUpdateDialogView = () => {
     const device = useSelector(selectedDevice);
@@ -41,7 +41,7 @@ const ModemUpdateDialogView = () => {
     const progressMsg = useSelector(getProgressMsg);
     const progressPercentage = useSelector(getProgressPercentage);
     const errorMsg = useSelector(getErrorMsg);
-    const isMcuboot = useSelector(getIsMcuboot);
+    const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     const expectedFwName = /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
 
     const dispatch = useDispatch();

@@ -35,20 +35,16 @@ import {
     loadingEnd,
     targetInfoKnown,
     targetRegionsKnown,
-    targetTypeKnown,
     targetWritableKnown,
     writingEnd,
     writingStart,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import {
-    CommunicationType,
     DeviceDefinition,
     DeviceFamily,
     getDeviceInfoByUSB,
     NordicFwIds,
-    USBProductIds,
-    VendorId,
 } from '../util/devices';
 import {
     defaultRegion,
@@ -72,28 +68,9 @@ const defaultDfuImage: DfuImage = {
     firmwareImage: Buffer.alloc(0),
 };
 
-/**
- * Check whether the device is Nordic USB device or not by providing vender Id and product Id
- *
- * @param {number} vid Vendor ID
- * @param {number} pid Product ID
- * @returns {boolean} whether the device is Nordic USB device
- */
-export const isNordicUsb = (vid?: number, pid?: number) =>
-    vid &&
-    pid &&
-    vid === VendorId.NORDIC_SEMICONDUCTOR &&
-    USBProductIds.includes(pid);
-
 export const openDevice =
     (device: Device): AppThunk =>
     dispatch => {
-        dispatch(
-            targetTypeKnown({
-                targetType: CommunicationType.USBSDFU,
-                isRecoverable: false,
-            })
-        );
         logger.info(
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
         );

@@ -12,7 +12,6 @@ export const MODEM_DFU_NOT_STARTED = 'Not started.';
 export const MODEM_DFU_STARTING = 'Starting...';
 
 export interface ModemState {
-    isModem: boolean;
     isReady: boolean;
     isWriting: boolean;
     isWritingSucceed: boolean;
@@ -27,7 +26,6 @@ export interface ModemState {
 }
 
 const initialState: ModemState = {
-    isModem: false,
     isReady: false,
     isWriting: false,
     isWritingSucceed: false,
@@ -53,9 +51,6 @@ const modemSlice = createSlice({
     name: 'modem',
     initialState,
     reducers: {
-        modemKnown(state, action: PayloadAction<boolean>) {
-            state.isModem = action.payload;
-        },
         modemProcessUpdate(
             state,
             action: PayloadAction<ModemProcessUpdatePayload>
@@ -98,7 +93,6 @@ const modemSlice = createSlice({
 export default modemSlice.reducer;
 
 const {
-    modemKnown,
     modemProcessUpdate,
     modemWritingReady,
     modemWritingClose,
@@ -108,7 +102,6 @@ const {
     modemWritingFail,
 } = modemSlice.actions;
 
-export const getIsModem = (state: RootState) => state.app.modem.isModem;
 export const getIsWriting = (state: RootState) => state.app.modem.isWriting;
 export const getIsReady = (state: RootState) => state.app.modem.isReady;
 export const getProgressPercentage = (state: RootState) =>
@@ -124,7 +117,6 @@ export const getIsWritingSucceed = (state: RootState) =>
 export const getModemFwName = (state: RootState) => state.app.modem.modemFwName;
 
 export {
-    modemKnown,
     modemProcessUpdate,
     modemWritingReady,
     modemWritingClose,

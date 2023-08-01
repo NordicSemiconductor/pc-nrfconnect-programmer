@@ -23,7 +23,6 @@ import PropTypes from 'prop-types';
 
 import * as fileActions from '../actions/fileActions';
 import * as jlinkTargetActions from '../actions/jlinkTargetActions';
-import * as mcubootTargetActions from '../actions/mcubootTargetActions';
 import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
@@ -32,18 +31,18 @@ import {
     getMruFiles,
     getZipFilePath,
 } from '../reducers/fileReducer';
-import { getIsMcuboot } from '../reducers/mcubootReducer';
-import { getIsModem } from '../reducers/modemReducer';
-import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
+import {
+    getAutoRead,
+    getAutoReset,
+    getForceMcuBoot,
+    setForceMcuBoot,
+} from '../reducers/settingsReducer';
 import {
     getDeviceInfo,
     getIsMemLoaded,
     getIsReady,
-    getIsRecoverable,
     getIsWritable,
-    getTargetType,
 } from '../reducers/targetReducer';
-import { CommunicationType } from '../util/devices';
 
 const useRegisterDragEvents = () => {
     const dispatch = useDispatch();
@@ -181,25 +180,25 @@ const ControlPanel = () => {
     const autoRead = useSelector(getAutoRead);
     const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
-    const targetIsRecoverable = useSelector(getIsRecoverable);
     const targetIsMemLoaded = useSelector(getIsMemLoaded);
     const isProtected = !!useSelector(getDeviceInfo)?.cores.find(
         c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
     );
-    const targetIsReady = useSelector(getIsReady) && !!device;
-    const isJLink = useSelector(getTargetType) === CommunicationType.JLINK;
-    const isUsbSerial =
-        useSelector(getTargetType) === CommunicationType.USBSDFU;
-    const isMcuboot = useSelector(getIsMcuboot);
-    const isModem = useSelector(getIsModem);
     const zipFile = useSelector(getZipFilePath);
+    const forceMcuBoot = useSelector(getForceMcuBoot);
+    const targetIsReady = useSelector(getIsReady) && !!device;
+    const isJLink = !!device?.traits.jlink;
+    const isNordicDfu = !!device?.traits.nordicDfu;
+    const isMcuboot = !!device?.traits.mcuBoot;
+    const isModem = !!device?.traits.modem;
+
+    const targetIsRecoverable = isJLink;
 
     const dispatch = useDispatch();
     const closeFiles = () => dispatch(fileActions.closeFiles());
     const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
     const toggleAutoRead = () => dispatch(settingsActions.toggleAutoRead());
     const toggleAutoReset = () => dispatch(settingsActions.toggleAutoReset());
-    const toggleMcuboot = () => dispatch(mcubootTargetActions.toggleMcuboot());
     const performSaveAsFile = () => dispatch(jlinkTargetActions.saveAsFile());
 
     return (
@@ -288,7 +287,7 @@ const ControlPanel = () => {
                             return;
                         }
 
-                        if (isUsbSerial) {
+                        if (isNordicDfu) {
                             dispatch(usbsdfuTargetActions.resetDevice(device));
                         } else {
                             dispatch(jlinkTargetActions.resetDevice(device));
@@ -370,8 +369,14 @@ const ControlPanel = () => {
                     </>
                 </Toggle>
                 <Toggle
-                    onToggle={() => toggleMcuboot()}
-                    isToggled={isMcuboot}
+                    onToggle={v => {
+                        dispatch(setForceMcuBoot(v));
+                        if (device) {
+                            dispatch(targetActions.updateTargetWritable());
+                        }
+                    }}
+                    isToggled={forceMcuBoot || isMcuboot}
+                    disabled={isMcuboot}
                     label="Enable MCUboot"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}

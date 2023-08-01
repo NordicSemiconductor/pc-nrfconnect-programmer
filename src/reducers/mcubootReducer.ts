@@ -13,7 +13,6 @@ export const MCUBOOT_DFU_STARTING = 'Starting...';
 
 export interface McubootState {
     isFirmwareValid: boolean;
-    isMcuboot: boolean;
     isReady: boolean;
     isWriting: boolean;
     isWritingSucceed: boolean;
@@ -30,7 +29,6 @@ export interface McubootState {
 
 const initialState: McubootState = {
     isFirmwareValid: false,
-    isMcuboot: false,
     isReady: false,
     isWriting: false,
     isWritingSucceed: false,
@@ -59,9 +57,6 @@ const mcubootSlice = createSlice({
     name: 'mcuboot',
     initialState,
     reducers: {
-        mcubootKnown(state, action: PayloadAction<boolean>) {
-            state.isMcuboot = action.payload;
-        },
         mcubootProcessUpdate(
             state,
             action: PayloadAction<MCUBootProcessUpdatePayload>
@@ -113,7 +108,6 @@ const mcubootSlice = createSlice({
 export default mcubootSlice.reducer;
 
 const {
-    mcubootKnown,
     mcubootProcessUpdate,
     mcubootWritingReady,
     mcubootWritingClose,
@@ -143,10 +137,8 @@ export const getIsWritingFail = (state: RootState) =>
 export const getIsWritingSucceed = (state: RootState) =>
     state.app.mcuboot.isWritingSucceed;
 export const getIsReady = (state: RootState) => state.app.mcuboot.isReady;
-export const getIsMcuboot = (state: RootState) => state.app.mcuboot.isMcuboot;
 
 export {
-    mcubootKnown,
     mcubootProcessUpdate,
     mcubootWritingReady,
     mcubootWritingClose,
