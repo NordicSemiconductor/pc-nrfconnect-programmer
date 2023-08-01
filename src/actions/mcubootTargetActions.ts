@@ -28,7 +28,6 @@ import {
 import { modemKnown } from '../reducers/modemReducer';
 import {
     loadingEnd,
-    targetDeviceKnown,
     targetTypeKnown,
     targetWritableKnown,
 } from '../reducers/targetReducer';
@@ -72,57 +71,63 @@ export const isMcubootModem = (vid?: number, pid?: number) =>
     vid === VendorId.NORDIC_SEMICONDUCTOR &&
     ModemProductIds.includes(pid);
 
-export const openDevice = (): AppThunk<RootState> => (dispatch, getState) => {
-    const { device: inputDevice } = getState().app.target;
-    const device = inputDevice as Device;
-    const { serialPorts } = device;
+export const openDevice =
+    (device: Device): AppThunk =>
+    dispatch => {
+        const { serialPorts } = device;
 
-    // not all devices will have serialPorts property (non-Nordic devices for example)
-    if (!serialPorts || serialPorts.length === 0) return;
+        // not all devices will have serialPorts property (non-Nordic devices for example)
+        if (!serialPorts || serialPorts.length === 0) return;
 
-    const serialport = serialPorts[0];
-    const { vendorId, productId } = serialport as SerialPort;
-    const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
-    const pid = productId ? parseInt(productId.toString(), 16) : undefined;
+        const serialport = serialPorts[0];
+        const { vendorId, productId } = serialport as SerialPort;
+        const vid = vendorId ? parseInt(vendorId.toString(), 16) : undefined;
+        const pid = productId ? parseInt(productId.toString(), 16) : undefined;
 
-    dispatch(
-        targetTypeKnown({
-            targetType: CommunicationType.MCUBOOT,
-            isRecoverable: false,
-        })
-    );
-    dispatch(mcubootKnown(true));
-    if (isMcubootModem(vid, pid)) {
-        // Only Thingy91 matches the condition
-        // Update when a new Nordic USB device has both mcuboot and modem
-        dispatch(modemKnown(true));
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_FAMILY,
-            DeviceFamily.NRF91
+        dispatch(
+            targetTypeKnown({
+                targetType: CommunicationType.MCUBOOT,
+                isRecoverable: false,
+            })
         );
-        usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'Thingy91');
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_BOARD_VERSION,
-            'PCA20035'
-        );
-    } else {
-        // Only Thingy53 matches the condition
-        // Update when a new Nordic USB device has mcuboot without modem
-        dispatch(modemKnown(false));
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_FAMILY,
-            DeviceFamily.NRF53
-        );
-        usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'Thingy53');
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_BOARD_VERSION,
-            'PCA20053'
-        );
-    }
-    dispatch(updateFileRegions());
-    dispatch(canWrite());
-    dispatch(loadingEnd());
-};
+        dispatch(mcubootKnown(true));
+        if (isMcubootModem(vid, pid)) {
+            // Only Thingy91 matches the condition
+            // Update when a new Nordic USB device has both mcuboot and modem
+            dispatch(modemKnown(true));
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_FAMILY,
+                DeviceFamily.NRF91
+            );
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_VERSION,
+                'Thingy91'
+            );
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_BOARD_VERSION,
+                'PCA20035'
+            );
+        } else {
+            // Only Thingy53 matches the condition
+            // Update when a new Nordic USB device has mcuboot without modem
+            dispatch(modemKnown(false));
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_FAMILY,
+                DeviceFamily.NRF53
+            );
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_VERSION,
+                'Thingy53'
+            );
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_BOARD_VERSION,
+                'PCA20053'
+            );
+        }
+        dispatch(updateFileRegions());
+        dispatch(canWrite());
+        dispatch(loadingEnd());
+    };
 
 export const toggleMcuboot =
     (): AppThunk<RootState> => (dispatch, getState) => {
@@ -158,11 +163,12 @@ export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
 };
 
 export const performUpdate =
-    (netCoreUploadDelay: number | null): AppThunk<RootState, Promise<void>> =>
+    (
+        device: Device,
+        netCoreUploadDelay: number | null
+    ): AppThunk<RootState, Promise<void>> =>
     (dispatch, getState) =>
         new Promise<void>(resolve => {
-            const { device: inputDevice } = getState().app.target;
-            const device = inputDevice as Device;
             const { mcubootFilePath, zipFilePath } = getState().app.file;
             const dfuFilePath = mcubootFilePath || zipFilePath;
             const firmwareFormat = mcubootFilePath
@@ -228,7 +234,6 @@ export const performUpdate =
                     timeout: 99999999999999, // Wait 'indefinitely' as we will cancel the wait when programming is complete
                     when: 'always',
                     once: false,
-                    onSuccess: d => dispatch(targetDeviceKnown(d)),
                 })
             );
             dispatch(mcubootWritingStart());

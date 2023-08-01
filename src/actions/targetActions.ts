@@ -9,11 +9,7 @@ import { AppThunk, Device, logger, usageData } from 'pc-nrfconnect-shared';
 
 import { mcubootWritingReady } from '../reducers/mcubootReducer';
 import { modemWritingReady } from '../reducers/modemReducer';
-import {
-    loadingStart,
-    targetDeviceKnown,
-    targetWritableKnown,
-} from '../reducers/targetReducer';
+import { loadingStart, targetWritableKnown } from '../reducers/targetReducer';
 import { CommunicationType } from '../util/devices';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
@@ -24,7 +20,6 @@ export const openDevice =
     (device: Device): AppThunk =>
     dispatch => {
         dispatch(loadingStart());
-        dispatch(targetDeviceKnown(device));
 
         const { serialPorts } = device;
         const serialport = serialPorts?.slice(0)[0];
@@ -38,14 +33,14 @@ export const openDevice =
         const pid = productId ? parseInt(productId.toString(), 16) : undefined;
 
         if (device.traits.jlink || jlinkTargetActions.isJlink()) {
-            dispatch(jlinkTargetActions.openDevice());
+            dispatch(jlinkTargetActions.openDevice(device));
             usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
             return;
         }
 
         if (device.traits.mcuBoot || mcubootTargetActions.isMcuboot(vid, pid)) {
             usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
-            dispatch(mcubootTargetActions.openDevice());
+            dispatch(mcubootTargetActions.openDevice(device));
             return;
         }
         if (
@@ -53,7 +48,7 @@ export const openDevice =
             usbsdfuTargetActions.isNordicUsb(vid, pid)
         ) {
             usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicUsb');
-            dispatch(usbsdfuTargetActions.openDevice());
+            dispatch(usbsdfuTargetActions.openDevice(device));
             return;
         }
 
@@ -101,29 +96,31 @@ export const updateTargetWritable = (): AppThunk => (dispatch, getState) => {
         dispatch(targetWritableKnown(true));
 };
 
-export const write = (): AppThunk => (dispatch, getState) => {
-    const {
-        target,
-        file: { zipFilePath },
-        mcuboot: { isMcuboot },
-        modem: { isModem },
-    } = getState().app;
+export const write =
+    (device: Device): AppThunk =>
+    (dispatch, getState) => {
+        const {
+            target,
+            file: { zipFilePath },
+            mcuboot: { isMcuboot },
+            modem: { isModem },
+        } = getState().app;
 
-    if (isModem && zipFilePath) {
-        dispatch(modemWritingReady(zipFilePath));
-        return;
-    }
-    if (isMcuboot) {
-        dispatch(mcubootWritingReady());
-        return;
-    }
-    if (target.targetType === CommunicationType.JLINK) {
-        dispatch(jlinkTargetActions.write());
-        return;
-    }
-    if (target.targetType === CommunicationType.USBSDFU) {
-        dispatch(usbsdfuTargetActions.write());
-        return;
-    }
-    logger.error('Invalid write action');
-};
+        if (isModem && zipFilePath) {
+            dispatch(modemWritingReady(zipFilePath));
+            return;
+        }
+        if (isMcuboot) {
+            dispatch(mcubootWritingReady());
+            return;
+        }
+        if (target.targetType === CommunicationType.JLINK) {
+            dispatch(jlinkTargetActions.write(device));
+            return;
+        }
+        if (target.targetType === CommunicationType.USBSDFU) {
+            dispatch(usbsdfuTargetActions.write(device));
+            return;
+        }
+        logger.error('Invalid write action');
+    };

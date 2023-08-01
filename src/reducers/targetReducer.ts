@@ -6,7 +6,6 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import MemoryMap from 'nrf-intel-hex';
-import { Device } from 'pc-nrfconnect-shared';
 
 import {
     CommunicationType,
@@ -20,7 +19,6 @@ import type { RootState } from './types';
 export interface TargetState {
     readonly targetType: CommunicationType;
     readonly deviceInfo?: DeviceDefinition;
-    readonly device?: Device;
     readonly memMap?: MemoryMap;
     readonly regions?: Region[]; // TODO: Define region
     readonly warnings?: string[];
@@ -70,9 +68,6 @@ const targetSlice = createSlice({
         },
         targetInfoKnown(state, action: PayloadAction<DeviceDefinition>) {
             state.deviceInfo = action.payload;
-        },
-        targetDeviceKnown(state, action: PayloadAction<Device>) {
-            state.device = action.payload;
         },
         targetContentsKnown(
             state,
@@ -139,7 +134,6 @@ export default targetSlice.reducer;
 const {
     targetTypeKnown,
     targetInfoKnown,
-    targetDeviceKnown,
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,
@@ -165,7 +159,6 @@ export const getIsRecoverable = (state: RootState) =>
     state.app.target.isRecoverable;
 export const getIsWritable = (state: RootState) => state.app.target.isWritable;
 export const getDeviceInfo = (state: RootState) => state.app.target.deviceInfo;
-export const getDevice = (state: RootState) => state.app.target.device;
 export const getRegions = (state: RootState) => state.app.target.regions;
 export const getIsWriting = (state: RootState) => state.app.target.isWriting;
 export const getIsErasing = (state: RootState) => state.app.target.isErasing;
@@ -182,7 +175,6 @@ export const getRefreshEnabled = (state: RootState) =>
 export {
     targetTypeKnown,
     targetInfoKnown,
-    targetDeviceKnown,
     targetContentsKnown,
     targetRegionsKnown,
     targetWritableKnown,

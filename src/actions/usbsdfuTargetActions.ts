@@ -25,7 +25,6 @@ import {
     HashType,
     logger,
     sdfuOperations,
-    selectedDevice,
     setWaitForDevice,
     switchToBootloaderMode,
     usageData,
@@ -86,30 +85,30 @@ export const isNordicUsb = (vid?: number, pid?: number) =>
     vid === VendorId.NORDIC_SEMICONDUCTOR &&
     USBProductIds.includes(pid);
 
-/**
- * Display some information about a devkit. Called on a devkit connection.
- *
- * @returns {Promise<void>} resolved promise
- */
-export const openDevice = (): AppThunk => (dispatch, getState) => {
-    const { device: inputDevice } = getState().app.target;
-    const openedDevice = inputDevice as Device;
+export const openDevice =
+    (device: Device): AppThunk =>
+    dispatch => {
+        dispatch(
+            targetTypeKnown({
+                targetType: CommunicationType.USBSDFU,
+                isRecoverable: false,
+            })
+        );
+        logger.info(
+            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
+        );
+        usageData.sendUsageData(
+            EventAction.OPEN_DEVICE_FAMILY,
+            DeviceFamily.NRF52
+        );
+        usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
+        usageData.sendUsageData(
+            EventAction.OPEN_DEVICE_BOARD_VERSION,
+            'PCA10059'
+        );
 
-    dispatch(
-        targetTypeKnown({
-            targetType: CommunicationType.USBSDFU,
-            isRecoverable: false,
-        })
-    );
-    logger.info(
-        'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
-    );
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_FAMILY, DeviceFamily.NRF52);
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_BOARD_VERSION, 'PCA10059');
-
-    dispatch(refreshMemoryLayout(openedDevice));
-};
+        dispatch(refreshMemoryLayout(device));
+    };
 
 const refreshMemoryLayout =
     (staleDevice: Device): AppThunk =>
@@ -248,16 +247,8 @@ const refreshMemoryLayout =
         );
     };
 
-/**
- * Reset device to Application mode
- * @returns {Promise<void>} resolved promise
- */
-export const resetDevice = (): AppThunk => (_, getState) => {
-    const { device: inputDevice } = getState().app.target;
-    const device = inputDevice as Device;
-
+export const resetDevice = (device: Device) =>
     deviceControlReset(getDeviceLibContext(), device.id);
-};
 
 /**
  * Create DFU image by given region name and firmware type
@@ -594,15 +585,9 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
     });
 };
 
-/**
- * Write files to target device
- *
- * @returns {Promise<void>} resolved promise
- */
 export const write =
-    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
-        const device = selectedDevice(getState());
-
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         if (!device) {
             logger.error(
                 `Failed to write: ${describeError('Device not found')}`

@@ -17,7 +17,9 @@ import {
     DialogButton,
     GenericDialog,
     getPersistentStore,
+    logger,
     NumberInlineInput,
+    selectedDevice,
     Slider,
     Toggle,
     useStopwatch,
@@ -38,7 +40,6 @@ import {
     getTimeoutValue,
     mcubootWritingClose,
 } from '../reducers/mcubootReducer';
-import { getDevice } from '../reducers/targetReducer';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
@@ -65,7 +66,7 @@ const McuUpdateDialogView = () => {
     const writingHasStarted = isWriting || isWritingFail || isWritingSucceed;
 
     const dispatch = useDispatch();
-    const device = useSelector(getDevice);
+    const device = useSelector(selectedDevice);
 
     const [uploadDelay, setUploadDelay] = useState(NET_CORE_UPLOAD_DELAY);
     const [keepDefaultTimeout, setKeepDefaultTimeout] = useState(true);
@@ -117,10 +118,15 @@ const McuUpdateDialogView = () => {
     };
 
     const onWriteStart = () => {
+        if (!device) {
+            logger.error('No target device!');
+            return;
+        }
+
         reset();
         start();
         setKeepDialogOpen(true);
-        dispatch(performUpdate(showDelayTimeout ? uploadDelay : null));
+        dispatch(performUpdate(device, showDelayTimeout ? uploadDelay : null));
     };
 
     const updateUploadDelayTimeout = (timeout: number) => {

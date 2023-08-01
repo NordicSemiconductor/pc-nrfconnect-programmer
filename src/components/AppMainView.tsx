@@ -6,9 +6,10 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { selectedDevice } from 'pc-nrfconnect-shared';
 
 import { getLoaded, getZipFilePath } from '../reducers/fileReducer';
-import { getDevice, getDeviceInfo } from '../reducers/targetReducer';
+import { getDeviceInfo } from '../reducers/targetReducer';
 import useOpenFileFromArgs from '../useOpenFileFromArgs';
 import { DeviceDefinition } from '../util/devices';
 import McuUpdateDialogView from './McuUpdateDialogView';
@@ -36,7 +37,7 @@ function hasFileContent(loaded: Record<string, unknown>) {
 const AppMainView = () => {
     const loaded = useSelector(getLoaded);
     const zipFilePath = useSelector(getZipFilePath);
-    const device = useSelector(getDevice);
+    const device = useSelector(selectedDevice);
     const deviceInfo = useSelector(getDeviceInfo);
 
     useOpenFileFromArgs();
