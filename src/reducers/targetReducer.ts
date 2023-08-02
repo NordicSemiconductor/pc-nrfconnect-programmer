@@ -59,6 +59,10 @@ const targetSlice = createSlice({
             state.memMap = action.payload.targetMemMap;
             state.isMemLoaded = action.payload.isMemLoaded;
         },
+        targetContentsUnknown(state) {
+            state.memMap = undefined;
+            state.isMemLoaded = false;
+        },
         targetRegionsKnown(state, action: PayloadAction<Region[]>) {
             state.regions = action.payload;
         },
@@ -117,6 +121,7 @@ export default targetSlice.reducer;
 const {
     targetInfoKnown,
     targetContentsKnown,
+    targetContentsUnknown,
     targetRegionsKnown,
     targetWritableKnown,
     writeProgress,
@@ -151,6 +156,7 @@ export const getRefreshEnabled = (state: RootState) =>
 export {
     targetInfoKnown,
     targetContentsKnown,
+    targetContentsUnknown,
     targetRegionsKnown,
     targetWritableKnown,
     writeProgress,
