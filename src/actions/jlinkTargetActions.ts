@@ -30,6 +30,7 @@ import {
     targetContentsUnknown,
     targetInfoKnown,
     targetRegionsKnown,
+    targetRegionsUnknown,
     targetWritableKnown,
     writingEnd,
     writingStart,
@@ -227,7 +228,9 @@ export const read =
 
         if (
             deviceInfo.cores.find(
-                c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
+                c =>
+                    c.protectionStatus &&
+                    c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
             )
         ) {
             logger.info(
@@ -277,6 +280,7 @@ export const read =
         } catch (error) {
             console.log(error);
             dispatch(targetContentsUnknown());
+            dispatch(targetRegionsUnknown());
             dispatch(canWrite());
             dispatch(loadingEnd());
             logger.error('Error when reading device');

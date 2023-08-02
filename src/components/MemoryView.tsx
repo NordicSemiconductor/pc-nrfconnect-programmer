@@ -51,16 +51,20 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
         isTarget ? state.app.target.regions : state.app.file.regions
     );
     const zipFilePath = useSelector(getZipFilePath);
-    const isJLink = useSelector(getForceMcuBoot) || !!device?.traits.jlink;
+    const isJLink = !useSelector(getForceMcuBoot) && !!device?.traits.jlink;
     const isNordicDfu =
-        useSelector(getForceMcuBoot) || !!device?.traits.nordicDfu;
+        !useSelector(getForceMcuBoot) && !!device?.traits.nordicDfu;
     const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
     const isLoading = useSelector(getIsLoading);
-    const isProtected = !!useSelector(getDeviceInfo)?.cores.find(
-        c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
+    const isKnownProtected = !!useSelector(getDeviceInfo)?.cores.find(
+        c => c.protectionStatus
     );
+    const isProtected =
+        !!useSelector(getDeviceInfo)?.cores.find(
+            c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
+        ) && isKnownProtected;
     const refreshEnabled = useSelector(getRefreshEnabled);
     const targetCores = useSelector(getDeviceInfo)?.cores as CoreDefinition[];
 
@@ -88,7 +92,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                     )}
                     {isTarget && refreshEnabled && isJLink && (
                         <div className="centering-container">
-                            {!isProtected && (
+                            {isKnownProtected && !isProtected && (
                                 <div className="read-indicator">
                                     <p>Device is connected</p>
                                     <p>
@@ -97,10 +101,22 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                                     </p>
                                 </div>
                             )}
-                            {isProtected && (
+                            {isKnownProtected && isProtected && (
                                 <div className="read-indicator">
                                     <p>Device is protected</p>
                                     <p>
+                                        Press <strong>Erase all</strong> button
+                                        to recover the protected memory
+                                    </p>
+                                </div>
+                            )}
+                            {!isKnownProtected && (
+                                <div className="read-indicator">
+                                    <p>Device protection status is unknown</p>
+                                    <p>
+                                        Could not determine any information
+                                        about the SOC
+                                        <br />
                                         Press <strong>Erase all</strong> button
                                         to recover the protected memory
                                     </p>
