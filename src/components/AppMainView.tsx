@@ -53,25 +53,26 @@ const AppMainView = () => {
                 !forcedMCUBoot &&
                 !device.traits.nordicDfu && (
                     <div className="warning-view tw-flex tw-flex-col tw-gap-2">
-                        <Alert variant="danger" label="Error: ">
-                            No operation possible.
-                        </Alert>
                         <Alert variant="warning" label="Caution: ">
-                            If the device is a MCUBoot device make sure it is in
-                            the bootloader mode.
+                            No operation possible. <br /> If the device is a
+                            MCUboot device make sure it is in the bootloader
+                            mode or enable MCUboot.
+                            {process.platform === 'linux' && (
+                                <>
+                                    <br />
+                                    If the device is a JLink device, please make
+                                    sure J-Link Software and nrf-udev are
+                                    installed.
+                                </>
+                            )}
+                            {process.platform === 'darwin' && (
+                                <>
+                                    <br />
+                                    If the device is a JLink device, please make
+                                    sure J-Link Software is installed.
+                                </>
+                            )}
                         </Alert>
-                        {process.platform === 'linux' && (
-                            <Alert variant="warning" label="Caution: ">
-                                If the device is a JLink device, please make
-                                sure J-Link Software and nrf-udev are installed
-                            </Alert>
-                        )}
-                        {process.platform === 'darwin' && (
-                            <Alert variant="warning" label="Caution: ">
-                                If the device is a JLink device, please make
-                                sure J-Link Software is installed
-                            </Alert>
-                        )}
                     </div>
                 )}
             <div className="memory-box-container">
