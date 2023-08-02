@@ -32,10 +32,16 @@ const DeviceInfoView = () => {
                     <p>{device?.serialNumber}</p>
                 </div>
             )}
-            {device?.serialport?.comName && (
+            {device?.serialPorts?.length && (
                 <div>
-                    <h5>Port</h5>
-                    <p>{device.serialport.comName}</p>
+                    <h5>Port{device?.serialPorts?.length > 1 ? 's' : ''}</h5>
+                    <p className="tw-flex tw-flex-col tw-gap-1">
+                        {device.serialPorts.map(port =>
+                            port.comName ? (
+                                <span key={port.comName}>{port.comName}</span>
+                            ) : null
+                        )}
+                    </p>
                 </div>
             )}
             <div>
