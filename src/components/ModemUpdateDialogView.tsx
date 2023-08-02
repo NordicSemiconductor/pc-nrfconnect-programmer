@@ -16,7 +16,6 @@ import {
     Progress,
     selectedDevice,
     useStopwatch,
-    WithRequired,
 } from 'pc-nrfconnect-shared';
 
 import { performUpdate } from '../actions/modemTargetActions';
@@ -26,6 +25,8 @@ import {
     setShowModemProgrammingDialog,
 } from '../reducers/modemReducer';
 import { getForceMcuBoot } from '../reducers/settingsReducer';
+
+type WithRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 const ModemUpdateDialogView = () => {
     const [progress, setProgress] =

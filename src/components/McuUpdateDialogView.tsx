@@ -26,7 +26,6 @@ import {
     Slider,
     Toggle,
     useStopwatch,
-    WithRequired,
 } from 'pc-nrfconnect-shared';
 
 import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
@@ -35,6 +34,8 @@ import {
     getShowMcuBootProgrammingDialog,
     setShowMcuBootProgrammingDialog,
 } from '../reducers/mcubootReducer';
+
+type WithRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';

@@ -7,9 +7,9 @@
 import {
     DeviceCore,
     DeviceCoreInfo,
+    NrfutilDevice,
     ProtectionStatus,
 } from 'pc-nrfconnect-shared';
-import { NrfutilDevice } from 'pc-nrfconnect-shared/typings/generated/src/Nrfutil/deviceTypes';
 
 import range from './range';
 
