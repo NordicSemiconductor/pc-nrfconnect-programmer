@@ -8,7 +8,6 @@ import { dialog, getCurrentWindow } from '@electron/remote';
 import nrfdl, {
     Device,
     FirmwareReadResult,
-    ProtectionStatus,
 } from '@nordicsemiconductor/nrf-device-lib-js';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
@@ -43,46 +42,9 @@ import {
     getDeviceInfoByJlink,
     updateCoreInfo,
 } from '../util/devices';
-import sequence from '../util/promise';
 import { getTargetRegions } from '../util/regions';
 import { updateFileAppRegions, updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
-
-/**
- * Load protection status of the core
- *
- * @param {number}deviceId the Id of the device
- * @param {string} deviceCoreName the name of the core
- * @returns{Promise<ProtectionStatus>} the protection status
- */
-export const loadProtectionStatus = async (
-    deviceId: number,
-    deviceCoreName: nrfdl.DeviceCore
-): Promise<ProtectionStatus> => {
-    try {
-        logger.info(
-            `Loading readback protection status for ${coreFriendlyName(
-                deviceCoreName
-            )} core`
-        );
-
-        const { protectionStatus } =
-            await nrfdl.deviceControlGetProtectionStatus(
-                getDeviceLibContext(),
-                deviceId,
-                deviceCoreName
-            );
-
-        logger.info(`Readback protection status: ${protectionStatus}`);
-        return protectionStatus;
-    } catch (error) {
-        const errorMessage = `Failed to load readback protection status: ${describeError(
-            error
-        )}`;
-        usageData.sendErrorReport(errorMessage);
-        throw Error(errorMessage);
-    }
-};
 
 export const openDevice =
     (device: Device): AppThunk<RootState, Promise<void>> =>
@@ -522,31 +484,64 @@ const updateCoresWithNrfdl = async (
     device: Device,
     deviceInfo: DeviceDefinition
 ): Promise<DeviceDefinition> => {
-    const cores = await Promise.all(
-        deviceInfo.cores.map(async (core, index) => {
-            try {
-                const protectionStatus = await loadProtectionStatus(
-                    device.id,
+    const updateCore = async (core: CoreDefinition, index: number) => {
+        try {
+            logger.info(
+                `Reading readback protection status for ${coreFriendlyName(
                     core.name
-                );
-                if (protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
-                    return core;
-                }
-                const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
-                    getDeviceLibContext(),
-                    device.id,
+                )} core`
+            );
+
+            const result = await nrfdl.deviceControlGetProtectionStatus(
+                getDeviceLibContext(),
+                device.id,
+                core.name
+            );
+
+            logger.info(
+                `Readback protection status for ${coreFriendlyName(
                     core.name
-                );
-                return updateCoreInfo(
-                    core,
-                    index,
-                    deviceCoreInfo,
-                    protectionStatus
-                );
-            } catch (e) {
+                )} core: ${result.protectionStatus}`
+            );
+
+            if (result.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
                 return core;
             }
-        })
+            const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
+                getDeviceLibContext(),
+                device.id,
+                core.name
+            );
+
+            return updateCoreInfo(
+                core,
+                index,
+                deviceCoreInfo,
+                result.protectionStatus
+            );
+        } catch (error) {
+            const errorMessage = `Failed to load readback protection status: ${describeError(
+                error
+            )}`;
+            usageData.sendErrorReport(errorMessage);
+            return core;
+        }
+    };
+
+    const cores: CoreDefinition[] = [];
+
+    await deviceInfo.cores.reduce(
+        (previousPromise, core, index) =>
+            previousPromise
+                .then(() =>
+                    updateCore(core, index).then(coreDefinition => {
+                        cores.push(coreDefinition);
+                        return Promise.resolve();
+                    })
+                )
+                .catch(Promise.reject),
+        Promise.resolve()
     );
+
     return { ...deviceInfo, cores };
 };
