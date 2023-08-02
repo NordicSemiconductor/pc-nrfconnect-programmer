@@ -268,12 +268,7 @@ const createDfuImages = (file: FileState) => {
 
     return dfuImages;
 };
-/**
- * Check if the files can be written to the target device
- *
- * @returns {Promise<void>} resolved promise
- */
-export const canWrite = (): AppThunk => (dispatch, getState) => {
+export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     // Disable write button
     dispatch(targetWritableKnown(false));
 
