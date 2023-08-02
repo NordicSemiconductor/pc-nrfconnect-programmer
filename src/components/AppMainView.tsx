@@ -38,9 +38,8 @@ function hasFileContent(loaded: Record<string, unknown>) {
 const AppMainView = () => {
     const loaded = useSelector(getLoaded);
     const zipFilePath = useSelector(getZipFilePath);
-    const serialNumber = useSelector(selectedDevice)?.serialNumber;
-    const deviceInfo = useSelector(getDeviceInfo);
     const device = useSelector(selectedDevice);
+    const deviceInfo = useSelector(getDeviceInfo);
     const forcedMCUBoot = useSelector(getForceMcuBoot);
 
     useOpenFileFromArgs();
@@ -84,13 +83,13 @@ const AppMainView = () => {
                 />
                 <MemoryBoxView
                     title={
-                        getTargetTitle(serialNumber, deviceInfo) ||
+                        getTargetTitle(device?.serialNumber, deviceInfo) ||
                         'Device memory layout'
                     }
                     description="Connect a device to display memory contents"
                     iconName="appicon-chip"
-                    isHolder={!serialNumber}
-                    isTarget={!!serialNumber}
+                    isHolder={!device?.serialNumber}
+                    isTarget={!!device?.serialNumber}
                 />
             </div>
             <UserInputDialogView />

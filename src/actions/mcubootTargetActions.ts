@@ -80,8 +80,10 @@ export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     // Check if mcu firmware is detected.
     // Check if target is MCU target.
     const { mcubootFilePath, zipFilePath } = getState().app.file;
+    const isMcuboot =
+        !!device.traits.mcuBoot || getState().app.settings.forceMcuBoot;
 
-    if (mcubootFilePath || zipFilePath) {
+    if ((mcubootFilePath || zipFilePath) && isMcuboot) {
         // Enable write button if all above items have been checked
         dispatch(targetWritableKnown(true));
     }

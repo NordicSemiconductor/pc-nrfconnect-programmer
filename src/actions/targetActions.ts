@@ -17,7 +17,6 @@ import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import {
     loadingEnd,
     loadingStart,
-    targetPortChanged,
     targetWritableKnown,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
@@ -27,23 +26,12 @@ import EventAction from './usageDataActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
 export const openDevice =
-    (device: Device, autoRead: boolean, autoReset: boolean): AppThunk =>
+    (device: Device): AppThunk =>
     dispatch => {
         dispatch(loadingStart());
 
-        const { serialPorts } = device;
-        const serialport = serialPorts?.slice(0)[0];
-
-        dispatch(
-            targetPortChanged({
-                path: serialport?.comName ?? undefined,
-            })
-        );
-
         if (device.traits.jlink) {
-            dispatch(
-                jlinkTargetActions.openDevice(device, autoRead, autoReset)
-            );
+            dispatch(jlinkTargetActions.openDevice(device));
             usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
             return;
         }
@@ -106,15 +94,9 @@ export const updateTargetWritable =
     };
 
 export const write =
-    (
-        device: Device,
-        autoRead: boolean,
-        autoReset: boolean
-    ): AppThunk<RootState> =>
+    (device: Device): AppThunk<RootState> =>
     (dispatch, getState) => {
-        const {
-            file: { zipFilePath },
-        } = getState().app;
+        const zipFilePath = getState().app.file.zipFilePath;
 
         if (device.traits.modem && zipFilePath) {
             dispatch(setShowModemProgrammingDialog(true));
@@ -125,7 +107,7 @@ export const write =
             return;
         }
         if (device.traits.jlink) {
-            dispatch(jlinkTargetActions.write(device, autoRead, autoReset));
+            dispatch(jlinkTargetActions.write(device));
             return;
         }
         if (device.traits.nordicDfu) {

@@ -174,16 +174,6 @@ export const NordicFwIds = {
 };
 
 /**
- * Supported communication types
- */
-export enum CommunicationType {
-    UNKNOWN,
-    JLINK,
-    USBSDFU,
-    MCUBOOT,
-}
-
-/**
  * Supported USB vender IDs
  */
 export enum VendorId {

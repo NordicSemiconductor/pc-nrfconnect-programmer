@@ -13,7 +13,6 @@ import { fileParse, filesEmpty } from './fileReducer';
 import type { RootState } from './types';
 
 export interface TargetState {
-    readonly port?: string;
     readonly deviceInfo?: DeviceDefinition;
     readonly memMap?: MemoryMap;
     readonly regions?: Region[]; // TODO: Define region
@@ -28,7 +27,6 @@ export interface TargetState {
 }
 
 const initialState: TargetState = {
-    port: undefined,
     deviceInfo: defaultDeviceDefinition,
     memMap: undefined,
     regions: [],
@@ -42,10 +40,6 @@ const initialState: TargetState = {
     isLoading: false,
 };
 
-interface TargetPortChangedPayload {
-    path?: string;
-}
-
 interface TargetContentsKnownPayload {
     targetMemMap: MemoryMap;
     isMemLoaded: boolean;
@@ -57,13 +51,6 @@ const targetSlice = createSlice({
     reducers: {
         targetInfoKnown(state, action: PayloadAction<DeviceDefinition>) {
             state.deviceInfo = action.payload;
-        },
-
-        targetPortChanged(
-            state,
-            action: PayloadAction<TargetPortChangedPayload>
-        ) {
-            state.port = action.payload.path;
         },
         targetContentsKnown(
             state,
@@ -107,7 +94,12 @@ const targetSlice = createSlice({
         loadingEnd(state) {
             state.isLoading = false;
         },
-
+        selectDevice(_, action: PayloadAction<string>) {
+            return {
+                ...initialState,
+                serialNumber: action.payload,
+            };
+        },
         deselectDevice() {
             return { ...initialState };
         },
@@ -128,7 +120,6 @@ export default targetSlice.reducer;
 
 const {
     targetInfoKnown,
-    targetPortChanged,
     targetContentsKnown,
     targetContentsUnknown,
     targetRegionsKnown,
@@ -143,7 +134,6 @@ const {
     deselectDevice,
 } = targetSlice.actions;
 
-export const getPort = (state: RootState) => state.app.target.port;
 export const getIsReady = (state: RootState) =>
     !state.app.target.isLoading &&
     !state.app.target.isWriting &&
@@ -165,7 +155,6 @@ export const getRefreshEnabled = (state: RootState) =>
 
 export {
     targetInfoKnown,
-    targetPortChanged,
     targetContentsKnown,
     targetContentsUnknown,
     targetRegionsKnown,

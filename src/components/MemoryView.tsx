@@ -7,7 +7,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectedDevice } from 'pc-nrfconnect-shared';
-import PropTypes from 'prop-types';
 
 import { getZipFilePath } from '../reducers/fileReducer';
 import { getForceMcuBoot } from '../reducers/settingsReducer';
@@ -87,7 +86,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
                     {isTarget && isErasing && (
                         <div className="erase-indicator striped active" />
                     )}
-                    {isTarget && refreshEnabled && isJLink && !isMcuboot && (
+                    {isTarget && refreshEnabled && isJLink && (
                         <div className="centering-container">
                             {!isProtected && (
                                 <div className="read-indicator">
@@ -138,10 +137,6 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
             ))}
         </>
     );
-};
-
-MemoryView.propTypes = {
-    isTarget: PropTypes.bool.isRequired,
 };
 
 export default MemoryView;

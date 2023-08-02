@@ -6,7 +6,6 @@
 
 import React from 'react';
 import { DeviceCore } from 'pc-nrfconnect-shared';
-import PropTypes from 'prop-types';
 
 import { hexpad8 } from '../util/hexpad';
 
@@ -38,15 +37,5 @@ const CoreInfoView = ({ name, romBaseAddr, romSize }: CoreInfoViewProps) => (
         </div>
     </>
 );
-
-CoreInfoView.propTypes = {
-    name: PropTypes.string,
-    romBaseAddr: PropTypes.number.isRequired,
-    romSize: PropTypes.number.isRequired,
-};
-
-CoreInfoView.defaultProps = {
-    name: null,
-};
 
 export default CoreInfoView;

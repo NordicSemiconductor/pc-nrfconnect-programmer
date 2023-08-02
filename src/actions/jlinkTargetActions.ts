@@ -22,6 +22,7 @@ import {
     usageData,
 } from 'pc-nrfconnect-shared';
 
+import { getAutoReset } from '../reducers/settingsReducer';
 import {
     erasingEnd,
     erasingStart,
@@ -47,12 +48,8 @@ import { updateFileAppRegions, updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
 export const openDevice =
-    (
-        device: Device,
-        autoRead: boolean,
-        autoReset: boolean
-    ): AppThunk<RootState> =>
-    async dispatch => {
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
         dispatch(loadingStart());
         logger.info(
             'Using nrfutil device to communicate with target via JLink'
@@ -63,7 +60,7 @@ export const openDevice =
         deviceInfo = await updateCoresWithNrfdl(device, deviceInfo);
 
         // Update modem target info according to detected device info
-        const isModem = device.traits.modem;
+        const isModem = !!device.traits.modem;
         if (isModem) logger.info('Modem detected');
 
         dispatch(targetInfoKnown(deviceInfo));
@@ -80,7 +77,8 @@ export const openDevice =
         dispatch(loadingEnd());
         logger.info('Device is loaded and ready for further operation');
 
-        if (autoRead) await dispatch(read(device, autoReset));
+        const { autoRead } = getState().app.settings;
+        if (autoRead) await dispatch(read(device));
     };
 
 /**
@@ -205,13 +203,13 @@ const updateTargetRegions =
     };
 
 export const read =
-    (device: Device, autoReset: boolean): AppThunk<RootState> =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
         const deviceInfo = getState().app.target.deviceInfo;
 
         if (!deviceInfo) {
             logger.error('No device info loaded');
-            return;
+            return Promise.reject(new Error('No device info loaded'));
         }
 
         if (
@@ -261,6 +259,7 @@ export const read =
             dispatch(canWrite());
             dispatch(loadingEnd());
 
+            const autoReset = getAutoReset(getState());
             if (autoReset) resetDevice(device);
         } catch (error) {
             console.log(error);
@@ -288,10 +287,8 @@ const recoverOneCore = async (device: Device, coreInfo: CoreDefinition) => {
 export const recover =
     (
         device: Device,
-        autoRead: boolean,
-        autoReset: boolean,
         continueToWrite = false
-    ): AppThunk<RootState> =>
+    ): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
         const deviceInfo = getState().app.target.deviceInfo;
 
@@ -309,8 +306,7 @@ export const recover =
         dispatch(erasingEnd());
         logger.info('Device recovery completed');
 
-        if (!continueToWrite)
-            await dispatch(openDevice(device, autoRead, autoReset));
+        if (!continueToWrite) await dispatch(openDevice(device));
     };
 
 const writeHex = (
@@ -376,7 +372,7 @@ const writeOneCore = async (
     });
 
     if (overlaps.size <= 0) {
-        return undefined;
+        return;
     }
 
     const programRegions = MemoryMap.flattenOverlaps(overlaps);
@@ -386,11 +382,7 @@ const writeOneCore = async (
 };
 
 export const write =
-    (
-        device: Device,
-        autoRead: boolean,
-        autoReset: boolean
-    ): AppThunk<RootState> =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
         const memMaps = getState().app.file.memMaps;
         const deviceInfo = getState().app.target.deviceInfo;
@@ -406,21 +398,18 @@ export const write =
             )
             .finally(() => dispatch(writingEnd()));
 
+        const autoReset = getAutoReset(getState());
         if (autoReset) await resetDevice(device);
-        await dispatch(openDevice(device, autoRead, autoReset));
+        await dispatch(openDevice(device));
         dispatch(canWrite());
     };
 
 export const recoverAndWrite =
-    (
-        device: Device,
-        autoRead: boolean,
-        autoReset: boolean
-    ): AppThunk<RootState, Promise<void>> =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
         const continueToWrite = true;
-        await dispatch(recover(device, autoRead, autoReset, continueToWrite));
-        await dispatch(write(device, autoRead, autoReset));
+        await dispatch(recover(device, continueToWrite));
+        await dispatch(write(device));
     };
 
 export const resetDevice = (device: Device) =>

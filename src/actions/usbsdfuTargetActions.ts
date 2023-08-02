@@ -262,11 +262,6 @@ const createDfuImages = (file: FileState) => {
     return dfuImages;
 };
 
-/**
- * Check if the files can be written to the target device
- *
- * @returns {Promise<void>} resolved promise
- */
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     const device = selectedDevice(getState());
 
@@ -432,7 +427,7 @@ const handleSdReq = (
  */
 const handleUserInput =
     (imageInput: DfuImage): AppThunk<RootState, Promise<DfuImage>> =>
-    async (dispatch): Promise<DfuImage> => {
+    async dispatch => {
         let image = imageInput;
         let sdReq;
 
@@ -546,14 +541,8 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
 };
 
 export const write =
-    (device: Device): AppThunk<RootState> =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        if (!device) {
-            logger.error(`Failed to write: Device not found}`);
-
-            return;
-        }
-
         dispatch(updateFileBlRegion());
         dispatch(updateFileAppRegions());
         const dfuImages = createDfuImages(getState().app.file);

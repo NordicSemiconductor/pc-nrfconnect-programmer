@@ -14,7 +14,6 @@ import {
     colors,
     Group,
     logger,
-    reset,
     selectedDevice,
     SidePanel,
     Toggle,
@@ -183,11 +182,10 @@ const ControlPanel = () => {
     );
     const zipFile = useSelector(getZipFilePath);
     const forceMcuBoot = useSelector(getForceMcuBoot);
-
     const targetIsReady = useSelector(getIsReady) && !!device;
     const isJLink = !!device?.traits.jlink;
-    const isUsbSerial = !!device?.traits.nordicDfu;
-    const isMcuBoot = !!device?.traits.mcuBoot;
+    const isNordicDfu = !!device?.traits.nordicDfu;
+    const isMcuboot = !!device?.traits.mcuBoot;
     const isModem = !!device?.traits.modem;
 
     const targetIsRecoverable = isJLink;
@@ -225,16 +223,10 @@ const ControlPanel = () => {
                             logger.error('No target device!');
                             return;
                         }
-                        dispatch(
-                            jlinkTargetActions.recover(
-                                device,
-                                autoRead,
-                                autoReset
-                            )
-                        );
+                        dispatch(jlinkTargetActions.recover(device));
                     }}
                     disabled={
-                        isMcuBoot ||
+                        isMcuboot ||
                         !isJLink ||
                         !targetIsReady ||
                         !targetIsRecoverable
@@ -253,16 +245,10 @@ const ControlPanel = () => {
                             return;
                         }
 
-                        dispatch(
-                            jlinkTargetActions.recoverAndWrite(
-                                device,
-                                autoRead,
-                                autoReset
-                            )
-                        );
+                        dispatch(jlinkTargetActions.recoverAndWrite(device));
                     }}
                     disabled={
-                        isMcuBoot ||
+                        isMcuboot ||
                         !isJLink ||
                         !targetIsReady ||
                         !fileRegionSize ||
@@ -298,8 +284,7 @@ const ControlPanel = () => {
                             return;
                         }
 
-                        if (isUsbSerial) {
-                            reset(device);
+                        if (isNordicDfu) {
                             dispatch(usbsdfuTargetActions.resetDevice(device));
                         } else {
                             dispatch(jlinkTargetActions.resetDevice(device));
@@ -321,9 +306,7 @@ const ControlPanel = () => {
                         }
                         // Refresh all files in case that some files have been updated right before write action.
                         refreshAllFiles();
-                        dispatch(
-                            targetActions.write(device, autoRead, autoReset)
-                        );
+                        dispatch(targetActions.write(device));
                     }}
                     disabled={
                         !targetIsReady ||
@@ -349,10 +332,10 @@ const ControlPanel = () => {
                             return;
                         }
 
-                        dispatch(jlinkTargetActions.read(device, autoReset));
+                        dispatch(jlinkTargetActions.read(device));
                     }}
                     disabled={
-                        isMcuBoot || !isJLink || !targetIsReady || isProtected
+                        isMcuboot || !isJLink || !targetIsReady || isProtected
                     }
                 >
                     <span className="mdi mdi-refresh" />
@@ -393,8 +376,8 @@ const ControlPanel = () => {
                             dispatch(targetActions.updateTargetWritable());
                         }
                     }}
-                    isToggled={forceMcuBoot || isMcuBoot}
-                    disabled={isMcuBoot}
+                    isToggled={forceMcuBoot || isMcuboot}
+                    disabled={isMcuboot}
                     label="Enable MCUboot"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
