@@ -177,9 +177,13 @@ const ControlPanel = () => {
     const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
     const targetIsMemLoaded = useSelector(getIsMemLoaded);
-    const isProtected = !!useSelector(getDeviceInfo)?.cores.find(
-        c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
+    const isKnownProtected = !!useSelector(getDeviceInfo)?.cores.find(
+        c => c.protectionStatus
     );
+    const isProtected =
+        !!useSelector(getDeviceInfo)?.cores.find(
+            c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
+        ) && isKnownProtected;
     const zipFile = useSelector(getZipFilePath);
     const forceMcuBoot = useSelector(getForceMcuBoot);
     const targetIsReady = useSelector(getIsReady) && !!device;

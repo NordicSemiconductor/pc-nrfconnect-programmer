@@ -227,7 +227,9 @@ export const read =
 
         if (
             deviceInfo.cores.find(
-                c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
+                c =>
+                    c.protectionStatus &&
+                    c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
             )
         ) {
             logger.info(

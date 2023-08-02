@@ -28,7 +28,7 @@ export type CoreDefinition = {
     mbrParamsOffset: number;
     mbrBaseAddr: number;
     mbrSize: number;
-    protectionStatus: ProtectionStatus;
+    protectionStatus?: ProtectionStatus;
 };
 
 /**
@@ -50,7 +50,6 @@ export const defaultCore: CoreDefinition = {
     mbrParamsOffset: 0x18,
     mbrBaseAddr: 0x0,
     mbrSize: 0x1000,
-    protectionStatus: 'NRFDL_PROTECTION_STATUS_SECURE_REGIONS',
 };
 
 /**
@@ -76,7 +75,11 @@ export interface DeviceDefinition {
 export const defaultDeviceDefinition: DeviceDefinition = {
     family: DeviceFamily.UNKNOWN,
     type: 'UNKNOWN',
-    cores: [defaultCore],
+    cores: [
+        {
+            ...defaultCore,
+        },
+    ],
 };
 
 /**
