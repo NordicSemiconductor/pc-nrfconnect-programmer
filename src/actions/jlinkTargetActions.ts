@@ -154,7 +154,7 @@ const getDeviceMemMap = (device: Device, coreInfo: CoreDefinition) =>
         );
     });
 
-/**
+/*
  * Check if the files can be written to the target device
  * The typical use case is having some HEX files that use the UICR, and a DevKit
  * that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
@@ -164,8 +164,6 @@ const getDeviceMemMap = (device: Device, coreInfo: CoreDefinition) =>
  * able to press the "program" button.
  * There are also instances where the UICR can be erased and overwritten, but
  * unfortunately the casuistics are just too complex.
- *
- * @returns {void}
  */
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     const device = selectedDevice(getState());
@@ -435,16 +433,11 @@ export const recoverAndWrite =
         await dispatch(write(device));
     };
 
-export const resetDevice = async (device: Device) => {
-    await nrfdl.deviceControlReset(getDeviceLibContext(), device.id);
-    logger.info(`Resetting device completed`);
-};
+export const resetDevice = (device: Device) =>
+    nrfdl.deviceControlReset(getDeviceLibContext(), device.id).then(() => {
+        logger.info(`Resetting device completed`);
+    });
 
-/**
- * Save the content from the device memory as hex file.
- *
- * @returns {void}
- */
 export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
     const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
     const deviceInfo = inputDeviceInfo as DeviceDefinition;
