@@ -43,7 +43,6 @@ import {
 import { RootState } from '../reducers/types';
 import {
     DeviceDefinition,
-    DeviceFamily,
     getDeviceInfoByUSB,
     NordicFwIds,
 } from '../util/devices';
@@ -75,15 +74,29 @@ export const openDevice =
         logger.info(
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
         );
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_FAMILY,
-            DeviceFamily.NRF52
-        );
-        usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_BOARD_VERSION,
-            'PCA10059'
-        );
+
+        console.log(device);
+
+        if (device.hwInfo?.deviceFamily) {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_FAMILY,
+                device.hwInfo?.deviceFamily
+            );
+        }
+
+        if (device.hwInfo?.deviceVersion) {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_VERSION,
+                device.hwInfo.deviceVersion
+            );
+        }
+
+        if (device.boardVersion) {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_BOARD_VERSION,
+                device.boardVersion
+            );
+        }
 
         dispatch(refreshMemoryLayout(device));
     };

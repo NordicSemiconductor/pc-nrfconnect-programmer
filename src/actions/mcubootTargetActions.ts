@@ -17,7 +17,6 @@ import {
 
 import { loadingEnd, targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
-import { DeviceFamily } from '../util/devices';
 import { updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
@@ -30,37 +29,23 @@ export const openDevice =
         // not all devices will have serialPorts property (non-Nordic devices for example)
         if (!device.serialPorts || device.serialPorts.length === 0) return;
 
-        if (device.traits.modem) {
-            // Only Thingy91 matches the condition
-            // When a new Nordic USB device has both mcuboot and modem
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_FAMILY,
-                DeviceFamily.NRF91
-            );
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_VERSION,
-                'Thingy91'
-            );
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_BOARD_VERSION,
-                'PCA20035'
-            );
-        } else {
-            // Only Thingy53 matches the condition
-            // When a new Nordic USB device has mcuboot without modem
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_FAMILY,
-                DeviceFamily.NRF53
-            );
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_VERSION,
-                'Thingy53'
-            );
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_BOARD_VERSION,
-                'PCA20053'
-            );
-        }
+        console.log(device);
+
+        usageData.sendUsageData(
+            EventAction.PRODUCT_NAME,
+            `${device.usb?.product}`
+        );
+
+        usageData.sendUsageData(
+            EventAction.PRODUCT_ID,
+            `${device.usb?.device.descriptor.idProduct}`
+        );
+
+        usageData.sendUsageData(
+            EventAction.OPEN_DEVICE_BOARD_VERSION,
+            `${device.boardVersion}`
+        );
+
         dispatch(updateFileRegions());
         dispatch(canWrite());
         dispatch(loadingEnd());
