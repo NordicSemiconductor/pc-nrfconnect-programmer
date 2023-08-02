@@ -4,14 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import {
-    deviceControlReset,
-    Error,
-    firmwareProgram,
-    FWInfo,
-    Progress,
-    readFwInfo,
-} from '@nordicsemiconductor/nrf-device-lib-js';
 import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';
 import {
@@ -20,10 +12,13 @@ import {
     describeError,
     Device,
     DfuImage,
+    FWInfoImageType,
     FwType,
-    getDeviceLibContext,
+    getFwInfo,
     HashType,
     logger,
+    programBuffer,
+    reset,
     sdfuOperations,
     selectedDevice,
     setWaitForDevice,
@@ -73,7 +68,7 @@ export const openDevice =
     (device: Device): AppThunk =>
     dispatch => {
         logger.info(
-            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
+            'Using nrfutil-device to communicate with target via USB SDFU protocol'
         );
         usageData.sendUsageData(
             EventAction.OPEN_DEVICE_FAMILY,
@@ -95,10 +90,7 @@ const refreshMemoryLayout =
             switchToBootloaderMode(
                 device,
                 async deviceInBootLoader => {
-                    const fwInfo: FWInfo.ReadResult = await readFwInfo(
-                        getDeviceLibContext(),
-                        deviceInBootLoader.id
-                    );
+                    const fwInfo = await getFwInfo(deviceInBootLoader);
                     const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
                     dispatch(targetInfoKnown(deviceInfo));
 
@@ -155,7 +147,7 @@ const refreshMemoryLayout =
 
                     // Add bootloader, softDevice, applications to regions
                     const { imageInfoList } = fwInfo;
-                    imageInfoList.forEach((image: FWInfo.Image) => {
+                    imageInfoList.forEach(image => {
                         const { imageType, imageLocation, version } = image;
 
                         if (!imageLocation) return;
@@ -171,7 +163,7 @@ const refreshMemoryLayout =
                         const regionName =
                             (<
                                 Partial<{
-                                    [key in FWInfo.ImageType]: RegionName;
+                                    [key in FWInfoImageType]: RegionName;
                                 }>
                             >{
                                 NRFDL_IMAGE_TYPE_BOOTLOADER:
@@ -185,7 +177,7 @@ const refreshMemoryLayout =
                         const color =
                             (<
                                 Partial<{
-                                    [key in FWInfo.ImageType]: RegionColor;
+                                    [key in FWInfoImageType]: RegionColor;
                                 }>
                             >{
                                 NRFDL_IMAGE_TYPE_BOOTLOADER:
@@ -226,7 +218,7 @@ const refreshMemoryLayout =
     };
 
 export const resetDevice = (device: Device) =>
-    deviceControlReset(getDeviceLibContext(), device.id).then(() => {
+    reset(device).then(() => {
         logger.info(`Resetting device completed`);
     });
 
@@ -513,46 +505,38 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
     let prevPercentage: number;
 
     return new Promise<void>((resolve, reject) => {
-        firmwareProgram(
-            getDeviceLibContext(),
-            device.id,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_SDFU_ZIP',
-            zipBuffer,
-            (error?: Error) => {
-                if (error) {
-                    if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
-                        logger.error('Failed to write to the target device');
-                        logger.error(
-                            'The required SoftDevice version does not match'
-                        );
-                    } else {
-                        logger.error(describeError(error));
-                    }
-                    reject(error);
-                } else {
-                    logger.info(
-                        'All dfu images have been written to the target device'
-                    );
-                    resolve();
-                }
-            },
-            ({ progressJson: progress }: Progress.CallbackParameters) => {
-                // Don't repeat percentage steps that have already been logged.
-                if (prevPercentage === progress.progressPercentage) {
-                    return;
-                }
-
-                const message = progress.message || '';
-
-                const status = `${message.replace('.', ':')} ${
-                    progress.progressPercentage
-                }%`;
-
-                logger.info(status);
-                prevPercentage = progress.progressPercentage;
+        programBuffer(device, zipBuffer, 'zip', progress => {
+            // Don't repeat percentage steps that have already been logged.
+            if (prevPercentage === progress.progressPercentage) {
+                return;
             }
-        );
+
+            const message = progress.message || '';
+
+            const status = `${message.replace('.', ':')} ${
+                progress.progressPercentage
+            }%`;
+
+            logger.info(status);
+            prevPercentage = progress.progressPercentage;
+        })
+            .then(() => {
+                logger.info(
+                    'All dfu images have been written to the target device'
+                );
+                resolve();
+            })
+            .catch(error => {
+                if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
+                    logger.error('Failed to write to the target device');
+                    logger.error(
+                        'The required SoftDevice version does not match'
+                    );
+                } else {
+                    logger.error(describeError(error));
+                }
+                reject(error);
+            });
     });
 };
 

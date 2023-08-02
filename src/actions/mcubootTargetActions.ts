@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     AppThunk,
     describeError,
     Device,
-    getDeviceLibContext,
     logger,
+    program,
+    Progress,
     selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
@@ -91,46 +91,30 @@ export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
 
 export const performUpdate = (
     device: Device,
-    onProgress: (progress: nrfdl.Progress.Operation) => void,
-    mcubootFilePath?: string,
-    zipFilePath?: string,
+    dfuFilePath: string,
+    onProgress: (progress: Progress) => void,
     netCoreUploadDelay?: number
 ) =>
     new Promise<void>((resolve, reject) => {
-        const dfuFilePath = mcubootFilePath || zipFilePath;
-        const firmwareFormat = mcubootFilePath
-            ? 'NRFDL_FW_INTEL_HEX'
-            : 'NRFDL_FW_MCUBOOT_MULTI_IMAGE';
         logger.info(`Writing ${dfuFilePath} to device ${device.serialNumber}`);
 
-        nrfdl.firmwareProgram(
-            getDeviceLibContext(),
-            device.id,
-            'NRFDL_FW_FILE',
-            firmwareFormat,
-            dfuFilePath as string,
-            error => {
-                if (!error) {
-                    logger.info('MCUboot DFU completed successfully!');
-                    resolve();
-                } else {
-                    let errorMsg = describeError(error);
-                    logger.error(`MCUboot DFU failed with error: ${errorMsg}`);
-                    // To be fixed in nrfdl
-                    // @ts-expect-error will be fixed in nrfdl
-                    if (error.error_code === 0x25b) {
-                        errorMsg =
-                            'Please make sure that the device is in MCUboot mode and try again.';
-                    }
-                    logger.error(errorMsg);
-                    reject(new Error(errorMsg));
+        // TODO: Fix force mcuboot trait when possible from CLI
+        program(device, dfuFilePath, onProgress, undefined, {
+            netCoreUploadDelay,
+        })
+            .then(() => {
+                logger.info('MCUboot DFU completed successfully!');
+                resolve();
+            })
+            .catch(error => {
+                let errorMsg = describeError(error);
+                logger.error(`MCUboot DFU failed with error: ${errorMsg}`);
+                // To be fixed in nrfdl
+                if (error.error_code === 0x25b) {
+                    errorMsg =
+                        'Please make sure that the device is in MCUboot mode and try again.';
                 }
-            },
-            ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                onProgress(progress);
-            },
-            netCoreUploadDelay !== undefined
-                ? { netCoreUploadDelay }
-                : undefined
-        );
+                logger.error(errorMsg);
+                reject(new Error(errorMsg));
+            });
     });

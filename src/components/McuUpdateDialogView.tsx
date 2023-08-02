@@ -11,7 +11,6 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Alert,
     classNames,
@@ -21,11 +20,13 @@ import {
     getPersistentStore,
     logger,
     NumberInlineInput,
+    Progress,
     selectedDevice,
     setWaitForDevice,
     Slider,
     Toggle,
     useStopwatch,
+    WithRequired,
 } from 'pc-nrfconnect-shared';
 
 import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
@@ -41,7 +42,8 @@ const TOOLTIP_TEXT =
 const NET_CORE_UPLOAD_DELAY = 120;
 
 const McuUpdateDialogView = () => {
-    const [progress, setProgress] = useState<nrfdl.Progress.Operation>();
+    const [progress, setProgress] =
+        useState<WithRequired<Progress, 'message'>>();
     const [writing, setWriting] = useState(false);
     const [writingFail, setWritingFail] = useState(false);
     const [writingSucceed, setWritingSucceed] = useState(false);
@@ -53,6 +55,8 @@ const McuUpdateDialogView = () => {
     const isVisible = useSelector(getShowMcuBootProgrammingDialog);
     const mcubootFwPath = useSelector(getMcubootFilePath);
     const zipFilePath = useSelector(getZipFilePath);
+
+    const fwPath = mcubootFwPath || zipFilePath;
 
     const [netCoreUploadDelayOffset, setNetCoreUploadDelayOffset] =
         useState(-1);
@@ -128,6 +132,11 @@ const McuUpdateDialogView = () => {
             return;
         }
 
+        if (!fwPath) {
+            logger.error('No file selected');
+            return;
+        }
+
         setWriting(true);
         reset();
         start();
@@ -142,8 +151,9 @@ const McuUpdateDialogView = () => {
 
         performUpdate(
             device,
+            fwPath,
             programmingProgress => {
-                let updatedProgress: nrfdl.Progress.Operation = {
+                let updatedProgress: WithRequired<Progress, 'message'> = {
                     ...programmingProgress,
                     message: programmingProgress.message ?? '',
                 };
@@ -167,8 +177,6 @@ const McuUpdateDialogView = () => {
                 }
                 setProgress(updatedProgress);
             },
-            mcubootFwPath,
-            zipFilePath,
             showDelayTimeout ? uploadDelay : undefined
         )
             .then(() => {
