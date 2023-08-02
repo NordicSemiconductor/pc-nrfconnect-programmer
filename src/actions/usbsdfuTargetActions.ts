@@ -88,17 +88,17 @@ export const openDevice =
     };
 
 const refreshMemoryLayout =
-    (staleDevice: Device): AppThunk =>
+    (device: Device): AppThunk =>
     dispatch => {
         dispatch(
             switchToBootloaderMode(
-                staleDevice,
-                async device => {
+                device,
+                async deviceInBootLoader => {
                     const fwInfo: FWInfo.ReadResult = await readFwInfo(
                         getDeviceLibContext(),
-                        device.id
+                        deviceInBootLoader.id
                     );
-                    const deviceInfo = getDeviceInfoByUSB(device);
+                    const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
                     dispatch(targetInfoKnown(deviceInfo));
 
                     const appCoreNumber = 0;
