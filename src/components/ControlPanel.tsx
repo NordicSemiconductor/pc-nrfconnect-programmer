@@ -341,6 +341,8 @@ const ControlPanel = () => {
                     <span className="mdi mdi-refresh" />
                     Read
                 </Button>
+            </Group>
+            <Group heading="Jlink Settings">
                 <Toggle
                     onToggle={() => dispatch(settingsActions.toggleAutoRead())}
                     isToggled={autoRead}
@@ -365,6 +367,8 @@ const ControlPanel = () => {
                         )}
                     </>
                 </Toggle>
+            </Group>
+            <Group heading="MCUboot Settings">
                 <Toggle
                     onToggle={v => {
                         dispatch(setForceMcuBoot(v));
