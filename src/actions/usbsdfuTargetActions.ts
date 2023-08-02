@@ -25,6 +25,7 @@ import {
     HashType,
     logger,
     sdfuOperations,
+    selectedDevice,
     setWaitForDevice,
     switchToBootloaderMode,
     usageData,
@@ -268,7 +269,15 @@ const createDfuImages = (file: FileState) => {
 
     return dfuImages;
 };
+
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
+    const device = selectedDevice(getState());
+
+    if (!device) {
+        dispatch(targetWritableKnown(false));
+        return;
+    }
+
     // Disable write button
     dispatch(targetWritableKnown(false));
 
