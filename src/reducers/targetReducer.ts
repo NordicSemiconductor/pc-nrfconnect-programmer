@@ -66,6 +66,9 @@ const targetSlice = createSlice({
         targetRegionsKnown(state, action: PayloadAction<Region[]>) {
             state.regions = action.payload;
         },
+        targetRegionsUnknown(state) {
+            state.regions = [];
+        },
         targetWritableKnown(state, action: PayloadAction<boolean>) {
             state.isWritable = action.payload;
         },
@@ -123,6 +126,7 @@ const {
     targetContentsKnown,
     targetContentsUnknown,
     targetRegionsKnown,
+    targetRegionsUnknown,
     targetWritableKnown,
     writeProgress,
     writingStart,
@@ -158,6 +162,7 @@ export {
     targetContentsKnown,
     targetContentsUnknown,
     targetRegionsKnown,
+    targetRegionsUnknown,
     targetWritableKnown,
     writeProgress,
     writingStart,

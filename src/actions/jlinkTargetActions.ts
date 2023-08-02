@@ -30,6 +30,7 @@ import {
     targetContentsUnknown,
     targetInfoKnown,
     targetRegionsKnown,
+    targetRegionsUnknown,
     targetWritableKnown,
     writingEnd,
     writingStart,
@@ -277,7 +278,9 @@ export const read =
             const autoReset = getAutoReset(getState());
             if (autoReset) resetDevice(device);
         } catch (error) {
+            console.log(error);
             dispatch(targetContentsUnknown());
+            dispatch(targetRegionsUnknown());
             dispatch(canWrite());
             dispatch(loadingEnd());
             logger.error('Error when reading device');
