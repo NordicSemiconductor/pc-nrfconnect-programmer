@@ -75,8 +75,6 @@ export const openDevice =
             'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
         );
 
-        console.log(device);
-
         if (device.hwInfo?.deviceFamily) {
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_FAMILY,

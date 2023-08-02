@@ -277,7 +277,6 @@ export const read =
             const autoReset = getAutoReset(getState());
             if (autoReset) resetDevice(device);
         } catch (error) {
-            console.log(error);
             dispatch(targetContentsUnknown());
             dispatch(canWrite());
             dispatch(loadingEnd());

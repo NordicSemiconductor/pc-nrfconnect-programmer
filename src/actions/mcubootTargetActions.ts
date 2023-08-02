@@ -29,8 +29,6 @@ export const openDevice =
         // not all devices will have serialPorts property (non-Nordic devices for example)
         if (!device.serialPorts || device.serialPorts.length === 0) return;
 
-        console.log(device);
-
         usageData.sendUsageData(
             EventAction.PRODUCT_NAME,
             `${device.usb?.product}`
