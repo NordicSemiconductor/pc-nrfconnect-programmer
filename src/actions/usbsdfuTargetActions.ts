@@ -573,10 +573,9 @@ export const write =
                 handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
             )
             .map(image => handleHash(image, HashType.SHA256));
+
         images = await Promise.all(
-            images?.map(async image =>
-                dispatch(await handleUserInput(image))
-            ) as Promise<DfuImage>[]
+            images.map(image => dispatch(handleUserInput(image)))
         );
 
         // Start writing after handling images since user may cancel userInput
