@@ -503,15 +503,7 @@ const handleHash = (image: DfuImage, hashType: number): DfuImage => {
 const nrfdlErrorSdfuExtSdVersionFailure = (error: unknown) =>
     (error as { error_code: number }).error_code === 514;
 
-/**
- * Operate DFU process with update all the images on the target device
- *
- * @param {number} deviceId the Id of device
- * @param {DfuImage[]} inputDfuImages the list of DFU image
- *
- * @returns {Promise<void>} resolved promise
- */
-const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
+const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
 
     let prevPercentage: number;
@@ -519,7 +511,7 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
     return new Promise<void>((resolve, reject) => {
         firmwareProgram(
             getDeviceLibContext(),
-            deviceId,
+            device.id,
             'NRFDL_FW_BUFFER',
             'NRFDL_FW_SDFU_ZIP',
             zipBuffer,
@@ -535,14 +527,10 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
                     }
                     reject(error);
                 } else {
-                    // if (restImages.length === 0) {
                     logger.info(
                         'All dfu images have been written to the target device'
                     );
                     resolve();
-                    // return;
-                    // }
-                    // return operateDFU(deviceId, restImages);
                 }
             },
             ({ progressJson: progress }: Progress.CallbackParameters) => {
@@ -604,7 +592,7 @@ export const write =
                     once: false,
                 })
             );
-            await operateDFU(device.id, images);
+            await operateDFU(device, images);
             dispatch(writingEnd());
 
             // Operation done reconnect one more time only
