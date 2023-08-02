@@ -225,7 +225,9 @@ const refreshMemoryLayout =
     };
 
 export const resetDevice = (device: Device) =>
-    deviceControlReset(getDeviceLibContext(), device.id);
+    deviceControlReset(getDeviceLibContext(), device.id).then(() => {
+        logger.info(`Resetting device completed`);
+    });
 
 /**
  * Create DFU image by given region name and firmware type
@@ -565,14 +567,6 @@ const operateDFU = async (deviceId: number, inputDfuImages: DfuImage[]) => {
 export const write =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        if (!device) {
-            logger.error(
-                `Failed to write: ${describeError('Device not found')}`
-            );
-
-            return;
-        }
-
         dispatch(updateFileBlRegion());
         dispatch(updateFileAppRegions());
         const dfuImages = createDfuImages(getState().app.file);
