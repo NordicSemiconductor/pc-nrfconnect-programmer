@@ -51,9 +51,9 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
         isTarget ? state.app.target.regions : state.app.file.regions
     );
     const zipFilePath = useSelector(getZipFilePath);
-    const isJLink = useSelector(getForceMcuBoot) || !!device?.traits.jlink;
+    const isJLink = !useSelector(getForceMcuBoot) && !!device?.traits.jlink;
     const isNordicDfu =
-        useSelector(getForceMcuBoot) || !!device?.traits.nordicDfu;
+        !useSelector(getForceMcuBoot) && !!device?.traits.nordicDfu;
     const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     const isWriting = useSelector(getIsWriting);
     const isErasing = useSelector(getIsErasing);
