@@ -28,6 +28,7 @@ import {
     loadingEnd,
     loadingStart,
     targetContentsKnown,
+    targetContentsUnknown,
     targetInfoKnown,
     targetRegionsKnown,
     targetWritableKnown,
@@ -257,11 +258,13 @@ const updateTargetRegions =
 export const read =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        dispatch(loadingStart());
-        const inputDeviceInfo = getState().app.target.deviceInfo;
-        const deviceInfo = inputDeviceInfo as DeviceDefinition;
+        const deviceInfo = getState().app.target.deviceInfo;
 
-        // Read from the device
+        if (!deviceInfo) {
+            logger.error('No device info loaded');
+            return Promise.reject(new Error('No device info loaded'));
+        }
+
         if (
             deviceInfo.cores.find(
                 c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
@@ -270,24 +273,34 @@ export const read =
             logger.info(
                 'Skipped reading, since at least one core has app readback protection'
             );
-        } else {
-            let memMap: MemoryMap[];
-            let mergedMemMap;
-            try {
-                memMap = (await sequence(
-                    getDeviceMemMap,
-                    [],
-                    deviceInfo.cores.map(c => [device.id, c])
-                )) as MemoryMap[];
-                mergedMemMap = MemoryMap.flattenOverlaps(
-                    MemoryMap.overlapMemoryMaps(
-                        memMap.filter(m => m).map(m => ['', m])
-                    )
-                );
-            } catch (error) {
-                logger.error('Error when reading device');
-                return;
-            }
+            return;
+        }
+
+        dispatch(loadingStart());
+        // Read from the device
+
+        try {
+            const memMap: MemoryMap[] = [];
+
+            await deviceInfo.cores.reduce(
+                (accumulatorPromise, core) =>
+                    accumulatorPromise
+                        .then(() =>
+                            getDeviceMemMap(device, core).then(map => {
+                                memMap.push(map);
+                                return Promise.resolve();
+                            })
+                        )
+                        .catch(Promise.reject),
+                Promise.resolve()
+            );
+
+            const mergedMemMap = MemoryMap.flattenOverlaps(
+                MemoryMap.overlapMemoryMaps(
+                    memMap.filter(m => m).map(m => ['', m])
+                )
+            );
+
             dispatch(
                 targetContentsKnown({
                     targetMemMap: mergedMemMap,
@@ -295,13 +308,19 @@ export const read =
                 })
             );
             dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
+
+            dispatch(canWrite());
+            dispatch(loadingEnd());
+
+            const autoReset = getAutoReset(getState());
+            if (autoReset) resetDevice(device);
+        } catch (error) {
+            console.log(error);
+            dispatch(targetContentsUnknown());
+            dispatch(canWrite());
+            dispatch(loadingEnd());
+            logger.error('Error when reading device');
         }
-
-        dispatch(canWrite());
-        dispatch(loadingEnd());
-
-        const autoReset = getAutoReset(getState());
-        if (autoReset) resetDevice(device);
     };
 
 const recoverOneCore = async (device: Device, coreInfo: CoreDefinition) => {
