@@ -8,36 +8,34 @@ import {
     describeError,
     Device,
     logger,
-    program,
+    NrfutilDeviceLib,
     Progress,
     usageData,
 } from 'pc-nrfconnect-shared';
 
-export const performUpdate = (
+export const performUpdate = async (
     device: Device,
     fileName: string,
     onProgress: (progress: Progress) => void
-) =>
-    new Promise<void>((resolve, reject) => {
-        logger.info('Modem DFU starts to write...');
-        logger.info(
-            `Writing ${fileName} to device ${device.serialNumber || ''}`
-        );
+) => {
+    logger.info('Modem DFU starts to write...');
+    logger.info(`Writing ${fileName} to device ${device.serialNumber || ''}`);
 
-        program(device, fileName, onProgress)
-            .then(() => {
-                logger.info('Modem DFU completed successfully!');
-                resolve();
-            })
-            .catch(error => {
-                let errorMsg = describeError(error);
-                logger.error(`Modem DFU failed with error: ${errorMsg}`);
-                if (error.error_code === 0x25b) {
-                    errorMsg =
-                        'Please make sure that the device is in MCUboot mode and try again.';
-                }
+    try {
+        await NrfutilDeviceLib.program(device, fileName, onProgress);
 
-                usageData.sendErrorReport(errorMsg);
-                reject(new Error(errorMsg));
-            });
-    });
+        logger.info('Modem DFU completed successfully!');
+    } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const error = e as any;
+        let errorMsg = describeError(error);
+        logger.error(`Modem DFU failed with error: ${errorMsg}`);
+        if (error.error_code === 0x25b) {
+            errorMsg =
+                'Please make sure that the device is in MCUboot mode and try again.';
+        }
+
+        usageData.sendErrorReport(errorMsg);
+        throw new Error(errorMsg);
+    }
+};

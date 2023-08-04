@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-programmer",
-    "version": "3.0.9",
+    "version": "3.1.0",
     "displayName": "Programmer",
     "description": "Tool for flash programming of nRF SoCs",
     "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer",
@@ -13,10 +13,12 @@
     "engines": {
         "nrfconnect": ">=4.0.0"
     },
-    "nrfutil": {
-        "device": [
-            "1.2.2"
-        ]
+    "nrfConnectForDesktop": {
+        "nrfutil": {
+            "device": [
+                "1.2.0"
+            ]
+        }
     },
     "main": "dist/bundle.js",
     "files": [
@@ -44,7 +46,7 @@
     },
     "devDependencies": {
         "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/nrfutil-device-clean"
+        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/use-nrfutil-device"
     },
     "eslintConfig": {
         "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"

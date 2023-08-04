@@ -12,13 +12,11 @@ import {
     describeError,
     Device,
     DfuImage,
-    FWInfoImageType,
     FwType,
-    getFwInfo,
     HashType,
+    ImageType,
     logger,
-    programBuffer,
-    reset,
+    NrfutilDeviceLib,
     sdfuOperations,
     selectedDevice,
     setWaitForDevice,
@@ -90,7 +88,9 @@ const refreshMemoryLayout =
             switchToBootloaderMode(
                 device,
                 async deviceInBootLoader => {
-                    const fwInfo = await getFwInfo(deviceInBootLoader);
+                    const fwInfo = await NrfutilDeviceLib.getFwInfo(
+                        deviceInBootLoader
+                    );
                     const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
                     dispatch(targetInfoKnown(deviceInfo));
 
@@ -163,7 +163,7 @@ const refreshMemoryLayout =
                         const regionName =
                             (<
                                 Partial<{
-                                    [key in FWInfoImageType]: RegionName;
+                                    [key in ImageType]: RegionName;
                                 }>
                             >{
                                 NRFDL_IMAGE_TYPE_BOOTLOADER:
@@ -177,7 +177,7 @@ const refreshMemoryLayout =
                         const color =
                             (<
                                 Partial<{
-                                    [key in FWInfoImageType]: RegionColor;
+                                    [key in ImageType]: RegionColor;
                                 }>
                             >{
                                 NRFDL_IMAGE_TYPE_BOOTLOADER:
@@ -218,7 +218,7 @@ const refreshMemoryLayout =
     };
 
 export const resetDevice = (device: Device) =>
-    reset(device).then(() => {
+    NrfutilDeviceLib.reset(device).then(() => {
         logger.info(`Resetting device completed`);
     });
 
@@ -504,40 +504,37 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
 
     let prevPercentage: number;
 
-    return new Promise<void>((resolve, reject) => {
-        programBuffer(device, zipBuffer, 'zip', progress => {
-            // Don't repeat percentage steps that have already been logged.
-            if (prevPercentage === progress.progressPercentage) {
-                return;
-            }
-
-            const message = progress.message || '';
-
-            const status = `${message.replace('.', ':')} ${
-                progress.progressPercentage
-            }%`;
-
-            logger.info(status);
-            prevPercentage = progress.progressPercentage;
-        })
-            .then(() => {
-                logger.info(
-                    'All dfu images have been written to the target device'
-                );
-                resolve();
-            })
-            .catch(error => {
-                if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
-                    logger.error('Failed to write to the target device');
-                    logger.error(
-                        'The required SoftDevice version does not match'
-                    );
-                } else {
-                    logger.error(describeError(error));
+    try {
+        await NrfutilDeviceLib.program(
+            device,
+            { buffer: zipBuffer, type: 'zip' },
+            progress => {
+                // Don't repeat percentage steps that have already been logged.
+                if (prevPercentage === progress.progressPercentage) {
+                    return;
                 }
-                reject(error);
-            });
-    });
+
+                const message = progress.message || '';
+
+                const status = `${message.replace('.', ':')} ${
+                    progress.progressPercentage
+                }%`;
+
+                logger.info(status);
+                prevPercentage = progress.progressPercentage;
+            }
+        );
+
+        logger.info('All dfu images have been written to the target device');
+    } catch (error) {
+        if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
+            logger.error('Failed to write to the target device');
+            logger.error('The required SoftDevice version does not match');
+        } else {
+            logger.error(describeError(error));
+        }
+        throw error;
+    }
 };
 
 export const write =

@@ -11,13 +11,8 @@ import {
     AppThunk,
     describeError,
     Device,
-    firmwareRead,
-    getCoreInfo,
-    getProtectionStatus,
     logger,
-    programBuffer,
-    recover as nrfUtilRecover,
-    reset,
+    NrfutilDeviceLib,
     selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
@@ -114,32 +109,30 @@ const logDeviceInfo = (device: Device) => {
     );
 };
 
-const getDeviceMemMap = (device: Device, coreInfo: CoreDefinition) =>
-    new Promise<MemoryMap>((resolve, reject) => {
-        logger.info(`Reading memory for ${coreInfo.name} core`);
-        firmwareRead(device, coreInfo.name)
-            .then(hexBuffer => {
-                const hexText = hexBuffer.toString('utf8');
-                const memMap = MemoryMap.fromHex(hexText);
+const getDeviceMemMap = async (device: Device, coreInfo: CoreDefinition) => {
+    logger.info(`Reading memory for ${coreInfo.name} core`);
+    const hexBuffer = await NrfutilDeviceLib.firmwareRead(
+        device,
+        coreInfo.name
+    );
+    try {
+        const hexText = hexBuffer.toString('utf8');
+        const memMap = MemoryMap.fromHex(hexText);
 
-                const paddedArray = memMap.slicePad(
-                    0,
-                    coreInfo.romBaseAddr + coreInfo.romSize
-                );
-                const paddedMemMap =
-                    MemoryMap.fromPaddedUint8Array(paddedArray);
-                logger.info(
-                    `Reading memory for ${coreInfo.name} core completed`
-                );
-                resolve(paddedMemMap);
-            })
-            .catch(error => {
-                usageData.sendErrorReport(
-                    `Failed to get device memory map: ${describeError(error)}`
-                );
-                reject(error);
-            });
-    });
+        const paddedArray = memMap.slicePad(
+            0,
+            coreInfo.romBaseAddr + coreInfo.romSize
+        );
+        const paddedMemMap = MemoryMap.fromPaddedUint8Array(paddedArray);
+        logger.info(`Reading memory for ${coreInfo.name} core completed`);
+        return paddedMemMap;
+    } catch (error) {
+        usageData.sendErrorReport(
+            `Failed to get device memory map: ${describeError(error)}`
+        );
+        throw error;
+    }
+};
 
 /*
  * Check if the files can be written to the target device
@@ -274,7 +267,7 @@ const recoverOneCore = async (device: Device, coreInfo: CoreDefinition) => {
     logger.info(`Recovering ${coreInfo.name} core`);
 
     try {
-        await nrfUtilRecover(device, coreInfo.name);
+        await NrfutilDeviceLib.recover(device, coreInfo.name);
         logger.info(`Recovering ${coreInfo.name} core completed`);
         return;
     } catch (error) {
@@ -309,18 +302,16 @@ export const recover =
         if (!continueToWrite) await dispatch(openDevice(device));
     };
 
-const writeHex = (
+const writeHex = async (
     device: Device,
     coreInfo: CoreDefinition,
     hexFileString: string
-) =>
-    new Promise<void>((resolve, reject) => {
-        logger.info(`Writing HEX to ${coreInfo.name} core`);
-
-        programBuffer(
+) => {
+    logger.info(`Writing HEX to ${coreInfo.name} core`);
+    try {
+        await NrfutilDeviceLib.program(
             device,
-            Buffer.from(hexFileString, 'utf8'),
-            'hex',
+            { buffer: Buffer.from(hexFileString, 'utf8'), type: 'hex' },
             progress => {
                 const message = progress.message || '';
 
@@ -330,20 +321,15 @@ const writeHex = (
                 logger.info(status);
             },
             coreInfo.name
-        )
-            .then(() => {
-                logger.info(`Writing HEX to ${coreInfo.name} core completed`);
-                resolve();
-            })
-            .catch(error => {
-                usageData.sendErrorReport(
-                    `Device programming failed with error: ${describeError(
-                        error
-                    )}`
-                );
-                reject(error); // This is new behavior
-            });
-    });
+        );
+        logger.info(`Writing HEX to ${coreInfo.name} core completed`);
+    } catch (error) {
+        usageData.sendErrorReport(
+            `Device programming failed with error: ${describeError(error)}`
+        );
+        throw error; // This is new behavior
+    }
+};
 
 const writeOneCore = async (
     device: Device,
@@ -413,7 +399,7 @@ export const recoverAndWrite =
     };
 
 export const resetDevice = (device: Device) =>
-    reset(device).then(() => {
+    NrfutilDeviceLib.reset(device).then(() => {
         logger.info(`Resetting device completed`);
     });
 
@@ -462,7 +448,10 @@ const updateCoresWithNrfdl = async (
                 `Reading readback protection status for ${core.name} core`
             );
 
-            const result = await getProtectionStatus(device, core.name);
+            const result = await NrfutilDeviceLib.getProtectionStatus(
+                device,
+                core.name
+            );
 
             logger.info(
                 `Readback protection status for ${core.name} core: ${result.protectionStatus}`
@@ -471,7 +460,10 @@ const updateCoresWithNrfdl = async (
             if (result.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
                 return core;
             }
-            const deviceCoreInfo = await getCoreInfo(device, core.name);
+            const deviceCoreInfo = await NrfutilDeviceLib.getCoreInfo(
+                device,
+                core.name
+            );
 
             return updateCoreInfo(
                 core,
