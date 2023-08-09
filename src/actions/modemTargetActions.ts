@@ -4,14 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import {
-    describeError,
-    Device,
-    logger,
-    NrfutilDeviceLib,
-    Progress,
-    usageData,
-} from 'pc-nrfconnect-shared';
+import { describeError, Device, logger, usageData } from 'pc-nrfconnect-shared';
+import { NrfutilDeviceLib, Progress } from 'pc-nrfconnect-shared/nrfutil';
 
 export const performUpdate = async (
     device: Device,

@@ -14,15 +14,14 @@ import {
     DfuImage,
     FwType,
     HashType,
-    ImageType,
     logger,
-    NrfutilDeviceLib,
     sdfuOperations,
     selectedDevice,
     setWaitForDevice,
     switchToBootloaderMode,
     usageData,
 } from 'pc-nrfconnect-shared';
+import { ImageType, NrfutilDeviceLib } from 'pc-nrfconnect-shared/nrfutil';
 
 import { FileState } from '../reducers/fileReducer';
 import {

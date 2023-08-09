@@ -12,10 +12,10 @@ import {
     describeError,
     Device,
     logger,
-    NrfutilDeviceLib,
     selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
+import { NrfutilDeviceLib } from 'pc-nrfconnect-shared/nrfutil';
 
 import { getAutoReset } from '../reducers/settingsReducer';
 import {

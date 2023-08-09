@@ -9,7 +9,7 @@ import {
     DeviceCoreInfo,
     NrfutilDevice,
     ProtectionStatus,
-} from 'pc-nrfconnect-shared';
+} from 'pc-nrfconnect-shared/nrfutil';
 
 import range from './range';
 

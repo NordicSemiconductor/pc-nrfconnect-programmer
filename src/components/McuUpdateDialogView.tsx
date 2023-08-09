@@ -20,13 +20,13 @@ import {
     getPersistentStore,
     logger,
     NumberInlineInput,
-    Progress,
     selectedDevice,
     setWaitForDevice,
     Slider,
     Toggle,
     useStopwatch,
 } from 'pc-nrfconnect-shared';
+import { Progress } from 'pc-nrfconnect-shared/nrfutil';
 
 import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';

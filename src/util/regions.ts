@@ -8,7 +8,7 @@
 
 import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
 import { logger } from 'pc-nrfconnect-shared';
-import { SemanticVersion } from 'pc-nrfconnect-shared/typings/generated/src/Nrfutil/sandboxTypes';
+import { SemanticVersion } from 'pc-nrfconnect-shared/nrfutil';
 
 import { CoreDefinition, DeviceDefinition } from './devices';
 import { hexpad2 } from './hexpad';

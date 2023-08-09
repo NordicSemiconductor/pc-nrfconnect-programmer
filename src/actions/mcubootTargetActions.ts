@@ -9,11 +9,10 @@ import {
     describeError,
     Device,
     logger,
-    NrfutilDeviceLib,
-    Progress,
     selectedDevice,
     usageData,
 } from 'pc-nrfconnect-shared';
+import { NrfutilDeviceLib, Progress } from 'pc-nrfconnect-shared/nrfutil';
 
 import { loadingEnd, targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
