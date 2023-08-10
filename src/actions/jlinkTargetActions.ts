@@ -336,8 +336,6 @@ const writeOneCore = async (
     coreInfo: CoreDefinition,
     memMaps: MemoryMaps
 ) => {
-    logger.info(`Writing procedure starts for ${coreInfo.name} core`);
-
     // Parse input files and filter program regions with core start address and size
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     overlaps.forEach((overlap, key) => {
@@ -360,6 +358,8 @@ const writeOneCore = async (
     if (overlaps.size <= 0) {
         return;
     }
+
+    logger.info(`Writing procedure starts for ${coreInfo.name} core`);
 
     const programRegions = MemoryMap.flattenOverlaps(overlaps);
 
