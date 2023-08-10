@@ -76,7 +76,7 @@ const MemoryView = ({ isTarget }: MemoryViewProps) => {
         <>
             {placeHolder.map(coreView => (
                 <div
-                    key={coreView.props.core.mbrBaseAddr}
+                    key={coreView.props.core.name}
                     className="core-container"
                     style={{
                         flex: coreView.props.core.romSize,
