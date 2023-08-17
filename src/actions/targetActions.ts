@@ -12,60 +12,63 @@ import {
     usageData,
 } from 'pc-nrfconnect-shared';
 
+import { setDeviceBusy } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
-import {
-    loadingEnd,
-    loadingStart,
-    targetWritableKnown,
-} from '../reducers/targetReducer';
+import { targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
 import EventAction from './usageDataActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
+let abortController: AbortController;
+
 export const openDevice =
     (device: Device): AppThunk =>
-    dispatch => {
-        dispatch(loadingStart());
+    async dispatch => {
+        abortController = new AbortController();
 
-        if (device.traits.jlink) {
-            dispatch(jlinkTargetActions.openDevice(device));
-            usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
-            return;
+        dispatch(setDeviceBusy(true));
+        try {
+            if (device.traits.jlink) {
+                await dispatch(
+                    jlinkTargetActions.openDevice(device, abortController)
+                );
+                usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
+            } else if (device.traits.mcuBoot) {
+                usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
+                dispatch(mcubootTargetActions.openDevice(device));
+            } else if (device.traits.nordicDfu) {
+                usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicDfu');
+                dispatch(usbsdfuTargetActions.openDevice(device));
+            } else {
+                logger.warn('No operations possible for device.');
+                logger.warn(
+                    `If the device is a MCUBoot device make sure it is in the bootloader mode`
+                );
+                if (process.platform === 'linux') {
+                    logger.warn(
+                        'If the device is a JLink device, please make sure J-Link Software and nrf-udev are installed. ' +
+                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
+                    );
+                }
+                if (process.platform === 'darwin') {
+                    logger.warn(
+                        'If the device is a JLink device, please make sure J-Link Software is installed. ' +
+                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
+                    );
+                }
+            }
+        } catch (error) {
+            /* empty */
         }
-
-        if (device.traits.mcuBoot) {
-            usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
-            dispatch(mcubootTargetActions.openDevice(device));
-            return;
-        }
-        if (device.traits.nordicDfu) {
-            usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicDfu');
-            dispatch(usbsdfuTargetActions.openDevice(device));
-            return;
-        }
-
-        logger.warn('No operations possible for device.');
-        logger.warn(
-            `If the device is a MCUBoot device make sure it is in the bootloader mode`
-        );
-        if (process.platform === 'linux') {
-            logger.warn(
-                'If the device is a JLink device, please make sure J-Link Software and nrf-udev are installed. ' +
-                    'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
-            );
-        }
-        if (process.platform === 'darwin') {
-            logger.warn(
-                'If the device is a JLink device, please make sure J-Link Software is installed. ' +
-                    'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
-            );
-        }
-
-        dispatch(loadingEnd());
+        dispatch(setDeviceBusy(false));
     };
+
+export const closeDevice = () => {
+    abortController.abort();
+};
 
 export const updateTargetWritable =
     (): AppThunk<RootState> => (dispatch, getState) => {
@@ -74,9 +77,8 @@ export const updateTargetWritable =
             file: { zipFilePath },
         } = getState().app;
 
-        if (device?.traits.jlink) {
-            dispatch(jlinkTargetActions.canWrite());
-        } else if (device?.traits.nordicDfu) {
+        // jLink we only use Erase and write that is not dependent on the canWrite()
+        if (device?.traits.nordicDfu) {
             dispatch(usbsdfuTargetActions.canWrite());
         } else if (
             device?.traits.mcuBoot ||
@@ -107,8 +109,7 @@ export const write =
             return;
         }
         if (device.traits.jlink) {
-            dispatch(jlinkTargetActions.write(device));
-            return;
+            throw new Error('Only Erase and write are allowed with jlink');
         }
         if (device.traits.nordicDfu) {
             dispatch(usbsdfuTargetActions.write(device));

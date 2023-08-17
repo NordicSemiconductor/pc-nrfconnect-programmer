@@ -8,12 +8,13 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectedDevice } from 'pc-nrfconnect-shared';
 
-import { getDeviceInfo, getIsMemLoaded } from '../reducers/targetReducer';
+import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
+import { convertDeviceDefinitionToCoreArray } from '../util/devices';
 
 const DeviceInfoView = () => {
     const device = useSelector(selectedDevice);
-    const deviceInfo = useSelector(getDeviceInfo);
-    const isMemLoaded = useSelector(getIsMemLoaded);
+    const deviceDefinition = useSelector(getDeviceDefinition);
+    const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
 
     let targetType = 'UNKNOWN';
     if (device?.traits?.mcuBoot) {
@@ -32,26 +33,40 @@ const DeviceInfoView = () => {
                     <p>{device?.serialNumber}</p>
                 </div>
             )}
-            {device?.serialport?.comName && (
+            {device?.serialPorts?.length && (
                 <div>
-                    <h5>Port</h5>
-                    <p>{device.serialport.comName}</p>
+                    <h5>Port{device?.serialPorts?.length > 1 ? 's' : ''}</h5>
+                    <p className="tw-flex tw-flex-col tw-gap-1">
+                        {device.serialPorts.map(port =>
+                            port.comName ? (
+                                <span key={port.comName}>{port.comName}</span>
+                            ) : null
+                        )}
+                    </p>
                 </div>
             )}
             <div>
                 <h5>Communication Type</h5>
                 <p>{targetType}</p>
             </div>
-            {deviceInfo && deviceInfo.cores && (
+            {coreInfos.length > 0 && (
                 <div>
                     <h5>Core Number</h5>
-                    <p>{deviceInfo.cores.length}</p>
+                    <p>{coreInfos.length}</p>
                 </div>
             )}
             {device?.traits.jlink && (
                 <div>
                     <h5>Device memory is loaded?</h5>
-                    <p>{isMemLoaded ? 'Yes' : 'No'}</p>
+                    <p className="tw-flex tw-flex-col tw-gap-1">
+                        {coreInfos.map(core => (
+                            <span key={core.name}>
+                                {`${core.name} core is ${
+                                    core.coreMemMap ? 'loaded' : 'not loaded'
+                                }`}
+                            </span>
+                        ))}
+                    </p>
                 </div>
             )}
         </div>

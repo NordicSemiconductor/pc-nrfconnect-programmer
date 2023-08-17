@@ -16,67 +16,52 @@ import {
 } from 'pc-nrfconnect-shared';
 
 import {
+    getDeviceDefinition as getDeviceDefinitionFromRedux,
+    setDeviceDefinition,
+} from '../reducers/deviceDefinitionReducer';
+import {
     fileParse,
     filesEmpty,
     mcubootFileKnown,
     mruFilesLoadSuccess,
     zipFileKnown,
 } from '../reducers/fileReducer';
-import { targetInfoKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import { fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
-import {
-    defaultDeviceDefinition,
-    DeviceFamily,
-    getDeviceDefinition,
-} from '../util/devices';
-import { updateFileRegions } from './regionsActions';
+import { defaultDeviceDefinition, nRF5340DefaultDevice } from '../util/devices';
+import { DeviceFamily } from '../util/deviceTypes';
 import { updateTargetWritable } from './targetActions';
 
 // Update core info when file actions happen and not when the device is selected
 const updateCoreInfo = (): AppThunk<RootState> => (dispatch, getState) => {
-    const { target, file } = getState().app;
-    const { family, type } = { ...target.deviceInfo };
+    const deviceDefinition = getDeviceDefinitionFromRedux(getState());
 
     // If device is selected, device family and device type will not be null
     // and so will not assume target cores by file regions.
-    if (family !== DeviceFamily.UNKNOWN || type !== 'UNKNOWN') {
+    if (
+        deviceDefinition.family !== DeviceFamily.UNKNOWN ||
+        deviceDefinition.type !== 'UNKNOWN'
+    ) {
         return;
     }
+
+    const file = getState().app.file;
 
     // Display multiple cores if at least one of the regions matches
     // the requirements of nRF5340
     const overlaps = MemoryMap.overlapMemoryMaps(file.memMaps);
     const startAddresses = [...overlaps.keys()].sort().reverse();
-    const { cores } = getDeviceDefinition('nRF5340');
-    const networkCore = cores[1];
-    const { romBaseAddr: netwrokRomBaseAddr, romSize: networkRomSize } =
-        networkCore;
+    const networkCore = nRF5340DefaultDevice.coreDefinitions.Network;
+
     if (
         startAddresses.find(
             s =>
-                s >= netwrokRomBaseAddr &&
-                s <= netwrokRomBaseAddr + networkRomSize
+                s >= networkCore.romBaseAddr &&
+                s <= networkCore.romBaseAddr + networkCore.romSize
         )
     ) {
-        dispatch(
-            targetInfoKnown({
-                ...defaultDeviceDefinition,
-                cores: [
-                    {
-                        ...cores[0],
-                        romBaseAddr: 0x0,
-                        romSize: 0x100000, // 1 MB
-                    },
-                    {
-                        ...cores[1],
-                        romBaseAddr: 0x1000000,
-                        romSize: 0x40000, // 256 KB
-                    },
-                ],
-            })
-        );
+        dispatch(setDeviceDefinition(nRF5340DefaultDevice));
         return;
     }
 
@@ -87,15 +72,15 @@ const updateCoreInfo = (): AppThunk<RootState> => (dispatch, getState) => {
         const lastEndAddress =
             lastStartAddress + (lastOverlap[0][1]?.length ?? 0);
         dispatch(
-            targetInfoKnown({
+            setDeviceDefinition({
                 ...defaultDeviceDefinition,
-                cores: [
-                    {
-                        ...cores[0],
+                coreDefinitions: {
+                    Application: {
+                        ...defaultDeviceDefinition.coreDefinitions.Application,
                         romBaseAddr: 0x0,
                         romSize: Math.max(lastEndAddress, 0x100000), // 1 MB
                     },
-                ],
+                },
             })
         );
     }
@@ -111,18 +96,17 @@ export const removeFile =
 
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
-        dispatch(updateFileRegions());
         dispatch(updateTargetWritable());
     };
 
 export const closeFiles = (): AppThunk<RootState> => (dispatch, getState) => {
     dispatch(fileWarningRemove());
     dispatch(filesEmpty());
-    dispatch(updateFileRegions());
 
     // Initialize the state of deviceInfo if no device is selected
-    if (!getState().app.target.deviceInfo?.type) {
-        dispatch(targetInfoKnown(defaultDeviceDefinition));
+    if (!getState().device.selectedSerialNumber) {
+        // TODO CHECK WHY THIS IS NEEDED
+        dispatch(setDeviceDefinition(defaultDeviceDefinition));
     }
     dispatch(updateTargetWritable());
 };
@@ -237,7 +221,6 @@ const parseHexFile =
         const newMemMaps = [...memMaps, [filePath, memMap]] as MemoryMapTuple[];
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
-        dispatch(updateFileRegions());
         dispatch(updateTargetWritable());
     };
 

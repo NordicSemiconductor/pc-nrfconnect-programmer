@@ -25,8 +25,7 @@ import {
     setShowModemProgrammingDialog,
 } from '../reducers/modemReducer';
 import { getForceMcuBoot } from '../reducers/settingsReducer';
-
-type WithRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
+import { WithRequired } from '../util/types';
 
 const ModemUpdateDialogView = () => {
     const [progress, setProgress] =

@@ -23,22 +23,17 @@ import {
 } from 'pc-nrfconnect-shared';
 import { ImageType, NrfutilDeviceLib } from 'pc-nrfconnect-shared/nrfutil';
 
-import { FileState } from '../reducers/fileReducer';
 import {
-    loadingEnd,
-    targetInfoKnown,
+    setDeviceDefinition,
+    updateCoreOperations,
+} from '../reducers/deviceDefinitionReducer';
+import {
     targetRegionsKnown,
     targetWritableKnown,
-    writingEnd,
-    writingStart,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
-import {
-    DeviceDefinition,
-    DeviceFamily,
-    getDeviceInfoByUSB,
-    NordicFwIds,
-} from '../util/devices';
+import { getDeviceInfoByUSB, NordicFwIds } from '../util/devices';
+import { DeviceDefinition, DeviceFamily } from '../util/deviceTypes';
 import {
     defaultRegion,
     getSoftDeviceId,
@@ -48,10 +43,10 @@ import {
     RegionPermission,
 } from '../util/regions';
 import {
-    updateFileAppRegions,
-    updateFileBlRegion,
-    updateFileRegions,
-} from './regionsActions';
+    generateFileAppRegions,
+    generateFileBlRegion,
+    generateRegionDetectedNames,
+} from '../util/usbsdfuHelpers';
 import EventAction from './usageDataActions';
 import * as userInputActions from './userInputActions';
 
@@ -77,6 +72,9 @@ export const openDevice =
             'PCA10059'
         );
 
+        const deviceInfo = getDeviceInfoByUSB(device);
+        dispatch(setDeviceDefinition(deviceInfo));
+
         dispatch(refreshMemoryLayout(device));
     };
 
@@ -87,61 +85,57 @@ const refreshMemoryLayout =
             switchToBootloaderMode(
                 device,
                 async deviceInBootLoader => {
+                    dispatch(
+                        updateCoreOperations({
+                            core: 'Application',
+                            state: 'reading',
+                        })
+                    );
                     const fwInfo = await NrfutilDeviceLib.getFwInfo(
                         deviceInBootLoader
                     );
+                    dispatch(
+                        updateCoreOperations({
+                            core: 'Application',
+                            state: 'idle',
+                        })
+                    );
                     const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
-                    dispatch(targetInfoKnown(deviceInfo));
+                    dispatch(setDeviceDefinition(deviceInfo));
 
-                    const appCoreNumber = 0;
-                    const coreInfo = deviceInfo.cores[appCoreNumber];
+                    const coreInfo = deviceInfo.coreDefinitions.Application;
 
-                    let regions: Region[] = [];
+                    const regions: Region[] = [];
 
-                    // Add FICR to regions
-                    if (coreInfo.ficrBaseAddr) {
-                        regions = [
-                            ...regions,
-                            {
-                                ...defaultRegion,
-                                name: RegionName.FICR,
-                                version: 0,
-                                startAddress: coreInfo.ficrBaseAddr,
-                                regionSize: coreInfo.ficrSize,
-                                permission: RegionPermission.NONE,
-                            },
-                        ];
-                    }
+                    if (coreInfo) {
+                        // Add FICR to regions
+                        regions.push({
+                            ...defaultRegion,
+                            name: RegionName.FICR,
+                            version: 0,
+                            startAddress: coreInfo.ficrBaseAddr,
+                            regionSize: coreInfo.ficrSize,
+                            permission: RegionPermission.NONE,
+                        });
 
-                    // Add UICR to regions
-                    if (coreInfo.uicrBaseAddr) {
-                        regions = [
-                            ...regions,
-                            {
-                                ...defaultRegion,
-                                name: RegionName.UICR,
-                                version: 0,
-                                startAddress: coreInfo.uicrBaseAddr,
-                                regionSize: coreInfo.uicrSize,
-                                permission: RegionPermission.NONE,
-                            },
-                        ];
-                    }
+                        regions.push({
+                            ...defaultRegion,
+                            name: RegionName.UICR,
+                            version: 0,
+                            startAddress: coreInfo.uicrBaseAddr,
+                            regionSize: coreInfo.uicrSize,
+                            permission: RegionPermission.NONE,
+                        });
 
-                    // Add MBR to regions
-                    if (coreInfo.uicrBaseAddr) {
-                        regions = [
-                            ...regions,
-                            {
-                                ...defaultRegion,
-                                name: RegionName.MBR,
-                                version: 0,
-                                startAddress: coreInfo.mbrBaseAddr,
-                                regionSize: coreInfo.mbrSize,
-                                color: RegionColor.MBR,
-                                permission: RegionPermission.NONE,
-                            },
-                        ];
+                        regions.push({
+                            ...defaultRegion,
+                            name: RegionName.MBR,
+                            version: 0,
+                            startAddress: coreInfo.mbrBaseAddr,
+                            regionSize: coreInfo.mbrSize,
+                            color: RegionColor.MBR,
+                            permission: RegionPermission.NONE,
+                        });
                     }
 
                     // Add bootloader, softDevice, applications to regions
@@ -187,23 +181,24 @@ const refreshMemoryLayout =
                                     RegionColor.APPLICATION,
                             })[imageType] || RegionColor.NONE;
 
-                        regions = [
-                            ...regions,
-                            {
-                                ...defaultRegion,
-                                name: regionName,
-                                version,
-                                startAddress,
-                                regionSize,
-                                color,
-                            },
-                        ];
+                        regions.push({
+                            ...defaultRegion,
+                            name: regionName,
+                            version,
+                            startAddress,
+                            regionSize,
+                            color,
+                        });
                     });
 
                     dispatch(targetRegionsKnown(regions));
-                    dispatch(updateFileRegions());
                     dispatch(canWrite());
-                    dispatch(loadingEnd());
+                    dispatch(
+                        updateCoreOperations({
+                            core: 'Application',
+                            state: 'idle',
+                        })
+                    );
                 },
                 error => {
                     logger.error(
@@ -216,10 +211,24 @@ const refreshMemoryLayout =
         );
     };
 
-export const resetDevice = (device: Device) =>
-    NrfutilDeviceLib.reset(device).then(() => {
+export const resetDevice =
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async dispatch => {
+        dispatch(
+            updateCoreOperations({
+                core: 'Application',
+                state: 'loading',
+            })
+        );
+        await NrfutilDeviceLib.reset(device);
         logger.info(`Resetting device completed`);
-    });
+        dispatch(
+            updateCoreOperations({
+                core: 'Application',
+                state: 'idle',
+            })
+        );
+    };
 
 /**
  * Create DFU image by given region name and firmware type
@@ -240,9 +249,9 @@ const createDfuImage = (regionName: string, fwType: number) => {
     return dfuImage;
 };
 
-const createDfuImages = (file: FileState) => {
+const createDfuImages = (regions: Region[]) => {
     const dfuImages: DfuImage[] = [];
-    file.detectedRegionNames.forEach(regionName => {
+    generateRegionDetectedNames(regions).forEach(regionName => {
         switch (regionName) {
             case RegionName.BOOTLOADER:
                 dfuImages.push(createDfuImage(regionName, FwType.BOOTLOADER));
@@ -274,8 +283,7 @@ export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
 
     // Check if there are writable regions.
     // If not, then return.
-    const { detectedRegionNames } = getState().app.file;
-    if (!detectedRegionNames.size) {
+    if (!generateRegionDetectedNames(getState().app.file.regions).size) {
         return;
     }
 
@@ -403,7 +411,12 @@ const handleSdReq = (
         sdReq = [0x00];
         logger.info('SdReq for SoftDevice is set as 0x00.');
     } else if (image.name.startsWith(RegionName.APPLICATION)) {
-        const sdId = getSoftDeviceId(fileMemMap, deviceInfo.cores[0]);
+        const sdId = deviceInfo.coreDefinitions?.Application
+            ? getSoftDeviceId(
+                  fileMemMap,
+                  deviceInfo.coreDefinitions?.Application
+              )
+            : undefined;
         sdReq = sdId ? [sdId] : undefined;
     } else {
         throw new Error('Firmware type is unknown when setting user input.');
@@ -539,23 +552,27 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
 export const write =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        dispatch(updateFileBlRegion());
-        dispatch(updateFileAppRegions());
-        const dfuImages = createDfuImages(getState().app.file);
+        let fileRegions = getState().app.file.regions;
+        const deviceDefinition = getState().app.deviceDefinition;
+        const targetRegions = getState().app.target.regions;
 
-        const fileRegions = getState().app.file.regions;
+        fileRegions = generateFileBlRegion(fileRegions, deviceDefinition);
+        fileRegions = generateFileAppRegions(fileRegions, targetRegions);
+        const dfuImages = createDfuImages(fileRegions);
+
         const fileMemMaps = getState().app.file.memMaps;
         const fileOverlaps = MemoryMap.overlapMemoryMaps(fileMemMaps);
         const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
-        const { deviceInfo } = getState().app.target;
-        const hwVersion = parseInt(deviceInfo?.family?.slice(3) ?? '0', 10);
+
+        const hwVersion = parseInt(
+            deviceDefinition.family?.slice(3) ?? '0',
+            10
+        );
 
         let images = dfuImages
             ?.map(image => handleImage(image, fileRegions, fileMemMap))
             .map(image => handleHwVersion(image, hwVersion))
-            .map(image =>
-                handleSdReq(image, fileMemMap, deviceInfo as DeviceDefinition)
-            )
+            .map(image => handleSdReq(image, fileMemMap, deviceDefinition))
             .map(image => handleHash(image, HashType.SHA256));
 
         images = await Promise.all(
@@ -564,7 +581,12 @@ export const write =
 
         // Start writing after handling images since user may cancel userInput
         logger.info('Performing DFU. This may take a few seconds');
-        dispatch(writingStart());
+        dispatch(
+            updateCoreOperations({
+                core: 'Application',
+                state: 'writing',
+            })
+        );
 
         try {
             // We might have more that one reboot of the device during the next operation
@@ -576,7 +598,6 @@ export const write =
                 })
             );
             await operateDFU(device, images);
-            dispatch(writingEnd());
 
             // Operation done reconnect one more time only
             dispatch(
@@ -590,7 +611,13 @@ export const write =
             );
         } catch (error) {
             logger.error(`Failed to write: ${describeError(error)}`);
-            dispatch(writingEnd());
             dispatch(refreshMemoryLayout(device));
         }
+
+        dispatch(
+            updateCoreOperations({
+                core: 'Application',
+                state: 'idle',
+            })
+        );
     };

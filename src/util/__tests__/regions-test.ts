@@ -45,7 +45,7 @@ describe('detect regions', () => {
         const data = readFileSync(mbrFile);
         const memMap = MemoryMap.fromHex(data.toString());
         const memMaps = [['', memMap]] as MemoryMaps;
-        const regionList = regions.getFileRegions(memMaps, CoreDefinition);
+        const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(1);
         expect(
             regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
@@ -68,7 +68,7 @@ describe('detect regions', () => {
         const data = readFileSync(bootloaderFile);
         const memMap = MemoryMap.fromHex(data.toString());
         const memMaps = [['', memMap]] as MemoryMaps;
-        const regionList = regions.getFileRegions(memMaps, CoreDefinition);
+        const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
             regionList.find(r => r.name === regions.RegionName.BOOTLOADER)
@@ -91,7 +91,7 @@ describe('detect regions', () => {
         const data = readFileSync(softDeviceFile);
         const memMap = MemoryMap.fromHex(data.toString());
         const memMaps = [['', memMap]] as MemoryMaps;
-        const regionList = regions.getFileRegions(memMaps, CoreDefinition);
+        const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
             regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
@@ -114,7 +114,7 @@ describe('detect regions', () => {
         const data = readFileSync(twoAppFile);
         const memMap = MemoryMap.fromHex(data.toString());
         const memMaps = [['', memMap]] as MemoryMaps;
-        const regionList = regions.getFileRegions(memMaps, CoreDefinition);
+        const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
             regionList.find(r => r.name === regions.RegionName.APPLICATION)
@@ -142,7 +142,7 @@ describe('detect regions', () => {
             ['', memMap],
             ['', memMap2],
         ] as MemoryMaps;
-        const regionList = regions.getFileRegions(memMaps, CoreDefinition);
+        const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(4);
         expect(
             regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
@@ -173,7 +173,7 @@ describe('detect regions', () => {
             ['', memMap2],
             ['', memMap3],
         ] as MemoryMaps;
-        const regionList = regions.getFileRegions(memMaps, CoreDefinition);
+        const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(6);
         expect(
             regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)

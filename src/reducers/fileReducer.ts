@@ -18,7 +18,6 @@ type Loaded = {
 };
 
 export interface FileState {
-    detectedRegionNames: Set<string>;
     loaded: Record<string, Loaded>;
     mcubootFilePath?: string;
     zipFilePath?: string;
@@ -28,7 +27,6 @@ export interface FileState {
 }
 
 const initialState: FileState = {
-    detectedRegionNames: new Set(),
     loaded: {},
     mcubootFilePath: undefined,
     zipFilePath: undefined,
@@ -59,10 +57,6 @@ const fileSlice = createSlice({
         fileRegionsKnown(state, action: PayloadAction<Region[]>) {
             state.regions = action.payload;
         },
-        fileRegionNamesKnown(state, action: PayloadAction<Set<string>>) {
-            state.detectedRegionNames = action.payload;
-        },
-
         mruFilesLoadSuccess(state, action: PayloadAction<string[]>) {
             state.mruFiles = action.payload || [];
         },
@@ -83,12 +77,12 @@ const {
     filesEmpty,
     fileParse,
     fileRegionsKnown,
-    fileRegionNamesKnown,
     mruFilesLoadSuccess,
     mcubootFileKnown,
     zipFileKnown,
 } = fileSlice.actions;
 
+export const getFileMemMaps = (state: RootState) => state.app.file.memMaps;
 export const getLoaded = (state: RootState) => state.app.file.loaded;
 export const getMruFiles = (state: RootState) => state.app.file.mruFiles;
 export const getMcubootFilePath = (state: RootState) =>
@@ -100,7 +94,6 @@ export {
     filesEmpty,
     fileParse,
     fileRegionsKnown,
-    fileRegionNamesKnown,
     mruFilesLoadSuccess,
     mcubootFileKnown,
     zipFileKnown,

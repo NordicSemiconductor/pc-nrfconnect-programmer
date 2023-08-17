@@ -14,14 +14,9 @@ import {
 } from 'pc-nrfconnect-shared';
 import { NrfutilDeviceLib, Progress } from 'pc-nrfconnect-shared/nrfutil';
 
-import {
-    loadingEnd,
-    loadingStart,
-    targetWritableKnown,
-} from '../reducers/targetReducer';
+import { targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import { DeviceFamily } from '../util/deviceTypes';
-import { updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
@@ -30,7 +25,6 @@ export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
 export const openDevice =
     (device: Device): AppThunk =>
     dispatch => {
-        dispatch(loadingStart());
         // not all devices will have serialPorts property (non-Nordic devices for example)
         if (!device.serialPorts || device.serialPorts.length === 0) return;
 
@@ -65,9 +59,8 @@ export const openDevice =
                 'PCA20053'
             );
         }
-        dispatch(updateFileRegions());
+
         dispatch(canWrite());
-        dispatch(loadingEnd());
     };
 
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {

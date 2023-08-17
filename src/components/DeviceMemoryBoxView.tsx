@@ -7,26 +7,38 @@
 import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Popover from 'react-bootstrap/Popover';
+import { useSelector } from 'react-redux';
+import { selectedDevice } from 'pc-nrfconnect-shared';
 
+import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
+import { DeviceDefinition } from '../util/deviceTypes';
 import DeviceInfoView from './DeviceInfoView';
-import MemoryView from './MemoryView';
+import DeviceMemoryView from './DeviceMemoryView';
 
-interface MemoryBoxViewProps {
-    title: string;
-    description?: string;
-    iconName?: string;
-    isHolder?: boolean;
-    isTarget?: boolean;
-}
+const getTargetTitle = (
+    serialNumber: string | undefined,
+    deviceDefinition: DeviceDefinition | undefined
+) => {
+    if (serialNumber) {
+        return deviceDefinition?.type !== 'UNKNOWN'
+            ? deviceDefinition?.type
+            : deviceDefinition.family;
+    }
+    return undefined;
+};
 
-const MemoryBoxView = ({
-    title,
-    description,
-    iconName,
-    isHolder,
-    isTarget,
-}: MemoryBoxViewProps) => {
+export default () => {
     const [showOverlay, setShowOverlay] = useState(false);
+    const device = useSelector(selectedDevice);
+    const deviceDefinition = useSelector(getDeviceDefinition);
+
+    const title =
+        getTargetTitle(device?.serialNumber, deviceDefinition) ||
+        'Device memory layout';
+    const description = 'Connect a device to display memory contents';
+    const iconName = 'appicon-chip';
+    const isHolder = !device?.serialNumber;
+    const isTarget = !!device?.serialNumber;
 
     return (
         <Card className="memory-layout">
@@ -63,10 +75,8 @@ const MemoryBoxView = ({
                         <p>{description}</p>
                     </div>
                 )}
-                {!isHolder && <MemoryView isTarget={isTarget as boolean} />}
+                {!isHolder && <DeviceMemoryView />}
             </Card.Body>
         </Card>
     );
 };
-
-export default MemoryBoxView;
