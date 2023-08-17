@@ -185,7 +185,7 @@ const ControlPanel = () => {
         coreInfo => coreInfo.coreProtection === 'NRFDL_PROTECTION_STATUS_NONE'
     );
 
-    const isMemLoaded = !coreInfos.find(coreInfo => !!coreInfo.coreMemMap);
+    const isMemLoaded = coreInfos.find(coreInfo => !!coreInfo.coreMemMap);
     const isJLink = !!device?.traits.jlink;
     const isNordicDfu = !!device?.traits.nordicDfu;
     const isMcuboot = !!device?.traits.mcuBoot;
