@@ -33,7 +33,7 @@ import {
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import { getDeviceInfoByUSB, NordicFwIds } from '../util/devices';
-import { DeviceDefinition, DeviceFamily } from '../util/deviceTypes';
+import { DeviceDefinition } from '../util/deviceTypes';
 import {
     defaultRegion,
     getSoftDeviceId,
@@ -62,15 +62,27 @@ export const openDevice =
         logger.info(
             'Using nrfutil-device to communicate with target via USB SDFU protocol'
         );
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_FAMILY,
-            DeviceFamily.NRF52
-        );
-        usageData.sendUsageData(EventAction.OPEN_DEVICE_VERSION, 'nRF52840');
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_BOARD_VERSION,
-            'PCA10059'
-        );
+
+        if (device.hwInfo?.deviceFamily) {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_FAMILY,
+                device.hwInfo?.deviceFamily
+            );
+        }
+
+        if (device.hwInfo?.deviceVersion) {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_VERSION,
+                device.hwInfo.deviceVersion
+            );
+        }
+
+        if (device.boardVersion) {
+            usageData.sendUsageData(
+                EventAction.OPEN_DEVICE_BOARD_VERSION,
+                device.boardVersion
+            );
+        }
 
         const deviceInfo = getDeviceInfoByUSB(device);
         dispatch(setDeviceDefinition(deviceInfo));
