@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Alert } from 'pc-nrfconnect-shared';
+import { Alert } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getFileWarnings } from '../reducers/warningReducer';
 

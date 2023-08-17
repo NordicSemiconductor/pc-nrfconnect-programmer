@@ -12,8 +12,6 @@ import {
     Progress,
     readFwInfo,
 } from '@nordicsemiconductor/nrf-device-lib-js';
-import Crypto from 'crypto';
-import MemoryMap from 'nrf-intel-hex';
 import {
     AppThunk,
     defaultInitPacket,
@@ -29,7 +27,9 @@ import {
     setWaitForDevice,
     switchToBootloaderMode,
     usageData,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import Crypto from 'crypto';
+import MemoryMap from 'nrf-intel-hex';
 
 import { FileState } from '../reducers/fileReducer';
 import {

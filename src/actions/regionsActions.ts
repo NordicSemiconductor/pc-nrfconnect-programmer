@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { AppThunk, logger } from 'pc-nrfconnect-shared';
+import { AppThunk, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     fileRegionNamesKnown,

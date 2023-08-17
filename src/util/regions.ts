@@ -7,8 +7,8 @@
 /* eslint-disable no-bitwise */
 
 import { FWInfo } from '@nordicsemiconductor/nrf-device-lib-js';
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
-import { logger } from 'pc-nrfconnect-shared';
 
 import { CoreDefinition, coreFriendlyName, DeviceDefinition } from './devices';
 import { hexpad2 } from './hexpad';

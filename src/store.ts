@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { getPersistentStore } from 'pc-nrfconnect-shared';
+import { getPersistentStore } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 interface StoreSchema {
     settings: Settings;

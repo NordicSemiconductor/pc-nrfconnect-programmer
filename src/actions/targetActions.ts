@@ -10,7 +10,7 @@ import {
     logger,
     selectedDevice,
     usageData,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';

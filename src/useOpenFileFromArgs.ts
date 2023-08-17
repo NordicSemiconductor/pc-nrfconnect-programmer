@@ -6,8 +6,8 @@
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { AppThunk, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import * as fs from 'fs';
-import { AppThunk, logger } from 'pc-nrfconnect-shared';
 
 import * as fileActions from './actions/fileActions';
 
