@@ -38,11 +38,11 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "nrf-intel-hex": "^1.2.0",
-        "pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#v77"
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^89.0.0",
+        "nrf-intel-hex": "^1.2.0"
     },
     "eslintConfig": {
-        "extends": "./node_modules/pc-nrfconnect-shared/config/eslintrc"
+        "extends": "./node_modules/@nordicsemiconductor/pc-nrfconnect-shared/config/eslintrc"
     },
-    "prettier": "./node_modules/pc-nrfconnect-shared/config/prettier.config.js"
+    "prettier": "@nordicsemiconductor/pc-nrfconnect-shared/config/prettier.config.js"
 }

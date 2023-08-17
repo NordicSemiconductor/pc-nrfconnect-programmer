@@ -9,8 +9,6 @@ import nrfdl, {
     Device,
     FirmwareReadResult,
 } from '@nordicsemiconductor/nrf-device-lib-js';
-import fs from 'fs';
-import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import {
     AppThunk,
     describeError,
@@ -18,7 +16,9 @@ import {
     logger,
     selectedDevice,
     usageData,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import fs from 'fs';
+import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
 import { getAutoReset } from '../reducers/settingsReducer';
 import {

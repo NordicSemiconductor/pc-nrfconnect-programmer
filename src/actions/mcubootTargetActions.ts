@@ -13,7 +13,7 @@ import {
     logger,
     selectedDevice,
     usageData,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { loadingEnd, targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';

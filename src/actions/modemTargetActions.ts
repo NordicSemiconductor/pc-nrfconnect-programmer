@@ -10,7 +10,7 @@ import {
     getDeviceLibContext,
     logger,
     usageData,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 export const performUpdate = (
     device: Device,
