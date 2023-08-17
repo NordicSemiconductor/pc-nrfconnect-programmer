@@ -20,8 +20,7 @@ import {
     setWaitForDevice,
     switchToBootloaderMode,
     usageData,
-} from 'pc-nrfconnect-shared';
-import { ImageType, NrfutilDeviceLib } from 'pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     setDeviceDefinition,

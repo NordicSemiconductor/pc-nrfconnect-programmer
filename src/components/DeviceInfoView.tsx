@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectedDevice } from 'pc-nrfconnect-shared';
+import { selectedDevice } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';

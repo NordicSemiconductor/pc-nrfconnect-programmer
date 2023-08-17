@@ -13,15 +13,7 @@ import {
     Device,
     logger,
     usageData,
-} from 'pc-nrfconnect-shared';
-import {
-    BatchCallbacks,
-    DeviceBatch,
-    DeviceCore,
-    DeviceCoreInfo,
-    GetProtectionStatusResult,
-    NrfutilDeviceLib,
-} from 'pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     getDeviceDefinition,

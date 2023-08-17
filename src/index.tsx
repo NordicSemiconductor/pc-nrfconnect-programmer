@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { App } from 'pc-nrfconnect-shared';
+import { App } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import AppMainView from './components/AppMainView';
 import ControlPanel from './components/ControlPanel';

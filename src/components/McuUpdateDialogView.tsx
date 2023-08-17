@@ -25,8 +25,8 @@ import {
     Slider,
     Toggle,
     useStopwatch,
-} from 'pc-nrfconnect-shared';
-import { Progress } from 'pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';

@@ -6,7 +6,10 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Alert, selectedDevice } from 'pc-nrfconnect-shared';
+import {
+    Alert,
+    selectedDevice,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getForceMcuBoot } from '../reducers/settingsReducer';
 import useOpenFileFromArgs from '../useOpenFileFromArgs';

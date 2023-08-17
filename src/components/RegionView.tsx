@@ -9,7 +9,7 @@ import Button from 'react-bootstrap/Button';
 import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch } from 'react-redux';
-import { colors } from 'pc-nrfconnect-shared';
+import { colors } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import * as fileActions from '../actions/fileActions';
 import { CoreInfo } from '../util/devices';

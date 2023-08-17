@@ -15,8 +15,8 @@ import {
     logger,
     selectedDevice,
     useStopwatch,
-} from 'pc-nrfconnect-shared';
-import { Progress } from 'pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { performUpdate } from '../actions/modemTargetActions';
 import { getZipFilePath } from '../reducers/fileReducer';

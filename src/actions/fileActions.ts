@@ -5,15 +5,15 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
-import { readFile, stat, Stats, statSync } from 'fs';
-import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
-import { basename } from 'path';
 import {
     AppThunk,
     describeError,
     ErrorDialogActions,
     logger,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { readFile, stat, Stats, statSync } from 'fs';
+import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
+import { basename } from 'path';
 
 import {
     getDeviceDefinition as getDeviceDefinitionFromRedux,

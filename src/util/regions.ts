@@ -7,8 +7,8 @@
 /* eslint-disable no-bitwise */
 
 import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
-import { logger } from 'pc-nrfconnect-shared';
-import { DeviceCore, SemanticVersion } from 'pc-nrfconnect-shared/nrfutil';
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { DeviceCore, SemanticVersion } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { convertDeviceDefinitionToCoreArray } from './devices';
 import { CoreDefinition, DeviceDefinition } from './deviceTypes';

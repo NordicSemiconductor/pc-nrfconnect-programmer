@@ -18,7 +18,7 @@ import {
     SidePanel,
     Toggle,
     truncateMiddle,
-} from 'pc-nrfconnect-shared';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import * as fileActions from '../actions/fileActions';
 import * as jlinkTargetActions from '../actions/jlinkTargetActions';
