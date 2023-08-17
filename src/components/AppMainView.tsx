@@ -32,9 +32,6 @@ export default () => {
                 !forcedMCUBoot &&
                 !device.traits.nordicDfu && (
                     <div className="warning-view tw-flex tw-flex-col tw-gap-2">
-                        <Alert variant="danger" label="Error: ">
-                            No operation possible.
-                        </Alert>
                         <Alert variant="warning" label="Caution: ">
                             No operation possible. <br /> If the device is a
                             MCUboot device make sure it is in the bootloader
