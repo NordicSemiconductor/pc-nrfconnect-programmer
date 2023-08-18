@@ -11,8 +11,11 @@ import {
     logger,
     selectedDevice,
     usageData,
-} from 'pc-nrfconnect-shared';
-import { NrfutilDeviceLib, Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    NrfutilDeviceLib,
+    Progress,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';

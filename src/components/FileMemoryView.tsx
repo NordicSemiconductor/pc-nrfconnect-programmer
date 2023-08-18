@@ -6,8 +6,8 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logger } from 'pc-nrfconnect-shared';
-import { DeviceCore } from 'pc-nrfconnect-shared/nrfutil';
+import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import {
     getCoreDefinitions,

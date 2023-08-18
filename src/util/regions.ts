@@ -6,9 +6,12 @@
 
 /* eslint-disable no-bitwise */
 
-import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { DeviceCore, SemanticVersion } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import {
+    DeviceCore,
+    SemanticVersion,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
 
 import { convertDeviceDefinitionToCoreArray } from './devices';
 import { CoreDefinition, DeviceDefinition } from './deviceTypes';

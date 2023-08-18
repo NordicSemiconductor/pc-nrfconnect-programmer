@@ -6,9 +6,9 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectedDevice } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import MemoryMap from 'nrf-intel-hex';
-import { selectedDevice } from 'pc-nrfconnect-shared';
-import { DeviceCore } from 'pc-nrfconnect-shared/nrfutil';
 
 import {
     getCoreDefinitions,

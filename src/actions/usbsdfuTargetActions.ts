@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import Crypto from 'crypto';
-import MemoryMap from 'nrf-intel-hex';
 import {
     AppThunk,
     defaultInitPacket,
@@ -21,6 +19,12 @@ import {
     switchToBootloaderMode,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    ImageType,
+    NrfutilDeviceLib,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import Crypto from 'crypto';
+import MemoryMap from 'nrf-intel-hex';
 
 import {
     setDeviceDefinition,

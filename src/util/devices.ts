@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import MemoryMap from 'nrf-intel-hex';
 import {
     DeviceCore,
     DeviceCoreInfo,
     NrfutilDevice,
-} from 'pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import MemoryMap from 'nrf-intel-hex';
 
 import {
     CoreDefinition,

@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Popover from 'react-bootstrap/Popover';
 import { useSelector } from 'react-redux';
-import { selectedDevice } from 'pc-nrfconnect-shared';
+import { selectedDevice } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
 import { DeviceDefinition } from '../util/deviceTypes';

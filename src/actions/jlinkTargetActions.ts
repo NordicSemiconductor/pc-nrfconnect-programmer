@@ -5,8 +5,6 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
-import fs from 'fs';
-import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import {
     AppThunk,
     describeError,
@@ -14,6 +12,16 @@ import {
     logger,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    BatchCallbacks,
+    DeviceBatch,
+    DeviceCore,
+    DeviceCoreInfo,
+    GetProtectionStatusResult,
+    NrfutilDeviceLib,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import fs from 'fs';
+import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
 import {
     getDeviceDefinition,
