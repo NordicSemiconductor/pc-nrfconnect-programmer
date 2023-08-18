@@ -389,7 +389,7 @@ export const recover =
 
         await batch.run(device, abortController);
 
-        await dispatch(getAllCoreProtectionStatusBatch(coreNames, batch)).run(
+        await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
             abortController
         );
