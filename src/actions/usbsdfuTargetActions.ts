@@ -46,10 +46,10 @@ import {
     RegionPermission,
 } from '../util/regions';
 import {
-    updateFileAppRegions,
-    updateFileBlRegion,
-    updateFileRegions,
-} from './regionsActions';
+    generateFileAppRegions,
+    generateFileBlRegion,
+    generateRegionDetectedNames,
+} from '../util/usbsdfuHelpers';
 import EventAction from './usageDataActions';
 import * as userInputActions from './userInputActions';
 
@@ -261,9 +261,9 @@ const createDfuImage = (regionName: string, fwType: number) => {
     return dfuImage;
 };
 
-const createDfuImages = (file: FileState) => {
+const createDfuImages = (regions: Region[]) => {
     const dfuImages: DfuImage[] = [];
-    file.detectedRegionNames.forEach(regionName => {
+    generateRegionDetectedNames(regions).forEach(regionName => {
         switch (regionName) {
             case RegionName.BOOTLOADER:
                 dfuImages.push(createDfuImage(regionName, FwType.BOOTLOADER));
@@ -295,8 +295,7 @@ export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
 
     // Check if there are writable regions.
     // If not, then return.
-    const { detectedRegionNames } = getState().app.file;
-    if (!detectedRegionNames.size) {
+    if (!generateRegionDetectedNames(getState().app.file.regions).size) {
         return;
     }
 
@@ -565,14 +564,18 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
 export const write =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        dispatch(updateFileBlRegion());
-        dispatch(updateFileAppRegions());
-        const dfuImages = createDfuImages(getState().app.file);
+        let fileRegions = getState().app.file.regions;
+        const deviceDefinition = getState().app.deviceDefinition;
+        const targetRegions = getState().app.target.regions;
 
-        const fileRegions = getState().app.file.regions;
+        fileRegions = generateFileBlRegion(fileRegions, deviceDefinition);
+        fileRegions = generateFileAppRegions(fileRegions, targetRegions);
+        const dfuImages = createDfuImages(fileRegions);
+
         const fileMemMaps = getState().app.file.memMaps;
         const fileOverlaps = MemoryMap.overlapMemoryMaps(fileMemMaps);
         const fileMemMap = MemoryMap.flattenOverlaps(fileOverlaps);
+
         const hwVersion = parseInt(
             deviceDefinition.family?.slice(3) ?? '0',
             10
