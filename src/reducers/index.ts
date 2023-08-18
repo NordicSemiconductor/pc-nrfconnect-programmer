@@ -6,6 +6,7 @@
 
 import { combineReducers } from 'redux';
 
+import deviceDefinition from './deviceDefinitionReducer';
 import file from './fileReducer';
 import mcuboot from './mcubootReducer';
 import modem from './modemReducer';
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
     modem,
     mcuboot,
     settings,
+    deviceDefinition,
     target,
     userInput,
     warning,

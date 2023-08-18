@@ -15,6 +15,7 @@ import {
 
 import { openDevice } from '../actions/targetActions';
 import EventAction from '../actions/usageDataActions';
+import { resetDeviceInfo } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import { deselectDevice } from '../reducers/targetReducer';
@@ -32,6 +33,7 @@ export default () => {
                 dispatch(setShowMcuBootProgrammingDialog(false));
                 dispatch(setShowModemProgrammingDialog(false));
                 dispatch(deselectDevice());
+                dispatch(resetDeviceInfo());
                 logger.info('Target device closed');
             }}
             deviceListing={{
