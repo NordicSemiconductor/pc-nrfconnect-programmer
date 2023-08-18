@@ -17,9 +17,8 @@ import {
     Progress,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
-import { loadingEnd, targetWritableKnown } from '../reducers/targetReducer';
+import { targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
-import { updateFileRegions } from './regionsActions';
 import EventAction from './usageDataActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
@@ -46,9 +45,7 @@ export const openDevice =
             `${device.boardVersion}`
         );
 
-        dispatch(updateFileRegions());
         dispatch(canWrite());
-        dispatch(loadingEnd());
     };
 
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
