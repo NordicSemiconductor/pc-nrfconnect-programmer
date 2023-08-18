@@ -5,80 +5,90 @@
  */
 
 import { dialog, getCurrentWindow } from '@electron/remote';
-import nrfdl, {
-    Device,
-    FirmwareReadResult,
-} from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     AppThunk,
     describeError,
-    getDeviceLibContext,
+    Device,
     logger,
-    selectedDevice,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    BatchCallbacks,
+    DeviceBatch,
+    DeviceCore,
+    DeviceCoreInfo,
+    GetProtectionStatusResult,
+    NrfutilDeviceLib,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
-import { getAutoReset } from '../reducers/settingsReducer';
 import {
-    erasingEnd,
-    erasingStart,
-    loadingEnd,
-    loadingStart,
-    targetContentsKnown,
-    targetContentsUnknown,
-    targetInfoKnown,
-    targetRegionsKnown,
-    targetRegionsUnknown,
-    targetWritableKnown,
-    writingEnd,
-    writingStart,
-} from '../reducers/targetReducer';
+    getDeviceDefinition,
+    setDeviceDefinition,
+    updateCoreInfos,
+    updateCoreMemMap,
+    updateCoreOperations,
+    updateCoreProtection,
+} from '../reducers/deviceDefinitionReducer';
 import { RootState } from '../reducers/types';
 import {
-    CoreDefinition,
-    coreFriendlyName,
-    DeviceDefinition,
-    getDeviceInfoByJlink,
-    updateCoreInfo,
+    convertDeviceDefinitionToCoreArray,
+    generateMergedMemMap,
+    getDefaultDeviceInfoByJlinkFamily,
+    mergeNrfutilDeviceInfoInCoreDefinition,
 } from '../util/devices';
-import { getTargetRegions } from '../util/regions';
-import { updateFileAppRegions, updateFileRegions } from './regionsActions';
+import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
 import EventAction from './usageDataActions';
 
+let abortController: AbortController | undefined;
+
 export const openDevice =
-    (device: Device): AppThunk<RootState, Promise<void>> =>
+    (
+        device: Device,
+        controller: AbortController
+    ): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        dispatch(loadingStart());
+        abortController = controller;
         logger.info(
-            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via JLink'
+            'Using nrfutil device to communicate with target via JLink'
         );
 
         logDeviceInfo(device);
-        let deviceInfo = getDeviceInfoByJlink(device);
-        deviceInfo = await updateCoresWithNrfdl(device, deviceInfo);
+        const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(device);
+        const deviceCoreNames = convertDeviceDefinitionToCoreArray(
+            defaultDeviceInfo
+        ).map(c => c.name);
 
-        // Update modem target info according to detected device info
-        const isModem = !!device.traits.modem;
-        if (isModem) logger.info('Modem detected');
+        dispatch(setDeviceDefinition(defaultDeviceInfo));
 
-        dispatch(targetInfoKnown(deviceInfo));
-        dispatch(
-            targetContentsKnown({
-                targetMemMap: new MemoryMap([]),
-                isMemLoaded: false,
-            })
+        await dispatch(getAllCoreProtectionStatusBatch(deviceCoreNames)).run(
+            device,
+            abortController
         );
-        dispatch(updateTargetRegions(new MemoryMap([]), deviceInfo));
 
-        dispatch(updateFileRegions());
-        dispatch(canWrite());
-        dispatch(loadingEnd());
+        const deviceDefinition = getDeviceDefinition(getState());
+
+        const batch = dispatch(getAllCoreInfoBatch(deviceDefinition, true));
+
+        const autoRead = getState().app.settings.autoRead;
+        if (autoRead) {
+            dispatch(readAllCoresBatch(deviceDefinition, true, batch));
+        }
+
+        const autoReset = getState().app.settings.autoReset;
+        if (autoReset) {
+            await batch
+                .reset('Application', 'RESET_DEBUG')
+                .run(device, abortController);
+            await dispatch(
+                getAllCoreProtectionStatusBatch(deviceCoreNames)
+            ).run(device, abortController);
+        } else {
+            await batch.run(device, abortController);
+        }
+
         logger.info('Device is loaded and ready for further operation');
-
-        const { autoRead } = getState().app.settings;
-        if (autoRead) await dispatch(read(device));
     };
 
 /**
@@ -114,339 +124,344 @@ const logDeviceInfo = (device: Device) => {
     );
 };
 
-const getDeviceMemMap = (device: Device, coreInfo: CoreDefinition) =>
-    new Promise<MemoryMap>((resolve, reject) => {
-        logger.info(`Reading memory for ${coreInfo.name} core`);
-        nrfdl.firmwareRead(
-            getDeviceLibContext(),
-            device.id,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_INTEL_HEX',
-            result => {
-                if ((result as nrfdl.Error).message) {
-                    usageData.sendErrorReport(
-                        `Failed to get device memory map: ${describeError(
-                            result
-                        )}`
-                    );
-                    reject();
-                    return;
-                }
-
-                const buffer = (result as FirmwareReadResult).buffer || '';
-                const hexText = Buffer.from(buffer, 'base64').toString('utf8');
-                const memMap = MemoryMap.fromHex(hexText);
-
-                const paddedArray = memMap.slicePad(
-                    0,
-                    coreInfo.romBaseAddr + coreInfo.romSize
-                );
-                const paddedMemMap =
-                    MemoryMap.fromPaddedUint8Array(paddedArray);
-                logger.info(
-                    `Reading memory for ${coreInfo.name} core completed`
-                );
-                resolve(paddedMemMap);
-            },
-            () => {},
-            null,
-            null,
-            coreInfo.name
-        );
-    });
-
-/*
- * Check if the files can be written to the target device
- * The typical use case is having some HEX files that use the UICR, and a DevKit
- * that doesn't allow erasing the UICR page(s). Also, the (rare) cases where the
- * nRF SoC has readback protection enabled (and the loaded HEX files write the
- * readback-protected region).
- * In all those cases, this function will return false, and the user should not be
- * able to press the "program" button.
- * There are also instances where the UICR can be erased and overwritten, but
- * unfortunately the casuistics are just too complex.
- */
-export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
-    const device = selectedDevice(getState());
-
-    if (!device) {
-        dispatch(targetWritableKnown(false));
-        return;
-    }
-
-    // TODO: get the UICR address from the target definition. This value
-    // works for nRF51s and nRF52s, but other targets might use a different one!!!
-    const appState = getState().app;
-    const { isErased, isMemLoaded } = appState.target;
-    const isMcuboot = !!device.traits.mcuBoot;
-    const {
-        memMaps: fileMemMaps,
-        mcubootFilePath,
-        zipFilePath,
-    } = appState.file;
-    const isModem = device.traits.modem;
-
-    // If MCU is enabled and MCU firmware is detected
-    if (isMcuboot && mcubootFilePath) {
-        dispatch(targetWritableKnown(true));
-        return;
-    }
-
-    if (zipFilePath && (isMcuboot || isModem)) {
-        dispatch(targetWritableKnown(true));
-        return;
-    }
-
-    // If the device has been erased or the memory has been loaded and firmware is selected
-    if ((!isErased && !isMemLoaded) || !fileMemMaps.length) {
-        dispatch(targetWritableKnown(false));
-        return;
-    }
-
-    dispatch(targetWritableKnown(true));
-};
-
-const updateTargetRegions =
-    (memMap: MemoryMap, deviceInfo: DeviceDefinition): AppThunk =>
+const readAllCoresBatch =
+    (
+        deviceDefinition: DeviceDefinition,
+        checkProtection: boolean,
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
     dispatch => {
-        const memMaps: MemoryMaps = [['', memMap]];
-        const regions = getTargetRegions(memMaps, deviceInfo);
+        convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
+            (accBatch, deviceCoreInfo) => {
+                if (
+                    checkProtection &&
+                    deviceCoreInfo.coreProtection !==
+                        'NRFDL_PROTECTION_STATUS_NONE'
+                ) {
+                    logger.info(
+                        `Skipping reading core ${deviceCoreInfo.name} as it is protected.`
+                    );
+                    return accBatch;
+                }
+                return accBatch.firmwareRead(
+                    deviceCoreInfo.name,
+                    batchLoggingCallbacks<Buffer>(
+                        `Reading memory for ${deviceCoreInfo.name} core`,
+                        () => {
+                            dispatch(
+                                updateCoreOperations({
+                                    core: deviceCoreInfo.name,
+                                    state: 'reading',
+                                })
+                            );
+                            dispatch(
+                                updateCoreMemMap({
+                                    [deviceCoreInfo.name]: undefined,
+                                })
+                            );
+                        },
+                        (success, hexBuffer) => {
+                            if (success && hexBuffer) {
+                                const hexText = hexBuffer.toString('utf8');
+                                const memMap = MemoryMap.fromHex(hexText);
 
-        dispatch(targetRegionsKnown(regions));
-        dispatch(updateFileAppRegions());
+                                const paddedArray = memMap.slicePad(
+                                    0,
+                                    deviceCoreInfo.coreDefinitions.romBaseAddr +
+                                        deviceCoreInfo.coreDefinitions.romSize
+                                );
+
+                                dispatch(
+                                    updateCoreMemMap({
+                                        [deviceCoreInfo.name]:
+                                            MemoryMap.fromPaddedUint8Array(
+                                                paddedArray
+                                            ),
+                                    })
+                                );
+                            }
+                            dispatch(
+                                updateCoreOperations({
+                                    core: deviceCoreInfo.name,
+                                    state: 'idle',
+                                })
+                            );
+                        }
+                    )
+                );
+            },
+            batch
+        );
+
+        return batch;
     };
 
 export const read =
-    (device: Device): AppThunk<RootState, Promise<void>> =>
-    async (dispatch, getState) => {
-        const deviceInfo = getState().app.target.deviceInfo;
-
-        if (!deviceInfo) {
-            logger.error('No device info loaded');
-            return Promise.reject(new Error('No device info loaded'));
-        }
-
-        if (
-            deviceInfo.cores.find(
-                c =>
-                    c.protectionStatus &&
-                    c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
-            )
-        ) {
-            logger.info(
-                'Skipped reading, since at least one core has app readback protection'
-            );
-            return;
-        }
-
-        dispatch(loadingStart());
-        // Read from the device
-
-        try {
-            const memMap: MemoryMap[] = [];
-
-            await deviceInfo.cores.reduce(
-                (accumulatorPromise, core) =>
-                    accumulatorPromise
-                        .then(() =>
-                            getDeviceMemMap(device, core).then(map => {
-                                memMap.push(map);
-                                return Promise.resolve();
-                            })
-                        )
-                        .catch(Promise.reject),
-                Promise.resolve()
-            );
-
-            const mergedMemMap = MemoryMap.flattenOverlaps(
-                MemoryMap.overlapMemoryMaps(
-                    memMap.filter(m => m).map(m => ['', m])
-                )
-            );
-
-            dispatch(
-                targetContentsKnown({
-                    targetMemMap: mergedMemMap,
-                    isMemLoaded: true,
-                })
-            );
-            dispatch(updateTargetRegions(mergedMemMap, deviceInfo));
-
-            dispatch(canWrite());
-            dispatch(loadingEnd());
-
-            const autoReset = getAutoReset(getState());
-            if (autoReset) resetDevice(device);
-        } catch (error) {
-            console.log(error);
-            dispatch(targetContentsUnknown());
-            dispatch(targetRegionsUnknown());
-            dispatch(canWrite());
-            dispatch(loadingEnd());
-            logger.error('Error when reading device');
-        }
-    };
-
-const recoverOneCore = async (device: Device, coreInfo: CoreDefinition) => {
-    logger.info(`Recovering ${coreInfo.name} core`);
-
-    try {
-        await nrfdl.deviceControlRecover(
-            getDeviceLibContext(),
-            device.id,
-            coreInfo.name
-        );
-        logger.info(`Recovering ${coreInfo.name} core completed`);
-        return;
-    } catch (error) {
-        usageData.sendErrorReport(
-            `Failed to recover ${coreInfo.name} core: ${describeError(error)}`
-        );
-    }
-};
-
-export const recover =
     (
         device: Device,
-        continueToWrite = false
+        deviceDefinition: DeviceDefinition
     ): AppThunk<RootState, Promise<void>> =>
-    async (dispatch, getState) => {
-        const deviceInfo = getState().app.target.deviceInfo;
-
-        await deviceInfo?.cores.reduce(
-            (accumulatorPromise, core) =>
-                accumulatorPromise
-                    .then(() => {
-                        dispatch(erasingStart());
-                        return recoverOneCore(device, core);
-                    })
-                    .catch(Promise.reject),
-            Promise.resolve()
+    async dispatch => {
+        await dispatch(readAllCoresBatch(deviceDefinition, true)).run(
+            device,
+            abortController
         );
-
-        dispatch(erasingEnd());
-        logger.info('Device recovery completed');
-
-        if (!continueToWrite) await dispatch(openDevice(device));
     };
 
-const writeHex = (
-    device: Device,
-    coreInfo: CoreDefinition,
-    hexFileString: string
-) =>
-    new Promise<void>((resolve, reject) => {
-        logger.info(`Writing HEX to ${coreInfo.name} core`);
+const batchLoggingCallbacks = <T>(
+    message: string,
+    onBegin?: () => void,
+    onEnd?: (success: boolean, data?: T) => void
+): BatchCallbacks<T> => ({
+    onTaskBegin: () => {
+        logger.info(message);
+        onBegin?.();
+    },
+    onTaskEnd: taskEnd => {
+        onEnd?.(taskEnd.result === 'success', taskEnd.data);
 
-        nrfdl.firmwareProgram(
-            getDeviceLibContext(),
-            device.id,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_INTEL_HEX',
-            Buffer.from(hexFileString, 'utf8'),
-            error => {
-                if (error) {
-                    usageData.sendErrorReport(
-                        `Device programming failed with error: ${describeError(
-                            error
-                        )}`
+        if (taskEnd.result === 'success') {
+            logger.info(`${message} completed`);
+        } else {
+            usageData.sendErrorReport(
+                `Failed to ${message.toLowerCase()} core. Error: ${
+                    taskEnd.error
+                }, message: ${taskEnd.message}`
+            );
+        }
+    },
+    onException: () => {
+        onEnd?.(false);
+    },
+    onProgress: progress => {
+        const status = `${message.replace('.', ':')} ${
+            progress.progressPercentage
+        }%`;
+        logger.info(status);
+    },
+});
+
+const recoverOneCoreBatch =
+    (
+        core: DeviceCore,
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        batch.recover(
+            core,
+            batchLoggingCallbacks(
+                `Recovering ${core} core`,
+                () => {
+                    dispatch(updateCoreMemMap({ [core]: undefined }));
+                    dispatch(
+                        updateCoreOperations({
+                            core,
+                            state: 'erasing',
+                        })
                     );
-                    reject(error); // This is new behavior
-                    return;
-                }
-                logger.info(`Writing HEX to ${coreInfo.name} core completed`);
-                resolve();
-            },
-            ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                const message = progress.message || '';
-
-                const status = `${message.replace('.', ':')} ${
-                    progress.progressPercentage
-                }%`;
-                logger.info(status);
-            },
-            null,
-            coreInfo.name
+                },
+                () =>
+                    dispatch(
+                        updateCoreOperations({
+                            core,
+                            state: 'idle',
+                        })
+                    )
+            )
         );
-    });
 
-const writeOneCore = async (
-    device: Device,
-    coreInfo: CoreDefinition,
-    memMaps: MemoryMaps
-) => {
-    logger.info(`Writing procedure starts for ${coreInfo.name} core`);
+const writeOneCoreBatch =
+    (
+        core: DeviceCore,
+        hexFileString: string,
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        batch.program(
+            { buffer: Buffer.from(hexFileString, 'utf8'), type: 'hex' },
+            core,
+            undefined,
+            {
+                ...batchLoggingCallbacks(
+                    `Writing HEX to ${core} core`,
+                    () => {
+                        dispatch(updateCoreMemMap({ [core]: undefined }));
+                        dispatch(
+                            updateCoreOperations({ core, state: 'writing' })
+                        );
+                    },
+                    () =>
+                        dispatch(updateCoreOperations({ core, state: 'idle' }))
+                ),
+            }
+        );
 
+const geCoreHexIntel = (coreInfo: CoreDefinition, memMaps: MemoryMaps) => {
     // Parse input files and filter program regions with core start address and size
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     overlaps.forEach((overlap, key) => {
         const overlapStartAddr = key;
         const overlapSize = overlap[0][1].length;
+        const overlapEndAddr = overlapStartAddr + overlapSize;
 
         const isInCore =
             overlapStartAddr >= coreInfo.romBaseAddr &&
-            overlapStartAddr + overlapSize <=
-                coreInfo.romBaseAddr + coreInfo.romSize;
+            overlapEndAddr <= coreInfo.romBaseAddr + coreInfo.romSize;
         const isUicr =
             overlapStartAddr >= coreInfo.uicrBaseAddr &&
-            overlapStartAddr + overlapSize <=
-                coreInfo.uicrBaseAddr + coreInfo.pageSize;
+            overlapEndAddr <= coreInfo.uicrBaseAddr + coreInfo.pageSize;
         if (!isInCore && !isUicr) {
             overlaps.delete(key);
         }
     });
 
     if (overlaps.size <= 0) {
-        return;
+        return undefined;
     }
 
-    const programRegions = MemoryMap.flattenOverlaps(overlaps);
-
-    await writeHex(device, coreInfo, programRegions.asHexString());
-    logger.info(`Writing procedure ends for ${coreInfo.name} core`);
+    return MemoryMap.flattenOverlaps(overlaps);
 };
 
-export const write =
-    (device: Device): AppThunk<RootState, Promise<void>> =>
+const recoverAllCoresBatch =
+    (
+        cores: DeviceCore[],
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        cores.reduce(
+            (accBatch, core) => dispatch(recoverOneCoreBatch(core, accBatch)),
+            batch
+        );
+
+const writeToAllCoresBatch =
+    (
+        deviceDefinition: DeviceDefinition,
+        memMaps: MemoryMaps,
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
+            (accBatch, deviceCoreInfo) => {
+                const hex = geCoreHexIntel(
+                    deviceCoreInfo.coreDefinitions,
+                    memMaps
+                );
+                if (!hex) return accBatch;
+
+                return dispatch(
+                    writeOneCoreBatch(
+                        deviceCoreInfo.name,
+                        hex.asHexString(),
+                        accBatch
+                    )
+                );
+            },
+            batch
+        );
+
+export const recover =
+    (
+        device: Device,
+        deviceDefinition: DeviceDefinition
+    ): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
-        const memMaps = getState().app.file.memMaps;
-        const deviceInfo = getState().app.target.deviceInfo;
+        const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
+        const coreNames = coreInfos.map(c => c.name);
+        const batch = dispatch(recoverAllCoresBatch(coreNames));
 
-        dispatch(writingStart());
-        await deviceInfo?.cores
-            .reduce(
-                (accumulatorPromise, core) =>
-                    accumulatorPromise
-                        .then(() => writeOneCore(device, core, memMaps))
-                        .catch(Promise.reject),
-                Promise.resolve()
+        const autoRead = getState().app.settings.autoRead;
+        if (autoRead) {
+            dispatch(readAllCoresBatch(deviceDefinition, false, batch)); // No need to check protection as we recovered
+        }
+
+        dispatch(
+            getAllCoreInfoBatch(
+                deviceDefinition,
+                false, // No need to check protection as we recovered
+                batch
             )
-            .finally(() => dispatch(writingEnd()));
+        );
 
-        const autoReset = getAutoReset(getState());
-        if (autoReset) await resetDevice(device);
-        await dispatch(openDevice(device));
-        dispatch(canWrite());
+        const autoReset = getState().app.settings.autoReset;
+        if (autoReset) {
+            batch.reset('Application', 'RESET_DEBUG');
+        }
+
+        await batch.run(device, abortController);
+
+        await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
+            device,
+            abortController
+        );
     };
 
 export const recoverAndWrite =
-    (device: Device): AppThunk<RootState, Promise<void>> =>
-    async dispatch => {
-        const continueToWrite = true;
-        await dispatch(recover(device, continueToWrite));
-        await dispatch(write(device));
+    (
+        device: Device,
+        deviceDefinition: DeviceDefinition
+    ): AppThunk<RootState, Promise<void>> =>
+    async (dispatch, getState) => {
+        const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
+        const coreNames = coreInfos.map(c => c.name);
+        const batch = dispatch(recoverAllCoresBatch(coreNames));
+
+        const memMaps = getState().app.file.memMaps;
+        dispatch(writeToAllCoresBatch(deviceDefinition, memMaps, batch));
+
+        const autoRead = getState().app.settings.autoRead;
+        if (autoRead) {
+            dispatch(readAllCoresBatch(deviceDefinition, false, batch)); // No need to check protection as we recovered
+        }
+
+        dispatch(
+            getAllCoreInfoBatch(
+                deviceDefinition,
+                false, // No need to check protection as we recovered
+                batch
+            )
+        );
+
+        const autoReset = getState().app.settings.autoReset;
+        if (autoReset) {
+            batch.reset('Application', 'RESET_DEBUG');
+        }
+
+        await batch.run(device, abortController);
+
+        await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
+            device,
+            abortController
+        );
     };
 
-export const resetDevice = (device: Device) =>
-    nrfdl.deviceControlReset(getDeviceLibContext(), device.id).then(() => {
-        logger.info(`Resetting device completed`);
-    });
+export const resetDevice =
+    (device: Device, deviceDefinition: DeviceDefinition): AppThunk =>
+    async dispatch => {
+        await NrfutilDeviceLib.reset(
+            device,
+            'Application',
+            'RESET_DEBUG',
+            undefined,
+            abortController
+        );
+
+        const deviceCoreNames = convertDeviceDefinitionToCoreArray(
+            deviceDefinition
+        ).map(c => c.name);
+
+        await dispatch(getAllCoreProtectionStatusBatch(deviceCoreNames)).run(
+            device,
+            abortController
+        );
+    };
 
 export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
-    const { memMap, deviceInfo: inputDeviceInfo } = getState().app.target;
-    const deviceInfo = inputDeviceInfo as DeviceDefinition;
+    const deviceDefinition = getDeviceDefinition(getState());
+    const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     const maxAddress = Math.max(
-        ...deviceInfo.cores.map(c => c.romBaseAddr + c.romSize)
+        ...coreInfos.map(
+            c => c.coreDefinitions.romBaseAddr + c.coreDefinitions.romSize
+        )
     );
 
     const options = {
@@ -458,6 +473,7 @@ export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
     // eslint-disable-next-line no-undef
     const save = ({ filePath }: Electron.SaveDialogReturnValue) => {
         if (filePath) {
+            const memMap = generateMergedMemMap(deviceDefinition);
             const data = memMap?.slice(0, maxAddress).asHexString();
 
             if (data === undefined) {
@@ -477,68 +493,116 @@ export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
     dialog.showSaveDialog(getCurrentWindow(), options).then(save);
 };
 
-const updateCoresWithNrfdl = async (
-    device: Device,
-    deviceInfo: DeviceDefinition
-): Promise<DeviceDefinition> => {
-    const updateCore = async (core: CoreDefinition, index: number) => {
-        try {
-            logger.info(
-                `Reading readback protection status for ${coreFriendlyName(
-                    core.name
-                )} core`
-            );
+const getCoreProtectionStatusBatch =
+    (
+        core: DeviceCore,
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        batch.getProtectionStatus(
+            core,
+            batchLoggingCallbacks<GetProtectionStatusResult>(
+                `Reading readback protection status for ${core} core`,
+                () => {
+                    dispatch(updateCoreProtection({ [core]: undefined }));
+                },
+                (success, protectionStatus) => {
+                    if (success && protectionStatus) {
+                        logger.info(
+                            `${core} core protection status '${protectionStatus?.protectionStatus}'`
+                        );
+                        dispatch(
+                            updateCoreProtection({
+                                [core]: protectionStatus.protectionStatus,
+                            })
+                        );
 
-            const result = await nrfdl.deviceControlGetProtectionStatus(
-                getDeviceLibContext(),
-                device.id,
-                core.name
-            );
+                        if (
+                            protectionStatus.protectionStatus !==
+                            'NRFDL_PROTECTION_STATUS_NONE'
+                        ) {
+                            dispatch(
+                                updateCoreMemMap({
+                                    [core]: undefined,
+                                })
+                            );
+                        }
+                    }
+                }
+            )
+        );
 
-            logger.info(
-                `Readback protection status for ${coreFriendlyName(
-                    core.name
-                )} core: ${result.protectionStatus}`
-            );
+const getAllCoreProtectionStatusBatch =
+    (
+        cores: DeviceCore[],
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        cores.reduce(
+            (accBatch, core) =>
+                dispatch(getCoreProtectionStatusBatch(core, accBatch)),
+            batch
+        );
 
-            if (result.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE') {
-                return core;
-            }
-            const deviceCoreInfo = await nrfdl.getDeviceCoreInfo(
-                getDeviceLibContext(),
-                device.id,
-                core.name
-            );
+const getCoreInfoBatch =
+    (
+        core: DeviceCore,
+        defaultCoreInfo: CoreDefinition,
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        batch.getCoreInfo(
+            core,
+            batchLoggingCallbacks<DeviceCoreInfo>(
+                `Loading core information for ${core} core`,
+                () => {
+                    dispatch(updateCoreOperations({ core, state: 'loading' }));
+                    dispatch(updateCoreInfos({ [core]: defaultCoreInfo }));
+                },
+                (success, coreInfo) => {
+                    if (success && coreInfo) {
+                        dispatch(
+                            updateCoreInfos({
+                                [core]: mergeNrfutilDeviceInfoInCoreDefinition(
+                                    defaultCoreInfo,
+                                    coreInfo
+                                ),
+                            })
+                        );
+                    }
+                    dispatch(updateCoreOperations({ core, state: 'idle' }));
+                }
+            )
+        );
 
-            return updateCoreInfo(
-                core,
-                index,
-                deviceCoreInfo,
-                result.protectionStatus
-            );
-        } catch (error) {
-            const errorMessage = `Failed to load readback protection status: ${describeError(
-                error
-            )}`;
-            usageData.sendErrorReport(errorMessage);
-            return core;
-        }
-    };
+const getAllCoreInfoBatch =
+    (
+        currentDeviceDefinition: DeviceDefinition,
+        checkProtection: boolean,
+        batch = NrfutilDeviceLib.batch()
+    ): AppThunk<RootState, DeviceBatch> =>
+    dispatch =>
+        convertDeviceDefinitionToCoreArray(currentDeviceDefinition).reduce(
+            (accBatch, coreInfo) => {
+                if (
+                    checkProtection &&
+                    coreInfo.coreProtection !== 'NRFDL_PROTECTION_STATUS_NONE'
+                ) {
+                    logger.info(
+                        `Skipping reading core ${coreInfo.name} information as it is protected.`
+                    );
+                    return accBatch;
+                }
 
-    const cores: CoreDefinition[] = [];
-
-    await deviceInfo.cores.reduce(
-        (previousPromise, core, index) =>
-            previousPromise
-                .then(() =>
-                    updateCore(core, index).then(coreDefinition => {
-                        cores.push(coreDefinition);
-                        return Promise.resolve();
-                    })
-                )
-                .catch(Promise.reject),
-        Promise.resolve()
-    );
-
-    return { ...deviceInfo, cores };
-};
+                return dispatch(
+                    getCoreInfoBatch(
+                        coreInfo.name,
+                        currentDeviceDefinition.coreDefinitions[
+                            coreInfo.name
+                        ] as CoreDefinition,
+                        accBatch
+                    )
+                );
+            },
+            batch
+        );
