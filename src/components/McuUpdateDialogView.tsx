@@ -11,7 +11,6 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Alert,
     classNames,
@@ -27,6 +26,7 @@ import {
     Toggle,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
@@ -34,6 +34,7 @@ import {
     getShowMcuBootProgrammingDialog,
     setShowMcuBootProgrammingDialog,
 } from '../reducers/mcubootReducer';
+import { WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
@@ -41,7 +42,8 @@ const TOOLTIP_TEXT =
 const NET_CORE_UPLOAD_DELAY = 120;
 
 const McuUpdateDialogView = () => {
-    const [progress, setProgress] = useState<nrfdl.Progress.Operation>();
+    const [progress, setProgress] =
+        useState<WithRequired<Progress, 'message'>>();
     const [writing, setWriting] = useState(false);
     const [writingFail, setWritingFail] = useState(false);
     const [writingSucceed, setWritingSucceed] = useState(false);
@@ -53,6 +55,8 @@ const McuUpdateDialogView = () => {
     const isVisible = useSelector(getShowMcuBootProgrammingDialog);
     const mcubootFwPath = useSelector(getMcubootFilePath);
     const zipFilePath = useSelector(getZipFilePath);
+
+    const fwPath = mcubootFwPath || zipFilePath;
 
     const [netCoreUploadDelayOffset, setNetCoreUploadDelayOffset] =
         useState(-1);
@@ -128,6 +132,11 @@ const McuUpdateDialogView = () => {
             return;
         }
 
+        if (!fwPath) {
+            logger.error('No file selected');
+            return;
+        }
+
         setWriting(true);
         reset();
         start();
@@ -142,8 +151,9 @@ const McuUpdateDialogView = () => {
 
         performUpdate(
             device,
+            fwPath,
             programmingProgress => {
-                let updatedProgress: nrfdl.Progress.Operation = {
+                let updatedProgress: WithRequired<Progress, 'message'> = {
                     ...programmingProgress,
                     message: programmingProgress.message ?? '',
                 };
@@ -167,8 +177,6 @@ const McuUpdateDialogView = () => {
                 }
                 setProgress(updatedProgress);
             },
-            mcubootFwPath,
-            zipFilePath,
             showDelayTimeout ? uploadDelay : undefined
         )
             .then(() => {

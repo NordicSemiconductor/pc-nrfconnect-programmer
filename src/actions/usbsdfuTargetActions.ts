@@ -5,21 +5,12 @@
  */
 
 import {
-    deviceControlReset,
-    Error,
-    firmwareProgram,
-    FWInfo,
-    Progress,
-    readFwInfo,
-} from '@nordicsemiconductor/nrf-device-lib-js';
-import {
     AppThunk,
     defaultInitPacket,
     describeError,
     Device,
     DfuImage,
     FwType,
-    getDeviceLibContext,
     HashType,
     logger,
     sdfuOperations,
@@ -28,6 +19,10 @@ import {
     switchToBootloaderMode,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    ImageType,
+    NrfutilDeviceLib,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';
 
@@ -72,7 +67,7 @@ export const openDevice =
     (device: Device): AppThunk =>
     dispatch => {
         logger.info(
-            'Using @nordicsemiconductor/nrf-device-lib-js to communicate with target via USB SDFU protocol'
+            'Using nrfutil-device to communicate with target via USB SDFU protocol'
         );
 
         if (device.hwInfo?.deviceFamily) {
@@ -106,9 +101,8 @@ const refreshMemoryLayout =
             switchToBootloaderMode(
                 device,
                 async deviceInBootLoader => {
-                    const fwInfo: FWInfo.ReadResult = await readFwInfo(
-                        getDeviceLibContext(),
-                        deviceInBootLoader.id
+                    const fwInfo = await NrfutilDeviceLib.getFwInfo(
+                        deviceInBootLoader
                     );
                     const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
                     dispatch(targetInfoKnown(deviceInfo));
@@ -523,32 +517,11 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
 
     let prevPercentage: number;
 
-    return new Promise<void>((resolve, reject) => {
-        firmwareProgram(
-            getDeviceLibContext(),
-            device.id,
-            'NRFDL_FW_BUFFER',
-            'NRFDL_FW_SDFU_ZIP',
-            zipBuffer,
-            (error?: Error) => {
-                if (error) {
-                    if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
-                        logger.error('Failed to write to the target device');
-                        logger.error(
-                            'The required SoftDevice version does not match'
-                        );
-                    } else {
-                        logger.error(describeError(error));
-                    }
-                    reject(error);
-                } else {
-                    logger.info(
-                        'All dfu images have been written to the target device'
-                    );
-                    resolve();
-                }
-            },
-            ({ progressJson: progress }: Progress.CallbackParameters) => {
+    try {
+        await NrfutilDeviceLib.program(
+            device,
+            { buffer: zipBuffer, type: 'zip' },
+            progress => {
                 // Don't repeat percentage steps that have already been logged.
                 if (prevPercentage === progress.progressPercentage) {
                     return;
@@ -564,7 +537,17 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
                 prevPercentage = progress.progressPercentage;
             }
         );
-    });
+
+        logger.info('All dfu images have been written to the target device');
+    } catch (error) {
+        if (nrfdlErrorSdfuExtSdVersionFailure(error)) {
+            logger.error('Failed to write to the target device');
+            logger.error('The required SoftDevice version does not match');
+        } else {
+            logger.error(describeError(error));
+        }
+        throw error;
+    }
 };
 
 export const write =

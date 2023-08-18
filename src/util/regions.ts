@@ -6,8 +6,11 @@
 
 /* eslint-disable no-bitwise */
 
-import { FWInfo } from '@nordicsemiconductor/nrf-device-lib-js';
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    DeviceCore,
+    SemanticVersion,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
 
 import { CoreDefinition, coreFriendlyName, DeviceDefinition } from './devices';
@@ -64,7 +67,7 @@ export enum RegionColor {
  */
 export interface Region {
     name: RegionName;
-    version?: number | FWInfo.SemanticVersion | string;
+    version?: number | SemanticVersion | string;
     startAddress: number;
     regionSize: number;
     color: RegionColor;

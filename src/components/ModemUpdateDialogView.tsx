@@ -8,7 +8,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Alert,
     DialogButton,
@@ -17,6 +16,7 @@ import {
     selectedDevice,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { performUpdate } from '../actions/modemTargetActions';
 import { getZipFilePath } from '../reducers/fileReducer';
@@ -25,9 +25,11 @@ import {
     setShowModemProgrammingDialog,
 } from '../reducers/modemReducer';
 import { getForceMcuBoot } from '../reducers/settingsReducer';
+import { WithRequired } from '../util/types';
 
 const ModemUpdateDialogView = () => {
-    const [progress, setProgress] = useState<nrfdl.Progress.Operation>();
+    const [progress, setProgress] =
+        useState<WithRequired<Progress, 'message'>>();
     const [writing, setWriting] = useState(false);
     const [writingFail, setWritingFail] = useState(false);
     const [writingSucceed, setWritingSucceed] = useState(false);
@@ -80,7 +82,7 @@ const ModemUpdateDialogView = () => {
         setProgress(progress);
 
         performUpdate(device, modemFwName, programmingProgress => {
-            let updatedProgress: nrfdl.Progress.Operation = {
+            let updatedProgress: WithRequired<Progress, 'message'> = {
                 ...programmingProgress,
                 message: programmingProgress.message ?? '',
             };
