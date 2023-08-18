@@ -87,6 +87,9 @@ export const openDevice =
             );
         }
 
+        const deviceInfo = getDeviceInfoByUSB(device);
+        dispatch(setDeviceDefinition(deviceInfo));
+
         dispatch(refreshMemoryLayout(device));
     };
 
