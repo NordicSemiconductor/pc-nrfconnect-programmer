@@ -22,10 +22,12 @@ import * as mcubootTargetActions from './mcubootTargetActions';
 import EventAction from './usageDataActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
+let abortController: AbortController;
+
 export const openDevice =
     (device: Device): AppThunk =>
-    dispatch => {
-        dispatch(loadingStart());
+    async dispatch => {
+        abortController = new AbortController();
 
         dispatch(setDeviceBusy(true));
         try {
@@ -63,6 +65,10 @@ export const openDevice =
         }
         dispatch(setDeviceBusy(false));
     };
+
+export const closeDevice = () => {
+    abortController.abort();
+};
 
 export const updateTargetWritable =
     (): AppThunk<RootState> => (dispatch, getState) => {

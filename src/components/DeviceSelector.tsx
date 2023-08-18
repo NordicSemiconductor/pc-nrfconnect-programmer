@@ -13,12 +13,16 @@ import {
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { openDevice } from '../actions/targetActions';
+import { closeDevice, openDevice } from '../actions/targetActions';
 import EventAction from '../actions/usageDataActions';
 import { resetDeviceInfo } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import { deselectDevice } from '../reducers/targetReducer';
+
+const abortController = new AbortController();
+
+export const getAbortController = () => abortController;
 
 export default () => {
     const dispatch = useDispatch();
@@ -34,6 +38,7 @@ export default () => {
                 dispatch(setShowModemProgrammingDialog(false));
                 dispatch(deselectDevice());
                 dispatch(resetDeviceInfo());
+                closeDevice();
                 logger.info('Target device closed');
             }}
             deviceListing={{
