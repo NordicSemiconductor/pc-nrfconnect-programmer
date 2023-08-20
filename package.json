@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-programmer",
-    "version": "3.0.9",
+    "version": "3.0.10",
     "displayName": "Programmer",
     "description": "Tool for flash programming of nRF SoCs",
     "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer",
@@ -11,7 +11,7 @@
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
-        "nrfconnect": ">=4.0.0"
+        "nrfconnect": ">=4.2.0"
     },
     "main": "dist/bundle.js",
     "files": [

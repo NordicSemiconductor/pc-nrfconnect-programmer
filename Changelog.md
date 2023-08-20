@@ -1,3 +1,9 @@
+## 3.0.10 - unreleased
+
+### Added
+
+-   Update application to let device-lib detect file format for MCUBoot by itself.
+
 ## 3.0.9 - 15-06-23
 
 ### Added

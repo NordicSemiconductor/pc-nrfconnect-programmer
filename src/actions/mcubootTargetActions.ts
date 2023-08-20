@@ -182,9 +182,6 @@ export const performUpdate =
             const device = inputDevice as Device;
             const { mcubootFilePath, zipFilePath } = getState().app.file;
             const dfuFilePath = mcubootFilePath || zipFilePath;
-            const firmwareFormat = mcubootFilePath
-                ? 'NRFDL_FW_INTEL_HEX'
-                : 'NRFDL_FW_MCUBOOT_MULTI_IMAGE';
 
             logger.info(
                 `Writing ${dfuFilePath} to device ${device.serialNumber}`
@@ -253,7 +250,8 @@ export const performUpdate =
                 getDeviceLibContext(),
                 device.id,
                 'NRFDL_FW_FILE',
-                firmwareFormat,
+                //@ts-expect-error Works with device-lib-js >= 0.7.1; Pass undefined and lib decide file format
+                undefined,
                 dfuFilePath as string,
                 completeCallback,
                 progressCallback,
