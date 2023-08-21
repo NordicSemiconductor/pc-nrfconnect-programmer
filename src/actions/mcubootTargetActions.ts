@@ -250,7 +250,6 @@ export const performUpdate =
                 getDeviceLibContext(),
                 device.id,
                 'NRFDL_FW_FILE',
-                // @ts-expect-error Works with device-lib-js >= 0.7.1; Pass undefined and lib decide file format
                 undefined,
                 dfuFilePath as string,
                 completeCallback,
