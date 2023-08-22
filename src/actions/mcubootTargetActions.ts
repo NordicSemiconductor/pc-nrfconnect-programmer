@@ -81,16 +81,13 @@ export const performUpdate = (
 ) =>
     new Promise<void>((resolve, reject) => {
         const dfuFilePath = mcubootFilePath || zipFilePath;
-        const firmwareFormat = mcubootFilePath
-            ? 'NRFDL_FW_INTEL_HEX'
-            : 'NRFDL_FW_MCUBOOT_MULTI_IMAGE';
         logger.info(`Writing ${dfuFilePath} to device ${device.serialNumber}`);
 
         nrfdl.firmwareProgram(
             getDeviceLibContext(),
             device.id,
             'NRFDL_FW_FILE',
-            firmwareFormat,
+            undefined,
             dfuFilePath as string,
             error => {
                 if (!error) {
