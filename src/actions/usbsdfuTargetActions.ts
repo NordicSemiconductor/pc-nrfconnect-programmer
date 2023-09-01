@@ -33,6 +33,7 @@ import {
 } from '../reducers/deviceDefinitionReducer';
 import {
     targetRegionsKnown,
+    targetRegionsUnknown,
     targetWritableKnown,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
@@ -97,6 +98,7 @@ export const openDevice =
 const refreshMemoryLayout =
     (device: Device): AppThunk =>
     dispatch => {
+        dispatch(targetRegionsUnknown());
         dispatch(
             switchToBootloaderMode(
                 device,

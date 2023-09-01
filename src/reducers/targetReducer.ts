@@ -61,10 +61,19 @@ const targetSlice = createSlice({
 
 export default targetSlice.reducer;
 
-const { targetRegionsKnown, targetWritableKnown, deselectDevice } =
-    targetSlice.actions;
+const {
+    targetRegionsKnown,
+    targetWritableKnown,
+    targetRegionsUnknown,
+    deselectDevice,
+} = targetSlice.actions;
 
 export const getIsWritable = (state: RootState) => state.app.target.isWritable;
 export const getTargetRegions = (state: RootState) => state.app.target.regions;
 
-export { targetRegionsKnown, targetWritableKnown, deselectDevice };
+export {
+    targetRegionsKnown,
+    targetWritableKnown,
+    targetRegionsUnknown,
+    deselectDevice,
+};
