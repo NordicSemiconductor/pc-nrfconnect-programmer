@@ -12,6 +12,7 @@ import {
     DfuImage,
     FwType,
     HashType,
+    isDeviceInDFUBootloader,
     logger,
     sdfuOperations,
     selectedDevice,
@@ -288,7 +289,7 @@ const createDfuImages = (regions: Region[]) => {
 export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
     const device = selectedDevice(getState());
 
-    if (!device) {
+    if (!device || !isDeviceInDFUBootloader(device)) {
         dispatch(targetWritableKnown(false));
         return;
     }

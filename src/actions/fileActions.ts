@@ -221,7 +221,6 @@ const parseHexFile =
         const newMemMaps = [...memMaps, [filePath, memMap]] as MemoryMapTuple[];
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
-        dispatch(updateTargetWritable());
     };
 
 export const openFile =

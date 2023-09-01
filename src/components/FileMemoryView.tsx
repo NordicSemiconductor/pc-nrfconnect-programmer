@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
+import { updateTargetWritable } from '../actions/targetActions';
 import {
     getCoreDefinitions,
     getDeviceDefinition,
@@ -67,6 +68,10 @@ export default () => {
     const deviceDefinition = useSelector(getDeviceDefinition);
     const coreDefinitions = useSelector(getCoreDefinitions);
     const zipFilePath = useSelector(getZipFilePath);
+
+    useEffect(() => {
+        dispatch(updateTargetWritable());
+    }, [dispatch, fileRegions]);
 
     useEffect(() => {
         dispatch(fileWarningRemove());
