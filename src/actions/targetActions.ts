@@ -11,6 +11,7 @@ import {
     selectedDevice,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
 import { setDeviceBusy } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
@@ -61,7 +62,7 @@ export const openDevice =
                 }
             }
         } catch (error) {
-            /* empty */
+            logger.error(describeError(error));
         }
         dispatch(setDeviceBusy(false));
     };
