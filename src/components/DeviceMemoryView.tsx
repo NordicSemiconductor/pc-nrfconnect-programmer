@@ -6,7 +6,10 @@
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectedDevice } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    isDeviceInDFUBootloader,
+    selectedDevice,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import MemoryMap from 'nrf-intel-hex';
 
@@ -132,6 +135,20 @@ const TextOverlay = ({
                 <div className="centering-container">
                     <div className="read-indicatorv  tw-break-words tw-text-center">
                         <p>Device is connected</p>
+                    </div>
+                </div>
+            )}
+            {device && isNordicDfu && !isDeviceInDFUBootloader(device) && (
+                <div className="centering-container">
+                    <div className="read-indicator">
+                        <p>Device is connected</p>
+                        <p>
+                            Memory layout is only available in Bootloader mode
+                        </p>
+                        <p>
+                            WriteOperations are only supported in Bootloader
+                            mode
+                        </p>
                     </div>
                 </div>
             )}
