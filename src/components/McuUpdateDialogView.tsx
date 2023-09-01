@@ -224,7 +224,7 @@ const McuUpdateDialogView = () => {
                       100
               )
           )
-        : progress?.progressPercentage ?? 0;
+        : progress?.stepProgressPercentage ?? 0;
 
     return (
         <GenericDialog

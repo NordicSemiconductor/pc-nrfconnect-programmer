@@ -538,18 +538,18 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
             { buffer: zipBuffer, type: 'zip' },
             progress => {
                 // Don't repeat percentage steps that have already been logged.
-                if (prevPercentage === progress.progressPercentage) {
+                if (prevPercentage === progress.stepProgressPercentage) {
                     return;
                 }
 
                 const message = progress.message || '';
 
                 const status = `${message.replace('.', ':')} ${
-                    progress.progressPercentage
+                    progress.stepProgressPercentage
                 }%`;
 
                 logger.info(status);
-                prevPercentage = progress.progressPercentage;
+                prevPercentage = progress.stepProgressPercentage;
             }
         );
 

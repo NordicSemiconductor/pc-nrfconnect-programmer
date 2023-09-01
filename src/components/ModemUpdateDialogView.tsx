@@ -193,7 +193,7 @@ const ModemUpdateDialogView = () => {
                         {progress && (
                             <ProgressBar
                                 hidden={!writing}
-                                now={progress.progressPercentage}
+                                now={progress.stepProgressPercentage}
                                 style={{ height: '4px' }}
                             />
                         )}
