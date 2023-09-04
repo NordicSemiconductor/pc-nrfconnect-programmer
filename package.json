@@ -46,7 +46,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/nrfutil-device-update-1.4.0",
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^99.0.0",
         "nrf-intel-hex": "^1.2.0"
     },
     "eslintConfig": {
