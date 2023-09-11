@@ -16,7 +16,7 @@
     "nrfConnectForDesktop": {
         "nrfutil": {
             "device": [
-                "1.4.1"
+                "1.4.2"
             ]
         },
         "html": "dist/index.html"
@@ -46,7 +46,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^102.0.0",
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^104.0.0",
         "nrf-intel-hex": "^1.2.0"
     },
     "eslintConfig": {

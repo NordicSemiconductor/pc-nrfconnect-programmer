@@ -281,6 +281,7 @@ const writeOneCoreBatch =
             { buffer: Buffer.from(hexFileString, 'utf8'), type: 'hex' },
             core,
             undefined,
+            undefined,
             {
                 ...batchLoggingCallbacks(
                     `Writing HEX to ${core} core`,
