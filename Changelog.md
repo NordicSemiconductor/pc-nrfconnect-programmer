@@ -1,3 +1,18 @@
+## 4.0.0 - UNRELEASED
+
+### Added
+
+-   Allow reading multi-core devices if one or more cores are not protected.
+
+### Changed
+
+-   Programmer now uses nrfutil device for all it's operations
+-   Split settings `Jlink` and `MCUBoot` into different groups
+
+### Removed
+
+-   Notices in the side panel related to Cellular modem
+
 ## 3.0.9 - 15-06-23
 
 ### Added
