@@ -48,8 +48,6 @@ const McuUpdateDialogView = () => {
     const [writingFail, setWritingFail] = useState(false);
     const [writingSucceed, setWritingSucceed] = useState(false);
     const [writingFailError, setWritingFailError] = useState<string>();
-    const [timeoutStarted, setTimeoutStarted] = useState(false);
-    const [timeoutValue, setTimeoutValue] = useState(0);
 
     const device = useSelector(selectedDevice);
     const isVisible = useSelector(getShowMcuBootProgrammingDialog);
@@ -57,9 +55,6 @@ const McuUpdateDialogView = () => {
     const zipFilePath = useSelector(getZipFilePath);
 
     const fwPath = mcubootFwPath || zipFilePath;
-
-    const [netCoreUploadDelayOffset, setNetCoreUploadDelayOffset] =
-        useState(-1);
 
     const writingHasStarted = writing || writingFail || writingSucceed;
 
@@ -94,8 +89,6 @@ const McuUpdateDialogView = () => {
             setWritingSucceed(false);
             setWritingFail(false);
             setWritingFailError(undefined);
-            setTimeoutStarted(false);
-            setTimeoutValue(0);
         }
     }, [isVisible]);
 
@@ -112,14 +105,6 @@ const McuUpdateDialogView = () => {
             setKeepDefaultTimeout(false);
         }
     }, [device, showDelayTimeout]);
-
-    useEffect(() => {
-        if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
-            setNetCoreUploadDelayOffset(Math.floor(time));
-        } else if (!timeoutStarted) {
-            setNetCoreUploadDelayOffset(-1);
-        }
-    }, [netCoreUploadDelayOffset, timeoutStarted, time]);
 
     const onCancel = () => {
         dispatch(clearWaitForDevice());
@@ -164,17 +149,7 @@ const McuUpdateDialogView = () => {
                         message: `${programmingProgress.message} This will take some time.`,
                     };
                 }
-                if (
-                    programmingProgress.message?.match(
-                        /Waiting [0-9]+ seconds to let RAM NET Core flash succeed./
-                    )
-                ) {
-                    const timeouts = programmingProgress.message.match(/\d+/g);
-                    if (timeouts?.length === 1) {
-                        setTimeoutStarted(true);
-                        setTimeoutValue(parseInt(timeouts[0], 10));
-                    }
-                }
+
                 setProgress(updatedProgress);
             },
             showDelayTimeout ? uploadDelay : undefined
@@ -216,16 +191,6 @@ const McuUpdateDialogView = () => {
         }
     }, [writingFail, writingSucceed, pause]);
 
-    const timerProgress = timeoutStarted
-        ? Math.min(
-              100,
-              Math.round(
-                  ((time - netCoreUploadDelayOffset) / (timeoutValue * 1000)) *
-                      100
-              )
-          )
-        : progress?.stepProgressPercentage ?? 0;
-
     return (
         <GenericDialog
             title="MCUboot DFU"
@@ -265,7 +230,7 @@ const McuUpdateDialogView = () => {
                     </Form.Label>
                     <ProgressBar
                         hidden={!writing}
-                        now={timerProgress}
+                        now={progress?.stepProgressPercentage ?? 0}
                         style={{ height: '4px' }}
                     />
                 </Form.Group>
