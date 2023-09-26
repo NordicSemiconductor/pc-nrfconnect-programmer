@@ -11,7 +11,6 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
-import nrfdl from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     Alert,
     classNames,
@@ -27,6 +26,7 @@ import {
     Toggle,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
@@ -34,6 +34,7 @@ import {
     getShowMcuBootProgrammingDialog,
     setShowMcuBootProgrammingDialog,
 } from '../reducers/mcubootReducer';
+import { WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
@@ -41,21 +42,19 @@ const TOOLTIP_TEXT =
 const NET_CORE_UPLOAD_DELAY = 120;
 
 const McuUpdateDialogView = () => {
-    const [progress, setProgress] = useState<nrfdl.Progress.Operation>();
+    const [progress, setProgress] =
+        useState<WithRequired<Progress, 'message'>>();
     const [writing, setWriting] = useState(false);
     const [writingFail, setWritingFail] = useState(false);
     const [writingSucceed, setWritingSucceed] = useState(false);
     const [writingFailError, setWritingFailError] = useState<string>();
-    const [timeoutStarted, setTimeoutStarted] = useState(false);
-    const [timeoutValue, setTimeoutValue] = useState(0);
 
     const device = useSelector(selectedDevice);
     const isVisible = useSelector(getShowMcuBootProgrammingDialog);
     const mcubootFwPath = useSelector(getMcubootFilePath);
     const zipFilePath = useSelector(getZipFilePath);
 
-    const [netCoreUploadDelayOffset, setNetCoreUploadDelayOffset] =
-        useState(-1);
+    const fwPath = mcubootFwPath || zipFilePath;
 
     const writingHasStarted = writing || writingFail || writingSucceed;
 
@@ -90,8 +89,6 @@ const McuUpdateDialogView = () => {
             setWritingSucceed(false);
             setWritingFail(false);
             setWritingFailError(undefined);
-            setTimeoutStarted(false);
-            setTimeoutValue(0);
         }
     }, [isVisible]);
 
@@ -109,14 +106,6 @@ const McuUpdateDialogView = () => {
         }
     }, [device, showDelayTimeout]);
 
-    useEffect(() => {
-        if (netCoreUploadDelayOffset === -1 && timeoutStarted) {
-            setNetCoreUploadDelayOffset(Math.floor(time));
-        } else if (!timeoutStarted) {
-            setNetCoreUploadDelayOffset(-1);
-        }
-    }, [netCoreUploadDelayOffset, timeoutStarted, time]);
-
     const onCancel = () => {
         dispatch(clearWaitForDevice());
         dispatch(setShowMcuBootProgrammingDialog(false));
@@ -125,6 +114,11 @@ const McuUpdateDialogView = () => {
     const onWriteStart = () => {
         if (!device) {
             logger.error('No target device!');
+            return;
+        }
+
+        if (!fwPath) {
+            logger.error('No file selected');
             return;
         }
 
@@ -142,8 +136,9 @@ const McuUpdateDialogView = () => {
 
         performUpdate(
             device,
+            fwPath,
             programmingProgress => {
-                let updatedProgress: nrfdl.Progress.Operation = {
+                let updatedProgress: WithRequired<Progress, 'message'> = {
                     ...programmingProgress,
                     message: programmingProgress.message ?? '',
                 };
@@ -154,21 +149,9 @@ const McuUpdateDialogView = () => {
                         message: `${programmingProgress.message} This will take some time.`,
                     };
                 }
-                if (
-                    programmingProgress.message?.match(
-                        /Waiting [0-9]+ seconds to let RAM NET Core flash succeed./
-                    )
-                ) {
-                    const timeouts = programmingProgress.message.match(/\d+/g);
-                    if (timeouts?.length === 1) {
-                        setTimeoutStarted(true);
-                        setTimeoutValue(parseInt(timeouts[0], 10));
-                    }
-                }
+
                 setProgress(updatedProgress);
             },
-            mcubootFwPath,
-            zipFilePath,
             showDelayTimeout ? uploadDelay : undefined
         )
             .then(() => {
@@ -207,16 +190,6 @@ const McuUpdateDialogView = () => {
             pause();
         }
     }, [writingFail, writingSucceed, pause]);
-
-    const timerProgress = timeoutStarted
-        ? Math.min(
-              100,
-              Math.round(
-                  ((time - netCoreUploadDelayOffset) / (timeoutValue * 1000)) *
-                      100
-              )
-          )
-        : progress?.progressPercentage ?? 0;
 
     return (
         <GenericDialog
@@ -257,7 +230,7 @@ const McuUpdateDialogView = () => {
                     </Form.Label>
                     <ProgressBar
                         hidden={!writing}
-                        now={timerProgress}
+                        now={progress?.stepProgressPercentage ?? 0}
                         style={{ height: '4px' }}
                     />
                 </Form.Group>

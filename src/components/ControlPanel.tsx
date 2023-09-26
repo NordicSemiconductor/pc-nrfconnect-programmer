@@ -26,6 +26,11 @@ import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
 import {
+    getDeviceDefinition,
+    getDeviceIsBusy,
+    setDeviceBusy,
+} from '../reducers/deviceDefinitionReducer';
+import {
     getFileRegions,
     getMruFiles,
     getZipFilePath,
@@ -36,12 +41,8 @@ import {
     getForceMcuBoot,
     setForceMcuBoot,
 } from '../reducers/settingsReducer';
-import {
-    getDeviceInfo,
-    getIsMemLoaded,
-    getIsReady,
-    getIsWritable,
-} from '../reducers/targetReducer';
+import { getIsWritable } from '../reducers/targetReducer';
+import { convertDeviceDefinitionToCoreArray } from '../util/devices';
 
 const useRegisterDragEvents = () => {
     const dispatch = useDispatch();
@@ -169,24 +170,22 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
 
 const ControlPanel = () => {
     const dispatch = useDispatch();
-
     const device = useSelector(selectedDevice);
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
     const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
-    const targetIsMemLoaded = useSelector(getIsMemLoaded);
-    const isKnownProtected = !!useSelector(getDeviceInfo)?.cores.find(
-        c => c.protectionStatus
-    );
-    const isProtected =
-        !!useSelector(getDeviceInfo)?.cores.find(
-            c => c.protectionStatus !== 'NRFDL_PROTECTION_STATUS_NONE'
-        ) && isKnownProtected;
+    const deviceDefinition = useSelector(getDeviceDefinition);
     const zipFile = useSelector(getZipFilePath);
     const forceMcuBoot = useSelector(getForceMcuBoot);
-    const targetIsReady = useSelector(getIsReady) && !!device;
+    const targetIsReady = !useSelector(getDeviceIsBusy) && !!device;
+    const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
+    const canRead = !!coreInfos.find(
+        coreInfo => coreInfo.coreProtection === 'NRFDL_PROTECTION_STATUS_NONE'
+    );
+
+    const isMemLoaded = coreInfos.find(coreInfo => !!coreInfo.coreMemMap);
     const isJLink = !!device?.traits.jlink;
     const isNordicDfu = !!device?.traits.nordicDfu;
     const isMcuboot = !!device?.traits.mcuBoot;
@@ -222,12 +221,24 @@ const ControlPanel = () => {
                     variant="secondary"
                     className="w-100"
                     key="performRecover"
-                    onClick={() => {
+                    onClick={async () => {
                         if (!device) {
                             logger.error('No target device!');
                             return;
                         }
-                        dispatch(jlinkTargetActions.recover(device));
+
+                        dispatch(setDeviceBusy(true));
+                        try {
+                            await dispatch(
+                                jlinkTargetActions.recover(
+                                    device,
+                                    deviceDefinition
+                                )
+                            );
+                        } catch (e) {
+                            /* empty */
+                        }
+                        dispatch(setDeviceBusy(false));
                     }}
                     disabled={
                         isMcuboot ||
@@ -243,13 +254,24 @@ const ControlPanel = () => {
                     variant="secondary"
                     key="performRecoverAndWrite"
                     className="w-100"
-                    onClick={() => {
+                    onClick={async () => {
                         if (!device) {
                             logger.error('No target device!');
                             return;
                         }
 
-                        dispatch(jlinkTargetActions.recoverAndWrite(device));
+                        dispatch(setDeviceBusy(true));
+                        try {
+                            await dispatch(
+                                jlinkTargetActions.recoverAndWrite(
+                                    device,
+                                    deviceDefinition
+                                )
+                            );
+                        } catch (e) {
+                            /* empty */
+                        }
+                        dispatch(setDeviceBusy(false));
                     }}
                     disabled={
                         isMcuboot ||
@@ -273,7 +295,7 @@ const ControlPanel = () => {
                         }
                         dispatch(jlinkTargetActions.saveAsFile());
                     }}
-                    disabled={!isJLink || !targetIsMemLoaded}
+                    disabled={!isJLink || !isMemLoaded || !targetIsReady}
                 >
                     <span className="mdi mdi-floppy" />
                     Save as file
@@ -282,17 +304,30 @@ const ControlPanel = () => {
                     key="performReset"
                     variant="secondary"
                     className="w-100"
-                    onClick={() => {
+                    onClick={async () => {
                         if (!device) {
                             logger.error('No target device!');
                             return;
                         }
 
-                        if (isNordicDfu) {
-                            dispatch(usbsdfuTargetActions.resetDevice(device));
-                        } else {
-                            dispatch(jlinkTargetActions.resetDevice(device));
+                        dispatch(setDeviceBusy(true));
+                        try {
+                            if (isNordicDfu) {
+                                await dispatch(
+                                    usbsdfuTargetActions.resetDevice(device)
+                                );
+                            } else {
+                                await dispatch(
+                                    jlinkTargetActions.resetDevice(
+                                        device,
+                                        deviceDefinition
+                                    )
+                                );
+                            }
+                        } catch (e) {
+                            /* empty */
                         }
+                        dispatch(setDeviceBusy(false));
                     }}
                     disabled={!isJLink || !targetIsReady}
                 >
@@ -309,8 +344,14 @@ const ControlPanel = () => {
                             return;
                         }
                         // Refresh all files in case that some files have been updated right before write action.
-                        refreshAllFiles();
-                        dispatch(targetActions.write(device));
+                        dispatch(setDeviceBusy(true));
+                        try {
+                            refreshAllFiles();
+                            dispatch(targetActions.write(device));
+                        } catch (e) {
+                            /* empty */
+                        }
+                        dispatch(setDeviceBusy(false));
                     }}
                     disabled={
                         !targetIsReady ||
@@ -330,16 +371,27 @@ const ControlPanel = () => {
                     variant="secondary"
                     key="performJLinkRead"
                     className="w-100"
-                    onClick={() => {
+                    onClick={async () => {
                         if (!device) {
                             logger.error('No target device!');
                             return;
                         }
 
-                        dispatch(jlinkTargetActions.read(device));
+                        dispatch(setDeviceBusy(true));
+                        try {
+                            await dispatch(
+                                jlinkTargetActions.read(
+                                    device,
+                                    deviceDefinition
+                                )
+                            );
+                        } catch (e) {
+                            /* empty */
+                        }
+                        dispatch(setDeviceBusy(false));
                     }}
                     disabled={
-                        isMcuboot || !isJLink || !targetIsReady || isProtected
+                        isMcuboot || !isJLink || !targetIsReady || !canRead
                     }
                 >
                     <span className="mdi mdi-refresh" />

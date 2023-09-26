@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { App } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { App, render } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import AppMainView from './components/AppMainView';
 import ControlPanel from './components/ControlPanel';
@@ -15,7 +15,7 @@ import appReducer from './reducers';
 
 import '../resources/css/index.scss';
 
-export default () => (
+render(
     <App
         reportUsageData
         appReducer={appReducer}

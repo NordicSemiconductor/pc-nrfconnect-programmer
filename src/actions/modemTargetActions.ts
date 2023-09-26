@@ -4,50 +4,40 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import nrfdl, { Device } from '@nordicsemiconductor/nrf-device-lib-js';
 import {
     describeError,
-    getDeviceLibContext,
+    Device,
     logger,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    NrfutilDeviceLib,
+    Progress,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
-export const performUpdate = (
+export const performUpdate = async (
     device: Device,
     fileName: string,
-    onProgress: (progress: nrfdl.Progress.Operation) => void
-) =>
-    new Promise<void>((resolve, reject) => {
-        logger.info('Modem DFU starts to write...');
-        logger.info(
-            `Writing ${fileName} to device ${device.serialNumber || ''}`
-        );
+    onProgress: (progress: Progress) => void
+) => {
+    logger.info('Modem DFU starts to write...');
+    logger.info(`Writing ${fileName} to device ${device.serialNumber || ''}`);
 
-        nrfdl.firmwareProgram(
-            getDeviceLibContext(),
-            device.id,
-            'NRFDL_FW_FILE',
-            'NRFDL_FW_NRF91_MODEM',
-            fileName,
-            error => {
-                if (error) {
-                    let errorMsg = describeError(error);
-                    logger.error(`Modem DFU failed with error: ${errorMsg}`);
-                    // @ts-expect-error To be fixed in nrfdl
-                    if (error.error_code === 0x25b) {
-                        errorMsg =
-                            'Please make sure that the device is in MCUboot mode and try again.';
-                    }
+    try {
+        await NrfutilDeviceLib.program(device, fileName, onProgress);
 
-                    usageData.sendErrorReport(errorMsg);
-                    reject(new Error(errorMsg));
-                } else {
-                    logger.info('Modem DFU completed successfully!');
-                    resolve();
-                }
-            },
-            ({ progressJson: progress }: nrfdl.Progress.CallbackParameters) => {
-                onProgress(progress);
-            }
-        );
-    });
+        logger.info('Modem DFU completed successfully!');
+    } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const error = e as any;
+        let errorMsg = describeError(error);
+        logger.error(`Modem DFU failed with error: ${errorMsg}`);
+        if (error.error_code === 0x25b) {
+            errorMsg =
+                'Please make sure that the device is in MCUboot mode and try again.';
+        }
+
+        usageData.sendErrorReport(errorMsg);
+        throw new Error(errorMsg);
+    }
+};

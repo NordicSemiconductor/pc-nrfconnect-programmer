@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux';
 import { colors } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import * as fileActions from '../actions/fileActions';
-import { CoreDefinition } from '../util/devices';
+import { CoreInfo } from '../util/devices';
 import { Region } from '../util/regions';
 import CoreInfoView from './CoreInfoView';
 import RegionInfoView from './RegionInfoView';
@@ -23,7 +23,7 @@ interface RegionViewProps {
     striped?: boolean;
     hoverable?: boolean;
     region?: Region;
-    core?: CoreDefinition;
+    coreInfo?: CoreInfo;
 }
 
 const RegionView = ({
@@ -32,7 +32,7 @@ const RegionView = ({
     striped,
     hoverable,
     region,
-    core,
+    coreInfo,
 }: RegionViewProps) => {
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState<HTMLElement>();
@@ -90,11 +90,11 @@ const RegionView = ({
                             fileNames={region.fileNames}
                         />
                     )}
-                    {core && (
+                    {coreInfo && (
                         <CoreInfoView
-                            name={core.name}
-                            romBaseAddr={core.romBaseAddr}
-                            romSize={core.romSize}
+                            name={coreInfo.name}
+                            romBaseAddr={coreInfo.coreDefinitions.romBaseAddr}
+                            romSize={coreInfo.coreDefinitions.romSize}
                         />
                     )}
                 </Popover>
