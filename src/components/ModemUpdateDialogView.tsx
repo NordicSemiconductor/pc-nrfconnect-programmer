@@ -38,7 +38,9 @@ const ModemUpdateDialogView = () => {
     const device = useSelector(selectedDevice);
     const modemFwName = useSelector(getZipFilePath);
     const isVisible = useSelector(getShowModemProgrammingDialog);
-    const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
+    const isMcuboot =
+        (useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot) &&
+        !device?.traits.jlink;
 
     const expectedFwName =
         !modemFwName || /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
