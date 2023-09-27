@@ -3,6 +3,11 @@
 ### Added
 
 -   Allow reading multi-core devices if one or more cores are not protected.
+-   Alert message for a selected device when programmer cannot interact with it
+    when:
+    -   Device is not in MCUBoot,
+    -   Device is not in bootloader mode
+    -   Device is unknown type
 
 ### Changed
 
@@ -11,7 +16,11 @@
 
 ### Removed
 
--   Notices in the side panel related to Cellular modem
+-   Notice in the side panel related to Cellular modem
+
+### Fixed
+
+-   Audio kit did not always show up in the device selector
 
 ## 3.0.9 - 15-06-23
 
