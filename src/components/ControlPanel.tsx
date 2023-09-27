@@ -439,21 +439,6 @@ const ControlPanel = () => {
                     handleColor={colors.gray300}
                 />
             </Group>
-            <Group heading="Cellular Modem">
-                <div className="cellular-modem-instructions">
-                    To update the modem:
-                    <ol>
-                        <li>Connect a device</li>
-                        <li>
-                            Click <b>Add file</b>
-                        </li>
-                        <li>Select modem zip file</li>
-                        <li>
-                            Click <b>Write</b>
-                        </li>
-                    </ol>
-                </div>
-            </Group>
         </SidePanel>
     );
 };

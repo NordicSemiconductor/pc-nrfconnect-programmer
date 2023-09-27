@@ -77,53 +77,56 @@ const TextOverlay = ({
 }) => {
     const device = useSelector(selectedDevice);
     const isJLink = useSelector(getForceMcuBoot) || !!device?.traits.jlink;
-    const isNordicDfu =
-        useSelector(getForceMcuBoot) || !!device?.traits.nordicDfu;
+    const isNordicDfu = !!device?.traits.nordicDfu;
     const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
     return (
         <>
             {coreInfo.coreOperation === 'erasing' && (
                 <div className="erase-indicator striped active" />
             )}
-            {!busy && !coreInfo.coreMemMap && isJLink && (
-                <div className="centering-container">
-                    {coreInfo.coreProtection ===
-                        'NRFDL_PROTECTION_STATUS_NONE' && (
-                        <div className="read-indicator">
-                            <p>Device is connected</p>
-                            <p>
-                                Press <strong>READ</strong> button to read the
-                                memory
-                            </p>
-                        </div>
-                    )}
-                    {coreInfo.coreProtection !== undefined &&
-                        coreInfo.coreProtection !==
+            {!busy &&
+                !coreInfo.coreMemMap &&
+                isJLink &&
+                !isMcuboot &&
+                !isNordicDfu && (
+                    <div className="centering-container">
+                        {coreInfo.coreProtection ===
                             'NRFDL_PROTECTION_STATUS_NONE' && (
                             <div className="read-indicator">
-                                <p>{`${coreInfo.name} core is protected`}</p>
+                                <p>Device is connected</p>
                                 <p>
+                                    Press <strong>READ</strong> button to read
+                                    the memory
+                                </p>
+                            </div>
+                        )}
+                        {coreInfo.coreProtection !== undefined &&
+                            coreInfo.coreProtection !==
+                                'NRFDL_PROTECTION_STATUS_NONE' && (
+                                <div className="read-indicator">
+                                    <p>{`${coreInfo.name} core is protected`}</p>
+                                    <p>
+                                        Press <strong>Erase all</strong> button
+                                        to recover the protected memory
+                                    </p>
+                                </div>
+                            )}
+                        {coreInfo.coreProtection === undefined && (
+                            <div className="read-indicator">
+                                <p>Core protection status is unknown</p>
+                                <p>
+                                    Could not determine any information about
+                                    the SOC
+                                    <br />
                                     Press <strong>Erase all</strong> button to
                                     recover the protected memory
                                 </p>
                             </div>
                         )}
-                    {coreInfo.coreProtection === undefined && (
-                        <div className="read-indicator">
-                            <p>Core protection status is unknown</p>
-                            <p>
-                                Could not determine any information about the
-                                SOC
-                                <br />
-                                Press <strong>Erase all</strong> button to
-                                recover the protected memory
-                            </p>
-                        </div>
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
 
-            {isMcuboot && (
+            {isMcuboot && !isJLink && !isNordicDfu && (
                 <div className="centering-container">
                     <div className="read-indicator">
                         <p>Device core is connected</p>
@@ -146,7 +149,7 @@ const TextOverlay = ({
                             Memory layout is only available in Bootloader mode
                         </p>
                         <p>
-                            WriteOperations are only supported in Bootloader
+                            Write operations are only supported in Bootloader
                             mode
                         </p>
                     </div>
