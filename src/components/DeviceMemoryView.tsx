@@ -146,7 +146,7 @@ const TextOverlay = ({
                             Memory layout is only available in Bootloader mode
                         </p>
                         <p>
-                            WriteOperations are only supported in Bootloader
+                            Write operations are only supported in Bootloader
                             mode
                         </p>
                     </div>
