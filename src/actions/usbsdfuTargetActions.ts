@@ -98,17 +98,17 @@ export const openDevice =
 const refreshMemoryLayout =
     (device: Device): AppThunk =>
     dispatch => {
+        dispatch(
+            updateCoreOperations({
+                core: 'Application',
+                state: 'reading',
+            })
+        );
         dispatch(targetRegionsUnknown());
         dispatch(
             switchToBootloaderMode(
                 device,
                 async deviceInBootLoader => {
-                    dispatch(
-                        updateCoreOperations({
-                            core: 'Application',
-                            state: 'reading',
-                        })
-                    );
                     const fwInfo = await NrfutilDeviceLib.getFwInfo(
                         deviceInBootLoader
                     );
