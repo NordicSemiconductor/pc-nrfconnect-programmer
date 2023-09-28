@@ -141,20 +141,24 @@ const TextOverlay = ({
                     </div>
                 </div>
             )}
-            {device && isNordicDfu && !isDeviceInDFUBootloader(device) && (
-                <div className="centering-container">
-                    <div className="read-indicator">
-                        <p>Device is connected</p>
-                        <p>
-                            Memory layout is only available in Bootloader mode
-                        </p>
-                        <p>
-                            Write operations are only supported in Bootloader
-                            mode
-                        </p>
+            {device &&
+                isNordicDfu &&
+                !isDeviceInDFUBootloader(device) &&
+                coreInfo.coreOperation === 'idle' && (
+                    <div className="centering-container">
+                        <div className="read-indicator">
+                            <p>Device is connected</p>
+                            <p>
+                                Memory layout is only available in Bootloader
+                                mode
+                            </p>
+                            <p>
+                                Write operations are only supported in
+                                Bootloader mode
+                            </p>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
         </>
     );
 };
