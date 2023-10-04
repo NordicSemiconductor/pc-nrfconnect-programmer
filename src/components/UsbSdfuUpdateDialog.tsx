@@ -39,6 +39,7 @@ export default () => {
     const [writingFail, setWritingFail] = useState(false);
     const [writingSucceed, setWritingSucceed] = useState(false);
     const [startTime, setStartTime] = useState(Date.now());
+    const [endTime, setEndTime] = useState(Date.now());
     const [writingFailError, setWritingFailError] = useState<string>();
 
     const device = useSelector(selectedDevice);
@@ -47,13 +48,20 @@ export default () => {
 
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        if (writing) {
+            setStartTime(Date.now());
+        } else {
+            setEndTime(Date.now());
+        }
+    }, [writing]);
+
     const onWriteStart = useCallback(async () => {
         if (!device) {
             logger.error('No target device!');
             return;
         }
 
-        setStartTime(Date.now());
         // Start writing after handling images since user may cancel userInput
         logger.info('Performing DFU. This may take a few seconds');
         dispatch(
@@ -156,7 +164,7 @@ export default () => {
             {writingSucceed && (
                 <Alert variant="success">
                     Completed successfully in{' '}
-                    {Math.round((Date.now() - startTime) / 1000)} seconds.
+                    {Math.round((endTime - startTime) / 1000)} seconds.
                 </Alert>
             )}
             {writingFail && (
