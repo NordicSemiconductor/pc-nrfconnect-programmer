@@ -16,13 +16,13 @@ import {
     logger,
     sdfuOperations,
     selectedDevice,
-    setWaitForDevice,
     switchToBootloaderMode,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     ImageType,
     NrfutilDeviceLib,
+    Progress,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';
@@ -37,6 +37,10 @@ import {
     targetWritableKnown,
 } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
+import {
+    setDFUImages,
+    setUsbSdfuProgrammingDialog,
+} from '../reducers/usbSdfuReducer';
 import { getDeviceInfoByUSB, NordicFwIds } from '../util/devices';
 import { DeviceDefinition } from '../util/deviceTypes';
 import {
@@ -95,7 +99,7 @@ export const openDevice =
         dispatch(refreshMemoryLayout(device));
     };
 
-const refreshMemoryLayout =
+export const refreshMemoryLayout =
     (device: Device): AppThunk =>
     dispatch => {
         dispatch(
@@ -529,30 +533,18 @@ const handleHash = (image: DfuImage, hashType: number): DfuImage => {
 const nrfdlErrorSdfuExtSdVersionFailure = (error: unknown) =>
     (error as { error_code: number }).error_code === 514;
 
-const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
+export const operateDFU = async (
+    device: Device,
+    inputDfuImages: DfuImage[],
+    onProgress: (progress: Progress) => void
+) => {
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
-
-    let prevPercentage: number;
 
     try {
         await NrfutilDeviceLib.program(
             device,
             { buffer: zipBuffer, type: 'zip' },
-            progress => {
-                // Don't repeat percentage steps that have already been logged.
-                if (prevPercentage === progress.stepProgressPercentage) {
-                    return;
-                }
-
-                const message = progress.message || '';
-
-                const status = `${message.replace('.', ':')} ${
-                    progress.stepProgressPercentage
-                }%`;
-
-                logger.info(status);
-                prevPercentage = progress.stepProgressPercentage;
-            }
+            onProgress
         );
 
         logger.info('All dfu images have been written to the target device');
@@ -568,8 +560,7 @@ const operateDFU = async (device: Device, inputDfuImages: DfuImage[]) => {
 };
 
 export const write =
-    (device: Device): AppThunk<RootState, Promise<void>> =>
-    async (dispatch, getState) => {
+    (): AppThunk<RootState, Promise<void>> => async (dispatch, getState) => {
         let fileRegions = getState().app.file.regions;
         const deviceDefinition = getState().app.deviceDefinition;
         const targetRegions = getState().app.target.regions;
@@ -597,45 +588,6 @@ export const write =
             images.map(image => dispatch(handleUserInput(image)))
         );
 
-        // Start writing after handling images since user may cancel userInput
-        logger.info('Performing DFU. This may take a few seconds');
-        dispatch(
-            updateCoreOperations({
-                core: 'Application',
-                state: 'writing',
-            })
-        );
-
-        try {
-            // We might have more that one reboot of the device during the next operation
-            dispatch(
-                setWaitForDevice({
-                    timeout: 10000,
-                    when: 'always',
-                    once: false,
-                })
-            );
-            await operateDFU(device, images);
-
-            // Operation done reconnect one more time only
-            dispatch(
-                setWaitForDevice({
-                    timeout: 10000,
-                    when: 'always',
-                    once: true,
-                    onSuccess: programmedDevice =>
-                        dispatch(refreshMemoryLayout(programmedDevice)),
-                })
-            );
-        } catch (error) {
-            logger.error(`Failed to write: ${describeError(error)}`);
-            dispatch(refreshMemoryLayout(device));
-        }
-
-        dispatch(
-            updateCoreOperations({
-                core: 'Application',
-                state: 'idle',
-            })
-        );
+        dispatch(setDFUImages(images));
+        dispatch(setUsbSdfuProgrammingDialog(true));
     };

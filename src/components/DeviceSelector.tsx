@@ -19,6 +19,7 @@ import { resetDeviceInfo } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import { deselectDevice } from '../reducers/targetReducer';
+import { setUsbSdfuProgrammingDialog } from '../reducers/usbSdfuReducer';
 
 const abortController = new AbortController();
 
@@ -36,6 +37,7 @@ export default () => {
                 usageData.sendUsageData(EventAction.CLOSE_DEVICE, '');
                 dispatch(setShowMcuBootProgrammingDialog(false));
                 dispatch(setShowModemProgrammingDialog(false));
+                dispatch(setUsbSdfuProgrammingDialog(false));
                 dispatch(deselectDevice());
                 dispatch(resetDeviceInfo());
                 closeDevice();

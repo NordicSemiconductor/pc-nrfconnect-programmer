@@ -12,12 +12,14 @@ import mcuboot from './mcubootReducer';
 import modem from './modemReducer';
 import settings from './settingsReducer';
 import target from './targetReducer';
+import usbsdfu from './usbSdfuReducer';
 import userInput from './userInputReducer';
 import warning from './warningReducer';
 
 const rootReducer = combineReducers({
     file,
     modem,
+    usbsdfu,
     mcuboot,
     settings,
     deviceDefinition,

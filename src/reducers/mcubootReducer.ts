@@ -24,9 +24,6 @@ const mcubootSlice = createSlice({
             state.isVisible = action.payload;
         },
     },
-    extraReducers: {
-        'device/selectDevice': () => ({ ...initialState }),
-    },
 });
 
 export default mcubootSlice.reducer;
