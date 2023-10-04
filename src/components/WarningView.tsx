@@ -6,7 +6,10 @@
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Alert } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    Alert,
+    selectedDevice,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getFileWarnings } from '../reducers/warningReducer';
 
@@ -20,8 +23,9 @@ const combineWarnings = (fileWarningStrings: string[]) =>
 
 const WarningView = () => {
     const fileWarningStrings = useSelector(getFileWarnings);
+    const device = useSelector(selectedDevice);
 
-    if (fileWarningStrings.length <= 0) return null;
+    if (fileWarningStrings.length <= 0 || !device) return null;
 
     return (
         <div className="tw-w-full tw-max-w-5xl tw-self-center">
