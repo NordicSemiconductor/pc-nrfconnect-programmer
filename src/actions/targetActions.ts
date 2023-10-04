@@ -113,7 +113,7 @@ export const write =
             throw new Error('Only Erase and write are allowed with jlink');
         }
         if (device.traits.nordicDfu) {
-            dispatch(usbsdfuTargetActions.write(device));
+            dispatch(usbsdfuTargetActions.write());
             return;
         }
         logger.error('Invalid write action');

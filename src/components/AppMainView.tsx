@@ -17,6 +17,7 @@ import DeviceMemoryBoxView from './DeviceMemoryBoxView';
 import FileMemoryBoxView from './FileMemoryBoxView';
 import McuUpdateDialogView from './McuUpdateDialogView';
 import ModemUpdateDialogView from './ModemUpdateDialogView';
+import UsbSdfuUpdateDialog from './UsbSdfuUpdateDialog';
 import UserInputDialogView from './UserInputDialogView';
 import WarningView from './WarningView';
 
@@ -64,6 +65,7 @@ export default () => {
             <UserInputDialogView />
             <ModemUpdateDialogView />
             <McuUpdateDialogView />
+            <UsbSdfuUpdateDialog />
         </div>
     );
 };
