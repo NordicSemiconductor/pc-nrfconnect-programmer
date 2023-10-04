@@ -45,7 +45,10 @@ const UserInputDialogView = () => {
     const onSelectChoice = (choice: DropdownItem) => {
         setSelectedValue(choice);
 
-        if (choice.value !== 'Custom') {
+        if (choice.value === 'Custom') {
+            setIsValidInput(false);
+            setCustomValue('');
+        } else {
             setIsValidInput(true);
         }
     };
