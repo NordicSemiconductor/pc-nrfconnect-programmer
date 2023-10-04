@@ -24,7 +24,7 @@ const WarningView = () => {
     if (fileWarningStrings.length <= 0) return null;
 
     return (
-        <div className="warning-view">
+        <div className="tw-w-full tw-max-w-5xl tw-self-center">
             {combineWarnings(fileWarningStrings)}
         </div>
     );
