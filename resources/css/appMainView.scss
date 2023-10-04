@@ -4,19 +4,6 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-.warning-view {
-    width: 100%;
-    padding-bottom: 16px;
-    max-width: 1016px;
-    align-self: center;
-    .alert {
-        margin-bottom: 0;
-    }
-    span {
-        margin-right: 10px;
-    }
-}
-
 .alert {
     a {
         color: white;
@@ -25,15 +12,6 @@
 }
 
 .memory-box-container {
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-    width: 100%;
-    gap: 16px;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-
     .arrow::before {
         border-bottom-color: #999;
     }
@@ -45,7 +23,6 @@
     flex: 1;
     flex-grow: 1;
     flex-direction: column;
-    max-width: 500px;
     width: 50%;
     height: 100%;
 

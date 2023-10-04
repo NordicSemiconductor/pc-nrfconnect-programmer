@@ -57,7 +57,7 @@ export default () => {
                         </Alert>
                     </div>
                 )}
-            <div className="memory-box-container">
+            <div className="memory-box-container tw-flex tw-h-full tw-w-full tw-max-w-5xl tw-flex-row tw-flex-nowrap tw-justify-center tw-gap-4 tw-self-center">
                 <FileMemoryBoxView />
                 <DeviceMemoryBoxView />
             </div>
