@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormLabel from 'react-bootstrap/FormLabel';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -42,6 +42,7 @@ const TOOLTIP_TEXT =
 const NET_CORE_UPLOAD_DELAY = 120;
 
 const McuUpdateDialogView = () => {
+    const abortController = useRef(new AbortController());
     const [progress, setProgress] =
         useState<WithRequired<Progress, 'message'>>();
     const [writing, setWriting] = useState(false);
@@ -83,12 +84,14 @@ const McuUpdateDialogView = () => {
     }, [device]);
 
     useEffect(() => {
-        if (!isVisible) {
+        if (isVisible) {
             setProgress(undefined);
             setWriting(false);
             setWritingSucceed(false);
             setWritingFail(false);
             setWritingFailError(undefined);
+        } else {
+            abortController.current.abort();
         }
     }, [isVisible]);
 
@@ -109,6 +112,11 @@ const McuUpdateDialogView = () => {
     const onCancel = () => {
         dispatch(clearWaitForDevice());
         dispatch(setShowMcuBootProgrammingDialog(false));
+        setProgress(undefined);
+        setWriting(false);
+        setWritingSucceed(false);
+        setWritingFail(false);
+        setWritingFailError(undefined);
     };
 
     const onWriteStart = () => {
@@ -134,6 +142,8 @@ const McuUpdateDialogView = () => {
             })
         );
 
+        abortController.current = new AbortController();
+
         performUpdate(
             device,
             fwPath,
@@ -152,6 +162,7 @@ const McuUpdateDialogView = () => {
 
                 setProgress(updatedProgress);
             },
+            abortController.current,
             showDelayTimeout ? uploadDelay : undefined
         )
             .then(() => {
@@ -162,6 +173,7 @@ const McuUpdateDialogView = () => {
                 setWritingFail(true);
             })
             .finally(() => {
+                dispatch(clearWaitForDevice());
                 dispatch(canWrite());
                 setWriting(false);
             });
@@ -194,7 +206,7 @@ const McuUpdateDialogView = () => {
     return (
         <GenericDialog
             title="MCUboot DFU"
-            isVisible={isVisible}
+            isVisible={isVisible || writingSucceed || writingFail}
             onHide={onCancel}
             showSpinner={writing}
             closeOnUnfocus={false}

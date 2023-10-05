@@ -18,13 +18,21 @@ import {
 export const performUpdate = async (
     device: Device,
     fileName: string,
-    onProgress: (progress: Progress) => void
+    onProgress: (progress: Progress) => void,
+    abortController: AbortController
 ) => {
     logger.info('Modem DFU starts to write...');
     logger.info(`Writing ${fileName} to device ${device.serialNumber || ''}`);
 
     try {
-        await NrfutilDeviceLib.program(device, fileName, onProgress);
+        await NrfutilDeviceLib.program(
+            device,
+            fileName,
+            onProgress,
+            undefined,
+            undefined,
+            abortController
+        );
 
         logger.info('Modem DFU completed successfully!');
     } catch (e) {
