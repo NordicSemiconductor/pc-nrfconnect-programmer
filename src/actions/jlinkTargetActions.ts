@@ -246,8 +246,9 @@ const recoverOneCoreBatch =
         core: DeviceCore,
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
-    dispatch =>
-        batch.recover(
+    dispatch => {
+        dispatch(updateCoreMemMap({ [core]: undefined }));
+        return batch.recover(
             core,
             batchLoggingCallbacks(
                 `Recovering ${core} core`,
@@ -269,6 +270,7 @@ const recoverOneCoreBatch =
                     )
             )
         );
+    };
 
 const writeOneCoreBatch =
     (
