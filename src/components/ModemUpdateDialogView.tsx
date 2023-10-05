@@ -47,12 +47,13 @@ const ModemUpdateDialogView = () => {
         !modemFwName || /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
 
     useEffect(() => {
-        if (!isVisible) {
+        if (isVisible) {
             setProgress(undefined);
             setWriting(false);
             setWritingSucceed(false);
             setWritingFail(false);
             setWritingFailError(undefined);
+        } else {
             abortController.current.abort();
         }
     }, [isVisible]);
@@ -116,8 +117,10 @@ const ModemUpdateDialogView = () => {
         )
             .then(() => setWritingSucceed(true))
             .catch(error => {
-                setWritingFailError(error.message);
-                setWritingFail(true);
+                if (!abortController.current.signal.aborted) {
+                    setWritingFailError(error.message);
+                    setWritingFail(true);
+                }
             })
             .finally(() => setWriting(false));
     };
