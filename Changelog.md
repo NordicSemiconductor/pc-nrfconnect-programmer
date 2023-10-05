@@ -1,4 +1,4 @@
-## 4.0.0 - 05-10-23
+## 4.0.0 - 2023-10-05
 
 ### Added
 
@@ -22,7 +22,7 @@
 
 -   Sometimes audio kit did not show up in the device selector.
 
-## 3.0.9 - 15-06-23
+## 3.0.9 - 2023-06-15
 
 ### Added
 
@@ -42,7 +42,7 @@
     programming is still ongoing and `Auto Reconnect` is Enabled.
 -   Write button will not remain active when device is deselected.
 
-## 3.0.8 - 30-03-23
+## 3.0.8 - 2023-03-30
 
 ### Added
 
