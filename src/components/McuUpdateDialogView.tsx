@@ -83,7 +83,7 @@ const McuUpdateDialogView = () => {
     }, [device]);
 
     useEffect(() => {
-        if (!isVisible) {
+        if (isVisible) {
             setProgress(undefined);
             setWriting(false);
             setWritingSucceed(false);
@@ -109,6 +109,11 @@ const McuUpdateDialogView = () => {
     const onCancel = () => {
         dispatch(clearWaitForDevice());
         dispatch(setShowMcuBootProgrammingDialog(false));
+        setProgress(undefined);
+        setWriting(false);
+        setWritingSucceed(false);
+        setWritingFail(false);
+        setWritingFailError(undefined);
     };
 
     const onWriteStart = () => {
@@ -162,6 +167,7 @@ const McuUpdateDialogView = () => {
                 setWritingFail(true);
             })
             .finally(() => {
+                dispatch(clearWaitForDevice());
                 dispatch(canWrite());
                 setWriting(false);
             });
@@ -194,7 +200,7 @@ const McuUpdateDialogView = () => {
     return (
         <GenericDialog
             title="MCUboot DFU"
-            isVisible={isVisible}
+            isVisible={isVisible || writingSucceed || writingFail}
             onHide={onCancel}
             showSpinner={writing}
             closeOnUnfocus={false}
