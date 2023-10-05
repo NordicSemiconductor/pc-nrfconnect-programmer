@@ -17,7 +17,7 @@ const combineWarnings = (fileWarningStrings: string[]) =>
     fileWarningStrings.map((s, index) => (
         <Alert variant="warning" key={`warning-${index + 1}`}>
             <span className="mdi mdi-alert" />
-            {s}
+            {` ${s}`}
         </Alert>
     ));
 
