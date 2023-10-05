@@ -169,8 +169,10 @@ const McuUpdateDialogView = () => {
                 setWritingSucceed(true);
             })
             .catch(error => {
-                setWritingFailError(error.message);
-                setWritingFail(true);
+                if (!abortController.current.signal.aborted) {
+                    setWritingFailError(error.message);
+                    setWritingFail(true);
+                }
             })
             .finally(() => {
                 dispatch(clearWaitForDevice());
