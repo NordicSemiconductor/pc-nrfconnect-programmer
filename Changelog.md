@@ -11,7 +11,7 @@
 
 ### Changed
 
--   Programmer now uses nrfutil device for all it's operations.
+-   Programmer now uses nrfutil device for all device operations.
 -   Split settings `Jlink` and `MCUBoot` into different groups.
 
 ### Removed
