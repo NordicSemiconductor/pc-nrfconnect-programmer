@@ -5,8 +5,8 @@
 -   Allow reading multi-core devices if one or more cores are not protected.
 -   Alert message for a selected device when the programmer app cannot interact
     with it. Alert will be displayed when:
-    -   Device is not in the MCUBoot mode;
-    -   Device is not in the bootloader mode;
+    -   Device is not in MCUBoot mode;
+    -   Device is not in bootloader mode;
     -   Device is unknown type.
 
 ### Changed
