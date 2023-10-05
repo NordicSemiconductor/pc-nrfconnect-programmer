@@ -67,7 +67,7 @@ const UserInputDialogView = () => {
             ? `0x${value.slice(2).toUpperCase()}`
             : `0x${value.toUpperCase()}`;
         setCustomValue(value);
-        setIsValidInput(!Number.isNaN(parseInt(value, 16)));
+        setIsValidInput(value.match(/^0[xX][0-9a-fA-F]+$/) != null);
     };
 
     return (
