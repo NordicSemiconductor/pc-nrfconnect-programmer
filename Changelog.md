@@ -1,28 +1,28 @@
-## 4.0.0 - UNRELEASED
+## 4.0.0 - 2023-10-05
 
 ### Added
 
 -   Allow reading multi-core devices if one or more cores are not protected.
--   Alert message for a selected device when programmer cannot interact with it
-    when:
-    -   Device is not in MCUBoot,
-    -   Device is not in bootloader mode
-    -   Device is unknown type
+-   Alert message for a selected device when the programmer app cannot interact
+    with it. Alert will be displayed when:
+    -   Device is not in MCUBoot mode;
+    -   Device is not in bootloader mode;
+    -   Device is unknown type.
 
 ### Changed
 
--   Programmer now uses nrfutil device for all it's operations
--   Split settings `Jlink` and `MCUBoot` into different groups
+-   Programmer now uses nrfutil device for all device operations.
+-   Split settings `Jlink` and `MCUBoot` into different groups.
 
 ### Removed
 
--   Notice in the side panel related to Cellular modem
+-   Notice in the side panel related to the Cellular modem.
 
 ### Fixed
 
--   Audio kit did not always show up in the device selector
+-   Sometimes audio kit did not show up in the device selector.
 
-## 3.0.9 - 15-06-23
+## 3.0.9 - 2023-06-15
 
 ### Added
 
@@ -42,7 +42,7 @@
     programming is still ongoing and `Auto Reconnect` is Enabled.
 -   Write button will not remain active when device is deselected.
 
-## 3.0.8 - 30-03-23
+## 3.0.8 - 2023-03-30
 
 ### Added
 
