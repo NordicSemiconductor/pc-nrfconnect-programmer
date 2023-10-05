@@ -84,12 +84,12 @@ const TextOverlay = ({
     const isNordicDfu = !!device?.traits.nordicDfu;
     const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
 
-    if (coreInfo.coreMemMap) return null;
+    if (coreInfo.coreMemMap || busy) return null;
 
     if (coreInfo.coreOperation === 'erasing')
         return <div className="erase-indicator striped active" />;
 
-    if (isJLink && !busy && !coreInfo.coreMemMap) {
+    if (isJLink && !coreInfo.coreMemMap) {
         return (
             <div className="centering-container">
                 {coreInfo.coreProtection === 'NRFDL_PROTECTION_STATUS_NONE' && (
