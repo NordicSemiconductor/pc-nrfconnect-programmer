@@ -11,6 +11,10 @@ import {
     selectedDevice,
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    DeviceInfo,
+    NrfutilDeviceLib,
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
 import { setDeviceBusy } from '../reducers/deviceDefinitionReducer';
@@ -30,6 +34,13 @@ export const openDevice =
     async dispatch => {
         abortController = new AbortController();
 
+        let deviceInfo: DeviceInfo | undefined;
+        try {
+            deviceInfo = await NrfutilDeviceLib.deviceInfo(device);
+        } catch (e) {
+            // DO Nothing
+        }
+
         dispatch(setDeviceBusy(true));
         try {
             if (device.traits.jlink) {
@@ -42,7 +53,7 @@ export const openDevice =
                 dispatch(mcubootTargetActions.openDevice(device));
             } else if (device.traits.nordicDfu) {
                 usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicDfu');
-                dispatch(usbsdfuTargetActions.openDevice(device));
+                dispatch(usbsdfuTargetActions.openDevice(device, deviceInfo));
             } else {
                 logger.warn('No operations possible for device.');
                 logger.warn(

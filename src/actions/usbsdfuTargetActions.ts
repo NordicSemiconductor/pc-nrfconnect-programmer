@@ -20,6 +20,7 @@ import {
     usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
+    DeviceInfo,
     ImageType,
     NrfutilDeviceLib,
     Progress,
@@ -66,35 +67,35 @@ const defaultDfuImage: DfuImage = {
 };
 
 export const openDevice =
-    (device: Device): AppThunk =>
+    (device: Device, deviceInfo?: DeviceInfo): AppThunk =>
     dispatch => {
         logger.info(
             'Using nrfutil-device to communicate with target via USB SDFU protocol'
         );
 
-        if (device.hwInfo?.deviceFamily) {
+        if (deviceInfo?.hwInfo?.deviceFamily) {
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_FAMILY,
-                device.hwInfo?.deviceFamily
+                deviceInfo.hwInfo?.deviceFamily
             );
         }
 
-        if (device.hwInfo?.deviceVersion) {
+        if (deviceInfo?.hwInfo?.deviceVersion) {
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_VERSION,
-                device.hwInfo.deviceVersion
+                deviceInfo.hwInfo.deviceVersion
             );
         }
 
-        if (device.boardVersion) {
+        if (device.devKit?.boardVersion) {
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_BOARD_VERSION,
-                device.boardVersion
+                device.devKit.boardVersion
             );
         }
 
-        const deviceInfo = getDeviceInfoByUSB(device);
-        dispatch(setDeviceDefinition(deviceInfo));
+        const deviceUsbInfo = getDeviceInfoByUSB(device);
+        dispatch(setDeviceDefinition(deviceUsbInfo));
 
         dispatch(refreshMemoryLayout(device));
     };
