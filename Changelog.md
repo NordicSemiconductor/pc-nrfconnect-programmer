@@ -1,4 +1,8 @@
-## 4.0.0 - 2023-10-05
+## 4.0.1 - 2023-10-16
+
+### Fixed
+
+-   Device enumeration timeout in some cases
 
 ### Added
 
