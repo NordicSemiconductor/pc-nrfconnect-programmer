@@ -1,8 +1,11 @@
-## 4.0.1 - 2023-10-16
+## 4.0.1 - 2023-10-17
 
 ### Fixed
 
--   Device enumeration timeout in some cases
+-   Device enumeration timeout with jlink devices resulting in no device showing
+    up in the device list
+
+## 4.0.0 - 2023-10-05
 
 ### Added
 
