@@ -17,6 +17,7 @@ import {
     DeviceBatch,
     DeviceCore,
     DeviceCoreInfo,
+    DeviceInfo,
     GetProtectionStatusResult,
     NrfutilDeviceLib,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
@@ -54,8 +55,10 @@ export const openDevice =
             'Using nrfutil device to communicate with target via JLink'
         );
 
-        logDeviceInfo(device);
-        const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(device);
+        logDeviceInfo(device, getState().device.selectedDeviceInfo);
+        const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(
+            getState().device.selectedDeviceInfo
+        );
         const deviceCoreNames = convertDeviceDefinitionToCoreArray(
             defaultDeviceInfo
         ).map(c => c.name);
@@ -91,36 +94,31 @@ export const openDevice =
         logger.info('Device is loaded and ready for further operation');
     };
 
-/**
- * Log the device information
- * @param {Device} device the input device from device lister
- * @returns {void}
- */
-const logDeviceInfo = (device: Device) => {
-    if (!device.jlink) return;
+const logDeviceInfo = (device: Device, deviceInfo?: DeviceInfo) => {
+    if (!deviceInfo?.jlink) return;
 
-    const {
-        jlinkObFirmwareVersion,
-        deviceFamily,
-        deviceVersion,
-        boardVersion,
-    } = device.jlink;
-    logger.info('JLink OB firmware version', jlinkObFirmwareVersion);
+    logger.info(
+        'JLink OB firmware version',
+        deviceInfo.jlink.jlinkObFirmwareVersion
+    );
     usageData.sendUsageData(
         EventAction.OPEN_DEVICE_JLINK_OB,
-        `${jlinkObFirmwareVersion}`
+        `${deviceInfo.jlink.jlinkObFirmwareVersion}`
     );
-    logger.info('Device family', deviceFamily);
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_FAMILY, `${deviceFamily}`);
-    logger.info('Device version', deviceVersion);
+    logger.info('Device family', device.devkit?.deviceFamily);
+    usageData.sendUsageData(
+        EventAction.OPEN_DEVICE_FAMILY,
+        `${device.devkit?.deviceFamily}`
+    );
+    logger.info('Device version', deviceInfo.jlink.deviceVersion);
     usageData.sendUsageData(
         EventAction.OPEN_DEVICE_VERSION,
-        `${deviceVersion}`
+        `${deviceInfo.jlink.deviceVersion}`
     );
-    logger.info('Board version', boardVersion);
+    logger.info('Board version', device.devkit?.boardVersion);
     usageData.sendUsageData(
         EventAction.OPEN_DEVICE_BOARD_VERSION,
-        `${boardVersion}`
+        `${device.devkit?.boardVersion}`
     );
 };
 

@@ -7,6 +7,7 @@
 import {
     DeviceCore,
     DeviceCoreInfo,
+    DeviceInfo,
     NrfutilDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import MemoryMap from 'nrf-intel-hex';
@@ -232,12 +233,12 @@ const getProductId = (device: NrfutilDevice) => {
     );
 };
 
-const identifyUsbByVersion = (device: NrfutilDevice) => {
-    if (!device.hwInfo || device.hwInfo.deviceVersion?.length === 0)
+const identifyUsbByVersion = (deviceInfo?: DeviceInfo) => {
+    if (!deviceInfo?.hwInfo || deviceInfo?.hwInfo.deviceVersion?.length === 0)
         return null;
 
     return getDeviceDefinition(
-        device.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
+        deviceInfo?.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
     );
 };
 
@@ -258,18 +259,21 @@ const identifyUsbBySerialPort = (device: NrfutilDevice) => {
 };
 
 // Get device info by calling version command
-export const getDeviceInfoByUSB = (device: NrfutilDevice) =>
-    identifyUsbByVersion(device) ||
+export const getDeviceInfoByUSB = (
+    device: NrfutilDevice,
+    deviceInfo?: DeviceInfo
+) =>
+    identifyUsbByVersion(deviceInfo) ||
     identifyUsbBySerialPort(device) ||
     defaultDeviceDefinition;
 
 // Get default device info from jLink family
 export const getDefaultDeviceInfoByJlinkFamily = (
-    device: NrfutilDevice
+    deviceInfo?: DeviceInfo
 ): DeviceDefinition => {
-    const type = device.jlink?.deviceVersion ?? DeviceFamily.UNKNOWN;
-    const family = device.jlink
-        ? (device.jlink.deviceFamily as DeviceFamily)
+    const type = deviceInfo?.jlink?.deviceVersion ?? DeviceFamily.UNKNOWN;
+    const family = deviceInfo?.jlink
+        ? (deviceInfo.jlink?.deviceFamily as DeviceFamily)
         : DeviceFamily.UNKNOWN;
 
     return {

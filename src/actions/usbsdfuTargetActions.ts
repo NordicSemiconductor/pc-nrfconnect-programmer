@@ -66,30 +66,32 @@ const defaultDfuImage: DfuImage = {
 };
 
 export const openDevice =
-    (device: Device): AppThunk =>
-    dispatch => {
+    (device: Device): AppThunk<RootState> =>
+    (dispatch, getState) => {
         logger.info(
             'Using nrfutil-device to communicate with target via USB SDFU protocol'
         );
 
-        if (device.hwInfo?.deviceFamily) {
+        const hwInfo = getState().device.selectedDeviceInfo?.hwInfo;
+
+        if (hwInfo?.deviceFamily) {
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_FAMILY,
-                device.hwInfo?.deviceFamily
+                hwInfo?.deviceFamily
             );
         }
 
-        if (device.hwInfo?.deviceVersion) {
+        if (hwInfo?.deviceVersion) {
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_VERSION,
-                device.hwInfo.deviceVersion
+                hwInfo.deviceVersion
             );
         }
 
-        if (device.boardVersion) {
+        if (device.devkit?.boardVersion) {
             usageData.sendUsageData(
                 EventAction.OPEN_DEVICE_BOARD_VERSION,
-                device.boardVersion
+                device.devkit?.boardVersion
             );
         }
 

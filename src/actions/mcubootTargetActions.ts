@@ -42,7 +42,7 @@ export const openDevice =
 
         usageData.sendUsageData(
             EventAction.OPEN_DEVICE_BOARD_VERSION,
-            `${device.boardVersion}`
+            `${device.devkit?.boardVersion}`
         );
 
         dispatch(canWrite());
