@@ -40,7 +40,6 @@ import {
     mergeNrfutilDeviceInfoInCoreDefinition,
 } from '../util/devices';
 import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
-import EventAction from './usageDataActions';
 
 let abortController: AbortController | undefined;
 
@@ -101,25 +100,9 @@ const logDeviceInfo = (device: Device, deviceInfo?: DeviceInfo) => {
         'JLink OB firmware version',
         deviceInfo.jlink.jlinkObFirmwareVersion
     );
-    usageData.sendUsageData(
-        EventAction.OPEN_DEVICE_JLINK_OB,
-        `${deviceInfo.jlink.jlinkObFirmwareVersion}`
-    );
     logger.info('Device family', device.devkit?.deviceFamily);
-    usageData.sendUsageData(
-        EventAction.OPEN_DEVICE_FAMILY,
-        `${device.devkit?.deviceFamily}`
-    );
     logger.info('Device version', deviceInfo.jlink.deviceVersion);
-    usageData.sendUsageData(
-        EventAction.OPEN_DEVICE_VERSION,
-        `${deviceInfo.jlink.deviceVersion}`
-    );
     logger.info('Board version', device.devkit?.boardVersion);
-    usageData.sendUsageData(
-        EventAction.OPEN_DEVICE_BOARD_VERSION,
-        `${device.devkit?.boardVersion}`
-    );
 };
 
 const readAllCoresBatch =

@@ -46,7 +46,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/support-devices-no-sn",
+        "@nordicsemiconductor/pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/improve-azure-analytics",
         "nrf-intel-hex": "^1.2.0"
     },
     "eslintConfig": {

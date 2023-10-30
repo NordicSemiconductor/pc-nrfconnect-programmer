@@ -17,7 +17,6 @@ import '../resources/css/index.scss';
 
 render(
     <App
-        reportUsageData
         appReducer={appReducer}
         deviceSelect={<DeviceSelector />}
         sidePanel={<ControlPanel />}

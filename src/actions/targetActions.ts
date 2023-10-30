@@ -9,7 +9,6 @@ import {
     Device,
     logger,
     selectedDevice,
-    usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import describeError from '@nordicsemiconductor/pc-nrfconnect-shared/src/logging/describeError';
 
@@ -20,7 +19,6 @@ import { targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
-import EventAction from './usageDataActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
 let abortController: AbortController;
@@ -36,12 +34,9 @@ export const openDevice =
                 await dispatch(
                     jlinkTargetActions.openDevice(device, abortController)
                 );
-                usageData.sendUsageData(EventAction.OPEN_DEVICE, 'jlink');
             } else if (device.traits.mcuBoot) {
-                usageData.sendUsageData(EventAction.OPEN_DEVICE, 'mcuboot');
                 dispatch(mcubootTargetActions.openDevice(device));
             } else if (device.traits.nordicDfu) {
-                usageData.sendUsageData(EventAction.OPEN_DEVICE, 'nordicDfu');
                 dispatch(usbsdfuTargetActions.openDevice(device));
             } else {
                 logger.warn('No operations possible for device.');
