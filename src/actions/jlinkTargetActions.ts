@@ -10,7 +10,6 @@ import {
     describeError,
     Device,
     logger,
-    usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     BatchCallbacks,
@@ -204,7 +203,7 @@ const batchLoggingCallbacks = <T>(
         if (taskEnd.result === 'success') {
             logger.info(`${message} completed`);
         } else {
-            usageData.sendErrorReport(
+            logger.error(
                 `Failed to ${message.toLowerCase()} core. Error: ${
                     taskEnd.error
                 }, message: ${taskEnd.message}`
