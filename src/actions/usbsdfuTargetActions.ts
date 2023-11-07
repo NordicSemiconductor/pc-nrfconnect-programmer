@@ -17,7 +17,6 @@ import {
     sdfuOperations,
     selectedDevice,
     switchToBootloaderMode,
-    usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     ImageType,
@@ -56,7 +55,6 @@ import {
     generateFileBlRegion,
     generateRegionDetectedNames,
 } from '../util/usbsdfuHelpers';
-import EventAction from './usageDataActions';
 import * as userInputActions from './userInputActions';
 
 const defaultDfuImage: DfuImage = {
@@ -66,32 +64,11 @@ const defaultDfuImage: DfuImage = {
 };
 
 export const openDevice =
-    (device: Device): AppThunk =>
+    (device: Device): AppThunk<RootState> =>
     dispatch => {
         logger.info(
             'Using nrfutil-device to communicate with target via USB SDFU protocol'
         );
-
-        if (device.hwInfo?.deviceFamily) {
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_FAMILY,
-                device.hwInfo?.deviceFamily
-            );
-        }
-
-        if (device.hwInfo?.deviceVersion) {
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_VERSION,
-                device.hwInfo.deviceVersion
-            );
-        }
-
-        if (device.boardVersion) {
-            usageData.sendUsageData(
-                EventAction.OPEN_DEVICE_BOARD_VERSION,
-                device.boardVersion
-            );
-        }
 
         const deviceInfo = getDeviceInfoByUSB(device);
         dispatch(setDeviceDefinition(deviceInfo));

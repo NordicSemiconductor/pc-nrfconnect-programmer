@@ -8,7 +8,6 @@ import {
     describeError,
     Device,
     logger,
-    usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     NrfutilDeviceLib,
@@ -45,7 +44,6 @@ export const performUpdate = async (
                 'Please make sure that the device is in MCUboot mode and try again.';
         }
 
-        usageData.sendErrorReport(errorMsg);
         throw new Error(errorMsg);
     }
 };

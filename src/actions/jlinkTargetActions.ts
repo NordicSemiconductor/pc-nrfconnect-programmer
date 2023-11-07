@@ -10,13 +10,13 @@ import {
     describeError,
     Device,
     logger,
-    usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     BatchCallbacks,
     DeviceBatch,
     DeviceCore,
     DeviceCoreInfo,
+    DeviceInfo,
     GetProtectionStatusResult,
     NrfutilDeviceLib,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
@@ -39,7 +39,6 @@ import {
     mergeNrfutilDeviceInfoInCoreDefinition,
 } from '../util/devices';
 import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
-import EventAction from './usageDataActions';
 
 let abortController: AbortController | undefined;
 
@@ -54,8 +53,10 @@ export const openDevice =
             'Using nrfutil device to communicate with target via JLink'
         );
 
-        logDeviceInfo(device);
-        const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(device);
+        logDeviceInfo(device, getState().device.selectedDeviceInfo);
+        const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(
+            getState().device.selectedDeviceInfo
+        );
         const deviceCoreNames = convertDeviceDefinitionToCoreArray(
             defaultDeviceInfo
         ).map(c => c.name);
@@ -91,37 +92,16 @@ export const openDevice =
         logger.info('Device is loaded and ready for further operation');
     };
 
-/**
- * Log the device information
- * @param {Device} device the input device from device lister
- * @returns {void}
- */
-const logDeviceInfo = (device: Device) => {
-    if (!device.jlink) return;
+const logDeviceInfo = (device: Device, deviceInfo?: DeviceInfo) => {
+    if (!deviceInfo?.jlink) return;
 
-    const {
-        jlinkObFirmwareVersion,
-        deviceFamily,
-        deviceVersion,
-        boardVersion,
-    } = device.jlink;
-    logger.info('JLink OB firmware version', jlinkObFirmwareVersion);
-    usageData.sendUsageData(
-        EventAction.OPEN_DEVICE_JLINK_OB,
-        `${jlinkObFirmwareVersion}`
+    logger.info(
+        'JLink OB firmware version',
+        deviceInfo.jlink.jlinkObFirmwareVersion
     );
-    logger.info('Device family', deviceFamily);
-    usageData.sendUsageData(EventAction.OPEN_DEVICE_FAMILY, `${deviceFamily}`);
-    logger.info('Device version', deviceVersion);
-    usageData.sendUsageData(
-        EventAction.OPEN_DEVICE_VERSION,
-        `${deviceVersion}`
-    );
-    logger.info('Board version', boardVersion);
-    usageData.sendUsageData(
-        EventAction.OPEN_DEVICE_BOARD_VERSION,
-        `${boardVersion}`
-    );
+    logger.info('Device family', device.devkit?.deviceFamily);
+    logger.info('Device version', deviceInfo.jlink.deviceVersion);
+    logger.info('Board version', device.devkit?.boardVersion);
 };
 
 const readAllCoresBatch =
@@ -223,7 +203,7 @@ const batchLoggingCallbacks = <T>(
         if (taskEnd.result === 'success') {
             logger.info(`${message} completed`);
         } else {
-            usageData.sendErrorReport(
+            logger.error(
                 `Failed to ${message.toLowerCase()} core. Error: ${
                     taskEnd.error
                 }, message: ${taskEnd.message}`

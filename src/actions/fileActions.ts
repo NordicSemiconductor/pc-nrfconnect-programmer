@@ -104,7 +104,7 @@ export const closeFiles = (): AppThunk<RootState> => (dispatch, getState) => {
     dispatch(filesEmpty());
 
     // Initialize the state of deviceInfo if no device is selected
-    if (!getState().device.selectedSerialNumber) {
+    if (!getState().device.selectedDevice) {
         // TODO CHECK WHY THIS IS NEEDED
         dispatch(setDeviceDefinition(defaultDeviceDefinition));
     }

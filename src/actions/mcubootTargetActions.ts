@@ -10,7 +10,6 @@ import {
     Device,
     logger,
     selectedDevice,
-    usageData,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     NrfutilDeviceLib,
@@ -19,7 +18,6 @@ import {
 
 import { targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
-import EventAction from './usageDataActions';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
 export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
@@ -29,21 +27,6 @@ export const openDevice =
     dispatch => {
         // not all devices will have serialPorts property (non-Nordic devices for example)
         if (!device.serialPorts || device.serialPorts.length === 0) return;
-
-        usageData.sendUsageData(
-            EventAction.PRODUCT_NAME,
-            `${device.usb?.product}`
-        );
-
-        usageData.sendUsageData(
-            EventAction.PRODUCT_ID,
-            `${device.usb?.device.descriptor.idProduct}`
-        );
-
-        usageData.sendUsageData(
-            EventAction.OPEN_DEVICE_BOARD_VERSION,
-            `${device.boardVersion}`
-        );
 
         dispatch(canWrite());
     };

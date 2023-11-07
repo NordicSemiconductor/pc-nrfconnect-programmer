@@ -16,7 +16,7 @@ import DeviceInfoView from './DeviceInfoView';
 import DeviceMemoryView from './DeviceMemoryView';
 
 const getTargetTitle = (
-    serialNumber: string | undefined,
+    serialNumber: string | undefined | null,
     deviceDefinition: DeviceDefinition | undefined
 ) => {
     if (serialNumber) {
