@@ -1,3 +1,13 @@
+## 4.1.0 - UNRELEASED
+
+### Changed
+
+-   Update nrfutil device to 2.0.2
+
+### Fixed
+
+-   Issue with detecting Thingy:91 Rev: 1.5.0
+
 ## 4.0.1 - 2023-10-17
 
 ### Fixed
