@@ -26,6 +26,7 @@ export default () => {
     const dispatch = useDispatch();
     return (
         <DeviceSelector
+            deviceFilter={device => !!device.serialNumber}
             onDeviceSelected={(device: SharedDevice) => {
                 dispatch(openDevice(device));
             }}
