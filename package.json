@@ -11,7 +11,7 @@
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",
     "engines": {
-        "nrfconnect": ">=4.2.2"
+        "nrfconnect": ">=4.3.0"
     },
     "nrfConnectForDesktop": {
         "nrfutil": {
