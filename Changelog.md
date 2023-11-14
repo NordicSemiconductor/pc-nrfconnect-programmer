@@ -2,7 +2,7 @@
 
 ### Changed
 
--   Update nrfutil device to 2.0.2
+-   Update nrfutil device to v2.0.3
 
 ### Fixed
 
