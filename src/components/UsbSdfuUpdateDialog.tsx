@@ -77,6 +77,7 @@ export default () => {
                 timeout: 10000,
                 when: 'always',
                 once: false,
+                skipRefetchDeviceInfo: true,
             })
         );
 
