@@ -16,7 +16,7 @@
     "nrfConnectForDesktop": {
         "nrfutil": {
             "device": [
-                "2.0.2"
+                "2.0.3"
             ]
         },
         "html": "dist/index.html"
