@@ -279,7 +279,10 @@ const writeOneCoreBatch =
             }
         );
 
-const geCoreHexIntel = (coreInfo: CoreDefinition, memMaps: MemoryMaps) => {
+const geCoreHexIntel = (
+    coreInfo: CoreDefinition,
+    memMaps: MemoryMaps<string>
+) => {
     // Parse input files and filter program regions with core start address and size
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
     overlaps.forEach((overlap, key) => {
@@ -319,7 +322,7 @@ const recoverAllCoresBatch =
 const writeToAllCoresBatch =
     (
         deviceDefinition: DeviceDefinition,
-        memMaps: MemoryMaps,
+        memMaps: MemoryMaps<string>,
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch =>
