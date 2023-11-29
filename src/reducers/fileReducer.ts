@@ -21,7 +21,7 @@ export interface FileState {
     loaded: Record<string, Loaded>;
     mcubootFilePath?: string;
     zipFilePath?: string;
-    memMaps: MemoryMaps;
+    memMaps: MemoryMaps<string>;
     mruFiles: string[];
     regions: Region[];
 }
@@ -36,7 +36,7 @@ const initialState: FileState = {
 };
 
 interface FileParsePayload {
-    memMaps: MemoryMaps;
+    memMaps: MemoryMaps<string>;
     loaded: Record<string, Loaded>;
 }
 

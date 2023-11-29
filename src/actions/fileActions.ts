@@ -12,7 +12,7 @@ import {
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { readFile, stat, Stats, statSync } from 'fs';
-import MemoryMap, { MemoryMapTuple, Overlap } from 'nrf-intel-hex';
+import MemoryMap, { MemoryMapTuple } from 'nrf-intel-hex';
 import { basename } from 'path';
 
 import {
@@ -67,7 +67,7 @@ const updateCoreInfo = (): AppThunk<RootState> => (dispatch, getState) => {
 
     // Display 1 MB memory size or display to end address if the end address is greater than 1 MB
     const lastStartAddress = startAddresses[startAddresses.length - 1];
-    const lastOverlap = overlaps.get(lastStartAddress) as Overlap;
+    const lastOverlap = overlaps.get(lastStartAddress);
     if (lastOverlap) {
         const lastEndAddress =
             lastStartAddress + (lastOverlap[0][1]?.length ?? 0);
@@ -218,7 +218,10 @@ const parseHexFile =
                 memMap,
             },
         };
-        const newMemMaps = [...memMaps, [filePath, memMap]] as MemoryMapTuple[];
+        const newMemMaps = [
+            ...memMaps,
+            [filePath, memMap],
+        ] as MemoryMapTuple<string>[];
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
     };

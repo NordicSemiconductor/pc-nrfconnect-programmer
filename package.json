@@ -46,8 +46,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^133.0.0",
-        "nrf-intel-hex": "^1.2.0"
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^135.0.0"
     },
     "eslintConfig": {
         "extends": "./node_modules/@nordicsemiconductor/pc-nrfconnect-shared/config/eslintrc"
