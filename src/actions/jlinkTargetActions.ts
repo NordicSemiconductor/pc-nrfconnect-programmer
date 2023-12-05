@@ -423,6 +423,19 @@ export const recoverAndWrite =
 
         await batch.run(device, abortController);
 
+        const updateDeviceInfo = await NrfutilDeviceLib.deviceInfo(device);
+
+        dispatch(setSelectedDeviceInfo(updateDeviceInfo));
+        const defaultDeviceInfo =
+            getDefaultDeviceInfoByJlinkFamily(updateDeviceInfo);
+
+        dispatch(setDeviceDefinition(defaultDeviceInfo));
+
+        await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
+            device,
+            abortController
+        );
+
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
             abortController
