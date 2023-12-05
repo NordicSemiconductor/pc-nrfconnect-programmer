@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { selectedDevice } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
-import { DeviceDefinition } from '../util/deviceTypes';
+import { DeviceDefinition, DeviceFamily } from '../util/deviceTypes';
 import DeviceInfoView from './DeviceInfoView';
 import DeviceMemoryView from './DeviceMemoryView';
 
@@ -20,7 +20,8 @@ const getTargetTitle = (
     deviceDefinition: DeviceDefinition | undefined
 ) => {
     if (serialNumber) {
-        return deviceDefinition?.type !== 'UNKNOWN'
+        return deviceDefinition?.type !== 'UNKNOWN' &&
+            deviceDefinition?.type !== DeviceFamily.UNKNOWN
             ? deviceDefinition?.type
             : deviceDefinition.family;
     }
