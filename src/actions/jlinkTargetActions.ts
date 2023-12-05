@@ -20,6 +20,7 @@ import {
     GetProtectionStatusResult,
     NrfutilDeviceLib,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { setSelectedDeviceInfo } from '@nordicsemiconductor/pc-nrfconnect-shared/src/Device/deviceSlice';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 
@@ -374,6 +375,14 @@ export const recover =
         }
 
         await batch.run(device, abortController);
+
+        const updateDeviceInfo = await NrfutilDeviceLib.deviceInfo(device);
+
+        dispatch(setSelectedDeviceInfo(updateDeviceInfo));
+        const defaultDeviceInfo =
+            getDefaultDeviceInfoByJlinkFamily(updateDeviceInfo);
+
+        dispatch(setDeviceDefinition(defaultDeviceInfo));
 
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
