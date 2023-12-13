@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="284px" height="200px" viewBox="0 0 284 200" enable-background="new 0 0 284 200" xml:space="preserve">
+<g>
+	<g>
+		<defs>
+			<rect id="SVGID_1_" x="2.596" y="1.691" width="278.809" height="196.617"/>
+		</defs>
+		<clipPath id="SVGID_2_">
+			<use xlink:href="#SVGID_1_"  overflow="visible"/>
+		</clipPath>
+		<rect x="7.361" y="42.274" clip-path="url(#SVGID_2_)" fill="#F8981D" width="34" height="34"/>
+		<rect x="7.361" y="81.579" clip-path="url(#SVGID_2_)" fill="#E81F64" width="34" height="34"/>
+		<rect x="7.361" y="120.884" clip-path="url(#SVGID_2_)" fill="#4555A5" width="34" height="34"/>
+		<rect x="7.361" y="160.189" clip-path="url(#SVGID_2_)" fill="#4DAF4E" width="34" height="34"/>
+		<rect x="7.361" y="2.969" clip-path="url(#SVGID_2_)" fill="#333F48" width="34" height="34"/>
+		<g clip-path="url(#SVGID_2_)">
+			<rect x="58.574" y="171.103" fill="none" width="155.426" height="12.173"/>
+			<text transform="matrix(1 0 0 1 58.574 181.7098)" font-family="'Calibri'" font-size="13px">Application section</text>
+		</g>
+		<g clip-path="url(#SVGID_2_)">
+			<rect x="58.574" y="131.611" fill="none" width="148.532" height="12.171"/>
+			<text transform="matrix(1 0 0 1 58.574 142.2184)" font-family="'Calibri'" font-size="13px">SoftDevice section</text>
+		</g>
+		<g clip-path="url(#SVGID_2_)">
+			<rect x="58.574" y="92.59" fill="none" width="164.617" height="11.978"/>
+			<text transform="matrix(1 0 0 1 58.574 103.1968)" font-family="'Calibri'" font-size="13px">Bootloader section</text>
+		</g>
+		<g clip-path="url(#SVGID_2_)">
+			<rect x="58.574" y="53.43" fill="none" width="173.043" height="11.689"/>
+			<text transform="matrix(1 0 0 1 58.574 64.0362)" font-family="'Calibri'" font-size="13px">MBR or Application section</text>
+		</g>
+		<g clip-path="url(#SVGID_2_)">
+			<rect x="58.574" y="14.062" fill="none" width="155.426" height="11.815"/>
+			<text transform="matrix(1 0 0 1 58.574 24.6686)" font-family="'Calibri'" font-size="13px">Unknown</text>
+		</g>
+	</g>
+</g>
+</svg>

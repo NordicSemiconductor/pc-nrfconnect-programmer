@@ -1,0 +1,31 @@
+name: Create Zoomin bundle
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened]
+    paths:
+      - '.github/workflows/zoomin.yml'
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  create-zoomin-bundle:
+    name: Create Zoomin bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Copy zoomin properties
+        run: cp doc/docs/zoomin/* .
+
+      - name: Create zip file
+        run: |
+          zip -r nrf-connect-programmer.zip \
+            doc/docs doc/mkdocs.yml custom.properties tags.yml
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nrf-connect-programmer
+          path: nrf-connect-programmer.zip
+          retention-days: 7
