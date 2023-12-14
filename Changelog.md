@@ -9,6 +9,8 @@
 
 -   Warning message when writing nrf9161 modem firmware.
 -   Modem firmware download URL for nrf9161.
+-   Unable to press write when programming nrf9160 or nrf9161 modem firmware
+    with an external jLink
 
 ## 4.1.0 - 2023-12-07
 
