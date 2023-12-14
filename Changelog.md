@@ -1,3 +1,10 @@
+## 4.1.1 - 2023-12-14
+
+### Fixed
+
+-   Warning message when writing nrf9161 modem firmware.
+-   Modem firmware download URL for nrf9161.
+
 ## 4.1.0 - 2023-12-07
 
 ### Changed
