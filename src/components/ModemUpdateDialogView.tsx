@@ -14,6 +14,7 @@ import {
     GenericDialog,
     logger,
     selectedDevice,
+    selectedDeviceInfo,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
@@ -37,14 +38,38 @@ const ModemUpdateDialogView = () => {
     const [writingFailError, setWritingFailError] = useState<string>();
 
     const device = useSelector(selectedDevice);
+    const deviceInfo = useSelector(selectedDeviceInfo);
     const modemFwName = useSelector(getZipFilePath);
     const isVisible = useSelector(getShowModemProgrammingDialog);
     const isMcuboot =
         (useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot) &&
         !device?.traits.jlink;
 
-    const expectedFwName =
-        !modemFwName || /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
+    const is9160DK = deviceInfo?.jlink?.deviceVersion
+        ?.toLocaleUpperCase()
+        .includes('NRF9160');
+    const is9161DK = deviceInfo?.jlink?.deviceVersion
+        ?.toLocaleUpperCase()
+        .includes('NRF9161');
+
+    let expectedFwName = false;
+    let expectedFileName = '';
+    let url = '';
+
+    if (is9160DK) {
+        expectedFileName = 'mfw_nrf9160_X.X.X*.zip';
+        expectedFwName =
+            !modemFwName ||
+            /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
+        url =
+            'https://www.nordicsemi.com/Products/Development-hardware/nrf9160-dk/download#infotabs';
+    } else if (is9161DK) {
+        expectedFileName = 'mfw_nrf91x1_X.X.X*.zip';
+        expectedFwName =
+            !modemFwName ||
+            /mfw_nrf91x1_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
+        url = 'https://www.nordicsemi.com/Products/nRF9161/Download';
+    }
 
     useEffect(() => {
         if (isVisible) {
@@ -181,16 +206,18 @@ const ModemUpdateDialogView = () => {
                             >
                                 <br />
                                 Nordic official modem firmware files are named
-                                mfw_nrf9160_X.X.X*.zip.
+                                {expectedFileName}.
                                 <br />
                                 Modem firmware files can be downloaded from{' '}
-                                <a
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    href="https://www.nordicsemi.com/Products/Development-hardware/nrf9160-dk/download#infotabs"
-                                >
-                                    www.nordicsemi.com
-                                </a>
+                                {url && (
+                                    <a
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        href={url}
+                                    >
+                                        www.nordicsemi.com
+                                    </a>
+                                )}
                                 .
                             </Alert>
                         )}
