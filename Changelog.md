@@ -1,26 +1,26 @@
-## 4.2.0 - 2023-12-15
+## 4.2.0 - 2023-12-18
 
 ## Added
 
--   Persist state of `show log` panel
--   Feedback tab
+-   Persist state of `show log` panel.
+-   Feedback tab.
 
 ### Fixed
 
 -   Warning message when writing nrf9161 modem firmware.
 -   Modem firmware download URL for nrf9161.
 -   Unable to press write when programming modem firmware for nrf9160 or nrf9161
-    with an external jLink
+    with an external jLink.
 
 ## 4.1.0 - 2023-12-07
 
 ### Changed
 
--   Update nrfutil device to v2.0.3
+-   Update nrfutil device to v2.0.3.
 
 ### Fixed
 
--   Issue with detecting Thingy:91 Rev: 1.5.0
+-   Issue with detecting Thingy:91 Rev: 1.5.0.
 
 ## 4.0.1 - 2023-10-17
 
