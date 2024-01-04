@@ -14,7 +14,8 @@ To program the nRF52840 Dongle:
          - This step is not needed if the currently running application uses the DFU trigger library.
          - If this is the first time the dongle is connected, a driver needed for the nRF52840 USB DFU feature is also installed as part of this step.
 
-4. The status light (**LD2**) will start pulsing red, indicating that the dongle is powered up and in bootloader mode. After a few seconds, the computer recognizes the dongle as a USB composite device.
+    The status light (**LD2**) will start pulsing red, indicating that the dongle is powered up and in bootloader mode. After a few seconds, the computer recognizes the dongle as a USB composite device.
+
 5. In the navigation bar in the Programmer app, click **Select device** and choose the serial number of the dongle from the drop-down list.
 6. Drag and drop the HEX file into the **File Memory Layout** section. Alternatively, click **Add file** to add the files you want to program, using one of the following options:
 
