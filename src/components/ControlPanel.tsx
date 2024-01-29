@@ -398,7 +398,7 @@ const ControlPanel = () => {
                     Read
                 </Button>
             </Group>
-            <Group heading="Jlink Settings">
+            <Group heading="J-Link Settings">
                 <Toggle
                     onToggle={() => dispatch(settingsActions.toggleAutoRead())}
                     isToggled={autoRead}

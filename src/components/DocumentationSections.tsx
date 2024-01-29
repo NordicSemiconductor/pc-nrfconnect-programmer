@@ -10,10 +10,10 @@ import { DocumentationSection } from '@nordicsemiconductor/pc-nrfconnect-shared'
 const DocumentationSections = [
     <DocumentationSection
         key="infocenter"
-        linkLabel="Go to Infocenter"
-        link="https://infocenter.nordicsemi.com/topic/ug_nc_programmer/UG/nrf_connect_programmer/ncp_introduction.html"
+        linkLabel="Open documentation"
+        link="https://docs.nordicsemi.com/bundle/nrf-connect-programmer/page/index.html"
     >
-        Visit our Infocenter for more documentation about using the app.
+        Visit TechDocs for official documentation of the app.
     </DocumentationSection>,
 ];
 
