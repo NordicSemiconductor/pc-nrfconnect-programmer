@@ -61,7 +61,6 @@ nav:
   - Home: index.md
   - Installing the Programmer app: installing.md
   - Overview and user interface: overview.md
-  - Programming a Development Kit or the nRF51 Dongle: programming_dk.md
-  - Programming the nRF52840 Dongle: programming_dongle.md
+  - Programming devices: programming_dk.md
   - Troubleshooting: troubleshooting.md
   - Revision history: revision_history.md
