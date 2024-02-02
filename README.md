@@ -7,9 +7,9 @@ nRF Connect Programmer is a cross-platform tool that enables programming
 firmware to Nordic Semiconductor devices and custom devices that use Nordic
 Semiconductor hardware.
 
-The application supports J-Link, Nordic USB, and MCUboot programming methods,
-using both HEX and ZIP files. It lets you inspect the memory layout of the
-firmware files and the devices.
+The application supports J-Link, Nordic Secure DFU, and MCUboot programming
+methods, using both HEX and ZIP files. It lets you inspect the memory layout of
+the firmware files and the devices.
 
 ![screenshot](resources/screenshot.gif)
 

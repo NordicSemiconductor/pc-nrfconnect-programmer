@@ -20,7 +20,7 @@ When you select a device, the following actions are available in the File sectio
 
 | Action              | Description                                                                                        |
 |---------------------|----------------------------------------------------------------------------------------------------|
-| **Add files**       | Adds the file you select to the [**File Memory Layout**](#file-memory-layout) panel. You can select the files either from the drop-down list of previous files or by browsing to the file destination.              |
+| **Add files**       | Adds one or more files you select to the [**File Memory Layout**](#file-memory-layout) panel. You can select the files either from the drop-down list of previous files or by browsing to the file destination.              |
 | **Reload files**    | Reloads the file you have previously added to the **File Memory Layout**.                          |
 | **Clear files**     | Removes the file from the **File Memory Layout**.                                                  |
 
@@ -34,7 +34,7 @@ When you select a device, the following actions are available in the Device sect
 | **Erase & write**   | J-Link                   | Clears the written memory and programs the files added to the **File Memory Layout**.              |
 | **Save as file**    | J-Link                   | After you **Read** the memory, saves the current memory layout in the **Device Memory Layout** to a HEX file.                     |
 | **Reset**           | J-Link                   | Resets the device.                                                                                 |
-| **Write**           | MCUboot, Nordic USB, Modem firmware | Programs the files added to the **File Memory Layout**.                                 |
+| **Write**           | MCUboot, Nordic Secure DFU, Modem firmware | Programs the files added to the **File Memory Layout**.                                 |
 | **Read**            | J-Link                   | Reads and displays the written memory in the **Device Memory Layout**, unless the device has readback protection enabled.  |
 
 ### J-Link Settings
@@ -43,7 +43,7 @@ When you select a device, the following toggles are available in the J-Link Sett
 
 | Toggle                            | Description                                                                                          |
 |-----------------------------------|------------------------------------------------------------------------------------------------------|
-| **Auto read memory**              | Enable to automatically read and display the memory layout of the device when the device is selected.|
+| **Auto read memory**              | Enable to automatically read and display the memory layout of the device when the device is selected. Data is only automatically read on non-protected devices. |
 | **Auto reset**                    | Enable to automatically reset the device after it has been programmed to start the new binary.       |
 
 ### MCUboot Settings
@@ -52,7 +52,7 @@ When you select a device, the following toggles are available in the MCUboot Set
 
 | Toggle                              | Description                                                                                           |
 |-------------------------------------|-------------------------------------------------------------------------------------------------------|
-| **Enable MCUBoot**                  | Enable to write to the device memory when programming a Nordic USB device, such as Nordic Thingy:91 or the nRF52840 Dongle. You can also use this option for custom SoCs that support MCUboot. |
+| **Enable MCUBoot**                  | **Experimental feature** Enable to write to the device memory when programming a Nordic Secure DFU device, such as Nordic Thingy:91 or the nRF52840 Dongle. You can also use this option for custom SoCs that support MCUboot. |
 
 ## Programmer tab
 

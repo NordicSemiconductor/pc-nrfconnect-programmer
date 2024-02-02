@@ -1,6 +1,6 @@
 # nRF Connect Programmer
 
-nRF Connect Programmer is an app available from [nRF Connect for Desktop](https://nordic-dev.zoominsoftware.io/bundle/nrf-connect-desktop/page/index.html) that you can use to program firmware to Nordic devices. The application allows you to see the memory layout for J-Link, Nordic USB devices, and MCUboot devices. It also allows you to display content of HEX files and write it to the devices.
+nRF Connect Programmer is an app available from [nRF Connect for Desktop](https://nordic-dev.zoominsoftware.io/bundle/nrf-connect-desktop/page/index.html) that you can use to program firmware to Nordic devices. The application allows you to see the memory layout for devices that support programming with J-Link, Nordic Secure DFU, and MCUboot. It also allows you to display content of HEX files and write it to the devices.
 
 ## Supported devices
 

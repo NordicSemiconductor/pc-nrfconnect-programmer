@@ -35,7 +35,7 @@ To program a supported development kit, complete the following procedure:
 7. Depending on the device type and the programming method, use one of the following programming options in the **Device** panel:
 
    - **Erase & write** for J-Link
-   - **Write** for MCUboot, Nordic USB, or modem firmware
+   - **Write** for MCUboot, Nordic Secure DFU, or modem firmware
 
    When programming starts, a progress bar appears. Do not unplug or turn off the device during programming.
 
@@ -51,7 +51,7 @@ To program the nRF52840 Dongle, complete the following steps:
 
     !!! note "Note"
          - This step is not needed if the currently running application uses the [DFU trigger library](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fsdk_nrf5_v17.1.0%2Flib_dfu_trigger_usb.html), part of the nRF5 SDK v17.1.0.
-         - If this is the first time the dongle is connected, a driver needed for the nRF52840 USB DFU feature is also installed as part of this step.
+         - If this is the first time the dongle is connected, a driver needed for the nRF52840 Nordic Secure DFU feature is also installed as part of this step.
 
     The status light (**LD2**) will start pulsing red, indicating that the dongle is powered up and in bootloader mode. After a few seconds, the computer recognizes the dongle as a USB composite device.
 
