@@ -11,7 +11,7 @@ import {
     isDeviceInDFUBootloader,
     selectedDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import MemoryMap from 'nrf-intel-hex';
 
 import {

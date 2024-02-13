@@ -9,10 +9,8 @@ import {
     Device,
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import {
-    NrfutilDeviceLib,
-    Progress,
-} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 
 export const performUpdate = async (
     device: Device,

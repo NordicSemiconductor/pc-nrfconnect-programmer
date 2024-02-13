@@ -9,7 +9,7 @@ import {
     DeviceCoreInfo,
     DeviceInfo,
     NrfutilDevice,
-} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import MemoryMap from 'nrf-intel-hex';
 
 import {
