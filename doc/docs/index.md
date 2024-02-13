@@ -2,14 +2,44 @@
 
 nRF Connect Programmer is an app available from [nRF Connect for Desktop](https://nordic-dev.zoominsoftware.io/bundle/nrf-connect-desktop/page/index.html) that you can use to program firmware to Nordic devices. The application allows you to see the memory layout for devices that support programming with J-Link, Nordic Secure DFU, and MCUboot. It also allows you to display content of HEX files and write it to the devices.
 
-## Supported devices
+## Supported hardware
 
-- Nordic Thingy:91
-- Nordic Thingy:52
-- nRF91 Series DKs
-- nRF53 Series DKs
-- nRF52 Series DKs and Dongle
+The following table lists the hardware platforms that you can program with nRF Connect Programmer.
 
-### Deprecated support
+| Hardware platform   | Device   | PCA number | Programming with J-Link  | Programming with Nordic Secure DFU  | Programming with MCUboot |
+|---------------------|----------|------------|--------------------------|-------------------------------------|--------------------------|
+| nRF9161 DK          | nRF9161  | PCA10153   | Yes                      | No                                  | No                       |
+| nRF9160 DK          | nRF9160  | PCA10090   | Yes                      | No                                  | No                       |
+| Nordic Thingy:91    | nRF9160  | PCA20035   | Yes                      | No                                  | Yes                      |
+| nRF9131 DK          | nRF9131  | PCA10147   | Yes                      | No                                  | No                       |
+| nRF5340 DK          | nRF5340  | PCA10095   | Yes                      | No                                  | No                       |
+| nRF5340 Audio DK    | nRF5340  | PCA10121   | Yes                      | No                                  | No                       |
+| Nordic Thingy:53    | nRF5340  | PCA20053   | Yes                      | No                                  | Yes                      |
+| nPM1300 EK          | nPM1300  | PCA10152   | Yes                      | No                                  | Yes                      |
+| nRF52840 DK         | nRF52840 | PCA10056   | Yes                      | Possible                            | No                       |
+| nRF52840 Dongle     | nRF52840 | PCA10059   | No                       | Yes                                 | No                       |
+| nRF52833 DK         | nRF52833 | PCA10100   | Yes                      | Possible                            | No                       |
+| nRF52832 DK (nRF52) | nRF52832 | PCA10040   | Yes                      | Possible                            | No                       |
 
-- nRF51 Series DKs and Dongle
+Programming with Nordic Secure DFU is **Possible** on some nRF52 Series platforms if you implement a bootloader solution that supports Nordic Secure DFU.
+
+### Support for custom hardware
+
+The following criteria apply to programming custom hardware with nRF Connect Programmer:
+
+- **Device**: The hardware platform you are programming must use an SoC or SiP from Nordic Semiconductor.
+- **Programming with J-Link**: Possible for all custom hardware that features Nordic SoCs supported by [nRF Util](https://docs.nordicsemi.com/bundle/nrfutil/page/README.html).
+- **Programming with Nordic Secure DFU**: Possible if you implement a bootloader solution that supports Nordic Secure DFU. nRF Connect Programmer checks the bootloader for Nordic ID to be able to program using this method.
+- **Programming with MCUboot**: Only possible using CLI.
+
+## Deprecated hardware support
+
+The following hardware platforms cannot be programmed with nRF Connect Programmer anymore.
+
+| Hardware platform   | Device   | PCA number | Programming with J-Link  | Programming with Nordic Secure DFU  | Programming with MCUboot |
+|---------------------|----------|------------|--------------------------|-------------------------------------|--------------------------|
+| Nordic Thingy:52    | nRF52832 | PCA20020   | No                       | No                                  | No                       |
+| All platforms with nRF52820         | nRF52820 | -   | No                       | No                                  | No                       |
+| All platforms with nRF52811         | nRF52811 | -   | No                       | No                                  | No                       |
+| All platforms with nRF52805         | nRF52805 | -   | No                       | No                                  | No                       |
+| All platforms with nRF51 Series' SoC          | All | -   | No                       | No                                  | No                       |

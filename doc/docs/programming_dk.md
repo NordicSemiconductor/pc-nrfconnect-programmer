@@ -1,6 +1,6 @@
 # Programming devices
 
-In nRF Connect Programmer, you can program [supported devices](index.md#supported-devices) or a custom board with a supported chip that allows for communication with J-Link, Nordic USB devices, and MCUboot devices.
+In nRF Connect Programmer, you can program [supported devices](index.md#supported-devices) or a custom board with a supported chip that allows for communication with J-Link, Nordic Secure DFU devices, and MCUboot devices.
 
 !!! tip "Tip"
       If you experience any problems during the programming process, press Ctrl-R (command-R on macOS) to restart the nRF Connect Programmer app, and try programming again.
