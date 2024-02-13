@@ -5,8 +5,11 @@
  */
 
 import React from 'react';
-import { App, render } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import usageData from '@nordicsemiconductor/pc-nrfconnect-shared/src/utils/usageData';
+import {
+    App,
+    render,
+    telemetry,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import AppMainView from './components/AppMainView';
 import ControlPanel from './components/ControlPanel';
@@ -16,7 +19,7 @@ import appReducer from './reducers';
 
 import '../resources/css/index.scss';
 
-usageData.enableTelemetry();
+telemetry.enableTelemetry();
 
 render(
     <App

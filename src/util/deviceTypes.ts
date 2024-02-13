@@ -6,7 +6,7 @@
 import {
     DeviceCore,
     ProtectionStatus,
-} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import MemoryMap from 'nrf-intel-hex';
 
 export type CoreState = 'loading' | 'writing' | 'reading' | 'erasing' | 'idle';

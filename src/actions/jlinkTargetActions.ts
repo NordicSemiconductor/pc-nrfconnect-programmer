@@ -19,7 +19,7 @@ import {
     DeviceInfo,
     GetProtectionStatusResult,
     NrfutilDeviceLib,
-} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import { setSelectedDeviceInfo } from '@nordicsemiconductor/pc-nrfconnect-shared/src/Device/deviceSlice';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';

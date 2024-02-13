@@ -18,11 +18,11 @@ import {
     selectedDevice,
     switchToBootloaderMode,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import {
     ImageType,
     NrfutilDeviceLib,
-    Progress,
-} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+} from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import Crypto from 'crypto';
 import MemoryMap from 'nrf-intel-hex';
 

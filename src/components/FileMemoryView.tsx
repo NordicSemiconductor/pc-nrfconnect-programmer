@@ -7,7 +7,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 
 import { updateTargetWritable } from '../actions/targetActions';
 import {
