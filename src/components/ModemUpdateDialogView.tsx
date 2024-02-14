@@ -20,6 +20,7 @@ import {
 import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { performUpdate } from '../actions/modemTargetActions';
+import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
 import { getZipFilePath } from '../reducers/fileReducer';
 import {
     getShowModemProgrammingDialog,
@@ -39,31 +40,35 @@ const ModemUpdateDialogView = () => {
 
     const device = useSelector(selectedDevice);
     const deviceInfo = useSelector(selectedDeviceInfo);
+    const deviceDefinition = useSelector(getDeviceDefinition);
     const modemFwName = useSelector(getZipFilePath);
     const isVisible = useSelector(getShowModemProgrammingDialog);
     const isMcuboot =
         (useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot) &&
         !device?.traits.jlink;
 
-    const is9160DK = deviceInfo?.jlink?.deviceVersion
-        ?.toLocaleUpperCase()
-        .includes('NRF9160');
-    const is9161DK = deviceInfo?.jlink?.deviceVersion
-        ?.toLocaleUpperCase()
-        .includes('NRF9161');
+    const is9160 =
+        deviceDefinition.type?.toLocaleUpperCase().includes('NRF9160') ||
+        deviceInfo?.jlink?.deviceVersion
+            ?.toLocaleUpperCase()
+            .includes('NRF9160');
+    const is91x1 =
+        deviceDefinition.type?.toLocaleUpperCase().match(/NRF91\d1/) ||
+        deviceInfo?.jlink?.deviceVersion?.toLocaleUpperCase().match(/NRF91\d1/);
 
+    const deviceTypeKnown = is9160 || is91x1;
     let expectedFwName = false;
     let expectedFileName = '';
     let url = '';
 
-    if (is9160DK) {
+    if (is9160) {
         expectedFileName = 'mfw_nrf9160_X.X.X*.zip';
         expectedFwName =
             !modemFwName ||
             /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
         url =
             'https://www.nordicsemi.com/Products/Development-hardware/nrf9160-dk/download#infotabs';
-    } else if (is9161DK) {
+    } else if (is91x1) {
         expectedFileName = 'mfw_nrf91x1_X.X.X*.zip';
         expectedFwName =
             !modemFwName ||
@@ -199,7 +204,8 @@ const ModemUpdateDialogView = () => {
                     {!writing &&
                         !writingSucceed &&
                         !writingFail &&
-                        !expectedFwName && (
+                        !expectedFwName &&
+                        deviceTypeKnown && (
                             <Alert
                                 label="Unexpected file name detected"
                                 variant="warning"
@@ -219,6 +225,17 @@ const ModemUpdateDialogView = () => {
                                     </a>
                                 )}
                                 .
+                            </Alert>
+                        )}
+                    {!writing &&
+                        !writingSucceed &&
+                        !writingFail &&
+                        !deviceTypeKnown && (
+                            <Alert label="Modem firmware" variant="warning">
+                                <br />
+                                Unable to detect the device family. Make sure
+                                that the modem firmware file is intended for the
+                                connected device family.
                             </Alert>
                         )}
                 </Form.Group>
