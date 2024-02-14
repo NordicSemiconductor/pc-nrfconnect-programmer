@@ -215,9 +215,10 @@ const batchLoggingCallbacks = <T>(
         onEnd?.(false);
     },
     onProgress: progress => {
-        const status = `${message.replace('.', ':')} ${
-            progress.totalProgressPercentage
-        }%`;
+        const status = `${message.replace(
+            '.',
+            ':'
+        )} ${progress.totalProgressPercentage.toFixed(0)}%`;
         logger.info(status);
     },
 });
