@@ -14,8 +14,10 @@ import {
 import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 
+import { setDeviceDefinition } from '../reducers/deviceDefinitionReducer';
 import { targetWritableKnown } from '../reducers/targetReducer';
 import { RootState } from '../reducers/types';
+import { getDeviceInfoByUSB } from '../util/devices';
 
 export const first = <T>(items: T[]): T | undefined => items[0];
 export const last = <T>(items: T[]): T | undefined => items.slice(-1)[0];
@@ -25,6 +27,9 @@ export const openDevice =
     dispatch => {
         // not all devices will have serialPorts property (non-Nordic devices for example)
         if (!device.serialPorts || device.serialPorts.length === 0) return;
+
+        const deviceInfo = getDeviceInfoByUSB(device);
+        dispatch(setDeviceDefinition(deviceInfo));
 
         dispatch(canWrite());
     };

@@ -4,6 +4,11 @@
 
 -   Update nrfutil device to v2.1.1.
 
+### Fixed
+
+-   Valid Modem Firmware for Thingy:91 was previously detected as incorrect.
+-   Show the device family in the Memory layout title for MCU Boot devices
+
 ## 4.2.0 - 2024-01-04
 
 ## Added
