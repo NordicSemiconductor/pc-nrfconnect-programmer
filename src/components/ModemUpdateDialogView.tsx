@@ -64,15 +64,13 @@ const ModemUpdateDialogView = () => {
     if (is9160) {
         expectedFileName = 'mfw_nrf9160_X.X.X*.zip';
         expectedFwName =
-            !modemFwName ||
-            /mfw_nrf9160_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
+            !modemFwName || /mfw_nrf9160_\d+\.\d+\.\d+.*.zip/.test(modemFwName);
         url =
             'https://www.nordicsemi.com/Products/Development-hardware/nrf9160-dk/download#infotabs';
     } else if (is91x1) {
         expectedFileName = 'mfw_nrf91x1_X.X.X*.zip';
         expectedFwName =
-            !modemFwName ||
-            /mfw_nrf91x1_\d+\.\d+\.\d+\.*.zip/.test(modemFwName);
+            !modemFwName || /mfw_nrf91x1_\d+\.\d+\.\d+.*.zip/.test(modemFwName);
         url = 'https://www.nordicsemi.com/Products/nRF9161/Download';
     }
 
