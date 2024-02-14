@@ -6,8 +6,7 @@
 
 ### Fixed
 
--   Programming Modem Firmware to Thingy:91 no longer shows invalid warning when
-    modem firmware is the expected one
+-   Valid Modem Firmware for Thingy:91 was previously detected as incorrect.
 -   Show the device family in the Memory layout title for MCU Boot devices
 
 ## 4.2.0 - 2024-01-04
