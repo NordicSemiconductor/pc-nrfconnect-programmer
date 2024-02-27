@@ -35,12 +35,7 @@ import {
     getMruFiles,
     getZipFilePath,
 } from '../reducers/fileReducer';
-import {
-    getAutoRead,
-    getAutoReset,
-    getForceMcuBoot,
-    setForceMcuBoot,
-} from '../reducers/settingsReducer';
+import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
 import { getIsWritable } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';
 
@@ -178,7 +173,6 @@ const ControlPanel = () => {
     const targetIsWritable = useSelector(getIsWritable);
     const deviceDefinition = useSelector(getDeviceDefinition);
     const zipFile = useSelector(getZipFilePath);
-    const forceMcuBoot = useSelector(getForceMcuBoot);
     const targetIsReady = !useSelector(getDeviceIsBusy) && !!device;
     const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     const canRead = !!coreInfos.find(

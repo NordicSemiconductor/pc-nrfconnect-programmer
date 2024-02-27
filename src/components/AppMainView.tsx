@@ -11,7 +11,6 @@ import {
     selectedDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { getForceMcuBoot } from '../reducers/settingsReducer';
 import useOpenFileFromArgs from '../useOpenFileFromArgs';
 import DeviceMemoryBoxView from './DeviceMemoryBoxView';
 import FileMemoryBoxView from './FileMemoryBoxView';
@@ -23,7 +22,6 @@ import WarningView from './WarningView';
 
 export default () => {
     const device = useSelector(selectedDevice);
-    const forcedMCUBoot = useSelector(getForceMcuBoot);
 
     useOpenFileFromArgs();
 
@@ -33,7 +31,6 @@ export default () => {
             {device &&
                 !device.traits.jlink &&
                 !device.traits.mcuBoot &&
-                !forcedMCUBoot &&
                 !device.traits.nordicDfu && (
                     <div className="tw-flex tw-w-full tw-max-w-5xl tw-flex-col tw-gap-2 tw-self-center">
                         <Alert variant="warning" label="Caution: ">

@@ -26,7 +26,6 @@ import {
     getShowModemProgrammingDialog,
     setShowModemProgrammingDialog,
 } from '../reducers/modemReducer';
-import { getForceMcuBoot } from '../reducers/settingsReducer';
 import { WithRequired } from '../util/types';
 
 const ModemUpdateDialogView = () => {
@@ -43,9 +42,7 @@ const ModemUpdateDialogView = () => {
     const deviceDefinition = useSelector(getDeviceDefinition);
     const modemFwName = useSelector(getZipFilePath);
     const isVisible = useSelector(getShowModemProgrammingDialog);
-    const isMcuboot =
-        (useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot) &&
-        !device?.traits.jlink;
+    const isMcuboot = !!device?.traits.mcuBoot && !device?.traits.jlink;
 
     const is9160 =
         deviceDefinition.type?.toLocaleUpperCase().includes('NRF9160') ||

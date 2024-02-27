@@ -24,9 +24,6 @@ const settingsSlice = createSlice({
     name: 'settings',
     initialState,
     reducers: {
-        setForceMcuBoot(state, action: PayloadAction<boolean>) {
-            state.forceMcuBoot = action.payload;
-        },
         settingsLoad(state, action: PayloadAction<SettingsState>) {
             state.autoRead = action.payload.autoRead;
             state.autoReset = action.payload.autoReset;
@@ -42,12 +39,9 @@ const settingsSlice = createSlice({
 
 export default settingsSlice.reducer;
 
-const { setForceMcuBoot, settingsLoad, toggleAutoRead, toggleAutoReset } =
-    settingsSlice.actions;
+const { settingsLoad, toggleAutoRead, toggleAutoReset } = settingsSlice.actions;
 
-export { setForceMcuBoot, settingsLoad, toggleAutoRead, toggleAutoReset };
+export { settingsLoad, toggleAutoRead, toggleAutoReset };
 
 export const getAutoRead = (state: RootState) => state.app.settings.autoRead;
 export const getAutoReset = (state: RootState) => state.app.settings.autoReset;
-export const getForceMcuBoot = (state: RootState) =>
-    state.app.settings.forceMcuBoot;
