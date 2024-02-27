@@ -426,14 +426,10 @@ const ControlPanel = () => {
             </Group>
             <Group heading="MCUboot Settings">
                 <Toggle
-                    onToggle={v => {
-                        dispatch(setForceMcuBoot(v));
-                        if (device) {
-                            dispatch(targetActions.updateTargetWritable());
-                        }
-                    }}
-                    isToggled={forceMcuBoot || isMcuboot}
-                    disabled={isMcuboot}
+                    onToggle={() => {}}
+                    isToggled={false}
+                    disabled
+                    title="This feature is being disabled due to to lack of proper support. Enable MCU boot was an experimental feature to allow customers to program custom kits with nordic SoCs that have MCUBoot."
                     label="Enable MCUboot"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
