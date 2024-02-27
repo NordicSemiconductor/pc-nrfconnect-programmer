@@ -8,6 +8,8 @@
 
 -   Valid Modem Firmware for Thingy:91 was previously detected as incorrect.
 -   Show the device family in the Memory layout title for MCUboot devices.
+-   Windows and Linux: Dragging and dropping a file into the file memory layout
+    opened the file in an editor.
 
 ### Removed
 
