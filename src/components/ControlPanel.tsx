@@ -51,6 +51,9 @@ const useRegisterDragEvents = () => {
         const onDrop = async (event: DragEvent) => {
             if (!event.dataTransfer) return;
 
+            // calling this after our code would result in opening the file in an editor (atleast this was the case on linux)
+            event.preventDefault();
+
             // eslint-disable-next-line no-restricted-syntax
             for (const file of event.dataTransfer.files) {
                 // eslint-disable-next-line no-await-in-loop
@@ -60,8 +63,6 @@ const useRegisterDragEvents = () => {
                     )
                 );
             }
-
-            event.preventDefault();
         };
 
         document.body.addEventListener('drop', onDrop);
