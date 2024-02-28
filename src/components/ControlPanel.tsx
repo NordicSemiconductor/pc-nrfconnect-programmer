@@ -35,12 +35,7 @@ import {
     getMruFiles,
     getZipFilePath,
 } from '../reducers/fileReducer';
-import {
-    getAutoRead,
-    getAutoReset,
-    getForceMcuBoot,
-    setForceMcuBoot,
-} from '../reducers/settingsReducer';
+import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
 import { getIsWritable } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';
 
@@ -178,7 +173,6 @@ const ControlPanel = () => {
     const targetIsWritable = useSelector(getIsWritable);
     const deviceDefinition = useSelector(getDeviceDefinition);
     const zipFile = useSelector(getZipFilePath);
-    const forceMcuBoot = useSelector(getForceMcuBoot);
     const targetIsReady = !useSelector(getDeviceIsBusy) && !!device;
     const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     const canRead = !!coreInfos.find(
@@ -426,14 +420,10 @@ const ControlPanel = () => {
             </Group>
             <Group heading="MCUboot Settings">
                 <Toggle
-                    onToggle={v => {
-                        dispatch(setForceMcuBoot(v));
-                        if (device) {
-                            dispatch(targetActions.updateTargetWritable());
-                        }
-                    }}
-                    isToggled={forceMcuBoot || isMcuboot}
-                    disabled={isMcuboot}
+                    onToggle={() => {}}
+                    isToggled={false}
+                    disabled
+                    title="This feature is being disabled due to to lack of proper support. Enable MCU boot was an experimental feature to allow customers to program custom kits with nordic SoCs that have MCUBoot."
                     label="Enable MCUboot"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}

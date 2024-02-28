@@ -7,7 +7,11 @@
 ### Fixed
 
 -   Valid Modem Firmware for Thingy:91 was previously detected as incorrect.
--   Show the device family in the Memory layout title for MCU Boot devices
+-   Show the device family in the Memory layout title for MCUboot devices.
+
+### Removed
+
+-   `Enable MCUboot` toggle.
 
 ## 4.2.0 - 2024-01-04
 

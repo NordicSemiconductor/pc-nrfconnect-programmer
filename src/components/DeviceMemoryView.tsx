@@ -19,7 +19,6 @@ import {
     getCoreMemMap,
     getDeviceDefinition,
 } from '../reducers/deviceDefinitionReducer';
-import { getForceMcuBoot } from '../reducers/settingsReducer';
 import {
     getTargetRegions,
     targetRegionsKnown,
@@ -80,9 +79,9 @@ const TextOverlay = ({
     coreInfo: CoreInfo;
 }) => {
     const device = useSelector(selectedDevice);
-    const isJLink = useSelector(getForceMcuBoot) || !!device?.traits.jlink;
+    const isJLink = !!device?.traits.jlink;
     const isNordicDfu = !!device?.traits.nordicDfu;
-    const isMcuboot = useSelector(getForceMcuBoot) || !!device?.traits.mcuBoot;
+    const isMcuboot = !!device?.traits.mcuBoot;
 
     if (coreInfo.coreMemMap || busy) return null;
 
