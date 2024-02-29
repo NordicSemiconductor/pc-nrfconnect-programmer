@@ -48,11 +48,7 @@ When you select a device, the following toggles are available in the J-Link Sett
 
 ### MCUboot Settings
 
-When you select a device, the following toggles are available in the MCUboot Settings section:
-
-| Toggle                              | Description                                                                                           |
-|-------------------------------------|-------------------------------------------------------------------------------------------------------|
-| **Enable MCUBoot**                  | **Experimental feature** Enable to write to the device memory when programming a Nordic Secure DFU device, such as Nordic Thingy:91 or the nRF52840 Dongle. You can also use this option for custom SoCs that support MCUboot. |
+The experimental **Enable MCUBoot** toggle is deprecated and will be removed in a future release of nRF Connect Programmer.
 
 ## Programmer tab
 
