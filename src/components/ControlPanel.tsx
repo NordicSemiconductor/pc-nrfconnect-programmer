@@ -226,18 +226,20 @@ const ControlPanel = () => {
 
                         dispatch(setDeviceBusy(true));
 
-                        preventAppCloseUntilComplete(
-                            {
-                                message: `The device is being recovered.
+                        dispatch(
+                            preventAppCloseUntilComplete(
+                                {
+                                    message: `The device is being recovered.
 Closing application right now might result in some unknown behavior and might also brick the device.
 Are you sure you want to continue?`,
-                            },
-                            dispatch(
-                                jlinkTargetActions.recover(
-                                    device,
-                                    deviceDefinition
-                                )
-                            ).finally(() => dispatch(setDeviceBusy(false)))
+                                },
+                                dispatch(
+                                    jlinkTargetActions.recover(
+                                        device,
+                                        deviceDefinition
+                                    )
+                                ).finally(() => dispatch(setDeviceBusy(false)))
+                            )
                         );
                     }}
                     disabled={
@@ -261,18 +263,20 @@ Are you sure you want to continue?`,
                         }
 
                         dispatch(setDeviceBusy(true));
-                        preventAppCloseUntilComplete(
-                            {
-                                message: `The device is being programmed.
+                        dispatch(
+                            preventAppCloseUntilComplete(
+                                {
+                                    message: `The device is being programmed.
 Closing application right now might result in some unknown behavior and might also brick the device.
 Are you sure you want to continue?`,
-                            },
-                            dispatch(
-                                jlinkTargetActions.recoverAndWrite(
-                                    device,
-                                    deviceDefinition
-                                )
-                            ).finally(() => dispatch(setDeviceBusy(false)))
+                                },
+                                dispatch(
+                                    jlinkTargetActions.recoverAndWrite(
+                                        device,
+                                        deviceDefinition
+                                    )
+                                ).finally(() => dispatch(setDeviceBusy(false)))
+                            )
                         );
                     }}
                     disabled={

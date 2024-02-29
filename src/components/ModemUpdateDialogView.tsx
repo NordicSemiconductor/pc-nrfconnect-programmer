@@ -161,7 +161,7 @@ Are you sure you want to continue?`,
             })
             .finally(() => {
                 setWriting(false);
-                clearConfirmBeforeClose('modemProgramming');
+                dispatch(clearConfirmBeforeClose('modemProgramming'));
             });
     };
 
