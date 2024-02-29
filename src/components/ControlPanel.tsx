@@ -424,7 +424,7 @@ const ControlPanel = () => {
                     onToggle={() => {}}
                     isToggled={false}
                     disabled
-                    title="This feature is being disabled due to to lack of proper support. Enable MCUboot was an experimental feature to allow customers to program custom kits with nordic SoCs that have MCUBoot."
+                    title="This feature is being disabled due to to lack of proper support. Enable MCUboot was an experimental feature to allow customers to program custom kits with nordic SoCs that have MCUboot."
                     label="Enable MCUboot"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
