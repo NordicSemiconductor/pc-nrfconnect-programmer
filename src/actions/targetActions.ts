@@ -41,7 +41,7 @@ export const openDevice =
             } else {
                 logger.warn('No operations possible for device.');
                 logger.warn(
-                    `If the device is a MCUBoot device make sure it is in the bootloader mode`
+                    `If the device is a MCUboot device make sure it is in the bootloader mode`
                 );
                 if (process.platform === 'linux') {
                     logger.warn(
