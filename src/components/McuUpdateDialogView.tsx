@@ -190,7 +190,7 @@ Are you sure you want to continue?`,
                 dispatch(clearWaitForDevice());
                 dispatch(canWrite());
                 setWriting(false);
-                clearConfirmBeforeClose('mcuProgramming');
+                dispatch(clearConfirmBeforeClose('mcuProgramming'));
             });
     };
 
