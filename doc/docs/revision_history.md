@@ -2,7 +2,7 @@
 
 | Date       | Description                                                                                                                                                                                  |
 |------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 2024-02-15 | Updated the [supported devices section](index.md#supported-devices) with a matrix table.                                               |
+| 2024-02-29 | Updated the [supported devices section](index.md#supported-devices) with a matrix table.                                               |
 | 2024-01-29 | Updated the documentation for the [nRF Connect Programmer v4.2.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)                                               |
 | 2022-09-06 | Updated images and text for new user interface in [nRF Connect Programmer v3.0.3](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md#303---2022-06-17)                                               |
 | 2022-02-21 | Removed nRF9160 DK related content. Removed content is found in [Getting started with nRF9160 DK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/working_with_nrf/nrf91/nrf9160_gs.html)                         |
