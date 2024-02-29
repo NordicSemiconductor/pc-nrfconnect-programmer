@@ -1,5 +1,10 @@
 ## 4.2.1 - UNRELEASED
 
+### Added
+
+-   Warning about closing the app while programming, which may lead to unwanted
+    consequences.
+
 ### Changed
 
 -   Update nrfutil device to v2.1.1.

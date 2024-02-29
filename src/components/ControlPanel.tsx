@@ -10,10 +10,12 @@ import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    AppDispatch,
     Button,
     colors,
     Group,
     logger,
+    preventAppCloseUntilComplete,
     selectedDevice,
     SidePanel,
     Toggle,
@@ -165,7 +167,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
 };
 
 const ControlPanel = () => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const device = useSelector(selectedDevice);
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
@@ -216,24 +218,27 @@ const ControlPanel = () => {
                     variant="secondary"
                     className="w-100"
                     key="performRecover"
-                    onClick={async () => {
+                    onClick={() => {
                         if (!device) {
                             logger.error('No target device!');
                             return;
                         }
 
                         dispatch(setDeviceBusy(true));
-                        try {
-                            await dispatch(
+
+                        preventAppCloseUntilComplete(
+                            {
+                                message: `The device is being recovered.
+Closing application right now might result in some unknown behavior and might also brick the device.
+Are you sure you want to continue?`,
+                            },
+                            dispatch(
                                 jlinkTargetActions.recover(
                                     device,
                                     deviceDefinition
                                 )
-                            );
-                        } catch (e) {
-                            /* empty */
-                        }
-                        dispatch(setDeviceBusy(false));
+                            ).finally(() => dispatch(setDeviceBusy(false)))
+                        );
                     }}
                     disabled={
                         isMcuboot ||
@@ -249,24 +254,26 @@ const ControlPanel = () => {
                     variant="secondary"
                     key="performRecoverAndWrite"
                     className="w-100"
-                    onClick={async () => {
+                    onClick={() => {
                         if (!device) {
                             logger.error('No target device!');
                             return;
                         }
 
                         dispatch(setDeviceBusy(true));
-                        try {
-                            await dispatch(
+                        preventAppCloseUntilComplete(
+                            {
+                                message: `The device is being programmed.
+Closing application right now might result in some unknown behavior and might also brick the device.
+Are you sure you want to continue?`,
+                            },
+                            dispatch(
                                 jlinkTargetActions.recoverAndWrite(
                                     device,
                                     deviceDefinition
                                 )
-                            );
-                        } catch (e) {
-                            /* empty */
-                        }
-                        dispatch(setDeviceBusy(false));
+                            ).finally(() => dispatch(setDeviceBusy(false)))
+                        );
                     }}
                     disabled={
                         isMcuboot ||
@@ -338,9 +345,10 @@ const ControlPanel = () => {
                             logger.error('No target device!');
                             return;
                         }
-                        // Refresh all files in case that some files have been updated right before write action.
+
                         dispatch(setDeviceBusy(true));
                         try {
+                            // Refresh all files in case that some files have been updated right before write action.
                             refreshAllFiles();
                             dispatch(targetActions.write(device));
                         } catch (e) {

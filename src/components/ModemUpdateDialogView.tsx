@@ -9,7 +9,9 @@ import Form from 'react-bootstrap/Form';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    addConfirmBeforeClose,
     Alert,
+    clearConfirmBeforeClose,
     DialogButton,
     GenericDialog,
     logger,
@@ -108,10 +110,20 @@ const ModemUpdateDialogView = () => {
         reset();
         start();
 
+        abortController.current = new AbortController();
+
         setWriting(true);
+        dispatch(
+            addConfirmBeforeClose({
+                id: 'modemProgramming',
+                message: `The device is being programmed.
+Closing application right now might result in some unknown behavior and might also brick the device.
+Are you sure you want to continue?`,
+                onClose: () => abortController.current.abort(),
+            })
+        );
         setProgress(progress);
 
-        abortController.current = new AbortController();
         performUpdate(
             device,
             modemFwName,
@@ -147,7 +159,10 @@ const ModemUpdateDialogView = () => {
                     setWritingFail(true);
                 }
             })
-            .finally(() => setWriting(false));
+            .finally(() => {
+                setWriting(false);
+                clearConfirmBeforeClose('modemProgramming');
+            });
     };
 
     useEffect(() => {

@@ -9,7 +9,9 @@ import Form from 'react-bootstrap/Form';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    addConfirmBeforeClose,
     Alert,
+    clearConfirmBeforeClose,
     clearWaitForDevice,
     describeError,
     DialogButton,
@@ -82,6 +84,15 @@ export default () => {
         );
 
         setWriting(true);
+        dispatch(
+            addConfirmBeforeClose({
+                id: 'usbSdfuProgramming',
+                message: `The device is being programmed.
+Closing application right now might result in some unknown behavior and might also brick the device.
+Are you sure you want to continue?`,
+            })
+        );
+
         try {
             await operateDFU(device, images, programmingProgress => {
                 let updatedProgress: WithRequired<Progress, 'message'> = {
@@ -106,7 +117,9 @@ export default () => {
             setWritingFailError(error.message);
             setWritingFail(true);
         }
+
         setWriting(false);
+        dispatch(clearConfirmBeforeClose('usbSdfuProgramming'));
 
         // Operation done reconnect one more time only
         dispatch(

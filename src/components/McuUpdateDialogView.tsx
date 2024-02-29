@@ -12,8 +12,10 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    addConfirmBeforeClose,
     Alert,
     classNames,
+    clearConfirmBeforeClose,
     clearWaitForDevice,
     DialogButton,
     GenericDialog,
@@ -130,7 +132,19 @@ const McuUpdateDialogView = () => {
             return;
         }
 
+        abortController.current = new AbortController();
+
         setWriting(true);
+        dispatch(
+            addConfirmBeforeClose({
+                id: 'mcuProgramming',
+                message: `The device is being programmed.
+Closing application right now might result in some unknown behavior and might also brick the device.
+Are you sure you want to continue?`,
+                onClose: () => abortController.current.abort(),
+            })
+        );
+
         reset();
         start();
 
@@ -141,8 +155,6 @@ const McuUpdateDialogView = () => {
                 once: false,
             })
         );
-
-        abortController.current = new AbortController();
 
         performUpdate(
             device,
@@ -178,6 +190,7 @@ const McuUpdateDialogView = () => {
                 dispatch(clearWaitForDevice());
                 dispatch(canWrite());
                 setWriting(false);
+                clearConfirmBeforeClose('mcuProgramming');
             });
     };
 
