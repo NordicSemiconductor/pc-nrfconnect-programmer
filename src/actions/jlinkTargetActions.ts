@@ -27,6 +27,8 @@ import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import {
     getDeviceDefinition,
     setDeviceDefinition,
+    setDeviceFamily,
+    setDeviceType,
     updateCoreInfos,
     updateCoreMemMap,
     updateCoreOperations,
@@ -383,7 +385,8 @@ export const recover =
         const defaultDeviceInfo =
             getDefaultDeviceInfoByJlinkFamily(updateDeviceInfo);
 
-        dispatch(setDeviceDefinition(defaultDeviceInfo));
+        dispatch(setDeviceFamily(defaultDeviceInfo.family));
+        dispatch(setDeviceType(defaultDeviceInfo.type));
 
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
@@ -430,12 +433,8 @@ export const recoverAndWrite =
         const defaultDeviceInfo =
             getDefaultDeviceInfoByJlinkFamily(updateDeviceInfo);
 
-        dispatch(setDeviceDefinition(defaultDeviceInfo));
-
-        await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
-            device,
-            abortController
-        );
+        dispatch(setDeviceFamily(defaultDeviceInfo.family));
+        dispatch(setDeviceType(defaultDeviceInfo.type));
 
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
