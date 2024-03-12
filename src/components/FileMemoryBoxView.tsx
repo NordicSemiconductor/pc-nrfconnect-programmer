@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Card from 'react-bootstrap/Card';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { getLoaded, getZipFilePath } from '../reducers/fileReducer';
+import { fileWarningRemove } from '../reducers/warningReducer';
 import FileMemoryView from './FileMemoryView';
 
 const hasFileContent = (loaded: Record<string, unknown>) =>
@@ -21,6 +22,11 @@ export default () => {
     const loaded = useSelector(getLoaded);
     const zipFilePath = useSelector(getZipFilePath);
     const isHolder = !hasFileContent(loaded) && !zipFilePath;
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (isHolder) dispatch(fileWarningRemove());
+    }, [isHolder, dispatch]);
 
     return (
         <Card className="memory-layout">

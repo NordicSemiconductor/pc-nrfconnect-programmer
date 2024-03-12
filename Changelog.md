@@ -15,6 +15,7 @@
 -   Show the device family in the Memory layout title for MCUboot devices.
 -   Windows and Linux: Dragging and dropping a file into the file memory layout
     opened the file in an editor.
+-   File related warnings were not always removed when removing file regions.
 
 ### Removed
 
