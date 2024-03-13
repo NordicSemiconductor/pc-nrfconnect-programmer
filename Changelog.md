@@ -1,4 +1,4 @@
-## 4.3.0 - UNRELEASED
+## 4.3.0 - 2024-03-13
 
 ### Added
 
@@ -7,7 +7,7 @@
 
 ### Changed
 
--   Update nrfutil device to v2.1.1.
+-   Update `nrfutil device` to v2.1.1.
 
 ### Fixed
 
