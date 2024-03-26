@@ -436,7 +436,7 @@ Are you sure you want to continue?`,
                     onToggle={() => {}}
                     isToggled={false}
                     disabled
-                    title="This feature is being disabled due to to lack of proper support. Enable MCUboot was an experimental feature to allow customers to program custom kits with nordic SoCs that have MCUboot."
+                    title="This feature is being disabled due to to lack of proper support. Enable MCUboot was an experimental feature to allow customers to program custom kits with Nordic SoCs and SiPs that have MCUboot."
                     label="Enable MCUboot"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}

@@ -115,7 +115,7 @@ const TextOverlay = ({
                     <div className="read-indicator">
                         <p>Core protection status is unknown</p>
                         <p>
-                            Could not determine any information about the SOC
+                            Could not determine any information about the SoC
                             <br />
                             Press <strong>Erase all</strong> button to recover
                             the protected memory
