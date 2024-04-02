@@ -43,7 +43,7 @@ Please report issues on the [DevZone](https://devzone.nordicsemi.com) portal.
 ## Contributing
 
 See the
-[infos on contributing](https://nordicsemiconductor.github.io/pc-nrfconnect-docs/contributing)
+[information on contributing](https://nordicsemiconductor.github.io/pc-nrfconnect-docs/contributing)
 for details.
 
 ## License

@@ -50,7 +50,7 @@ To program the nRF52840 Dongle, complete the following steps:
     ![nRF52840 Dongle overview](./screenshots/nRF52840_dongle_press_reset.svg "Pressing the RESET button")
 
     !!! note "Note"
-         - This step is not needed if the currently running application uses the [DFU trigger library](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fsdk_nrf5_v17.1.0%2Flib_dfu_trigger_usb.html), part of the nRF5 SDK v17.1.0.
+         - This step is not needed if the currently running application uses the [DFU trigger library](https://docs.nordicsemi.com/bundle/sdk_nrf5_v17.1.0/page/lib_dfu_trigger_usb.html), part of the nRF5 SDK v17.1.0.
          - If this is the first time the dongle is connected, a driver needed for the nRF52840 Nordic Secure DFU feature is also installed as part of this step.
 
     The status light (**LD2**) will start pulsing red, indicating that the dongle is powered up and in bootloader mode. After a few seconds, the computer recognizes the dongle as a USB composite device.
@@ -64,4 +64,4 @@ To program the nRF52840 Dongle, complete the following steps:
 7. Select the firmware image file (with the extension HEX) from the file browser that opens up.
 8. Click **Write** to program the firmware onto the dongle.
 
-When the writing process completes, the device resets, and – unless the application uses the [DFU trigger library](https://infocenter.nordicsemi.com/index.jsp?topic=%2Fsdk_nrf5_v17.1.0%2Flib_dfu_trigger_usb.html) of the nRF5 SDK v17.1.0 – the dongle will no longer show up in the Programmer app, as it is no longer in the bootloader mode.
+When the writing process completes, the device resets, and – unless the application uses the [DFU trigger library](https://docs.nordicsemi.com/bundle/sdk_nrf5_v17.1.0/page/lib_dfu_trigger_usb.html) of the nRF5 SDK v17.1.0 – the dongle will no longer show up in the Programmer app, as it is no longer in the bootloader mode.
