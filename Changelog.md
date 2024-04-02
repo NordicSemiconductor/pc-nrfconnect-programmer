@@ -1,3 +1,10 @@
+## 4.3.1 - Unreleased
+
+### Fixed
+
+-   The **Enable MCUBoot** toggle reflects the MCIBoot trait of the connected
+    device
+
 ## 4.3.0 - 2024-03-13
 
 ### Added
