@@ -434,7 +434,7 @@ Are you sure you want to continue?`,
             <Group heading="MCUboot Settings">
                 <Toggle
                     onToggle={() => {}}
-                    isToggled={false}
+                    isToggled={isMcuboot}
                     disabled
                     title="This feature is being disabled due to to lack of proper support. Enable MCUboot was an experimental feature to allow customers to program custom kits with Nordic SoCs and SiPs that have MCUboot."
                     label="Enable MCUboot"

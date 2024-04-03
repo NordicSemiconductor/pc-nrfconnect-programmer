@@ -1,3 +1,10 @@
+## 4.3.1 - Unreleased
+
+### Fixed
+
+-   The **Enable MCUboot** toggle reflects the MCUboot trait of the connected
+    device.
+
 ## 4.3.0 - 2024-03-13
 
 ### Added
