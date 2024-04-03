@@ -15,10 +15,3 @@
 | Sep 2019   | Updated to match [nRF Connect Programmer v1.2.3](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md#123---2019-08-30):</br>   - Added Programming the nRF9160 DK cellular modem</br>   - Updated [Overview and user interface](overview.md)</br>   - Updated [Installing the Programmer app](installing.md) |
 | May 2019   | Updated [Installing the Programmer app](installing.md)                                                                   |
 | Feb 2019   | First release                                                                                                                                                                              |
-
-## Previous Versions
-
-PDF files for relevant previous versions are available here:
-
-- [nRF Connect Programmer User Guide v1.4.1](https://infocenter.nordicsemi.com/pdf/nRF_Connect_Programmer_User_Guide_v1.4.1.pdf) (corresponds to nRF Connect Programmer v1.4.1)
-- [nRF Connect Programmer User Guide v1.3](https://infocenter.nordicsemi.com/pdf/nRF_Connect_Programmer_User_Guide_v1.3.pdf) (corresponds to nRF Connect Programmer v1.3)
