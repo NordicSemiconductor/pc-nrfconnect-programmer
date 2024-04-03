@@ -1,5 +1,10 @@
 ## 4.3.1 - Unreleased
 
+### Changed
+
+-   Moved feedback tab to a dialog which can be opened by going to the about tab
+    and click **Give Feedback**.
+
 ### Fixed
 
 -   The **Enable MCUboot** toggle reflects the MCUboot trait of the connected
