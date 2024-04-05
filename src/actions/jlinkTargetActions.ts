@@ -207,9 +207,11 @@ const batchLoggingCallbacks = <T>(
             logger.info(`${message} completed`);
         } else {
             logger.error(
-                `Failed to ${message.toLowerCase()} core. Error: ${
+                `Failed "${message.toLowerCase()}". Error:${
                     taskEnd.error
-                }, message: ${taskEnd.message}`
+                        ? ` code: ${taskEnd.error.code}, description: ${taskEnd.error.description},`
+                        : ''
+                } message: ${taskEnd.message}`
             );
         }
     },
