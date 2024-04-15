@@ -443,7 +443,10 @@ export const recoverAndWrite =
     };
 
 export const resetDevice =
-    (device: Device, deviceDefinition: DeviceDefinition): AppThunk =>
+    (
+        device: Device,
+        deviceDefinition: DeviceDefinition
+    ): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
         await NrfutilDeviceLib.reset(
             device,
