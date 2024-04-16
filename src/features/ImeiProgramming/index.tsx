@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
     Button,
@@ -29,6 +29,11 @@ import path from 'path';
 
 import { readIMEI, writeIMEI } from '../nrfutil91';
 import fetchIMEI from './fetchIMEI';
+
+const ptiFirmware = getAppFile(path.join('resources', 'firmware', 'pti.zip'));
+const modemFirmware = getAppFile(
+    path.join('resources', 'firmware', 'mfw_nrf91x1_2.0.1.zip')
+);
 
 const PasswordComponent = ({
     onChanging,
@@ -151,19 +156,42 @@ export default () => {
         });
     };
 
-    useEffect(() => {
-        // if device disconnects
-        if (!device && status !== 'NONE') {
-            setStatus('NONE');
-        }
-    }, [device, status]);
-
-    const onClose = () => {
+    const onClose = useCallback(() => {
         if (cloudIMEI !== '' && status !== 'IMEI_NOTICE') {
             setStatus('IMEI_NOTICE');
         } else {
             setStatus('NONE');
         }
+    }, [status, cloudIMEI]);
+
+    useEffect(() => {
+        // if device disconnects
+        if (!device && status !== 'NONE') {
+            onClose();
+        }
+    }, [device, status, onClose]);
+
+    const program = (mfw: string) => {
+        if (!device) return;
+        waitForAction(async () => {
+            await NrfutilDeviceLib.program(device, mfw, () => {}, 'Modem', {
+                reset: 'RESET_SYSTEM',
+            });
+
+            const newStatus = await getStatus(
+                device,
+                await updateDeviceInfo(device)
+            );
+            if (newStatus === 'FIRMWARE') {
+                setError('Unable to communicate with the device.');
+                setStatus('UNSUPPORTED');
+            } else {
+                setStatus(newStatus);
+            }
+            setHasProgrammedFirmware(true);
+        }).catch(() =>
+            setError('Failed to program firmware. Please try again.')
+        );
     };
 
     return (
@@ -195,46 +223,22 @@ export default () => {
                             </DialogButton>
                         )}
                         {status === 'FIRMWARE' && (
-                            <DialogButton
-                                variant="primary"
-                                disabled={showSpinner}
-                                onClick={() => {
-                                    if (!device) return;
-
-                                    waitForAction(async () => {
-                                        const mfw = '';
-                                        await NrfutilDeviceLib.program(
-                                            device,
-                                            mfw,
-                                            () => {},
-                                            'Modem',
-                                            {
-                                                reset: 'RESET_SYSTEM',
-                                            }
-                                        );
-
-                                        const newStatus = await getStatus(
-                                            device,
-                                            await updateDeviceInfo(device)
-                                        );
-                                        if (newStatus === 'FIRMWARE') {
-                                            setError(
-                                                'Unable to communicate with the device.'
-                                            );
-                                            setStatus('UNSUPPORTED');
-                                        } else {
-                                            setStatus(newStatus);
-                                        }
-                                        setHasProgrammedFirmware(true);
-                                    }).catch(() =>
-                                        setError(
-                                            'Failed to program firmware. Please try again.'
-                                        )
-                                    );
-                                }}
-                            >
-                                Program firmware
-                            </DialogButton>
+                            <>
+                                <DialogButton
+                                    variant="primary"
+                                    disabled={showSpinner}
+                                    onClick={() => program(modemFirmware)}
+                                >
+                                    Program standard firmware
+                                </DialogButton>
+                                <DialogButton
+                                    variant="primary"
+                                    disabled={showSpinner}
+                                    onClick={() => program(ptiFirmware)}
+                                >
+                                    Program PTI firmware
+                                </DialogButton>
+                            </>
                         )}
                         {status === 'IMEI_NOT_SET' && (
                             <DialogButton
