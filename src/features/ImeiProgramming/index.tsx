@@ -107,21 +107,6 @@ const recover = async (device: Device) => {
     return getStatus(device, await updateDeviceInfo(device));
 };
 
-const CopyImeiNotice = ({ imei }: { imei: string }) => (
-    <>
-        The IMEI has been consumed in the cloud. Copy and store it.
-        <br />
-        {imei}
-        <button
-            type="button"
-            className="tw-preflight tw-inline tw-h-min tw-p-0 tw-text-lg/tight"
-            onClick={() => clipboard.writeText(imei)}
-        >
-            <span className="mdi mdi-content-copy tw-inline tw-leading-none active:tw-text-primary" />
-        </button>
-    </>
-);
-
 const formatDeviceVersionToProduct = (deviceVersion: string) => {
     switch (deviceVersion.toLocaleUpperCase().slice(0, 7)) {
         case 'NRF9161':
@@ -143,7 +128,8 @@ type Status =
     | 'FIRMWARE'
     | 'PROTECTED'
     | 'UNSUPPORTED'
-    | 'FINISHED';
+    | 'FINISHED'
+    | 'IMEI_NOTICE';
 
 export default () => {
     const device = useSelector(selectedDevice);
@@ -172,11 +158,19 @@ export default () => {
         }
     }, [device, status]);
 
+    const onClose = () => {
+        if (cloudIMEI !== '' && status !== 'IMEI_NOTICE') {
+            setStatus('IMEI_NOTICE');
+        } else {
+            setStatus('NONE');
+        }
+    };
+
     return (
         <>
             <GenericDialog
                 isVisible={status !== 'NONE'}
-                onHide={() => setStatus('NONE')}
+                onHide={onClose}
                 title="Program IMEI"
                 showSpinner={showSpinner}
                 footer={
@@ -287,6 +281,7 @@ export default () => {
                                             useCloud ? cloudIMEI : manualIMEI
                                         )
                                             .then(() => {
+                                                setCloudIMEI('');
                                                 setStatus('FINISHED');
                                             })
                                             .catch(() => {
@@ -308,7 +303,7 @@ export default () => {
                         <DialogButton
                             variant="secondary"
                             disabled={showSpinner}
-                            onClick={() => setStatus('NONE')}
+                            onClick={onClose}
                         >
                             Close
                         </DialogButton>
@@ -335,17 +330,13 @@ export default () => {
                 {status === 'UNSUPPORTED' && (
                     <div>
                         Programming IMEI is not supported for this device.
-                        {cloudIMEI && <CopyImeiNotice imei={cloudIMEI} />}
                     </div>
                 )}
                 {status === 'FIRMWARE' && (
-                    <>
-                        <div>
-                            Unable to communicate with the device. Do you want
-                            to program PTI firmware?
-                        </div>
-                        {cloudIMEI && <CopyImeiNotice imei={cloudIMEI} />}
-                    </>
+                    <div>
+                        Unable to communicate with the device. Do you want to
+                        program PTI firmware?
+                    </div>
                 )}
                 {status === 'IMEI_NOT_SET' && (
                     <>
@@ -367,9 +358,6 @@ export default () => {
                                 >
                                     Enter IMEI manually
                                 </button>
-                                {cloudIMEI && (
-                                    <CopyImeiNotice imei={cloudIMEI} />
-                                )}
                             </>
                         )}
                         {!useCloud && (
@@ -399,6 +387,21 @@ export default () => {
                     <div>The device already has an IMEI programmed.</div>
                 )}
                 {status === 'FINISHED' && <div>Finished.</div>}
+                {status === 'IMEI_NOTICE' && (
+                    <>
+                        IMEI from the cloud is unique. Copy and store to avoid
+                        losing it.
+                        <br />
+                        {cloudIMEI}
+                        <button
+                            type="button"
+                            className="tw-preflight tw-inline tw-h-min tw-p-0 tw-text-lg/tight"
+                            onClick={() => clipboard.writeText(cloudIMEI)}
+                        >
+                            <span className="mdi mdi-content-copy tw-inline tw-leading-none active:tw-text-primary" />
+                        </button>
+                    </>
+                )}
             </GenericDialog>
             <Button
                 variant="secondary"
