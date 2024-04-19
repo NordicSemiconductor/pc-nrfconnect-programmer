@@ -329,6 +329,9 @@ export default () => {
                     <div>
                         Recover the device in order to check whether programming
                         IMEI is supported.
+                        <br />
+                        Beware that this will remove the appication firmware
+                        present on the device.
                     </div>
                 )}
                 {status === 'UNSUPPORTED' && (
@@ -399,7 +402,7 @@ export default () => {
                         {cloudIMEI}
                         <button
                             type="button"
-                            className="tw-preflight tw-inline tw-h-min tw-p-0 tw-text-lg/tight"
+                            className="tw-preflight tw-inline tw-h-min tw-p-0 tw-pl-2 tw-text-lg/tight"
                             onClick={() => clipboard.writeText(cloudIMEI)}
                         >
                             <span className="mdi mdi-content-copy tw-inline tw-leading-none active:tw-text-primary" />
@@ -412,18 +415,18 @@ export default () => {
                 className="tw-w-full"
                 onClick={() => {
                     if (!device) return;
-                    setCloudIMEI('');
-                    setManualIMEI('');
-                    // fetch api key
-                    getPersistedApiKey('nrfcloud')
-                        .then(setAPIKey)
-                        .catch(() => setAPIKey(''));
-                    setHasProgrammedFirmware(false);
-                    setError('');
                     setStatus('INIT');
-                    waitForAction(async () =>
-                        setStatus(await getStatus(device, deviceInfo))
-                    );
+                    waitForAction(async () => {
+                        setCloudIMEI('test_imei');
+                        setManualIMEI('');
+                        setError('');
+                        setHasProgrammedFirmware(false);
+                        // fetch api key
+                        getPersistedApiKey('nrfcloud')
+                            .then(setAPIKey)
+                            .catch(() => setAPIKey(''));
+                        setStatus(await getStatus(device, deviceInfo));
+                    });
                 }}
                 disabled={!isMaybeSupportedDevice(deviceInfo)}
                 title={
