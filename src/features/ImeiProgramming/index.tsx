@@ -428,9 +428,9 @@ export default () => {
                         setStatus(await getStatus(device, deviceInfo));
                     });
                 }}
-                disabled={!isMaybeSupportedDevice(deviceInfo)}
+                disabled={!deviceInfo || !isMaybeSupportedDevice(deviceInfo)}
                 title={
-                    !isMaybeSupportedDevice(deviceInfo)
+                    !deviceInfo || !isMaybeSupportedDevice(deviceInfo)
                         ? 'Device not supported'
                         : ''
                 }
