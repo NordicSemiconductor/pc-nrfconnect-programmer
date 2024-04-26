@@ -327,11 +327,11 @@ export default () => {
                 )}
                 {status === 'PROTECTED' && (
                     <div>
-                        Recover the device in order to check whether programming
-                        IMEI is supported.
+                        Recover the device to check if programming IMEI is
+                        supported.
                         <br />
-                        Beware that this will remove the appication firmware
-                        present on the device.
+                        Note: recovering the device removes the application
+                        firmware.
                     </div>
                 )}
                 {status === 'UNSUPPORTED' && (
@@ -396,8 +396,8 @@ export default () => {
                 {status === 'FINISHED' && <div>Finished.</div>}
                 {status === 'IMEI_NOTICE' && (
                     <>
-                        IMEI from the cloud is unique. Copy and store to avoid
-                        losing it.
+                        IMEI from the cloud is unique. Copy and store it to
+                        avoid losing it.
                         <br />
                         {cloudIMEI}
                         <button
