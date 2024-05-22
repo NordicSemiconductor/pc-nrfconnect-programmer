@@ -72,13 +72,9 @@ In the **Device Memory Layout**, you can read the name, address range, and size 
       If the device has readback protection enabled, you will not be able to read its memory.
       In such cases, the information about application core being protected is displayed in the **Device Memory Layout** and the [**File**](#file) options **Read**, **Write**, and **Save as file** are disabled.
 
-## Feedback tab
-
-The Feedback tab lets you send feedback about nRF Connect Programmer application to the application development team.
-
 ## About tab
 
-You can view application information, restore settings to default, access source code, and documentation. You also can find information on the selected device, access support tools, and enable verbose logging.
+You can view application information, restore defaults, access source code and documentation. You also can find information on the selected device, access support tools, send feedback, and enable verbose logging.
 
 ![nRF Connect for Desktop Programmer About tab](./screenshots/nRF_Connect_for_Desktop_Prog_about.png "nRF Connect for Desktop Programmer About tab")
 
