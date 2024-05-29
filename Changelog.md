@@ -2,8 +2,9 @@
 
 ### Added
 
--   J-Link devices ONB FW can be automatically update when programming
--   Button to Manually update OB Firmware of a device
+-   J-Link devices OB FW can be automatically update when Erasing, Writing and
+    Reading a JLink Device.
+-   Button to Manually update OB Firmware of a device.
 
 ### Changed
 
