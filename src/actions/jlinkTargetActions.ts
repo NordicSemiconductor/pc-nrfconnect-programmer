@@ -10,7 +10,6 @@ import {
     describeError,
     Device,
     logger,
-    setWaitForDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     BatchCallbacks,
@@ -411,33 +410,21 @@ export const recover =
 
 export const updateOBFirmware =
     (device: Device): AppThunk<RootState, Promise<void>> =>
-    async dispatch => {
-        dispatch(
-            setWaitForDevice({
-                timeout: 30000,
-                when: 'always',
-                once: false,
-            })
-        );
-        logger.info(`Updating OB Firmware`);
-        await NrfutilDeviceLib.updateDebugProbeFirmware(device).then(result => {
+    dispatch => {
+        logger.info(`Updating J-Link OB firmware.`);
+        return dispatch(
+            NrfutilDeviceLib.updateOBFirmwareWithWaitForDevice(device)
+        ).then(result => {
             if (result.versionAfterUpdate === result.versionBeforeUpdate) {
                 logger.info(
-                    `No OB version update was required. OB version is at ${result.versionAfterUpdate}.`
+                    `No J-Link OB firmware update was required. Version is at ${result.versionAfterUpdate}.`
                 );
             } else {
                 logger.info(
-                    `OB version was updated to ${result.versionAfterUpdate}.`
+                    `J-Link OB firmware version was updated to ${result.versionAfterUpdate}.`
                 );
             }
         });
-        dispatch(
-            setWaitForDevice({
-                timeout: 30000,
-                when: 'always',
-                once: true,
-            })
-        );
     };
 
 export const recoverAndWrite =

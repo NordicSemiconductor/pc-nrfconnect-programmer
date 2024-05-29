@@ -312,7 +312,7 @@ Are you sure you want to continue?`,
                     disabled={isMcuboot || !isJLink || !targetIsReady}
                 >
                     <span className="mdi mdi-update" />
-                    Update OB Firmware
+                    Update J-Link OB Firmware
                 </Button>
                 <Button
                     variant="secondary"

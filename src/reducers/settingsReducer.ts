@@ -29,6 +29,7 @@ const settingsSlice = createSlice({
         settingsLoad(state, action: PayloadAction<SettingsState>) {
             state.autoRead = action.payload.autoRead;
             state.autoReset = action.payload.autoReset;
+            state.autoUpdateOBFirmware = action.payload.autoUpdateOBFirmware;
         },
         toggleAutoRead(state) {
             state.autoRead = !state.autoRead;
