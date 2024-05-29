@@ -10,6 +10,7 @@ import {
     describeError,
     Device,
     logger,
+    setWaitForDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
     BatchCallbacks,
@@ -184,7 +185,12 @@ export const read =
         device: Device,
         deviceDefinition: DeviceDefinition
     ): AppThunk<RootState, Promise<void>> =>
-    async dispatch => {
+    async (dispatch, getState) => {
+        const autoUpdateOBFirmware =
+            getState().app.settings.autoUpdateOBFirmware;
+        if (autoUpdateOBFirmware) {
+            await dispatch(updateOBFirmware(device));
+        }
         await dispatch(readAllCoresBatch(deviceDefinition, true)).run(
             device,
             abortController
@@ -359,6 +365,13 @@ export const recover =
     async (dispatch, getState) => {
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
+
+        const autoUpdateOBFirmware =
+            getState().app.settings.autoUpdateOBFirmware;
+        if (autoUpdateOBFirmware) {
+            await dispatch(updateOBFirmware(device));
+        }
+
         const batch = dispatch(recoverAllCoresBatch(coreNames));
 
         const autoRead = getState().app.settings.autoRead;
@@ -396,6 +409,37 @@ export const recover =
         );
     };
 
+export const updateOBFirmware =
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    async dispatch => {
+        dispatch(
+            setWaitForDevice({
+                timeout: 30000,
+                when: 'always',
+                once: false,
+            })
+        );
+        logger.info(`Updating OB Firmware`);
+        await NrfutilDeviceLib.updateDebugProbeFirmware(device).then(result => {
+            if (result.versionAfterUpdate === result.versionBeforeUpdate) {
+                logger.info(
+                    `No OB version update was required. OB version is at ${result.versionAfterUpdate}.`
+                );
+            } else {
+                logger.info(
+                    `OB version was updated to ${result.versionAfterUpdate}.`
+                );
+            }
+        });
+        dispatch(
+            setWaitForDevice({
+                timeout: 30000,
+                when: 'always',
+                once: true,
+            })
+        );
+    };
+
 export const recoverAndWrite =
     (
         device: Device,
@@ -404,6 +448,12 @@ export const recoverAndWrite =
     async (dispatch, getState) => {
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
+
+        const autoUpdateOBFirmware =
+            getState().app.settings.autoUpdateOBFirmware;
+        if (autoUpdateOBFirmware) {
+            await dispatch(updateOBFirmware(device));
+        }
         const batch = dispatch(recoverAllCoresBatch(coreNames));
 
         const memMaps = getState().app.file.memMaps;

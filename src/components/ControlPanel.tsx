@@ -37,7 +37,11 @@ import {
     getMruFiles,
     getZipFilePath,
 } from '../reducers/fileReducer';
-import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
+import {
+    getAutoRead,
+    getAutoReset,
+    getAutoUpdateOBFirmware,
+} from '../reducers/settingsReducer';
 import { getIsWritable } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';
 
@@ -172,6 +176,7 @@ const ControlPanel = () => {
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
+    const autoUpdateOBFirmware = useSelector(getAutoUpdateOBFirmware);
     const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
     const deviceDefinition = useSelector(getDeviceDefinition);
@@ -242,12 +247,7 @@ Are you sure you want to continue?`,
                             )
                         );
                     }}
-                    disabled={
-                        isMcuboot ||
-                        !isJLink ||
-                        !targetIsReady ||
-                        !targetIsRecoverable
-                    }
+                    disabled={isMcuboot || !isJLink || !targetIsReady}
                 >
                     <span className="mdi mdi-eraser" />
                     Erase all
@@ -289,6 +289,30 @@ Are you sure you want to continue?`,
                 >
                     <span className="mdi mdi-pencil" />
                     Erase & write
+                </Button>
+                <Button
+                    variant="secondary"
+                    className="tw-100"
+                    onClick={async () => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+
+                        dispatch(setDeviceBusy(true));
+                        try {
+                            await dispatch(
+                                jlinkTargetActions.updateOBFirmware(device)
+                            );
+                        } catch (e) {
+                            /* empty */
+                        }
+                        dispatch(setDeviceBusy(false));
+                    }}
+                    disabled={isMcuboot || !isJLink || !targetIsReady}
+                >
+                    <span className="mdi mdi-update" />
+                    Update OB Firmware
                 </Button>
                 <Button
                     variant="secondary"
@@ -430,6 +454,16 @@ Are you sure you want to continue?`,
                         )}
                     </>
                 </Toggle>
+                <Toggle
+                    onToggle={() =>
+                        dispatch(settingsActions.toggleAutoUpdateOBFirmware())
+                    }
+                    isToggled={autoUpdateOBFirmware}
+                    label="Auto update OB Firmware"
+                    barColor={colors.gray700}
+                    handleColor={colors.gray300}
+                    title="Update debug probe firmware when Erasing, Writing or reading the device"
+                />
             </Group>
             <Group heading="MCUboot Settings">
                 <Toggle

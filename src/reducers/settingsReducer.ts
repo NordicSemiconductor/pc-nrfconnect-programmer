@@ -12,12 +12,14 @@ export interface SettingsState {
     forceMcuBoot: boolean;
     autoRead: boolean;
     autoReset: boolean;
+    autoUpdateOBFirmware: boolean;
 }
 
 const initialState: SettingsState = {
     forceMcuBoot: false,
     autoRead: false,
     autoReset: false,
+    autoUpdateOBFirmware: true,
 };
 
 const settingsSlice = createSlice({
@@ -34,14 +36,29 @@ const settingsSlice = createSlice({
         toggleAutoReset(state) {
             state.autoReset = !state.autoReset;
         },
+        toggleAutoUpdateOBFirmware(state) {
+            state.autoUpdateOBFirmware = !state.autoUpdateOBFirmware;
+        },
     },
 });
 
 export default settingsSlice.reducer;
 
-const { settingsLoad, toggleAutoRead, toggleAutoReset } = settingsSlice.actions;
+const {
+    settingsLoad,
+    toggleAutoRead,
+    toggleAutoReset,
+    toggleAutoUpdateOBFirmware,
+} = settingsSlice.actions;
 
-export { settingsLoad, toggleAutoRead, toggleAutoReset };
+export {
+    settingsLoad,
+    toggleAutoRead,
+    toggleAutoReset,
+    toggleAutoUpdateOBFirmware,
+};
 
 export const getAutoRead = (state: RootState) => state.app.settings.autoRead;
 export const getAutoReset = (state: RootState) => state.app.settings.autoReset;
+export const getAutoUpdateOBFirmware = (state: RootState) =>
+    state.app.settings.autoUpdateOBFirmware;
