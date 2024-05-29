@@ -19,7 +19,7 @@ const initialState: SettingsState = {
     forceMcuBoot: false,
     autoRead: false,
     autoReset: false,
-    autoUpdateOBFirmware: true,
+    autoUpdateOBFirmware: false,
 };
 
 const settingsSlice = createSlice({
