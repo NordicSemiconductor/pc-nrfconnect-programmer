@@ -184,7 +184,12 @@ export const read =
         device: Device,
         deviceDefinition: DeviceDefinition
     ): AppThunk<RootState, Promise<void>> =>
-    async dispatch => {
+    async (dispatch, getState) => {
+        const autoUpdateOBFirmware =
+            getState().app.settings.autoUpdateOBFirmware;
+        if (autoUpdateOBFirmware) {
+            await dispatch(updateOBFirmware(device));
+        }
         await dispatch(readAllCoresBatch(deviceDefinition, true)).run(
             device,
             abortController
@@ -359,6 +364,13 @@ export const recover =
     async (dispatch, getState) => {
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
+
+        const autoUpdateOBFirmware =
+            getState().app.settings.autoUpdateOBFirmware;
+        if (autoUpdateOBFirmware) {
+            await dispatch(updateOBFirmware(device));
+        }
+
         const batch = dispatch(recoverAllCoresBatch(coreNames));
 
         const autoRead = getState().app.settings.autoRead;
@@ -396,6 +408,25 @@ export const recover =
         );
     };
 
+export const updateOBFirmware =
+    (device: Device): AppThunk<RootState, Promise<void>> =>
+    dispatch => {
+        logger.info(`Updating J-Link OB firmware.`);
+        return dispatch(
+            NrfutilDeviceLib.updateOBFirmwareWithWaitForDevice(device)
+        ).then(result => {
+            if (result.versionAfterUpdate === result.versionBeforeUpdate) {
+                logger.info(
+                    `No J-Link OB firmware update was required. Version is at ${result.versionAfterUpdate}.`
+                );
+            } else {
+                logger.info(
+                    `J-Link OB firmware version updated to ${result.versionAfterUpdate}.`
+                );
+            }
+        });
+    };
+
 export const recoverAndWrite =
     (
         device: Device,
@@ -404,6 +435,12 @@ export const recoverAndWrite =
     async (dispatch, getState) => {
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
+
+        const autoUpdateOBFirmware =
+            getState().app.settings.autoUpdateOBFirmware;
+        if (autoUpdateOBFirmware) {
+            await dispatch(updateOBFirmware(device));
+        }
         const batch = dispatch(recoverAllCoresBatch(coreNames));
 
         const memMaps = getState().app.file.memMaps;

@@ -37,7 +37,11 @@ import {
     getMruFiles,
     getZipFilePath,
 } from '../reducers/fileReducer';
-import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
+import {
+    getAutoRead,
+    getAutoReset,
+    getAutoUpdateOBFirmware,
+} from '../reducers/settingsReducer';
 import { getIsWritable } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';
 
@@ -172,6 +176,7 @@ const ControlPanel = () => {
     const fileRegionSize = useSelector(getFileRegions)?.length;
     const mruFiles = useSelector(getMruFiles);
     const autoRead = useSelector(getAutoRead);
+    const autoUpdateOBFirmware = useSelector(getAutoUpdateOBFirmware);
     const autoReset = useSelector(getAutoReset);
     const targetIsWritable = useSelector(getIsWritable);
     const deviceDefinition = useSelector(getDeviceDefinition);
@@ -242,12 +247,7 @@ Are you sure you want to continue?`,
                             )
                         );
                     }}
-                    disabled={
-                        isMcuboot ||
-                        !isJLink ||
-                        !targetIsReady ||
-                        !targetIsRecoverable
-                    }
+                    disabled={isMcuboot || !isJLink || !targetIsReady}
                 >
                     <span className="mdi mdi-eraser" />
                     Erase all
@@ -289,6 +289,30 @@ Are you sure you want to continue?`,
                 >
                     <span className="mdi mdi-pencil" />
                     Erase & write
+                </Button>
+                <Button
+                    variant="secondary"
+                    className="tw-100"
+                    onClick={async () => {
+                        if (!device) {
+                            logger.error('No target device!');
+                            return;
+                        }
+
+                        dispatch(setDeviceBusy(true));
+                        try {
+                            await dispatch(
+                                jlinkTargetActions.updateOBFirmware(device)
+                            );
+                        } catch (e) {
+                            /* empty */
+                        }
+                        dispatch(setDeviceBusy(false));
+                    }}
+                    disabled={isMcuboot || !isJLink || !targetIsReady}
+                >
+                    <span className="mdi mdi-update" />
+                    Update J-Link OB Firmware
                 </Button>
                 <Button
                     variant="secondary"
@@ -367,7 +391,7 @@ Are you sure you want to continue?`,
                     }
                     title={
                         isJLink && !zipFile
-                            ? 'The Write operation is not supported for JLink devices. Use Erase & write.'
+                            ? 'The write operation is not supported for J-Link devices. Use Erase & write instead.'
                             : ''
                     }
                 >
@@ -409,7 +433,7 @@ Are you sure you want to continue?`,
                 <Toggle
                     onToggle={() => dispatch(settingsActions.toggleAutoRead())}
                     isToggled={autoRead}
-                    label="Auto read memory"
+                    label="Automatic memory read"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
                 />
@@ -421,15 +445,25 @@ Are you sure you want to continue?`,
                     handleColor={colors.gray300}
                 >
                     <>
-                        Auto reset
+                        Automatic device reset
                         {isJLink && isModem && autoReset && (
                             <span
-                                title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
+                                title="Use this setting with care for devices with modem: resetting it too many times might cause it to lock up."
                                 className="mdi mdi-alert"
                             />
                         )}
                     </>
                 </Toggle>
+                <Toggle
+                    onToggle={() =>
+                        dispatch(settingsActions.toggleAutoUpdateOBFirmware())
+                    }
+                    isToggled={autoUpdateOBFirmware}
+                    label="OB FW automatic update"
+                    barColor={colors.gray700}
+                    handleColor={colors.gray300}
+                    title="Update the debug probe firmware when erasing, writing, or reading."
+                />
             </Group>
             <Group heading="MCUboot Settings">
                 <Toggle

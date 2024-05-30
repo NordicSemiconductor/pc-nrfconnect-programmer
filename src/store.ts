@@ -14,6 +14,7 @@ interface StoreSchema {
 interface Settings {
     autoRead: boolean;
     autoReset: boolean;
+    autoUpdateOBFirmware: boolean;
 }
 
 const store = getPersistentStore<StoreSchema>();

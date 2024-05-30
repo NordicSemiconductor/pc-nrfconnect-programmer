@@ -10,6 +10,7 @@ import {
     settingsLoad,
     toggleAutoRead as toggleAutoReadAction,
     toggleAutoReset as toggleAutoResetAction,
+    toggleAutoUpdateOBFirmware as toggleAutoUpdateOBFirmwareAction,
 } from '../reducers/settingsReducer';
 import { RootState } from '../reducers/types';
 import { getSettings, setSettings } from '../store';
@@ -28,6 +29,19 @@ export const loadSettings = (): AppThunk => dispatch => {
     setSettings(settings);
     dispatch(settingsLoad({ ...settings, forceMcuBoot: false }));
 };
+
+export const toggleAutoUpdateOBFirmware =
+    (): AppThunk<RootState> => (dispatch, getState) => {
+        dispatch(toggleAutoUpdateOBFirmwareAction());
+        const settings = getSettings();
+
+        // Do not use async functions above，
+        // otherwise the state would be the same as before toggling
+        setSettings({
+            ...settings,
+            autoUpdateOBFirmware: getState().app.settings.autoUpdateOBFirmware,
+        });
+    };
 
 export const toggleAutoRead =
     (): AppThunk<RootState> => (dispatch, getState) => {
