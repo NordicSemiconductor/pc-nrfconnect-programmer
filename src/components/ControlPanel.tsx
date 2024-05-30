@@ -459,10 +459,10 @@ Are you sure you want to continue?`,
                         dispatch(settingsActions.toggleAutoUpdateOBFirmware())
                     }
                     isToggled={autoUpdateOBFirmware}
-                    label="Auto update OB Firmware"
+                    label="OB Firmware automatic update"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
-                    title="Update debug probe firmware when Erasing, Writing or reading the device"
+                    title="Update the debug probe firmware when erasing, writing, or reading."
                 />
             </Group>
             <Group heading="MCUboot Settings">

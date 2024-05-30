@@ -421,7 +421,7 @@ export const updateOBFirmware =
                 );
             } else {
                 logger.info(
-                    `J-Link OB firmware version was updated to ${result.versionAfterUpdate}.`
+                    `J-Link OB firmware version updated to ${result.versionAfterUpdate}.`
                 );
             }
         });
