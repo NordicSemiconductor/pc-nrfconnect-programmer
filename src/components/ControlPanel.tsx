@@ -391,7 +391,7 @@ Are you sure you want to continue?`,
                     }
                     title={
                         isJLink && !zipFile
-                            ? 'The Write operation is not supported for JLink devices. Use Erase & write.'
+                            ? 'The write operation is not supported for J-Link devices. Use Erase & write instead.'
                             : ''
                     }
                 >
@@ -433,7 +433,7 @@ Are you sure you want to continue?`,
                 <Toggle
                     onToggle={() => dispatch(settingsActions.toggleAutoRead())}
                     isToggled={autoRead}
-                    label="Auto read memory"
+                    label="Automatic memory read"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
                 />
@@ -445,10 +445,10 @@ Are you sure you want to continue?`,
                     handleColor={colors.gray300}
                 >
                     <>
-                        Auto reset
+                        Automatic device reset
                         {isJLink && isModem && autoReset && (
                             <span
-                                title="Resetting modem too many times might cause it to lock up, use this setting with care for devices with modem."
+                                title="Use this setting with care for devices with modem: resetting it too many times might cause it to lock up."
                                 className="mdi mdi-alert"
                             />
                         )}
@@ -459,7 +459,7 @@ Are you sure you want to continue?`,
                         dispatch(settingsActions.toggleAutoUpdateOBFirmware())
                     }
                     isToggled={autoUpdateOBFirmware}
-                    label="OB Firmware automatic update"
+                    label="OB FW automatic update"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
                     title="Update the debug probe firmware when erasing, writing, or reading."
