@@ -9,6 +9,8 @@
 
 -   The **Enable MCUboot** toggle reflects the MCUboot trait of the connected
     device.
+-   Programming modem firmware with external JLink is now possible on nrf9131
+    and nrf9151
 
 ## 4.3.0 - 2024-03-13
 
