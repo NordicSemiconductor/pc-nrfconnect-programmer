@@ -27,8 +27,6 @@ import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
 import {
     getDeviceDefinition,
     setDeviceDefinition,
-    setDeviceFamily,
-    setDeviceType,
     updateCoreInfos,
     updateCoreMemMap,
     updateCoreOperations,
@@ -180,11 +178,10 @@ const readAllCoresBatch =
     };
 
 export const read =
-    (
-        device: Device,
-        deviceDefinition: DeviceDefinition
-    ): AppThunk<RootState, Promise<void>> =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
+        const deviceDefinition = await dispatch(updateDeviceInfo(device));
+
         await dispatch(readAllCoresBatch(deviceDefinition, true)).run(
             device,
             abortController
@@ -351,12 +348,23 @@ const writeToAllCoresBatch =
             batch
         );
 
+const updateDeviceInfo =
+    (device: Device): AppThunk<RootState, Promise<DeviceDefinition>> =>
+    async dispatch => {
+        const deviceInfo = await NrfutilDeviceLib.deviceInfo(device);
+        dispatch(setSelectedDeviceInfo());
+        const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(deviceInfo);
+
+        dispatch(setDeviceDefinition(defaultDeviceInfo));
+
+        return defaultDeviceInfo;
+    };
+
 export const recover =
-    (
-        device: Device,
-        deviceDefinition: DeviceDefinition
-    ): AppThunk<RootState, Promise<void>> =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
+        const deviceDefinition = await dispatch(updateDeviceInfo(device));
+
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
         const batch = dispatch(recoverAllCoresBatch(coreNames));
@@ -381,14 +389,7 @@ export const recover =
 
         await batch.run(device, abortController);
 
-        const updateDeviceInfo = await NrfutilDeviceLib.deviceInfo(device);
-
-        dispatch(setSelectedDeviceInfo(updateDeviceInfo));
-        const defaultDeviceInfo =
-            getDefaultDeviceInfoByJlinkFamily(updateDeviceInfo);
-
-        dispatch(setDeviceFamily(defaultDeviceInfo.family));
-        dispatch(setDeviceType(defaultDeviceInfo.type));
+        await dispatch(updateDeviceInfo(device));
 
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
@@ -397,11 +398,10 @@ export const recover =
     };
 
 export const recoverAndWrite =
-    (
-        device: Device,
-        deviceDefinition: DeviceDefinition
-    ): AppThunk<RootState, Promise<void>> =>
+    (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
+        const deviceDefinition = await dispatch(updateDeviceInfo(device));
+
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
         const batch = dispatch(recoverAllCoresBatch(coreNames));
@@ -429,14 +429,7 @@ export const recoverAndWrite =
 
         await batch.run(device, abortController);
 
-        const updateDeviceInfo = await NrfutilDeviceLib.deviceInfo(device);
-
-        dispatch(setSelectedDeviceInfo(updateDeviceInfo));
-        const defaultDeviceInfo =
-            getDefaultDeviceInfoByJlinkFamily(updateDeviceInfo);
-
-        dispatch(setDeviceFamily(defaultDeviceInfo.family));
-        dispatch(setDeviceType(defaultDeviceInfo.type));
+        await dispatch(updateDeviceInfo(device));
 
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
@@ -445,8 +438,10 @@ export const recoverAndWrite =
     };
 
 export const resetDevice =
-    (device: Device, deviceDefinition: DeviceDefinition): AppThunk =>
+    (device: Device): AppThunk =>
     async dispatch => {
+        const deviceDefinition = await dispatch(updateDeviceInfo(device));
+
         await NrfutilDeviceLib.reset(
             device,
             'Application',

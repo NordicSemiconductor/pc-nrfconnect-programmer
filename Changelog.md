@@ -1,3 +1,10 @@
+## 4.4.1 - 2024-08-23
+
+### Fix
+
+-   The SOC is detected before each operation to enure that if SOC change
+    between operation programer will still work as expected
+
 ## 4.4.0 - 2024-06-13
 
 ### Added
