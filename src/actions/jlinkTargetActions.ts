@@ -350,14 +350,34 @@ const writeToAllCoresBatch =
 
 const updateDeviceInfo =
     (device: Device): AppThunk<RootState, Promise<DeviceDefinition>> =>
-    async dispatch => {
-        const deviceInfo = await NrfutilDeviceLib.deviceInfo(device);
-        dispatch(setSelectedDeviceInfo());
+    async (dispatch, getState) => {
+        const deviceInfo = await NrfutilDeviceLib.deviceInfo(
+            device,
+            undefined,
+            undefined,
+            abortController
+        );
+
+        if (
+            deviceInfo?.jlink?.deviceFamily ===
+            getDeviceDefinition(getState()).family
+        ) {
+            return getDeviceDefinition(getState());
+        }
+
+        dispatch(setSelectedDeviceInfo(deviceInfo));
         const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(deviceInfo);
 
         dispatch(setDeviceDefinition(defaultDeviceInfo));
 
-        return defaultDeviceInfo;
+        const coreInfos = convertDeviceDefinitionToCoreArray(defaultDeviceInfo);
+        const coreNames = coreInfos.map(c => c.name);
+        await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
+            device,
+            abortController
+        );
+
+        return getDeviceDefinition(getState());
     };
 
 export const recover =
