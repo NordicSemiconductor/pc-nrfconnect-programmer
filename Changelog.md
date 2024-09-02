@@ -2,8 +2,8 @@
 
 ### Fix
 
--   The SoC is now detected before each operation to ensure the app works
-    even if the SoC changes between operations.
+-   The SoC is now detected before each operation to ensure the app works even
+    if the SoC changes between operations.
 
 ## 4.4.0 - 2024-06-13
 
