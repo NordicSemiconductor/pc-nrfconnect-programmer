@@ -73,6 +73,8 @@ export default () => {
             })
         );
 
+        let canceled = false;
+
         // We might have more that one reboot of the device during the next operation
         dispatch(
             setWaitForDevice({
@@ -80,6 +82,9 @@ export default () => {
                 when: 'always',
                 once: false,
                 skipRefetchDeviceInfo: true,
+                onCanceled: () => {
+                    canceled = true;
+                },
             })
         );
 
@@ -121,23 +126,25 @@ Are you sure you want to continue?`,
         setWriting(false);
         dispatch(clearConfirmBeforeClose('usbSdfuProgramming'));
 
-        // Operation done reconnect one more time only
-        dispatch(
-            setWaitForDevice({
-                timeout: 10000,
-                when: 'always',
-                once: true,
-                onSuccess: programmedDevice =>
-                    dispatch(refreshMemoryLayout(programmedDevice)),
-            })
-        );
+        if (!canceled) {
+            // Operation done reconnect one more time only
+            dispatch(
+                setWaitForDevice({
+                    timeout: 10000,
+                    when: 'always',
+                    once: true,
+                    onSuccess: programmedDevice =>
+                        dispatch(refreshMemoryLayout(programmedDevice)),
+                })
+            );
 
-        dispatch(
-            updateCoreOperations({
-                core: 'Application',
-                state: 'idle',
-            })
-        );
+            dispatch(
+                updateCoreOperations({
+                    core: 'Application',
+                    state: 'idle',
+                })
+            );
+        }
     }, [device, dispatch, images]);
 
     useEffect(() => {
