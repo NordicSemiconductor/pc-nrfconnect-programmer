@@ -84,9 +84,12 @@ export default () => {
                 const allRegions = generateFileRegions(memMaps, coreInfo);
                 const validRegions = allRegions.filter(
                     r =>
-                        r.startAddress >= coreInfo.romBaseAddr &&
-                        r.startAddress + r.regionSize <=
-                            coreInfo.romBaseAddr + coreInfo.romSize
+                        (r.startAddress >= coreInfo.romBaseAddr &&
+                            r.startAddress + r.regionSize <=
+                                coreInfo.romBaseAddr + coreInfo.romSize) ||
+                        (r.startAddress >= coreInfo.uicrBaseAddr &&
+                            r.startAddress + r.regionSize <=
+                                coreInfo.uicrBaseAddr + coreInfo.uicrSize)
                 );
 
                 if (validRegions.length !== allRegions.length) {
