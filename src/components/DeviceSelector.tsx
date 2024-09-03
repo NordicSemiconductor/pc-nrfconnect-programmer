@@ -28,9 +28,11 @@ export default () => {
         <DeviceSelector
             deviceFilter={device => !!device.serialNumber}
             onDeviceSelected={(device: SharedDevice) => {
+                logger.info(`Selected device ${device.serialNumber}`);
                 dispatch(openDevice(device, abortController));
             }}
             onDeviceDeselected={() => {
+                logger.info(`Deselected device`);
                 dispatch(setShowMcuBootProgrammingDialog(false));
                 dispatch(setShowModemProgrammingDialog(false));
                 dispatch(setUsbSdfuProgrammingDialog(false));
