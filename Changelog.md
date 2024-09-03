@@ -1,3 +1,10 @@
+## 4.4.1 - Unreleased
+
+### Fixed
+
+-   Invalid warning `Hex reguons are out of device memory size` for Hex files
+    with UICR.
+
 ## 4.4.0 - 2024-06-13
 
 ### Added
