@@ -234,10 +234,7 @@ Closing application right now might result in some unknown behavior and might al
 Are you sure you want to continue?`,
                                 },
                                 dispatch(
-                                    jlinkTargetActions.recover(
-                                        device,
-                                        deviceDefinition
-                                    )
+                                    jlinkTargetActions.recover(device)
                                 ).finally(() => dispatch(setDeviceBusy(false)))
                             )
                         );
@@ -271,10 +268,7 @@ Closing application right now might result in some unknown behavior and might al
 Are you sure you want to continue?`,
                                 },
                                 dispatch(
-                                    jlinkTargetActions.recoverAndWrite(
-                                        device,
-                                        deviceDefinition
-                                    )
+                                    jlinkTargetActions.recoverAndWrite(device)
                                 ).finally(() => dispatch(setDeviceBusy(false)))
                             )
                         );
@@ -324,10 +318,7 @@ Are you sure you want to continue?`,
                                 );
                             } else {
                                 await dispatch(
-                                    jlinkTargetActions.resetDevice(
-                                        device,
-                                        deviceDefinition
-                                    )
+                                    jlinkTargetActions.resetDevice(device)
                                 );
                             }
                         } catch (e) {
@@ -386,12 +377,7 @@ Are you sure you want to continue?`,
 
                         dispatch(setDeviceBusy(true));
                         try {
-                            await dispatch(
-                                jlinkTargetActions.read(
-                                    device,
-                                    deviceDefinition
-                                )
-                            );
+                            await dispatch(jlinkTargetActions.read(device));
                         } catch (e) {
                             /* empty */
                         }

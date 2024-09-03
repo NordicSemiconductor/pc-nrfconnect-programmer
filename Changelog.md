@@ -1,3 +1,10 @@
+## 4.4.1 - unreleased
+
+### Fix
+
+-   The SoC is now detected before each operation to ensure the app works even
+    if the SoC changes between operations.
+
 ## 4.4.0 - 2024-06-13
 
 ### Added
