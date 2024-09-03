@@ -2,8 +2,8 @@
 
 ### Fixed
 
--   Invalid warning `Hex reguons are out of device memory size` for Hex files
-    with UICR.
+-   Invalid warning `HEX regions are out of device memory size` for HEX files
+    with UICR will not be displayed anymore.
 -   The SoC is now detected before each operation to ensure the app works even
     if the SoC changes between operations.
 
