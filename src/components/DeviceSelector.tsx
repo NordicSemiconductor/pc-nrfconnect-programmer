@@ -9,17 +9,17 @@ import { useDispatch } from 'react-redux';
 import {
     Device as SharedDevice,
     DeviceSelector,
+    logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { closeDevice, openDevice } from '../actions/targetActions';
+import { openDevice } from '../actions/targetActions';
 import { resetDeviceInfo } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import { deselectDevice } from '../reducers/targetReducer';
 import { setUsbSdfuProgrammingDialog } from '../reducers/usbSdfuReducer';
 
-const abortController = new AbortController();
-
+let abortController = new AbortController();
 export const getAbortController = () => abortController;
 
 export default () => {
@@ -28,6 +28,8 @@ export default () => {
         <DeviceSelector
             deviceFilter={device => !!device.serialNumber}
             onDeviceSelected={(device: SharedDevice) => {
+                abortController?.abort();
+                abortController = new AbortController();
                 logger.info(`Selected device ${device.serialNumber}`);
                 dispatch(openDevice(device, abortController));
             }}
