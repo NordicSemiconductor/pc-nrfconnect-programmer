@@ -4,6 +4,8 @@
 
 -   Invalid warning `Hex reguons are out of device memory size` for Hex files
     with UICR.
+-   The SoC is now detected before each operation to ensure the app works even
+    if the SoC changes between operations.
 
 ## 4.4.0 - 2024-06-13
 
