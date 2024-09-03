@@ -40,7 +40,6 @@ export default () => {
                 dispatch(setUsbSdfuProgrammingDialog(false));
                 dispatch(deselectDevice());
                 dispatch(resetDeviceInfo());
-                closeDevice();
             }}
             deviceListing={{
                 nordicUsb: true,
