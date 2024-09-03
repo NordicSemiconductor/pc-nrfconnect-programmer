@@ -21,13 +21,9 @@ import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';
 
-let abortController: AbortController;
-
 export const openDevice =
-    (device: Device): AppThunk =>
+    (device: Device, abortController: AbortController): AppThunk =>
     async dispatch => {
-        abortController = new AbortController();
-
         dispatch(setDeviceBusy(true));
         try {
             if (device.traits.jlink) {
@@ -61,10 +57,6 @@ export const openDevice =
         }
         dispatch(setDeviceBusy(false));
     };
-
-export const closeDevice = () => {
-    abortController.abort();
-};
 
 export const updateTargetWritable =
     (): AppThunk<RootState> => (dispatch, getState) => {
