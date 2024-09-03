@@ -298,7 +298,7 @@ const geCoreHexIntel = (
             overlapEndAddr <= coreInfo.romBaseAddr + coreInfo.romSize;
         const isUicr =
             overlapStartAddr >= coreInfo.uicrBaseAddr &&
-            overlapEndAddr <= coreInfo.uicrBaseAddr + coreInfo.pageSize;
+            overlapEndAddr <= coreInfo.uicrBaseAddr + coreInfo.uicrSize;
         if (!isInCore && !isUicr) {
             overlaps.delete(key);
         }

@@ -29,9 +29,9 @@ export const defaultCore: CoreDefinition = {
     pageSize: 0x1000, // 4 KB
     blockSize: 0x200, // 0.5 KB
     ficrBaseAddr: 0x10000000,
-    ficrSize: 0x400, // Todo: check and make sure!
+    ficrSize: 0x1000,
     uicrBaseAddr: 0x10001000,
-    uicrSize: 0x400, // Todo: check and make sure!
+    uicrSize: 0x1000,
     blAddrOffset: 0x14,
     mbrParamsOffset: 0x18,
     mbrBaseAddr: 0x0,
