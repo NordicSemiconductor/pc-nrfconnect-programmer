@@ -6,6 +6,8 @@
     with UICR will not be displayed anymore.
 -   The SoC is now detected before each operation to ensure the app works even
     if the SoC changes between operations.
+-   Memory layout and device informaion now updates correclty when switching
+    between selected devices quickly.
 
 ## 4.4.0 - 2024-06-13
 
