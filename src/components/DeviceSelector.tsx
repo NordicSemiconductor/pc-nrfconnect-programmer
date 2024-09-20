@@ -11,24 +11,20 @@ import {
     DeviceSelector,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { closeDevice, openDevice } from '../actions/targetActions';
+import { openDevice } from '../actions/targetActions';
 import { resetDeviceInfo } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import { deselectDevice } from '../reducers/targetReducer';
 import { setUsbSdfuProgrammingDialog } from '../reducers/usbSdfuReducer';
 
-const abortController = new AbortController();
-
-export const getAbortController = () => abortController;
-
 export default () => {
     const dispatch = useDispatch();
     return (
         <DeviceSelector
             deviceFilter={device => !!device.serialNumber}
-            onDeviceSelected={(device: SharedDevice) => {
-                dispatch(openDevice(device));
+            onDeviceSelected={(device: SharedDevice, _, abortController) => {
+                dispatch(openDevice(device, abortController));
             }}
             onDeviceDeselected={() => {
                 dispatch(setShowMcuBootProgrammingDialog(false));
@@ -36,7 +32,6 @@ export default () => {
                 dispatch(setUsbSdfuProgrammingDialog(false));
                 dispatch(deselectDevice());
                 dispatch(resetDeviceInfo());
-                closeDevice();
             }}
             deviceListing={{
                 nordicUsb: true,
