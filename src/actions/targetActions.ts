@@ -33,7 +33,9 @@ export const openDevice =
             } else if (device.traits.mcuBoot) {
                 dispatch(mcubootTargetActions.openDevice(device));
             } else if (device.traits.nordicDfu) {
-                dispatch(usbsdfuTargetActions.openDevice(device));
+                dispatch(
+                    usbsdfuTargetActions.openDevice(device, abortController)
+                );
             } else {
                 logger.warn('No operations possible for device.');
                 logger.warn(

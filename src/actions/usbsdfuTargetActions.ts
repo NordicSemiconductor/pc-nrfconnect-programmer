@@ -57,6 +57,8 @@ import {
 } from '../util/usbsdfuHelpers';
 import * as userInputActions from './userInputActions';
 
+let abortController: AbortController | undefined;
+
 const defaultDfuImage: DfuImage = {
     name: '',
     initPacket: defaultInitPacket,
@@ -64,8 +66,9 @@ const defaultDfuImage: DfuImage = {
 };
 
 export const openDevice =
-    (device: Device): AppThunk<RootState> =>
+    (device: Device, controller: AbortController): AppThunk<RootState> =>
     dispatch => {
+        abortController = controller;
         logger.info(
             'Using nrfutil-device to communicate with target via USB SDFU protocol'
         );
@@ -91,7 +94,10 @@ export const refreshMemoryLayout =
                 device,
                 async deviceInBootLoader => {
                     const fwInfo = await NrfutilDeviceLib.getFwInfo(
-                        deviceInBootLoader
+                        deviceInBootLoader,
+                        undefined,
+                        undefined,
+                        abortController
                     );
                     dispatch(
                         updateCoreOperations({
@@ -219,7 +225,13 @@ export const resetDevice =
                 state: 'loading',
             })
         );
-        await NrfutilDeviceLib.reset(device);
+        await NrfutilDeviceLib.reset(
+            device,
+            undefined,
+            undefined,
+            undefined,
+            abortController
+        );
         logger.info(`Resetting device completed`);
         dispatch(
             updateCoreOperations({
@@ -521,7 +533,10 @@ export const operateDFU = async (
         await NrfutilDeviceLib.program(
             device,
             { buffer: zipBuffer, type: 'zip' },
-            onProgress
+            onProgress,
+            undefined,
+            undefined,
+            abortController
         );
 
         logger.info('All dfu images have been written to the target device');
