@@ -1,13 +1,13 @@
-## 4.4.1 - Unreleased
+## 4.4.1 - 2024-09-24
 
 ### Fixed
 
--   Invalid warning `HEX regions are out of device memory size` for HEX files
-    with UICR will not be displayed anymore.
+-   The warning "HEX regions are out of device memory size" will not be shown
+    anymore for HEX files with UICR.
 -   The SoC is now detected before each operation to ensure the app works even
     if the SoC changes between operations.
--   Memory layout and device informaion now updates correclty when switching
-    between selected devices quickly.
+-   Memory layout and device information now update correctly when quickly
+    switching between selected devices.
 
 ## 4.4.0 - 2024-06-13
 
