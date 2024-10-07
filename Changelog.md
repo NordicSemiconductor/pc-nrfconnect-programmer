@@ -1,3 +1,9 @@
+## 4.4.2 - unreleased
+
+### Fixed
+
+-   Now DECT modem firmware is correctly detected for 91x family.
+
 ## 4.4.1 - 2024-09-24
 
 ### Fixed
