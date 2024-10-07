@@ -69,9 +69,14 @@ const ModemUpdateDialogView = () => {
     } else if (is91x1) {
         expectedFileName = 'mfw_nrf91x1_X.X.X*.zip';
         expectedFwName =
-            !modemFwName || /mfw_nrf91x1_\d+\.\d+\.\d+.*.zip/.test(modemFwName);
+            !modemFwName ||
+            /mfw_nrf91x1_\d+\.\d+\.\d+.*.zip/.test(modemFwName) ||
+            // DECT mfw
+            /mfw.*nrf91.1_\d+\.\d+\.\d+\.zip/.test(modemFwName);
         url = 'https://www.nordicsemi.com/Products/nRF9161/Download';
     }
+
+    console.log('modemFwName: ', modemFwName);
 
     useEffect(() => {
         if (isVisible) {
@@ -221,7 +226,7 @@ Are you sure you want to continue?`,
                                 variant="warning"
                             >
                                 <br />
-                                Nordic official modem firmware files are named
+                                Nordic official modem firmware files are named{' '}
                                 {expectedFileName}.
                                 <br />
                                 Modem firmware files can be downloaded from{' '}
