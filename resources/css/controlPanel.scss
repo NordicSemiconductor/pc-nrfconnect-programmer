@@ -25,7 +25,6 @@ $labelHeight: 12px;
         flex-direction: row;
         justify-content: flex-start;
         align-items: center;
-        padding: revert;
 
         .mdi {
             flex: 0.5;
@@ -35,10 +34,6 @@ $labelHeight: 12px;
         .mdi-alert {
             margin-left: auto;
         }
-    }
-
-    .toggle:first-of-type {
-        margin-top: 16px;
     }
 
     .mdi-alert {
