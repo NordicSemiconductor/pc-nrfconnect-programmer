@@ -76,8 +76,6 @@ const ModemUpdateDialogView = () => {
         url = 'https://www.nordicsemi.com/Products/nRF9161/Download';
     }
 
-    console.log('modemFwName: ', modemFwName);
-
     useEffect(() => {
         if (isVisible) {
             setProgress(undefined);
