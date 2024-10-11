@@ -23,6 +23,7 @@ import {
     logger,
     NumberInlineInput,
     selectedDevice,
+    selectedDeviceInfo,
     setWaitForDevice,
     Slider,
     Toggle,
@@ -56,8 +57,14 @@ const McuUpdateDialogView = () => {
     const isVisible = useSelector(getShowMcuBootProgrammingDialog);
     const mcubootFwPath = useSelector(getMcubootFilePath);
     const zipFilePath = useSelector(getZipFilePath);
+    const deviceInfo = useSelector(selectedDeviceInfo);
+
+    const programmingOptions =
+        deviceInfo?.mcuStateOptions?.filter(s => s.type === 'Programming') ??
+        [];
 
     const fwPath = mcubootFwPath || zipFilePath;
+    const [chosenTarget, setChosenTarget] = useState<string>('');
 
     const writingHasStarted = writing || writingFail || writingSucceed;
 
@@ -175,7 +182,8 @@ Are you sure you want to continue?`,
                 setProgress(updatedProgress);
             },
             abortController.current,
-            showDelayTimeout ? uploadDelay : undefined
+            showDelayTimeout ? uploadDelay : undefined,
+            chosenTarget
         )
             .then(() => {
                 setWritingSucceed(true);
@@ -247,6 +255,42 @@ Are you sure you want to continue?`,
                     <span>{` ${mcubootFwPath || zipFilePath}`}</span>
                 </Form.Label>
             </Form.Group>
+
+            {programmingOptions.length > 1 && (
+                <Form.Group>
+                    <Form.Label>
+                        <strong>Target:</strong>
+                        <OverlayTrigger
+                            overlay={
+                                <Tooltip id="tooltip-target-info">
+                                    Your device has multiple targets. Please
+                                    select the target you want to program.
+                                </Tooltip>
+                            }
+                        >
+                            <span className="mdi mdi-information-outline info-icon ml-1" />
+                        </OverlayTrigger>
+                    </Form.Label>
+                    <Form.Control
+                        as="select"
+                        disabled={writingHasStarted}
+                        onChange={e => {
+                            setChosenTarget(e.target.value);
+                        }}
+                    >
+                        <option value="">Select target</option>
+                        {programmingOptions.map(option => (
+                            <option
+                                key={option.arguments?.target}
+                                value={option.arguments?.target}
+                            >
+                                {option.arguments?.target} - {option.name}
+                            </option>
+                        ))}
+                    </Form.Control>
+                </Form.Group>
+            )}
+
             {writing && (
                 <Form.Group>
                     <Form.Label>
