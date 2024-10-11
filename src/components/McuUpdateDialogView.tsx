@@ -239,7 +239,12 @@ Are you sure you want to continue?`,
                     <DialogButton
                         variant="primary"
                         onClick={onWriteStart}
-                        disabled={writing || writingSucceed || writingFail}
+                        disabled={
+                            writing ||
+                            writingSucceed ||
+                            writingFail ||
+                            (programmingOptions.length > 1 && !chosenTarget)
+                        }
                     >
                         Write
                     </DialogButton>
