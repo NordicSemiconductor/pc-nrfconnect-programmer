@@ -27,6 +27,7 @@ import * as jlinkTargetActions from '../actions/jlinkTargetActions';
 import * as settingsActions from '../actions/settingsActions';
 import * as targetActions from '../actions/targetActions';
 import * as usbsdfuTargetActions from '../actions/usbsdfuTargetActions';
+import ImeiProgramming from '../features/ImeiProgramming';
 import {
     getDeviceDefinition,
     getDeviceIsBusy,
@@ -42,7 +43,7 @@ import { getIsWritable } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';
 
 const useRegisterDragEvents = () => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     useEffect(() => {
         const onDragover = (event: DragEvent) => {
             if (!event.dataTransfer) return;
@@ -404,6 +405,7 @@ Are you sure you want to continue?`,
                     <span className="mdi mdi-refresh" />
                     Read
                 </Button>
+                <ImeiProgramming />
             </Group>
             <Group heading="J-Link Settings">
                 <Toggle
