@@ -76,7 +76,7 @@ const isMaybeSupportedDevice = (deviceInfo?: DeviceInfo) =>
         ? deviceInfo?.jlink?.deviceVersion
               ?.toLocaleUpperCase()
               .match(/NRF91\d1/)
-        : deviceInfo?.jlink?.deviceFamily !== 'NRF91_FAMILY';
+        : deviceInfo?.jlink?.deviceFamily === 'NRF91_FAMILY';
 
 const getStatus = async (device?: Device, deviceInfo?: DeviceInfo) => {
     if (!device || !deviceInfo) return 'NONE';
