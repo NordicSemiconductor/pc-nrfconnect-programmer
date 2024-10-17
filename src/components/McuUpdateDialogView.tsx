@@ -18,6 +18,8 @@ import {
     clearConfirmBeforeClose,
     clearWaitForDevice,
     DialogButton,
+    Dropdown,
+    DropdownItem,
     GenericDialog,
     getPersistentStore,
     logger,
@@ -37,6 +39,10 @@ import {
     getShowMcuBootProgrammingDialog,
     setShowMcuBootProgrammingDialog,
 } from '../reducers/mcubootReducer';
+import {
+    convertToDropDownItems,
+    getSelectedDropdownItem,
+} from '../util/dataConstructors';
 import { WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
@@ -62,6 +68,11 @@ const McuUpdateDialogView = () => {
     const programmingOptions =
         deviceInfo?.mcuStateOptions?.filter(s => s.type === 'Programming') ??
         [];
+
+    const targetDropdownItems = convertToDropDownItems(
+        programmingOptions.map(s => s.arguments?.target),
+        false
+    );
 
     const fwPath = mcubootFwPath || zipFilePath;
     const [chosenTarget, setChosenTarget] = useState<string>('');
@@ -117,6 +128,12 @@ const McuUpdateDialogView = () => {
             setKeepDefaultTimeout(false);
         }
     }, [device, showDelayTimeout]);
+
+    useEffect(() => {
+        if (targetDropdownItems.length > 0) {
+            setChosenTarget(targetDropdownItems[0].value);
+        }
+    }, [targetDropdownItems]);
 
     const onCancel = () => {
         dispatch(clearWaitForDevice());
@@ -183,7 +200,7 @@ Are you sure you want to continue?`,
             },
             abortController.current,
             showDelayTimeout ? uploadDelay : undefined,
-            chosenTarget
+            mcubootFwPath ? chosenTarget : undefined
         )
             .then(() => {
                 setWritingSucceed(true);
@@ -243,7 +260,9 @@ Are you sure you want to continue?`,
                             writing ||
                             writingSucceed ||
                             writingFail ||
-                            (programmingOptions.length > 1 && !chosenTarget)
+                            (programmingOptions.length > 1 &&
+                                !chosenTarget &&
+                                !!mcubootFwPath)
                         }
                     >
                         Write
@@ -261,7 +280,7 @@ Are you sure you want to continue?`,
                 </Form.Label>
             </Form.Group>
 
-            {programmingOptions.length > 1 && (
+            {programmingOptions.length > 1 && !zipFilePath && (
                 <Form.Group>
                     <Form.Label>
                         <strong>Target:</strong>
@@ -276,23 +295,17 @@ Are you sure you want to continue?`,
                             <span className="mdi mdi-information-outline info-icon ml-1" />
                         </OverlayTrigger>
                     </Form.Label>
-                    <Form.Control
-                        as="select"
-                        disabled={writingHasStarted}
-                        onChange={e => {
-                            setChosenTarget(e.target.value);
+                    <Dropdown
+                        items={targetDropdownItems}
+                        onSelect={(item: DropdownItem) => {
+                            setChosenTarget(item.value);
                         }}
-                    >
-                        <option value="">Select target</option>
-                        {programmingOptions.map(option => (
-                            <option
-                                key={option.arguments?.target}
-                                value={option.arguments?.target}
-                            >
-                                {option.arguments?.target} - {option.name}
-                            </option>
-                        ))}
-                    </Form.Control>
+                        selectedItem={getSelectedDropdownItem(
+                            targetDropdownItems,
+                            chosenTarget
+                        )}
+                        disabled={writingHasStarted}
+                    />
                 </Form.Group>
             )}
 
