@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-programmer",
-    "version": "4.4.1",
+    "version": "4.4.2",
     "displayName": "Programmer",
     "description": "Tool for flash programming Nordic SoCs and SiPs",
     "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer",
@@ -16,7 +16,7 @@
     "nrfConnectForDesktop": {
         "nrfutil": {
             "device": [
-                "2.5.0"
+                "2.6.4"
             ]
         },
         "html": "dist/index.html"
@@ -46,7 +46,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^185.0.0"
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^188.0.0"
     },
     "eslintConfig": {
         "extends": "./node_modules/@nordicsemiconductor/pc-nrfconnect-shared/config/eslintrc"
