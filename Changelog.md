@@ -2,7 +2,7 @@
 
 ### Fixed
 
--   Now DECT modem firmware is correctly detected for 91x family.
+-   The DECT modem firmware is now correctly detected for nRF91x1 devices.
 
 ## 4.4.1 - 2024-09-24
 
