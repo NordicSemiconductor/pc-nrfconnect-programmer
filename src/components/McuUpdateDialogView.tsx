@@ -17,11 +17,13 @@ import {
     classNames,
     clearConfirmBeforeClose,
     clearWaitForDevice,
+    convertToDropDownItems,
     DialogButton,
     Dropdown,
     DropdownItem,
     GenericDialog,
     getPersistentStore,
+    getSelectedDropdownItem,
     logger,
     NumberInlineInput,
     selectedDevice,
@@ -39,10 +41,6 @@ import {
     getShowMcuBootProgrammingDialog,
     setShowMcuBootProgrammingDialog,
 } from '../reducers/mcubootReducer';
-import {
-    convertToDropDownItems,
-    getSelectedDropdownItem,
-} from '../util/dataConstructors';
 import { WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
