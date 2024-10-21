@@ -26,6 +26,7 @@ import {
     getSelectedDropdownItem,
     logger,
     NumberInlineInput,
+    Overlay,
     selectedDevice,
     selectedDeviceInfo,
     setWaitForDevice,
@@ -45,6 +46,8 @@ import { WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
+const TOOLTIP_TEXT_MULTIPLE_TARGETS =
+    'Your device has multiple targets. Please select the target you want to program.';
 
 const NET_CORE_UPLOAD_DELAY = 120;
 
@@ -280,18 +283,20 @@ Are you sure you want to continue?`,
 
             {programmingOptions.length > 1 && !zipFilePath && (
                 <Form.Group>
-                    <Form.Label>
+                    <Form.Label
+                        style={{ display: 'inline-flex', alignItems: 'center' }}
+                    >
                         <strong>Target:</strong>
-                        <OverlayTrigger
-                            overlay={
-                                <Tooltip id="tooltip-target-info">
-                                    Your device has multiple targets. Please
-                                    select the target you want to program.
-                                </Tooltip>
+                        <Overlay
+                            tooltipChildren={
+                                <span>{TOOLTIP_TEXT_MULTIPLE_TARGETS}</span>
                             }
+                            keepShowingOnHoverTooltip
+                            tooltipId="test"
+                            placement="right"
                         >
                             <span className="mdi mdi-information-outline info-icon ml-1" />
-                        </OverlayTrigger>
+                        </Overlay>
                     </Form.Label>
                     <Dropdown
                         items={targetDropdownItems}
