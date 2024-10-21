@@ -327,18 +327,16 @@ Are you sure you want to continue?`,
             <Form.Group>
                 {!writingHasStarted && (
                     <Alert variant="warning">
-                        <div>
-                            <p className="mb-0">
-                                You are now programming via MCUboot.
-                            </p>
-                            <p className="mb-0">
+                        <div className="tw-flex tw-flex-col tw-gap-0">
+                            <span>You are now programming via MCUboot.</span>
+                            <span>
                                 The device will be recovered if you proceed to
                                 write.
-                            </p>
-                            <p className="mb-0">
+                            </span>
+                            <span>
                                 Make sure the device is in{' '}
                                 <strong>MCUboot mode</strong>.
-                            </p>
+                            </span>
                         </div>
                     </Alert>
                 )}
