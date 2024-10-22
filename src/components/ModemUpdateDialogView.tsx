@@ -5,7 +5,6 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Form from 'react-bootstrap/Form';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -206,60 +205,58 @@ Are you sure you want to continue?`,
             }
             isVisible={isVisible}
         >
-            <>
-                <Form.Group>
-                    <Form.Label>
+            <div className="tw-flex tw-flex-col tw-gap-4">
+                <div className="tw-flex tw-flex-col tw-gap-2">
+                    <div>
                         <b>Modem firmware</b>
-                    </Form.Label>
+                    </div>
                     <div>{modemFwName}</div>
-                </Form.Group>
-                <Form.Group>
-                    {!writing &&
-                        !writingSucceed &&
-                        !writingFail &&
-                        !expectedFwName &&
-                        deviceTypeKnown && (
-                            <Alert
-                                label="Unexpected file name detected"
-                                variant="warning"
-                            >
-                                <br />
-                                Nordic official modem firmware files are named{' '}
-                                {expectedFileName}.
-                                <br />
-                                Modem firmware files can be downloaded from{' '}
-                                {url && (
-                                    <a
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        href={url}
-                                    >
-                                        www.nordicsemi.com
-                                    </a>
-                                )}
-                                .
-                            </Alert>
-                        )}
-                    {!writing &&
-                        !writingSucceed &&
-                        !writingFail &&
-                        !deviceTypeKnown && (
-                            <Alert label="Modem firmware" variant="warning">
-                                <br />
-                                Unable to detect the device family. Make sure
-                                that the modem firmware file is intended for the
-                                connected device family.
-                            </Alert>
-                        )}
-                </Form.Group>
+                </div>
+                {!writing &&
+                    !writingSucceed &&
+                    !writingFail &&
+                    !expectedFwName &&
+                    deviceTypeKnown && (
+                        <Alert
+                            label="Unexpected file name detected"
+                            variant="warning"
+                        >
+                            <br />
+                            Nordic official modem firmware files are named{' '}
+                            {expectedFileName}.
+                            <br />
+                            Modem firmware files can be downloaded from{' '}
+                            {url && (
+                                <a
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    href={url}
+                                >
+                                    www.nordicsemi.com
+                                </a>
+                            )}
+                            .
+                        </Alert>
+                    )}
+                {!writing &&
+                    !writingSucceed &&
+                    !writingFail &&
+                    !deviceTypeKnown && (
+                        <Alert label="Modem firmware" variant="warning">
+                            <br />
+                            Unable to detect the device family. Make sure that
+                            the modem firmware file is intended for the
+                            connected device family.
+                        </Alert>
+                    )}
                 {writing && (
-                    <Form.Group>
-                        <Form.Label>
+                    <div className="tw-flex tw-flex-col tw-gap-2">
+                        <div>
                             <strong>Status: </strong>
                             <span>{`${
                                 progress ? progress.message : 'Starting...'
                             }`}</span>
-                        </Form.Label>
+                        </div>
                         {progress && (
                             <ProgressBar
                                 hidden={!writing}
@@ -267,43 +264,37 @@ Are you sure you want to continue?`,
                                 style={{ height: '4px' }}
                             />
                         )}
-                    </Form.Group>
+                    </div>
                 )}
-                <Form.Group>
-                    {isMcuboot &&
-                        !writing &&
-                        !writingSucceed &&
-                        !writingFail && (
-                            <Alert variant="warning">
-                                <p className="mb-0">
-                                    You are now performing modem DFU via
-                                    MCUboot.
-                                </p>
-                                <p className="mb-0">
-                                    The device will be overwritten if you
-                                    proceed to write.
-                                </p>
-                                <p className="mb-0">
-                                    Make sure the device is in{' '}
-                                    <strong>MCUboot mode</strong>.
-                                </p>
-                            </Alert>
-                        )}
-                    {writingSucceed && !writingFail && (
-                        <Alert variant="success">
-                            Completed successfully in
-                            {` ${Math.round(time / 1000)} `}
-                            seconds.
-                        </Alert>
-                    )}
-                    {writingFail && !writing && (
-                        <Alert variant="danger">
-                            {writingFailError?.trim() ||
-                                'Failed. Check the log below for more details...'}
-                        </Alert>
-                    )}
-                </Form.Group>
-            </>
+                {isMcuboot && !writing && !writingSucceed && !writingFail && (
+                    <Alert variant="warning">
+                        <p className="tw-mb-0">
+                            You are now performing modem DFU via MCUboot.
+                        </p>
+                        <p className="tw-mb-0">
+                            The device will be overwritten if you proceed to
+                            write.
+                        </p>
+                        <p className="tw-mb-0">
+                            Make sure the device is in{' '}
+                            <strong>MCUboot mode</strong>.
+                        </p>
+                    </Alert>
+                )}
+                {writingSucceed && !writingFail && (
+                    <Alert variant="success">
+                        Completed successfully in
+                        {` ${Math.round(time / 1000)} `}
+                        seconds.
+                    </Alert>
+                )}
+                {writingFail && !writing && (
+                    <Alert variant="danger">
+                        {writingFailError?.trim() ||
+                            'Failed. Check the log below for more details...'}
+                    </Alert>
+                )}
+            </div>
         </GenericDialog>
     );
 };
