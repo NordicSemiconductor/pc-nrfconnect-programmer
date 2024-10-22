@@ -252,7 +252,7 @@ Are you sure you want to continue?`,
                             }`}</span>
                         </div>
                         <ProgressBar
-                            hidden={false}
+                            hidden={!writing}
                             now={progress?.stepProgressPercentage ?? 0}
                             style={{ height: '4px' }}
                         />
