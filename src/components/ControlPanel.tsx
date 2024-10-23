@@ -21,6 +21,7 @@ import {
     Toggle,
     truncateMiddle,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { webUtils } from 'electron';
 
 import * as fileActions from '../actions/fileActions';
 import * as jlinkTargetActions from '../actions/jlinkTargetActions';
@@ -58,12 +59,10 @@ const useRegisterDragEvents = () => {
 
             // eslint-disable-next-line no-restricted-syntax
             for (const file of event.dataTransfer.files) {
+                const path = webUtils.getPathForFile(file);
+
                 // eslint-disable-next-line no-await-in-loop
-                await dispatch(
-                    fileActions.openFile(
-                        (file as unknown as { path: string }).path
-                    )
-                );
+                await dispatch(fileActions.openFile(path));
             }
         };
 
