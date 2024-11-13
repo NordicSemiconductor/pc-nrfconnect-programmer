@@ -1,10 +1,10 @@
 # Overview and user interface
 
-The nRF Connect Programmer app main window displays the memory layout of the device and the file you want to work with. It also provides options to program the device and inspect the entire process through the log.
+The {{app_name}} main window displays the memory layout of the device and the file you want to work with. It also provides options to program the device and inspect the entire process through the log.
 
 When you start the Programmer app, the application main window appears with the **Programmer** tab selected by default and the [**File Memory Layout**](#file-memory-layout) and [**Device Memory Layout**](#device-memory-layout) panels empty:
 
-![nRF Connect Programmer default view at startup](./screenshots/programmer_overview.png "nRF Connect Programmer main window")
+![{{app_name}} default view at startup](./screenshots/programmer_overview.png "{{app_name}} main window")
 
 ## Select Device
 
@@ -48,7 +48,7 @@ When you select a device, the following toggles are available in the J-Link Sett
 
 ### MCUboot Settings
 
-The experimental **Enable MCUBoot** toggle is deprecated and will be removed in a future release of nRF Connect Programmer.
+The experimental **Enable MCUBoot** toggle is deprecated and will be removed in a future release of the {{app_name}}.
 
 ## Programmer tab
 
@@ -76,7 +76,7 @@ In the **Device Memory Layout**, you can read the name, address range, and size 
 
 You can view application information, restore defaults, access source code and documentation. You also can find information on the selected device, access support tools, send feedback, and enable verbose logging.
 
-![nRF Connect for Desktop Programmer About tab](./screenshots/nRF_Connect_for_Desktop_Prog_about.png "nRF Connect for Desktop Programmer About tab")
+![{{app_name}} About tab](./screenshots/nRF_Connect_for_Desktop_Prog_about.png "{{app_name}} About tab")
 
 ## Log
 

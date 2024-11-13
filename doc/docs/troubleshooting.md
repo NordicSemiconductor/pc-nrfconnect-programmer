@@ -10,7 +10,7 @@ In OS X: An issue with the SEGGER J-Link OB firmware leads to the corruption of 
 
 ## Serial Port Access Permissions on Ubuntu Linux
 
-If you receive errors when trying to open the serial port in the nRF Connect Bluetooth Low Energy app on Ubuntu Linux, you may need to grant serial port access permissions to your user. To do this, run the following command:
+If you receive errors when trying to open the serial port in the {{app_name}} on Ubuntu Linux, you may need to grant serial port access permissions to your user. To do this, run the following command:
 
 ```
 sudo usermod -a -G dialout <username>
