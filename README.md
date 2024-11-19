@@ -3,9 +3,9 @@
 [![Build Status](https://dev.azure.com/NordicSemiconductor/Wayland/_apis/build/status/NordicSemiconductor.pc-nrfconnect-programmer?branchName=main)](https://dev.azure.com/NordicSemiconductor/Wayland/_build/latest?definitionId=4&branchName=main)
 [![License](https://img.shields.io/badge/license-Modified%20BSD%20License-blue.svg)](LICENSE)
 
-The Programmer app is a cross-platform tool that enables programming
-firmware to Nordic Semiconductor devices and custom devices that use Nordic
-Semiconductor hardware.
+The Programmer app is a cross-platform tool that enables programming firmware to
+Nordic Semiconductor devices and custom devices that use Nordic Semiconductor
+hardware.
 
 The application supports J-Link, Nordic Secure DFU, and MCUboot programming
 methods, using both HEX and ZIP files. It lets you inspect the memory layout of
