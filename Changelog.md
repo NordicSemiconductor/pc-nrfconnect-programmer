@@ -1,3 +1,9 @@
+## 4.4.3 - UNRELESED
+
+### Fixed
+
+-   Issue with flashing large firmware on nRF54L15.
+
 ## 4.4.2 - 2024-11-11
 
 ### Changed
