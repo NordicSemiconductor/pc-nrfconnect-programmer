@@ -121,11 +121,11 @@ export const nRF5340DefaultDevice: DeviceDefinition<
 };
 
 // TODO App and netowrk core are dynamic for now we will show entoer memroy as owne by one core
-export const nRF5415DefaultDevice: DeviceDefinition<
+export const nRF54L5DefaultDevice: DeviceDefinition<
     Required<Pick<CoreDefinitions, 'Application'>>
 > = {
     ...defaultDeviceDefinition,
-    family: DeviceFamily.NRF54,
+    family: DeviceFamily.NRF54L,
     type: 'nRF54L15',
     coreDefinitions: {
         Application: {
@@ -147,7 +147,7 @@ export const deviceDefinitions: DeviceDefinition[] = [
     nRF52840DefaultDevice,
     nRF9160DefaultDevice,
     nRF5340DefaultDevice,
-    nRF5415DefaultDevice,
+    nRF54L5DefaultDevice,
 ];
 
 /**

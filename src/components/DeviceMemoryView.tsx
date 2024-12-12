@@ -25,7 +25,11 @@ import {
     targetRegionsUnknown,
 } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray, CoreInfo } from '../util/devices';
-import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
+import {
+    CoreDefinition,
+    DeviceDefinition,
+    DeviceFamily,
+} from '../util/deviceTypes';
 import { getCoreRegions, Region } from '../util/regions';
 import CoreView from './CoreView';
 
@@ -79,14 +83,27 @@ const TextOverlay = ({
     coreInfo: CoreInfo;
 }) => {
     const device = useSelector(selectedDevice);
+    const deviceDefinition = useSelector(getDeviceDefinition);
     const isJLink = !!device?.traits.jlink;
     const isNordicDfu = !!device?.traits.nordicDfu;
     const isMcuboot = !!device?.traits.mcuBoot;
+    const isNRF54LFamily = deviceDefinition.family === DeviceFamily.NRF54L;
 
     if (coreInfo.coreMemMap || busy) return null;
 
     if (coreInfo.coreOperation === 'erasing')
         return <div className="erase-indicator striped active" />;
+
+    if (isNRF54LFamily) {
+        return (
+            <div className="centering-container">
+                <div className="read-indicator">
+                    <p>Device core is connected</p>
+                    <p>Memory layout is not available for nRF54L family</p>
+                </div>
+            </div>
+        );
+    }
 
     if (isJLink && !coreInfo.coreMemMap) {
         return (

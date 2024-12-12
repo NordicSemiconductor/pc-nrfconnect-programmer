@@ -39,7 +39,7 @@ export enum DeviceFamily {
     NRF51 = 'NRF51_FAMILY',
     NRF52 = 'NRF52_FAMILY',
     NRF53 = 'NRF53_FAMILY',
-    NRF54 = 'NRF54_FAMILY',
+    NRF54L = 'NRF54L_FAMILY',
     NRF91 = 'NRF91_FAMILY',
     UNKNOWN = 'UNKNOWN_FAMILY',
 }

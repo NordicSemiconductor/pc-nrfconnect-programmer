@@ -2,7 +2,8 @@
 
 ### Fixed
 
--   Issue with flashing large firmware on nRF54L15.
+-   Issue with flashing firmware on nRF54L15 larger than 1 MB firmware.
+-   Disable unsupported firmware read for nRF54L Family.
 
 ## 4.4.2 - 2024-11-11
 
