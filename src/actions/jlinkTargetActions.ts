@@ -117,9 +117,9 @@ const readAllCoresBatch =
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch => {
         if (deviceDefinition.family === DeviceFamily.NRF54L) {
-            logger.warn('Reading is not supported on nRF54L Family');
             return batch;
         }
+
         convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
             (accBatch, deviceCoreInfo) => {
                 if (
