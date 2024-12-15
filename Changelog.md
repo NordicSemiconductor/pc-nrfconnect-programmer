@@ -1,9 +1,12 @@
 ## 4.4.3 - UNRELESED
 
+### Changed
+
+-   Disabled unsupported firmware read for nRF54L Series.
+
 ### Fixed
 
--   Issue with flashing firmware on nRF54L15 larger than 1 MB firmware.
--   Disable unsupported firmware read for nRF54L Family.
+-   Issue with programming firmware on nRF54L15 when it is larger than 1 MB.
 
 ## 4.4.2 - 2024-11-11
 
