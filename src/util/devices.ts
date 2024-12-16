@@ -25,7 +25,6 @@ import {
 export const defaultCore: CoreDefinition = {
     romBaseAddr: 0x0,
     romSize: 0x100000, // 1 MB
-    ramSize: 0x0,
     pageSize: 0x1000, // 4 KB
     blockSize: 0x200, // 0.5 KB
     ficrBaseAddr: 0x10000000,
@@ -75,7 +74,6 @@ export const nRF52840DefaultDevice: DeviceDefinition<
         Application: {
             ...defaultCore,
             romSize: 0x100000, // 1 Mb
-            ramSize: 0x40000, // 256 Kb
             pageSize: 0x1000, // 4Kb
         },
     },
@@ -122,6 +120,24 @@ export const nRF5340DefaultDevice: DeviceDefinition<
     },
 };
 
+// TODO App and netowrk core are dynamic for now we will show entoer memroy as owne by one core
+export const nRF54L5DefaultDevice: DeviceDefinition<
+    Required<Pick<CoreDefinitions, 'Application'>>
+> = {
+    ...defaultDeviceDefinition,
+    family: DeviceFamily.NRF54L,
+    type: 'nRF54L15',
+    coreDefinitions: {
+        Application: {
+            ...defaultCore,
+            romBaseAddr: 0x0,
+            romSize: 0x17d000, // 1524 KB
+            ficrBaseAddr: 0x00ffc000,
+            uicrBaseAddr: 0x00ffd000,
+        },
+    },
+};
+
 /**
  * Some information cannot be fetch by nrfutil device-lib
  * Define the default values here
@@ -131,6 +147,7 @@ export const deviceDefinitions: DeviceDefinition[] = [
     nRF52840DefaultDevice,
     nRF9160DefaultDevice,
     nRF5340DefaultDevice,
+    nRF54L5DefaultDevice,
 ];
 
 /**
@@ -297,7 +314,6 @@ export const mergeNrfutilDeviceInfoInCoreDefinition = (
     inputCoreInfo: DeviceCoreInfo
 ): CoreDefinition => ({
     ...existingDefinition,
-    ramSize: inputCoreInfo.ramSize,
     romBaseAddr: inputCoreInfo.codeAddress,
     romSize: inputCoreInfo.codeSize,
     pageSize: inputCoreInfo.codePageSize,

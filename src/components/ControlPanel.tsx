@@ -41,6 +41,7 @@ import {
 import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
 import { getIsWritable } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';
+import { DeviceFamily } from '../util/deviceTypes';
 
 const useRegisterDragEvents = () => {
     const dispatch = useDispatch();
@@ -157,7 +158,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
                     </Dropdown.Item>
                 </Popover>
             </Overlay>
-            <Button variant="secondary" className="w-100" onClick={onClick}>
+            <Button variant="secondary" className="tw-full" onClick={onClick}>
                 <span className="mdi mdi-folder-open" />
                 Add file
             </Button>
@@ -187,6 +188,8 @@ const ControlPanel = () => {
     const isMcuboot = !!device?.traits.mcuBoot;
     const isModem = !!device?.traits.modem;
 
+    const isNRF54LFamily = deviceDefinition.family === DeviceFamily.NRF54L;
+
     const targetIsRecoverable = isJLink;
 
     const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
@@ -197,7 +200,7 @@ const ControlPanel = () => {
                 <Mru mruFiles={mruFiles} />
                 <Button
                     variant="secondary"
-                    className="w-100"
+                    className="tw-full"
                     onClick={refreshAllFiles}
                 >
                     <span className="mdi mdi-refresh" />
@@ -205,7 +208,7 @@ const ControlPanel = () => {
                 </Button>
                 <Button
                     variant="secondary"
-                    className="w-100"
+                    className="tw-full"
                     onClick={() => dispatch(fileActions.closeFiles())}
                 >
                     <span className="mdi mdi-minus-circle" />
@@ -215,7 +218,7 @@ const ControlPanel = () => {
             <Group heading="Device">
                 <Button
                     variant="secondary"
-                    className="w-100"
+                    className="tw-full"
                     key="performRecover"
                     onClick={() => {
                         if (!device) {
@@ -251,7 +254,7 @@ Are you sure you want to continue?`,
                 <Button
                     variant="secondary"
                     key="performRecoverAndWrite"
-                    className="w-100"
+                    className="tw-full"
                     onClick={() => {
                         if (!device) {
                             logger.error('No target device!');
@@ -286,7 +289,7 @@ Are you sure you want to continue?`,
                 <Button
                     variant="secondary"
                     key="performSaveAsFile"
-                    className="w-100"
+                    className="tw-full"
                     onClick={() => {
                         if (!device) {
                             logger.error('No target device!');
@@ -294,7 +297,12 @@ Are you sure you want to continue?`,
                         }
                         dispatch(jlinkTargetActions.saveAsFile());
                     }}
-                    disabled={!isJLink || !isMemLoaded || !targetIsReady}
+                    disabled={
+                        !isJLink ||
+                        !isMemLoaded ||
+                        !targetIsReady ||
+                        isNRF54LFamily
+                    }
                 >
                     <span className="mdi mdi-floppy" />
                     Save as file
@@ -302,7 +310,7 @@ Are you sure you want to continue?`,
                 <Button
                     key="performReset"
                     variant="secondary"
-                    className="w-100"
+                    className="tw-full"
                     onClick={async () => {
                         if (!device) {
                             logger.error('No target device!');
@@ -333,7 +341,7 @@ Are you sure you want to continue?`,
                 <Button
                     key="performWrite"
                     variant="secondary"
-                    className="w-100"
+                    className="tw-full"
                     onClick={() => {
                         if (!device) {
                             logger.error('No target device!');
@@ -358,7 +366,7 @@ Are you sure you want to continue?`,
                     title={
                         isJLink && !zipFile
                             ? 'The Write operation is not supported for JLink devices. Use Erase & write.'
-                            : ''
+                            : undefined
                     }
                 >
                     <span className="mdi mdi-pencil" />
@@ -367,7 +375,7 @@ Are you sure you want to continue?`,
                 <Button
                     variant="secondary"
                     key="performJLinkRead"
-                    className="w-100"
+                    className="tw-full"
                     onClick={async () => {
                         if (!device) {
                             logger.error('No target device!');
@@ -382,8 +390,17 @@ Are you sure you want to continue?`,
                         }
                         dispatch(setDeviceBusy(false));
                     }}
+                    title={
+                        isNRF54LFamily
+                            ? 'Reading memory from nRF54L family is not supported.'
+                            : undefined
+                    }
                     disabled={
-                        isMcuboot || !isJLink || !targetIsReady || !canRead
+                        isMcuboot ||
+                        !isJLink ||
+                        !targetIsReady ||
+                        !canRead ||
+                        isNRF54LFamily
                     }
                 >
                     <span className="mdi mdi-refresh" />
@@ -393,10 +410,16 @@ Are you sure you want to continue?`,
             <Group heading="J-Link Settings">
                 <Toggle
                     onToggle={() => dispatch(settingsActions.toggleAutoRead())}
-                    isToggled={autoRead}
+                    isToggled={autoRead && !isNRF54LFamily}
                     label="Auto read memory"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
+                    disabled={isNRF54LFamily}
+                    title={
+                        isNRF54LFamily
+                            ? 'Reading memory from nRF54L15 family is not supported.'
+                            : undefined
+                    }
                 />
                 <Toggle
                     isToggled={autoReset}

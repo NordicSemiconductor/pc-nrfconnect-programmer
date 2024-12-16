@@ -39,7 +39,11 @@ import {
     getDefaultDeviceInfoByJlinkFamily,
     mergeNrfutilDeviceInfoInCoreDefinition,
 } from '../util/devices';
-import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
+import {
+    CoreDefinition,
+    DeviceDefinition,
+    DeviceFamily,
+} from '../util/deviceTypes';
 
 let abortController: AbortController | undefined;
 
@@ -112,6 +116,10 @@ const readAllCoresBatch =
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch => {
+        if (deviceDefinition.family === DeviceFamily.NRF54L) {
+            return batch;
+        }
+
         convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
             (accBatch, deviceCoreInfo) => {
                 if (
