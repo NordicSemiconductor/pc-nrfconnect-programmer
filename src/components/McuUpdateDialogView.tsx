@@ -17,12 +17,18 @@ import {
     classNames,
     clearConfirmBeforeClose,
     clearWaitForDevice,
+    convertToDropDownItems,
     DialogButton,
+    Dropdown,
+    DropdownItem,
     GenericDialog,
     getPersistentStore,
+    getSelectedDropdownItem,
     logger,
     NumberInlineInput,
+    Overlay,
     selectedDevice,
+    selectedDeviceInfo,
     setWaitForDevice,
     Slider,
     Toggle,
@@ -40,6 +46,8 @@ import { WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
+const TOOLTIP_TEXT_MULTIPLE_TARGETS =
+    'Your device has multiple targets. Please select the target you want to program.';
 
 const NET_CORE_UPLOAD_DELAY = 120;
 
@@ -56,8 +64,19 @@ const McuUpdateDialogView = () => {
     const isVisible = useSelector(getShowMcuBootProgrammingDialog);
     const mcubootFwPath = useSelector(getMcubootFilePath);
     const zipFilePath = useSelector(getZipFilePath);
+    const deviceInfo = useSelector(selectedDeviceInfo);
+
+    const programmingOptions =
+        deviceInfo?.mcuStateOptions?.filter(s => s.type === 'Programming') ??
+        [];
+
+    const targetDropdownItems = convertToDropDownItems(
+        programmingOptions.map(s => s.arguments?.target),
+        false
+    );
 
     const fwPath = mcubootFwPath || zipFilePath;
+    const [chosenTarget, setChosenTarget] = useState<string>('');
 
     const writingHasStarted = writing || writingFail || writingSucceed;
 
@@ -110,6 +129,12 @@ const McuUpdateDialogView = () => {
             setKeepDefaultTimeout(false);
         }
     }, [device, showDelayTimeout]);
+
+    useEffect(() => {
+        if (targetDropdownItems.length > 0) {
+            setChosenTarget(targetDropdownItems[0].value);
+        }
+    }, [targetDropdownItems]);
 
     const onCancel = () => {
         dispatch(clearWaitForDevice());
@@ -175,7 +200,8 @@ Are you sure you want to continue?`,
                 setProgress(updatedProgress);
             },
             abortController.current,
-            showDelayTimeout ? uploadDelay : undefined
+            showDelayTimeout ? uploadDelay : undefined,
+            mcubootFwPath ? chosenTarget : undefined
         )
             .then(() => {
                 setWritingSucceed(true);
@@ -231,7 +257,14 @@ Are you sure you want to continue?`,
                     <DialogButton
                         variant="primary"
                         onClick={onWriteStart}
-                        disabled={writing || writingSucceed || writingFail}
+                        disabled={
+                            writing ||
+                            writingSucceed ||
+                            writingFail ||
+                            (programmingOptions.length > 1 &&
+                                !chosenTarget &&
+                                !!mcubootFwPath)
+                        }
                     >
                         Write
                     </DialogButton>
@@ -247,6 +280,38 @@ Are you sure you want to continue?`,
                     <span>{` ${mcubootFwPath || zipFilePath}`}</span>
                 </Form.Label>
             </Form.Group>
+
+            {programmingOptions.length > 1 && !zipFilePath && (
+                <Form.Group>
+                    <Form.Label
+                        style={{ display: 'inline-flex', alignItems: 'center' }}
+                    >
+                        <strong>Target:</strong>
+                        <Overlay
+                            tooltipChildren={
+                                <span>{TOOLTIP_TEXT_MULTIPLE_TARGETS}</span>
+                            }
+                            keepShowingOnHoverTooltip
+                            tooltipId="test"
+                            placement="right"
+                        >
+                            <span className="mdi mdi-information-outline info-icon ml-1" />
+                        </Overlay>
+                    </Form.Label>
+                    <Dropdown
+                        items={targetDropdownItems}
+                        onSelect={(item: DropdownItem) => {
+                            setChosenTarget(item.value);
+                        }}
+                        selectedItem={getSelectedDropdownItem(
+                            targetDropdownItems,
+                            chosenTarget
+                        )}
+                        disabled={writingHasStarted}
+                    />
+                </Form.Group>
+            )}
+
             {writing && (
                 <Form.Group>
                     <Form.Label>

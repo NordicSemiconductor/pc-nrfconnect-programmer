@@ -62,7 +62,8 @@ export const performUpdate = async (
     dfuFilePath: string,
     onProgress: (progress: Progress) => void,
     abortController: AbortController,
-    netCoreUploadDelay?: number
+    netCoreUploadDelay?: number,
+    target?: string
 ) => {
     logger.info(`Writing ${dfuFilePath} to device ${device.serialNumber}`);
 
@@ -75,6 +76,7 @@ export const performUpdate = async (
             undefined,
             {
                 netCoreUploadDelay,
+                target,
             },
             abortController
         );
