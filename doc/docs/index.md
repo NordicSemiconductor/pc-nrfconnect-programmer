@@ -1,10 +1,10 @@
-# nRF Connect Programmer
+# {{app_name}}
 
-nRF Connect Programmer is an app available from [nRF Connect for Desktop](https://nordic-dev.zoominsoftware.io/bundle/nrf-connect-desktop/page/index.html) that you can use to program firmware to Nordic devices. The application allows you to see the memory layout for devices that support programming with J-Link, Nordic Secure DFU, and MCUboot. It also allows you to display content of HEX files and write it to the devices.
+The {{app_name}} in [nRF Connect for Desktop](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/index.html) lets you program firmware to Nordic devices. The application allows you to see the memory layout for devices that support programming with J-Link, Nordic Secure DFU, and MCUboot. It also allows you to display content of HEX files and write it to the devices.
 
 ## Supported hardware
 
-The following table lists the hardware platforms that you can program with nRF Connect Programmer.
+The following table lists the hardware platforms that you can program with the {{app_name}}.
 
 | Hardware platform   | Device   | PCA number | Programming with J-Link  | Programming with Nordic Secure DFU  | Programming with MCUboot |
 |---------------------|----------|------------|--------------------------|-------------------------------------|--------------------------|
@@ -25,16 +25,16 @@ Programming with Nordic Secure DFU is **Possible** on some nRF52 Series platform
 
 ### Support for custom hardware
 
-The following criteria apply to programming custom hardware with nRF Connect Programmer:
+The following criteria apply to programming custom hardware with the {{app_name}}:
 
 - **Device**: The hardware platform you are programming must use an SoC or SiP from Nordic Semiconductor.
 - **Programming with J-Link**: Possible for all custom hardware that features Nordic SoCs supported by [nRF Util](https://docs.nordicsemi.com/bundle/nrfutil/page/README.html).
-- **Programming with Nordic Secure DFU**: Possible if you implement a bootloader solution that supports Nordic Secure DFU. nRF Connect Programmer checks the bootloader for Nordic ID to be able to program using this method.
+- **Programming with Nordic Secure DFU**: Possible if you implement a bootloader solution that supports Nordic Secure DFU. The {{app_name}} checks the bootloader for Nordic ID to be able to program using this method.
 - **Programming with MCUboot**: Only possible using CLI.
 
 ## Deprecated hardware support
 
-The following hardware platforms cannot be programmed with nRF Connect Programmer anymore.
+The following hardware platforms cannot be programmed with the {{app_name}} anymore.
 
 | Hardware platform   | Device   | PCA number | Programming with J-Link  | Programming with Nordic Secure DFU  | Programming with MCUboot |
 |---------------------|----------|------------|--------------------------|-------------------------------------|--------------------------|

@@ -1,3 +1,23 @@
+## 4.5.0 - 2024-12-17
+
+### Changed
+
+-   Disabled unsupported firmware read for nRF54L Series.
+
+### Fixed
+
+-   Issue with programming firmware on nRF54L15 when it is larger than 1 MB.
+
+## 4.4.2 - 2024-11-11
+
+### Changed
+
+-   Updated `nrfutil device` to v2.6.4.
+
+### Fixed
+
+-   The DECT modem firmware is now correctly detected for nRF91x1 devices.
+
 ## 4.4.1 - 2024-09-24
 
 ### Fixed

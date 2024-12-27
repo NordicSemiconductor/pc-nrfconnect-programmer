@@ -117,7 +117,6 @@ export const refreshMemoryLayout =
                         regions.push({
                             ...defaultRegion,
                             name: RegionName.FICR,
-                            version: 0,
                             startAddress: coreInfo.ficrBaseAddr,
                             regionSize: coreInfo.ficrSize,
                             permission: RegionPermission.NONE,
@@ -126,7 +125,6 @@ export const refreshMemoryLayout =
                         regions.push({
                             ...defaultRegion,
                             name: RegionName.UICR,
-                            version: 0,
                             startAddress: coreInfo.uicrBaseAddr,
                             regionSize: coreInfo.uicrSize,
                             permission: RegionPermission.NONE,
@@ -135,7 +133,6 @@ export const refreshMemoryLayout =
                         regions.push({
                             ...defaultRegion,
                             name: RegionName.MBR,
-                            version: 0,
                             startAddress: coreInfo.mbrBaseAddr,
                             regionSize: coreInfo.mbrSize,
                             color: RegionColor.MBR,
@@ -146,7 +143,7 @@ export const refreshMemoryLayout =
                     // Add bootloader, softDevice, applications to regions
                     const { imageInfoList } = fwInfo;
                     imageInfoList.forEach(image => {
-                        const { imageType, imageLocation, version } = image;
+                        const { imageType, imageLocation } = image;
 
                         if (!imageLocation) return;
 
@@ -189,7 +186,6 @@ export const refreshMemoryLayout =
                         regions.push({
                             ...defaultRegion,
                             name: regionName,
-                            version,
                             startAddress,
                             regionSize,
                             color,

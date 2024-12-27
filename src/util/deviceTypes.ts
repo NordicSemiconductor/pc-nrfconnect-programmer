@@ -20,7 +20,6 @@ export type CoreOperations = {
 export type CoreDefinition = {
     romBaseAddr: number;
     romSize: number;
-    ramSize: number;
     pageSize: number;
     blockSize: number;
     ficrBaseAddr: number;
@@ -40,6 +39,7 @@ export enum DeviceFamily {
     NRF51 = 'NRF51_FAMILY',
     NRF52 = 'NRF52_FAMILY',
     NRF53 = 'NRF53_FAMILY',
+    NRF54L = 'NRF54L_FAMILY',
     NRF91 = 'NRF91_FAMILY',
     UNKNOWN = 'UNKNOWN_FAMILY',
 }

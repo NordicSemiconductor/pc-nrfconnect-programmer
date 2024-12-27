@@ -1,9 +1,9 @@
 # Programming devices
 
-In nRF Connect Programmer, you can program [supported devices](index.md#supported-devices) or a custom board with a supported chip that allows for communication with J-Link, Nordic Secure DFU devices, and MCUboot devices.
+In the {{app_name}}, you can program [supported devices](index.md#supported-devices) or a custom board with a supported chip that allows for communication with J-Link, Nordic Secure DFU devices, and MCUboot devices.
 
 !!! tip "Tip"
-      If you experience any problems during the programming process, press Ctrl-R (command-R on macOS) to restart the nRF Connect Programmer app, and try programming again.
+      If you experience any problems during the programming process, press Ctrl-R (command-R on macOS) to restart the {{app_name}}, and try programming again.
 
 ## Device-specific procedures
 
@@ -21,7 +21,7 @@ The following devices have specific programming requirements or procedures:
 
 To program a supported development kit, complete the following procedure:
 
-1. Open nRF Connect for Desktop and launch **nRF Connect Programmer**.
+1. Open nRF Connect for Desktop and launch the {{app_name}}.
 2. Connect a development kit to the computer with a USB cable and turn it on.
 3. Click **Select device** and choose the device from the drop-down list.</br>
    The button text changes to the name and serial number of the selected device, and the **Device Memory Layout** section indicates that the device is connected.
@@ -43,7 +43,7 @@ To program a supported development kit, complete the following procedure:
 
 To program the nRF52840 Dongle, complete the following steps:
 
-1. Open nRF Connect for Desktop and launch nRF Connect Programmer.
+1. Open nRF Connect for Desktop and launch the {{app_name}}.
 2. Insert the nRF52840 Dongle into a USB port on the computer.
 3. Put the dongle into bootloader mode by pressing the **RESET** button.
 

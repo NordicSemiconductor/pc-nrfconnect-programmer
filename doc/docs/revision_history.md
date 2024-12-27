@@ -2,6 +2,7 @@
 
 | Date       | Description                                                                                                                                                                                  |
 |------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| November 2024   | Editorial changes |
 | May 2024   | Editorial changes |
 | March 2024 | Updated the documentation for the [nRF Connect Programmer v4.3.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)                                               |
 | February 2024  | Updated the [supported devices section](index.md#supported-devices) with a matrix table                                               |
