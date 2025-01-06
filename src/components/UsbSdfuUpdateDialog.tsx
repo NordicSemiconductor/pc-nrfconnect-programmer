@@ -5,7 +5,6 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import Form from 'react-bootstrap/Form';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -195,19 +194,19 @@ Are you sure you want to continue?`,
                 </Alert>
             )}
             {writing && (
-                <Form.Group>
-                    <Form.Label>
+                <div className="tw-flex tw-flex-col tw-gap-2">
+                    <div>
                         <strong>Status: </strong>
                         <span>{` ${
                             progress ? progress.message : 'Starting...'
                         }`}</span>
-                    </Form.Label>
+                    </div>
                     <ProgressBar
                         hidden={!writing}
                         now={progress?.stepProgressPercentage ?? 0}
                         style={{ height: '4px' }}
                     />
-                </Form.Group>
+                </div>
             )}
         </GenericDialog>
     );
