@@ -2,6 +2,7 @@
 
 | Date       | Description                                                                                                                                                                                  |
 |------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| January 2025    | Updated the [supported devices section](index.md#supported-devices) with entries for nRF54L15, nRF54H20, and nRF9151  |
 | November 2024   | Editorial changes |
 | May 2024   | Editorial changes |
 | March 2024 | Updated the documentation for the [nRF Connect Programmer v4.3.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)                                               |
