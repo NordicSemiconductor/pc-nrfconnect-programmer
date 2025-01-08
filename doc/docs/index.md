@@ -46,3 +46,8 @@ The following hardware platforms cannot be programmed with the {{app_name}} anym
 | All platforms with nRF52811         | nRF52811 | -   | No                       | No                                  | No                       |
 | All platforms with nRF52805         | nRF52805 | -   | No                       | No                                  | No                       |
 | All platforms with nRF51 Series' SoC          | All | -   | No                       | No                                  | No                       |
+
+## Application source code
+
+The code of the application is open source and [available on GitHub](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer).
+Feel free to fork the repository and clone it for secondary development or feature contributions.
