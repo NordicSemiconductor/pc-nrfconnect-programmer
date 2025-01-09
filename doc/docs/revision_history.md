@@ -2,7 +2,7 @@
 
 | Date       | Description                                                                                                                                                                                  |
 |------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| January 2025    | - Updated the [supported devices section](index.md#supported-devices) with entries for nRF54L15, nRF54H20, and nRF9151<br/>- Added the [Application source code](./index.md#application-source-code) section on the [Home](./index.md) page  |
+| January 2025    | - Updated the [supported devices section](index.md#supported-devices) with entries for nRF54L15, nRF54H20, and nRF9151<br/>- Added the Programming Nordic Thingy:53 section on the [Programming devices](programming_dk.md) page<br/>- Added the [Application source code](./index.md#application-source-code) section on the [Home](./index.md) page  |
 | November 2024   | Editorial changes |
 | May 2024   | Editorial changes |
 | March 2024 | Updated the documentation for the [nRF Connect Programmer v4.3.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)                                               |
