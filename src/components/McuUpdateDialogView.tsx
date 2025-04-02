@@ -5,11 +5,7 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import Form from 'react-bootstrap/Form';
-import FormLabel from 'react-bootstrap/FormLabel';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     addConfirmBeforeClose,
@@ -274,153 +270,152 @@ Are you sure you want to continue?`,
                 </>
             }
         >
-            <Form.Group>
-                <Form.Label className="mb-0">
+            <div className="tw-flex tw-flex-col tw-gap-4">
+                <div>
                     <strong>Firmware:</strong>
                     <span>{` ${mcubootFwPath || zipFilePath}`}</span>
-                </Form.Label>
-            </Form.Group>
+                </div>
 
-            {programmingOptions.length > 1 && !zipFilePath && (
-                <Form.Group>
-                    <Form.Label
-                        style={{ display: 'inline-flex', alignItems: 'center' }}
-                    >
-                        <strong>Target:</strong>
-                        <Overlay
-                            tooltipChildren={
-                                <span>{TOOLTIP_TEXT_MULTIPLE_TARGETS}</span>
-                            }
-                            keepShowingOnHoverTooltip
-                            tooltipId="test"
-                            placement="right"
-                        >
-                            <span className="mdi mdi-information-outline info-icon ml-1" />
-                        </Overlay>
-                    </Form.Label>
-                    <Dropdown
-                        items={targetDropdownItems}
-                        onSelect={(item: DropdownItem) => {
-                            setChosenTarget(item.value);
-                        }}
-                        selectedItem={getSelectedDropdownItem(
-                            targetDropdownItems,
-                            chosenTarget
-                        )}
-                        disabled={writingHasStarted}
-                    />
-                </Form.Group>
-            )}
-
-            {writing && (
-                <Form.Group>
-                    <Form.Label>
-                        <strong>Status: </strong>
-                        <span>{` ${
-                            progress ? progress.message : 'Starting...'
-                        }`}</span>
-                    </Form.Label>
-                    <ProgressBar
-                        hidden={!writing}
-                        now={progress?.stepProgressPercentage ?? 0}
-                        style={{ height: '4px' }}
-                    />
-                </Form.Group>
-            )}
-            {!writingHasStarted && showDelayTimeout && (
-                <Form.Group className="upload-delay p-3">
-                    <div className="d-flex justify-content-between">
-                        <Form.Label className="mb-0">
-                            <strong>
-                                Keep default delay after image upload
-                            </strong>
-                            <OverlayTrigger
-                                placement="bottom-end"
-                                overlay={
-                                    <Tooltip id="tooltip-delay-info">
-                                        <div className="info text-left">
-                                            <span>{TOOLTIP_TEXT}</span>
-                                        </div>
-                                    </Tooltip>
+                {programmingOptions.length > 1 && !zipFilePath && (
+                    <div>
+                        <div>
+                            <strong>Target:</strong>
+                            <Overlay
+                                tooltipChildren={
+                                    <span>{TOOLTIP_TEXT_MULTIPLE_TARGETS}</span>
                                 }
+                                keepShowingOnHoverTooltip
+                                tooltipId="test"
+                                placement="right"
                             >
                                 <span className="mdi mdi-information-outline info-icon ml-1" />
-                            </OverlayTrigger>
-                        </Form.Label>
-                        <Toggle
-                            onToggle={toggleDefaultTimeoutUI}
-                            isToggled={keepDefaultTimeout}
+                            </Overlay>
+                        </div>
+                        <Dropdown
+                            items={targetDropdownItems}
+                            onSelect={(item: DropdownItem) => {
+                                setChosenTarget(item.value);
+                            }}
+                            selectedItem={getSelectedDropdownItem(
+                                targetDropdownItems,
+                                chosenTarget
+                            )}
+                            disabled={writingHasStarted}
                         />
                     </div>
-                    <FormLabel
-                        className={classNames(
-                            'w-100 mb-0 mt-3',
-                            keepDefaultTimeout ? 'd-none' : 'd-block'
-                        )}
-                    >
-                        <div className="d-flex justify-content-between mb-2 flex-row">
-                            <div>
-                                <strong>Set delay duration</strong>
-                            </div>
-                            <div className="d-flex">
-                                <NumberInlineInput
-                                    value={uploadDelay}
-                                    range={uploadDelayRange}
-                                    onChange={updateUploadDelayTimeout}
-                                />
-                                <span>sec</span>
-                            </div>
-                        </div>
-                        <Slider
-                            values={[uploadDelay]}
-                            onChange={[
-                                (value: number) =>
-                                    updateUploadDelayTimeout(value),
-                            ]}
-                            range={uploadDelayRange}
-                        />
+                )}
 
-                        {uploadDelay !== NET_CORE_UPLOAD_DELAY && (
-                            <p className="note">
-                                Note: recommended delay for <i>most</i> of the
-                                devices is {NET_CORE_UPLOAD_DELAY} seconds.
-                            </p>
-                        )}
-                    </FormLabel>
-                </Form.Group>
-            )}
-            <Form.Group>
-                {!writingHasStarted && (
-                    <Alert variant="warning">
+                {writing && (
+                    <div className="tw-flex tw-flex-col tw-gap-2">
                         <div>
-                            <p className="mb-0">
-                                You are now programming via MCUboot.
-                            </p>
-                            <p className="mb-0">
-                                The device will be recovered if you proceed to
-                                write.
-                            </p>
-                            <p className="mb-0">
-                                Make sure the device is in{' '}
-                                <strong>MCUboot mode</strong>.
-                            </p>
+                            <strong>Status: </strong>
+                            <span>{` ${
+                                progress ? progress.message : 'Starting...'
+                            }`}</span>
                         </div>
-                    </Alert>
+                        <ProgressBar
+                            hidden={!writing}
+                            now={progress?.stepProgressPercentage ?? 0}
+                            style={{ height: '4px' }}
+                        />
+                    </div>
                 )}
-                {writingSucceed && (
-                    <Alert variant="success">
-                        Completed successfully in {` `}
-                        {` ${Math.round(time / 1000)} `}
-                        {` `} seconds.
-                    </Alert>
+                {!writingHasStarted && showDelayTimeout && (
+                    <div className="tw-flex tw-flex-col tw-gap-4 tw-border tw-border-solid tw-border-gray-100 tw-p-3">
+                        <div className="tw-flex tw-justify-between">
+                            <div className="tw-mb-0 tw-flex tw-flex-row tw-gap-1">
+                                <strong>
+                                    Keep default delay after image upload
+                                </strong>
+                                <Overlay
+                                    tooltipId="tooltip-delay-info"
+                                    keepShowingOnHoverTooltip
+                                    placement="bottom"
+                                    tooltipChildren={
+                                        <div className="tw-text-left">
+                                            <span>{TOOLTIP_TEXT}</span>
+                                        </div>
+                                    }
+                                >
+                                    <span className="mdi mdi-information-outline info-icon" />
+                                </Overlay>
+                            </div>
+                            <Toggle
+                                onToggle={toggleDefaultTimeoutUI}
+                                isToggled={keepDefaultTimeout}
+                            />
+                        </div>
+                        <div
+                            className={classNames(
+                                'tw-mb-0 tw-flex tw-w-full tw-flex-col tw-gap-2',
+                                keepDefaultTimeout ? 'tw-hidden' : 'tw-block'
+                            )}
+                        >
+                            <div className="tw-flex tw-flex-row tw-justify-between">
+                                <div>
+                                    <strong>Set delay duration</strong>
+                                </div>
+                                <div className="d-flex">
+                                    <NumberInlineInput
+                                        value={uploadDelay}
+                                        range={uploadDelayRange}
+                                        onChange={updateUploadDelayTimeout}
+                                    />
+                                    <span>sec</span>
+                                </div>
+                            </div>
+                            <Slider
+                                values={[uploadDelay]}
+                                onChange={[
+                                    (value: number) =>
+                                        updateUploadDelayTimeout(value),
+                                ]}
+                                range={uploadDelayRange}
+                            />
+
+                            {uploadDelay !== NET_CORE_UPLOAD_DELAY && (
+                                <p className="tw-mb-0 tw-text-xs">
+                                    Note: recommended delay for <i>most</i> of
+                                    the devices is {NET_CORE_UPLOAD_DELAY}{' '}
+                                    seconds.
+                                </p>
+                            )}
+                        </div>
+                    </div>
                 )}
-                {writingFail && (
-                    <Alert variant="danger">
-                        {writingFailError?.trim() ||
-                            'Failed. Check the log below for more details...'}
-                    </Alert>
-                )}
-            </Form.Group>
+                <div>
+                    {!writingHasStarted && (
+                        <Alert variant="warning">
+                            <div className="tw-flex tw-flex-col tw-gap-0">
+                                <span>
+                                    You are now programming via MCUboot.
+                                </span>
+                                <span>
+                                    The device will be recovered if you proceed
+                                    to write.
+                                </span>
+                                <span>
+                                    Make sure the device is in{' '}
+                                    <strong>MCUboot mode</strong>.
+                                </span>
+                            </div>
+                        </Alert>
+                    )}
+                    {writingSucceed && (
+                        <Alert variant="success">
+                            Completed successfully in {` `}
+                            {` ${Math.round(time / 1000)} `}
+                            {` `} seconds.
+                        </Alert>
+                    )}
+                    {writingFail && (
+                        <Alert variant="danger">
+                            {writingFailError?.trim() ||
+                                'Failed. Check the log below for more details...'}
+                        </Alert>
+                    )}
+                </div>
+            </div>
         </GenericDialog>
     );
 };

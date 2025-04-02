@@ -11,7 +11,10 @@ The following table lists the hardware platforms that you can program with the {
 | nRF9161 DK          | nRF9161  | PCA10153   | Yes                      | No                                  | No                       |
 | nRF9160 DK          | nRF9160  | PCA10090   | Yes                      | No                                  | No                       |
 | Nordic Thingy:91    | nRF9160  | PCA20035   | Yes                      | No                                  | Yes                      |
+| nRF9151 DK          | nRF9131  | PCA10171   | Yes                      | No                                  | No                       |
 | nRF9131 DK          | nRF9131  | PCA10147   | Yes                      | No                                  | No                       |
+| nRF54H20 DK         | nRF54H20 | PCA10175   | *Not yet available*      | No                                  | No                       |
+| nRF54L15 DK         | nRF54L15 | PCA10156   | Yes                      | No                                  | No                       |
 | nRF5340 DK          | nRF5340  | PCA10095   | Yes                      | No                                  | No                       |
 | nRF5340 Audio DK    | nRF5340  | PCA10121   | Yes                      | No                                  | No                       |
 | Nordic Thingy:53    | nRF5340  | PCA20053   | Yes                      | No                                  | Yes                      |
@@ -43,3 +46,8 @@ The following hardware platforms cannot be programmed with the {{app_name}} anym
 | All platforms with nRF52811         | nRF52811 | -   | No                       | No                                  | No                       |
 | All platforms with nRF52805         | nRF52805 | -   | No                       | No                                  | No                       |
 | All platforms with nRF51 Series' SoC          | All | -   | No                       | No                                  | No                       |
+
+## Application source code
+
+The code of the application is open source and [available on GitHub](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer).
+Feel free to fork the repository and clone it for secondary development or feature contributions.
