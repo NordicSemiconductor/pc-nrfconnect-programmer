@@ -42,8 +42,6 @@ import { WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';
-const TOOLTIP_TEXT_MULTIPLE_TARGETS =
-    'Your device has multiple targets. Please select the target you want to program.';
 
 const NET_CORE_UPLOAD_DELAY = 120;
 
@@ -127,10 +125,10 @@ const McuUpdateDialogView = () => {
     }, [device, showDelayTimeout]);
 
     useEffect(() => {
-        if (targetDropdownItems.length > 0) {
+        if (targetDropdownItems.length > 0 && !chosenTarget) {
             setChosenTarget(targetDropdownItems[0].value);
         }
-    }, [targetDropdownItems]);
+    }, [chosenTarget, targetDropdownItems]);
 
     const onCancel = () => {
         dispatch(clearWaitForDevice());
@@ -150,6 +148,11 @@ const McuUpdateDialogView = () => {
 
         if (!fwPath) {
             logger.error('No file selected');
+            return;
+        }
+
+        if (programmingOptions.length > 1 && !zipFilePath && !chosenTarget) {
+            logger.error('No target selected');
             return;
         }
 
@@ -277,20 +280,8 @@ Are you sure you want to continue?`,
                 </div>
 
                 {programmingOptions.length > 1 && !zipFilePath && (
-                    <div>
-                        <div>
-                            <strong>Target:</strong>
-                            <Overlay
-                                tooltipChildren={
-                                    <span>{TOOLTIP_TEXT_MULTIPLE_TARGETS}</span>
-                                }
-                                keepShowingOnHoverTooltip
-                                tooltipId="test"
-                                placement="right"
-                            >
-                                <span className="mdi mdi-information-outline info-icon ml-1" />
-                            </Overlay>
-                        </div>
+                    <div className="tw-flex tw-flex-col tw-gap-2">
+                        <strong>Target:</strong>
                         <Dropdown
                             items={targetDropdownItems}
                             onSelect={(item: DropdownItem) => {
