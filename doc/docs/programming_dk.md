@@ -11,6 +11,7 @@ The following devices have specific programming requirements or procedures:
 
 | Device                            | Description                                                                                                          |
 |-----------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| Nordic Thingy:91 X    | To program Nordic Thingy:91 X, see ???.
 | Nordic Thingy:91      | To program Nordic Thingy:91, see [Updating the Thingy:91 firmware using Programmer](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/working_with_nrf/nrf91/thingy91.html#updating_the_thingy91_firmware_using_programmer).
 | nRF9160 DK            | To program the nRF9160 DK, see [Updating the nRF9160 DK firmware using Programmer](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/working_with_nrf/nrf91/nrf9160.html#updating_the_dk_firmware_using_programmer). |
 | Nordic Thingy:53      | To program Nordic Thingy:53, follow the steps from the [Programming Nordic Thingy:53](#programming-nordic-thingy53) section. |

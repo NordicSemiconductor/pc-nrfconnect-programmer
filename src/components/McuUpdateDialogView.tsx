@@ -13,13 +13,18 @@ import {
     classNames,
     clearConfirmBeforeClose,
     clearWaitForDevice,
+    convertToDropDownItems,
     DialogButton,
+    Dropdown,
+    DropdownItem,
     GenericDialog,
     getPersistentStore,
+    getSelectedDropdownItem,
     logger,
     NumberInlineInput,
     Overlay,
     selectedDevice,
+    selectedDeviceInfo,
     setWaitForDevice,
     Slider,
     Toggle,
@@ -53,8 +58,19 @@ const McuUpdateDialogView = () => {
     const isVisible = useSelector(getShowMcuBootProgrammingDialog);
     const mcubootFwPath = useSelector(getMcubootFilePath);
     const zipFilePath = useSelector(getZipFilePath);
+    const deviceInfo = useSelector(selectedDeviceInfo);
+
+    const programmingOptions =
+        deviceInfo?.mcuStateOptions?.filter(s => s.type === 'Programming') ??
+        [];
+
+    const targetDropdownItems = convertToDropDownItems(
+        programmingOptions.map(s => s.arguments?.target),
+        false
+    );
 
     const fwPath = mcubootFwPath || zipFilePath;
+    const [chosenTarget, setChosenTarget] = useState<string>('');
 
     const writingHasStarted = writing || writingFail || writingSucceed;
 
@@ -108,6 +124,12 @@ const McuUpdateDialogView = () => {
         }
     }, [device, showDelayTimeout]);
 
+    useEffect(() => {
+        if (targetDropdownItems.length > 0 && !chosenTarget) {
+            setChosenTarget(targetDropdownItems[0].value);
+        }
+    }, [chosenTarget, targetDropdownItems]);
+
     const onCancel = () => {
         dispatch(clearWaitForDevice());
         dispatch(setShowMcuBootProgrammingDialog(false));
@@ -126,6 +148,11 @@ const McuUpdateDialogView = () => {
 
         if (!fwPath) {
             logger.error('No file selected');
+            return;
+        }
+
+        if (programmingOptions.length > 1 && !zipFilePath && !chosenTarget) {
+            logger.error('No target selected');
             return;
         }
 
@@ -172,7 +199,8 @@ Are you sure you want to continue?`,
                 setProgress(updatedProgress);
             },
             abortController.current,
-            showDelayTimeout ? uploadDelay : undefined
+            showDelayTimeout ? uploadDelay : undefined,
+            mcubootFwPath ? chosenTarget : undefined
         )
             .then(() => {
                 setWritingSucceed(true);
@@ -228,7 +256,14 @@ Are you sure you want to continue?`,
                     <DialogButton
                         variant="primary"
                         onClick={onWriteStart}
-                        disabled={writing || writingSucceed || writingFail}
+                        disabled={
+                            writing ||
+                            writingSucceed ||
+                            writingFail ||
+                            (programmingOptions.length > 1 &&
+                                !chosenTarget &&
+                                !!mcubootFwPath)
+                        }
                     >
                         Write
                     </DialogButton>
@@ -243,6 +278,24 @@ Are you sure you want to continue?`,
                     <strong>Firmware:</strong>
                     <span>{` ${mcubootFwPath || zipFilePath}`}</span>
                 </div>
+
+                {programmingOptions.length > 1 && !zipFilePath && (
+                    <div className="tw-flex tw-flex-col tw-gap-2">
+                        <strong>Target:</strong>
+                        <Dropdown
+                            items={targetDropdownItems}
+                            onSelect={(item: DropdownItem) => {
+                                setChosenTarget(item.value);
+                            }}
+                            selectedItem={getSelectedDropdownItem(
+                                targetDropdownItems,
+                                chosenTarget
+                            )}
+                            disabled={writingHasStarted}
+                        />
+                    </div>
+                )}
+
                 {writing && (
                     <div className="tw-flex tw-flex-col tw-gap-2">
                         <div>
