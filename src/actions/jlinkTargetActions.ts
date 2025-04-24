@@ -117,10 +117,6 @@ const readAllCoresBatch =
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch => {
-        if (deviceDefinition.family === DeviceFamily.NRF54L) {
-            return batch;
-        }
-
         convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
             (accBatch, deviceCoreInfo) => {
                 if (
