@@ -19,6 +19,7 @@ import {
     DeviceInfo,
     GetProtectionStatusResult,
     NrfutilDeviceLib,
+    ReadResult,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import { setSelectedDeviceInfo } from '@nordicsemiconductor/pc-nrfconnect-shared/src/Device/deviceSlice';
 import fs from 'fs';
@@ -132,9 +133,12 @@ const readAllCoresBatch =
                     );
                     return accBatch;
                 }
-                return accBatch.firmwareRead(
-                    deviceCoreInfo.name,
-                    batchLoggingCallbacks<Buffer>(
+                return accBatch.xRead(
+                    deviceCoreInfo.coreDefinitions.romBaseAddr,
+                    deviceCoreInfo.coreDefinitions.romSize,
+                    undefined,
+                    undefined,
+                    batchLoggingCallbacks<ReadResult>(
                         `Reading memory for ${deviceCoreInfo.name} core`,
                         () => {
                             dispatch(
@@ -149,10 +153,10 @@ const readAllCoresBatch =
                                 })
                             );
                         },
-                        (success, hexBuffer) => {
-                            if (success && hexBuffer) {
-                                const hexText = hexBuffer.toString('utf8');
-                                const memMap = MemoryMap.fromHex(hexText);
+                        (success, data) => {
+                            if (success && data) {
+                                console.log(data.intelHex);
+                                const memMap = MemoryMap.fromHex(data.intelHex);
 
                                 const paddedArray = memMap.slicePad(
                                     0,

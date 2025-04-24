@@ -16,7 +16,7 @@
     "nrfConnectForDesktop": {
         "nrfutil": {
             "device": [
-                "2.6.4"
+                "2.9.0"
             ]
         },
         "html": "dist/index.html"
@@ -46,7 +46,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^200.0.0"
+        "@nordicsemiconductor/pc-nrfconnect-shared": "github:NordicSemiconductor/pc-nrfconnect-shared#feat/support-x-read"
     },
     "eslintConfig": {
         "extends": "./node_modules/@nordicsemiconductor/pc-nrfconnect-shared/config/eslintrc"
