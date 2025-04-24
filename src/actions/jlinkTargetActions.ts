@@ -155,7 +155,6 @@ const readAllCoresBatch =
                         },
                         (success, data) => {
                             if (success && data) {
-                                console.log(data.intelHex);
                                 const memMap = MemoryMap.fromHex(data.intelHex);
 
                                 const paddedArray = memMap.slicePad(
