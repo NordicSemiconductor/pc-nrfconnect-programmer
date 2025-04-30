@@ -40,10 +40,7 @@ import {
     getDefaultDeviceInfoByJlinkFamily,
     mergeNrfutilDeviceInfoInCoreDefinition,
 } from '../util/devices';
-import {
-    CoreDefinition,
-    DeviceDefinition,
-} from '../util/deviceTypes';
+import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
 
 let abortController: AbortController | undefined;
 
