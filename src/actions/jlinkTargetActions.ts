@@ -126,6 +126,7 @@ const readAllCoresBatch =
                     return accBatch;
                 }
                 return accBatch.xRead(
+                    deviceCoreInfo.name,
                     deviceCoreInfo.coreDefinitions.romBaseAddr,
                     deviceCoreInfo.coreDefinitions.romSize,
                     undefined,
