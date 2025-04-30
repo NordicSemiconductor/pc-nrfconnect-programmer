@@ -43,7 +43,6 @@ import {
 import {
     CoreDefinition,
     DeviceDefinition,
-    DeviceFamily,
 } from '../util/deviceTypes';
 
 let abortController: AbortController | undefined;

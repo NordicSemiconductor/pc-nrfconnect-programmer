@@ -28,7 +28,6 @@ import { convertDeviceDefinitionToCoreArray, CoreInfo } from '../util/devices';
 import {
     CoreDefinition,
     DeviceDefinition,
-    DeviceFamily,
 } from '../util/deviceTypes';
 import { getCoreRegions, Region } from '../util/regions';
 import CoreView from './CoreView';
