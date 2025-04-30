@@ -1,4 +1,8 @@
-## 4.5.1 - unreleased
+## 4.6.0 - unreleased
+
+### Added
+
+-   Enabled firmware read for nRF54L Series.
 
 ### Changed
 
