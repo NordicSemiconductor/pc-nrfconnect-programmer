@@ -41,7 +41,6 @@ import {
 import { getAutoRead, getAutoReset } from '../reducers/settingsReducer';
 import { getIsWritable } from '../reducers/targetReducer';
 import { convertDeviceDefinitionToCoreArray } from '../util/devices';
-import { DeviceFamily } from '../util/deviceTypes';
 
 const useRegisterDragEvents = () => {
     const dispatch = useDispatch();
@@ -188,8 +187,6 @@ const ControlPanel = () => {
     const isMcuboot = !!device?.traits.mcuBoot;
     const isModem = !!device?.traits.modem;
 
-    const isNRF54LFamily = deviceDefinition.family === DeviceFamily.NRF54L;
-
     const targetIsRecoverable = isJLink;
 
     const refreshAllFiles = () => dispatch(fileActions.refreshAllFiles());
@@ -297,12 +294,7 @@ Are you sure you want to continue?`,
                         }
                         dispatch(jlinkTargetActions.saveAsFile());
                     }}
-                    disabled={
-                        !isJLink ||
-                        !isMemLoaded ||
-                        !targetIsReady ||
-                        isNRF54LFamily
-                    }
+                    disabled={!isJLink || !isMemLoaded || !targetIsReady}
                 >
                     <span className="mdi mdi-floppy" />
                     Save as file
@@ -390,17 +382,8 @@ Are you sure you want to continue?`,
                         }
                         dispatch(setDeviceBusy(false));
                     }}
-                    title={
-                        isNRF54LFamily
-                            ? 'Reading memory from nRF54L family is not supported.'
-                            : undefined
-                    }
                     disabled={
-                        isMcuboot ||
-                        !isJLink ||
-                        !targetIsReady ||
-                        !canRead ||
-                        isNRF54LFamily
+                        isMcuboot || !isJLink || !targetIsReady || !canRead
                     }
                 >
                     <span className="mdi mdi-refresh" />
@@ -410,16 +393,10 @@ Are you sure you want to continue?`,
             <Group heading="J-Link Settings">
                 <Toggle
                     onToggle={() => dispatch(settingsActions.toggleAutoRead())}
-                    isToggled={autoRead && !isNRF54LFamily}
+                    isToggled={autoRead}
                     label="Auto read memory"
                     barColor={colors.gray700}
                     handleColor={colors.gray300}
-                    disabled={isNRF54LFamily}
-                    title={
-                        isNRF54LFamily
-                            ? 'Reading memory from nRF54L15 family is not supported.'
-                            : undefined
-                    }
                 />
                 <Toggle
                     isToggled={autoReset}

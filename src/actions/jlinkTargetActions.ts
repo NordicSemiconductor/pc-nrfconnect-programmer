@@ -19,6 +19,7 @@ import {
     DeviceInfo,
     GetProtectionStatusResult,
     NrfutilDeviceLib,
+    ReadResult,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import { setSelectedDeviceInfo } from '@nordicsemiconductor/pc-nrfconnect-shared/src/Device/deviceSlice';
 import fs from 'fs';
@@ -39,11 +40,7 @@ import {
     getDefaultDeviceInfoByJlinkFamily,
     mergeNrfutilDeviceInfoInCoreDefinition,
 } from '../util/devices';
-import {
-    CoreDefinition,
-    DeviceDefinition,
-    DeviceFamily,
-} from '../util/deviceTypes';
+import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
 
 let abortController: AbortController | undefined;
 
@@ -116,10 +113,6 @@ const readAllCoresBatch =
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch => {
-        if (deviceDefinition.family === DeviceFamily.NRF54L) {
-            return batch;
-        }
-
         convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
             (accBatch, deviceCoreInfo) => {
                 if (
@@ -132,9 +125,13 @@ const readAllCoresBatch =
                     );
                     return accBatch;
                 }
-                return accBatch.firmwareRead(
+                return accBatch.xRead(
                     deviceCoreInfo.name,
-                    batchLoggingCallbacks<Buffer>(
+                    deviceCoreInfo.coreDefinitions.romBaseAddr,
+                    deviceCoreInfo.coreDefinitions.romSize,
+                    undefined,
+                    undefined,
+                    batchLoggingCallbacks<ReadResult>(
                         `Reading memory for ${deviceCoreInfo.name} core`,
                         () => {
                             dispatch(
@@ -149,10 +146,9 @@ const readAllCoresBatch =
                                 })
                             );
                         },
-                        (success, hexBuffer) => {
-                            if (success && hexBuffer) {
-                                const hexText = hexBuffer.toString('utf8');
-                                const memMap = MemoryMap.fromHex(hexText);
+                        (success, data) => {
+                            if (success && data) {
+                                const memMap = MemoryMap.fromHex(data.intelHex);
 
                                 const paddedArray = memMap.slicePad(
                                     0,
