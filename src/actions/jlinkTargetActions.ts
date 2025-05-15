@@ -70,9 +70,13 @@ export const openDevice =
             abortController
         );
 
-        const deviceDefinition = getDeviceDefinition(getState());
+        let deviceDefinition = getDeviceDefinition(getState());
 
-        const batch = dispatch(getAllCoreInfoBatch(deviceDefinition, true));
+        await dispatch(getAllCoreInfoBatch(deviceDefinition, true)).run(device);
+
+        const batch = NrfutilDeviceLib.batch();
+
+        deviceDefinition = getDeviceDefinition(getState());
 
         const autoRead = getState().app.settings.autoRead;
         if (autoRead) {
