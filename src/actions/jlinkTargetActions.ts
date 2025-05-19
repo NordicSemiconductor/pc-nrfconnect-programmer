@@ -70,17 +70,13 @@ export const openDevice =
             abortController
         );
 
-        let deviceDefinition = getDeviceDefinition(getState());
-
-        await dispatch(getAllCoreInfoBatch(deviceDefinition, true)).run(device);
+        await dispatch(getAllCoreInfoBatch(true)).run(device);
 
         const batch = NrfutilDeviceLib.batch();
 
-        deviceDefinition = getDeviceDefinition(getState());
-
         const autoRead = getState().app.settings.autoRead;
         if (autoRead) {
-            dispatch(readAllCoresBatch(deviceDefinition, true, batch));
+            dispatch(readAllCoresBatch(true, batch));
         }
 
         const autoReset = getState().app.settings.autoReset;
@@ -112,11 +108,11 @@ const logDeviceInfo = (device: Device, deviceInfo?: DeviceInfo) => {
 
 const readAllCoresBatch =
     (
-        deviceDefinition: DeviceDefinition,
         checkProtection: boolean,
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
-    dispatch => {
+    (dispatch, getState) => {
+        const deviceDefinition = getDeviceDefinition(getState());
         convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
             (accBatch, deviceCoreInfo) => {
                 if (
@@ -188,12 +184,9 @@ const readAllCoresBatch =
 export const read =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async dispatch => {
-        const deviceDefinition = await dispatch(updateDeviceInfo(device));
+        await dispatch(updateDeviceInfo(device));
 
-        await dispatch(readAllCoresBatch(deviceDefinition, true)).run(
-            device,
-            abortController
-        );
+        await dispatch(readAllCoresBatch(true)).run(device, abortController);
     };
 
 const batchLoggingCallbacks = <T>(
@@ -332,12 +325,12 @@ const recoverAllCoresBatch =
 
 const writeToAllCoresBatch =
     (
-        deviceDefinition: DeviceDefinition,
         memMaps: MemoryMaps<string>,
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
-    dispatch =>
-        convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
+    (dispatch, getState) => {
+        const deviceDefinition = getDeviceDefinition(getState());
+        return convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
             (accBatch, deviceCoreInfo) => {
                 const hex = geCoreHexIntel(
                     deviceCoreInfo.coreDefinitions,
@@ -355,6 +348,7 @@ const writeToAllCoresBatch =
             },
             batch
         );
+    };
 
 const updateDeviceInfo =
     (device: Device): AppThunk<RootState, Promise<DeviceDefinition>> =>
@@ -392,23 +386,23 @@ export const recover =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
         const deviceDefinition = await dispatch(updateDeviceInfo(device));
-
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
-        const batch = dispatch(recoverAllCoresBatch(coreNames));
+        let batch = dispatch(recoverAllCoresBatch(coreNames));
 
-        const autoRead = getState().app.settings.autoRead;
-        if (autoRead) {
-            dispatch(readAllCoresBatch(deviceDefinition, false, batch)); // No need to check protection as we recovered
-        }
-
-        dispatch(
+        await dispatch(
             getAllCoreInfoBatch(
-                deviceDefinition,
                 false, // No need to check protection as we recovered
                 batch
             )
-        );
+        ).run(device);
+
+        batch = NrfutilDeviceLib.batch();
+
+        const autoRead = getState().app.settings.autoRead;
+        if (autoRead) {
+            dispatch(readAllCoresBatch(false, batch)); // No need to check protection as we recovered
+        }
 
         const autoReset = getState().app.settings.autoReset;
         if (autoReset) {
@@ -429,26 +423,25 @@ export const recoverAndWrite =
     (device: Device): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
         const deviceDefinition = await dispatch(updateDeviceInfo(device));
-
         const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
         const coreNames = coreInfos.map(c => c.name);
-        const batch = dispatch(recoverAllCoresBatch(coreNames));
+        let batch = dispatch(recoverAllCoresBatch(coreNames));
 
-        const memMaps = getState().app.file.memMaps;
-        dispatch(writeToAllCoresBatch(deviceDefinition, memMaps, batch));
-
-        const autoRead = getState().app.settings.autoRead;
-        if (autoRead) {
-            dispatch(readAllCoresBatch(deviceDefinition, false, batch)); // No need to check protection as we recovered
-        }
-
-        dispatch(
+        await dispatch(
             getAllCoreInfoBatch(
-                deviceDefinition,
                 false, // No need to check protection as we recovered
                 batch
             )
-        );
+        ).run(device);
+
+        batch = NrfutilDeviceLib.batch();
+        const memMaps = getState().app.file.memMaps;
+        dispatch(writeToAllCoresBatch(memMaps, batch));
+
+        const autoRead = getState().app.settings.autoRead;
+        if (autoRead) {
+            dispatch(readAllCoresBatch(false, batch)); // No need to check protection as we recovered
+        }
 
         const autoReset = getState().app.settings.autoReset;
         if (autoReset) {
@@ -610,32 +603,32 @@ const getCoreInfoBatch =
 
 const getAllCoreInfoBatch =
     (
-        currentDeviceDefinition: DeviceDefinition,
         checkProtection: boolean,
         batch = NrfutilDeviceLib.batch()
     ): AppThunk<RootState, DeviceBatch> =>
-    dispatch =>
-        convertDeviceDefinitionToCoreArray(currentDeviceDefinition).reduce(
-            (accBatch, coreInfo) => {
-                if (
-                    checkProtection &&
-                    coreInfo.coreProtection !== 'NRFDL_PROTECTION_STATUS_NONE'
-                ) {
-                    logger.info(
-                        `Skipping reading core ${coreInfo.name} information as it is protected.`
-                    );
-                    return accBatch;
-                }
-
-                return dispatch(
-                    getCoreInfoBatch(
-                        coreInfo.name,
-                        currentDeviceDefinition.coreDefinitions[
-                            coreInfo.name
-                        ] as CoreDefinition,
-                        accBatch
-                    )
+    (dispatch, getState) => {
+        const currentDeviceDefinition = getDeviceDefinition(getState());
+        return convertDeviceDefinitionToCoreArray(
+            currentDeviceDefinition
+        ).reduce((accBatch, coreInfo) => {
+            if (
+                checkProtection &&
+                coreInfo.coreProtection !== 'NRFDL_PROTECTION_STATUS_NONE'
+            ) {
+                logger.info(
+                    `Skipping reading core ${coreInfo.name} information as it is protected.`
                 );
-            },
-            batch
-        );
+                return accBatch;
+            }
+
+            return dispatch(
+                getCoreInfoBatch(
+                    coreInfo.name,
+                    currentDeviceDefinition.coreDefinitions[
+                        coreInfo.name
+                    ] as CoreDefinition,
+                    accBatch
+                )
+            );
+        }, batch);
+    };
