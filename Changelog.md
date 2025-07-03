@@ -1,3 +1,9 @@
+## 4.6.1 - UNRELEASED
+
+### Changed
+
+-   Maintenance release to update the dependencies.
+
 ## 4.6.0 - 2025-05-22
 
 ### Added
