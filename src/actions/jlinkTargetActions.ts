@@ -119,8 +119,6 @@ const readAllCoresBatch =
                 const xReadOptions = {
                     address: deviceCoreInfo.coreDefinitions.romBaseAddr,
                     bytes: deviceCoreInfo.coreDefinitions.romSize,
-                    width: undefined,
-                    direct: undefined,
                 } as XReadOptions;
                 if (
                     checkProtection &&
