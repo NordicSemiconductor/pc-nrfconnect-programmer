@@ -21,6 +21,7 @@ import {
     NrfutilDeviceLib,
     ReadResult,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import { XReadOptions } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device/xRead';
 import { setSelectedDeviceInfo } from '@nordicsemiconductor/pc-nrfconnect-shared/src/Device/deviceSlice';
 import fs from 'fs';
 import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
@@ -115,6 +116,10 @@ const readAllCoresBatch =
         const deviceDefinition = getDeviceDefinition(getState());
         convertDeviceDefinitionToCoreArray(deviceDefinition).reduce(
             (accBatch, deviceCoreInfo) => {
+                const xReadOptions = {
+                    address: deviceCoreInfo.coreDefinitions.romBaseAddr,
+                    bytes: deviceCoreInfo.coreDefinitions.romSize,
+                } as XReadOptions;
                 if (
                     checkProtection &&
                     deviceCoreInfo.coreProtection !==
@@ -127,10 +132,7 @@ const readAllCoresBatch =
                 }
                 return accBatch.xRead(
                     deviceCoreInfo.name,
-                    deviceCoreInfo.coreDefinitions.romBaseAddr,
-                    deviceCoreInfo.coreDefinitions.romSize,
-                    undefined,
-                    undefined,
+                    xReadOptions,
                     batchLoggingCallbacks<ReadResult>(
                         `Reading memory for ${deviceCoreInfo.name} core`,
                         () => {
