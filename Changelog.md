@@ -2,7 +2,7 @@
 
 ### Fixed
 
--   Issue when selecting devices in verbose logging.
+-   Issue with selecting devices when logging is set to verbose.
 
 ## 4.6.1 - 2025-07-08
 
