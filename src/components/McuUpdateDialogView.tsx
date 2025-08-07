@@ -172,7 +172,11 @@ Are you sure you want to continue?`,
                 setProgress(updatedProgress);
             },
             abortController.current,
-            showDelayTimeout ? uploadDelay : undefined
+            showDelayTimeout
+                ? {
+                      netCoreUploadDelay: uploadDelay,
+                  }
+                : undefined
         )
             .then(() => {
                 setWritingSucceed(true);
