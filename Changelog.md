@@ -1,3 +1,10 @@
+## 4.6.3 - Unreleased
+
+### Fixed
+
+-   Programming of some MCUBoot devices no longer fails with
+    `Unhandled ProgrammingOptions`
+
 ## 4.6.2 - 2025-07-14
 
 ### Fixed

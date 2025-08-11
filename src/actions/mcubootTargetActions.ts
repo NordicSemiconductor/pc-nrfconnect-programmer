@@ -13,6 +13,7 @@ import {
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import { ProgrammingOptions } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device/program';
 
 import { setDeviceDefinition } from '../reducers/deviceDefinitionReducer';
 import { targetWritableKnown } from '../reducers/targetReducer';
@@ -62,7 +63,7 @@ export const performUpdate = async (
     dfuFilePath: string,
     onProgress: (progress: Progress) => void,
     abortController: AbortController,
-    netCoreUploadDelay?: number
+    programmingOptions?: ProgrammingOptions
 ) => {
     logger.info(`Writing ${dfuFilePath} to device ${device.serialNumber}`);
 
@@ -73,9 +74,7 @@ export const performUpdate = async (
             dfuFilePath,
             onProgress,
             undefined,
-            {
-                netCoreUploadDelay,
-            },
+            programmingOptions,
             abortController
         );
         logger.info('MCUboot DFU completed successfully!');
