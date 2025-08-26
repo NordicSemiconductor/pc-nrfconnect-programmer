@@ -83,7 +83,9 @@ export const openDevice =
         const autoReset = getState().app.settings.autoReset;
         if (autoReset) {
             await batch
-                .reset('Application', 'RESET_DEBUG')
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore For now
+                .reset('Application', 'RESET_DEFAULT')
                 .run(device, abortController);
             await dispatch(
                 getAllCoreProtectionStatusBatch(deviceCoreNames)
@@ -408,7 +410,9 @@ export const recover =
 
         const autoReset = getState().app.settings.autoReset;
         if (autoReset) {
-            batch.reset('Application', 'RESET_DEBUG');
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore For now
+            batch.reset('Application', 'RESET_DEFAULT');
         }
 
         await batch.run(device, abortController);
@@ -447,7 +451,9 @@ export const recoverAndWrite =
 
         const autoReset = getState().app.settings.autoReset;
         if (autoReset) {
-            batch.reset('Application', 'RESET_DEBUG');
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore For now
+            batch.reset('Application', 'RESET_DEFAULT');
         }
 
         await batch.run(device, abortController);
@@ -468,7 +474,9 @@ export const resetDevice =
         await NrfutilDeviceLib.reset(
             device,
             'Application',
-            'RESET_DEBUG',
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore For now
+            'RESET_DEFAULT',
             undefined,
             abortController
         );
