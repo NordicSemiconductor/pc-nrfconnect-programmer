@@ -2,7 +2,7 @@
 
 The {{app_name}} main window displays the memory layout of the device and the file you want to work with. It also provides options to program the device and inspect the entire process through the log.
 
-When you start the Programmer app, the application main window appears with the **Programmer** tab selected by default and the [**File Memory Layout**](#file-memory-layout) and [**Device Memory Layout**](#device-memory-layout) panels empty:
+When you start the {{app_name}}, the application main window appears with the **Programmer** tab selected by default and the [**File Memory Layout**](#file-memory-layout) and [**Device Memory Layout**](#device-memory-layout) panels empty:
 
 ![{{app_name}} default view at startup](./screenshots/programmer_overview.png "{{app_name}} main window")
 
@@ -60,7 +60,7 @@ Both windows display the different sections in the memory with different colors.
 
 ### File Memory Layout
 
-The **File Memory Layout** panel displays the memory layout for files added to the Programmer app with the [**Add file**](#file) option. Once added, these files can be programmed onto the device.
+The **File Memory Layout** panel displays the memory layout for files added to the {{app_name}} with the [**Add file**](#file) option. Once added, these files can be programmed onto the device.
 
 ### Device Memory Layout
 
