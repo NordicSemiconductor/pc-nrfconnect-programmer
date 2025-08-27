@@ -2,8 +2,8 @@
 
 ### Fixed
 
--   Programming of some MCUBoot devices no longer fails with
-    `Unhandled ProgrammingOptions`
+-   Issue where programming some MCUboot-compatible devices would fail with
+    `Unhandled ProgrammingOptions`.
 
 ## 4.6.2 - 2025-07-14
 
