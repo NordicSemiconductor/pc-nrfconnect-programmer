@@ -40,7 +40,8 @@ markdown_extensions:
   - meta
   - pymdownx.details
   - pymdownx.keys
-  - pymdownx.tabbed
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.superfences
   - toc:
       permalink: true
@@ -59,6 +60,9 @@ nav:
   - Home: index.md
   - Installing the Programmer app: installing.md
   - Overview and user interface: overview.md
-  - Programming devices: programming_dk.md
+  - Programming devices:
+    - General programming procedure: programming_dk.md
+    - Programming Nordic Thingy prototyping platforms: programming_thingy.md
+    - Programming nRF52840 Dongle: programming_nrf52840_dongle.md
   - Troubleshooting: troubleshooting.md
   - Revision history: revision_history.md

@@ -60,7 +60,7 @@ Both windows display the different sections in the memory with different colors.
 
 ### File Memory Layout
 
-The **File Memory Layout** panel displays the memory layout for files added to the Programmer app with the [**Add file**](#file-section) option. Once added, these files can be programmed onto the device.
+The **File Memory Layout** panel displays the memory layout for files added to the Programmer app with the [**Add file**](#file) option. Once added, these files can be programmed onto the device.
 
 ### Device Memory Layout
 

@@ -9,11 +9,13 @@ The following table lists the hardware platforms that you can program with the {
 | Hardware platform   | Device   | PCA number | Programming with J-Link  | Programming with Nordic Secure DFU  | Programming with MCUboot |
 |---------------------|----------|------------|--------------------------|-------------------------------------|--------------------------|
 | nRF9161 DK          | nRF9161  | PCA10153   | Yes                      | No                                  | No                       |
+| Nordic Thingy:91 X  | nRF9151  | PCA20065   | Yes                      | No                                  | Yes                      |
 | nRF9160 DK          | nRF9160  | PCA10090   | Yes                      | No                                  | No                       |
 | Nordic Thingy:91    | nRF9160  | PCA20035   | Yes                      | No                                  | Yes                      |
 | nRF9151 DK          | nRF9131  | PCA10171   | Yes                      | No                                  | No                       |
 | nRF9131 DK          | nRF9131  | PCA10147   | Yes                      | No                                  | No                       |
 | nRF54H20 DK         | nRF54H20 | PCA10175   | *Not yet available*      | No                                  | No                       |
+| nRF54LM20A DK       | nRF54L20 | PCA10184   | Yes                      | No                                  | No                       |
 | nRF54L15 DK         | nRF54L15 | PCA10156   | Yes                      | No                                  | No                       |
 | nRF5340 DK          | nRF5340  | PCA10095   | Yes                      | No                                  | No                       |
 | nRF5340 Audio DK    | nRF5340  | PCA10121   | Yes                      | No                                  | No                       |

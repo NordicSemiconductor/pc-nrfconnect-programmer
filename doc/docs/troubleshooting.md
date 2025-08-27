@@ -27,5 +27,5 @@ If you are unable to program a device with the **Write** button, verify that:
 
 If the application returns an error, you can restart it by pressing **Ctrl+R** in Windows and **Command+R** in macOS. A restart might be required in the following scenarios:
 
-- A device is reset while it is connected to the Programmer app.
+- A device is reset while it is connected to the {{app_name}}.
 - Other errors.
