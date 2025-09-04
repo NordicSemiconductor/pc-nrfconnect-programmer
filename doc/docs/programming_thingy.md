@@ -123,7 +123,7 @@ You can now disconnect the Nordic Thingy:91 X from the computer.
       1. Navigate to where you extracted the firmware.
       1. Open the folder `img_fota_dfu_hex` that contains the HEX files for updating over USB.<br/>
          See the `CONTENTS.txt` file for information on which file you need.
-      1. Select the `_*connectivity_bridge_*.hex` file.
+      1. Select the `*_connectivity_bridge_*.hex` file.
       1. Click **Open**.
       1. In the [**Device** section](overview.md#device), click **Write**.<br/>
          The **MCUboot DFU** window appears.
