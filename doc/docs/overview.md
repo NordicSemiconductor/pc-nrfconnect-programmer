@@ -6,9 +6,11 @@ When you start the {{app_name}}, the application main window appears with the **
 
 ![{{app_name}} default view at startup](./screenshots/programmer_overview.png "{{app_name}} main window")
 
-## Select Device
+## Select device
 
 Once you connect a device to the system, it becomes visible and available when you click on the **Select device** drop-down list. You can choose a device from the list of connected devices to perform further actions on the device such as programming.
+
+![Select device drop-down menu](./screenshots/thingy91x_select_device.png "Select device drop-down menu")
 
 ## Device panel sections
 
