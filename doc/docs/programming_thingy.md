@@ -31,22 +31,22 @@ The downloaded ZIP archive contains the following firmware:
 
 To program the Nordic Thingy prototyping platforms, you can use one of the following options:
 
-* Using USB-C cable
+* Using a USB cable
 * Using an external debug probe
 
 !!! note "Note"
 
       Do not unplug the Nordic Thingy prototyping platform during this process.
 
-## Programming using a USB-C cable
+## Programming using a USB cable
 
-See the following sections for programming Nordic Thingy prototyping platforms using a USB-C cable.
+See the following sections for programming Nordic Thingy prototyping platforms using a USB cable.
 
 ### Nordic Thingy:91 X
 
-To program Nordic Thingy using the USB-C connection, complete the following steps:
+To program Nordic Thingy using the USB connection, complete the following steps:
 
-1. Connect the Thingy:91 X to your computer with a USB-C cable.
+1. Connect the Thingy:91 X to your computer with a USB cable.
 1. Power on the device by switching **SW1** to the **ON** position.
 1. Open nRF Connect for Desktop and launch the {{app_name}}.
 1. In the Programmer navigation bar, click **Select device**.<br/>
@@ -69,7 +69,7 @@ You can now disconnect the Nordic Thingy:91 X from the computer.
 
 === "Updating nRF52840 SoC firmware"
 
-    To program Nordic Thingy using the USB-C connection, complete the following steps:
+    To program Nordic Thingy using the USB connection, complete the following steps:
 
     !!! note "Note"
         To update the Thingy:91 through USB, the nRF9160 SiP and nRF52840 SoC bootloaders must be factory-compatible.
@@ -86,7 +86,7 @@ You can now disconnect the Nordic Thingy:91 X from the computer.
 
          ![Thingy:91 - SW1 SW4 switch](./screenshots/thingy91_sw1_sw4.webp "Thingy:91 - SW1 SW4 switch")
 
-      1. In the Programmer navigation bar, click **SELECT DEVICE**.<br/>
+      1. In the Programmer navigation bar, click **Select device**.<br/>
          A drop-down menu appears.
 
          ![Programmer - Select device](./screenshots/programmer_select_device2.png "Programmer - Select device")
@@ -129,7 +129,7 @@ You can now disconnect the Nordic Thingy:91 X from the computer.
 
          ![Thingy:91 - SW1 SW3 switch](./screenshots/thingy91_sw1_sw3.webp "Thingy:91 - SW1 SW3 switch")
 
-      1. In the Programmer navigation bar, click **SELECT DEVICE**.<br/>
+      1. In the Programmer navigation bar, click **Select device**.<br/>
          A drop-down menu appears.
       1. In the menu, select the entry corresponding to your device (**Thingy:91**).
       1. In the menu on the left, click **Add file** in the **FILE** section, and select **Browse**.<br/>
@@ -192,10 +192,10 @@ You can now disconnect the Nordic Thingy:91 X from the computer.
 
 ### Nordic Thingy:53
 
-To program Nordic Thingy using the USB-C connection, complete the following steps:
+To program Nordic Thingy using the USB connection, complete the following steps:
 
 1. Take off the top cover of the Nordic Thingy:53 so you can access the **SW2** button in Step 7.
-1. Plug the Nordic Thingy:53 into the computer using a USB-C cable.
+1. Plug the Nordic Thingy:53 into the computer using a USB cable.
 
     ![The Nordic Thingy:53 schematic - **SW1** and USB connector cover](./screenshots/thingy53_sw1_usb.svg "The Nordic Thingy:53 schematic - **SW1** and USB connector cover")
 
@@ -246,7 +246,7 @@ To program Nordic Thingy:91 X using an external debug probe, complete the follow
 
     d. Power on the external debug probe.
 
-    e. Connect the external debug probe to the computer with a micro-USB cable.<br/>
+    e. Connect the external debug probe to the computer with a USB cable.<br/>
        In the {{app_name}}'s navigation bar, **No devices available** changes to **Select device**.
 
      ![Programmer - Select device](./screenshots/programmer_select_device1.png "Programmer - Select device")
@@ -258,6 +258,7 @@ To program Nordic Thingy:91 X using an external debug probe, complete the follow
     !!! note "Note"
         If the nRF5340 DK does not show up in the drop-down list, press Ctrl-R in Windows or command-R in macOS to restart the {{app_name}}.
 
+1. Depending on the firmware you are programming, set the **SWD** selection switch on the Thingy:91 X to **nRF53** or **nRF91**.
 1. Click **Add file** in the **FILE** section, and select **Browse**.<br/>
    A file explorer window appears.
 1. Navigate to the folder with the application firmware in the HEX format.<br/>
@@ -291,19 +292,18 @@ The update is complete when the animation in the {{app_name}}'s **Device memory 
             Do not unplug or power off the devices during this process.
 
         c. Connect the external debug probe to the computer with a micro-USB cable.<br/>
-           In the {{app_name}}'s navigation bar, **No devices available** changes to **SELECT DEVICE**.
+           In the {{app_name}}'s navigation bar, **No devices available** changes to **Select device**.
 
            ![Programmer - Select device](./screenshots/programmer_select_device1.png "Programmer - Select device")
 
-     1. Click **SELECT DEVICE** and select the appropriate debug probe entry from the drop-down list.<br/>
+     1. Click **Select device** and select the appropriate debug probe entry from the drop-down list.<br/>
         Select the nRF9160 DK from the list.
 
          ![Programmer - nRF9160 DK](./screenshots/programmer_com_ports.png "Programmer - nRF9160 DK")
 
         The button text changes to the SEGGER ID of the selected device, and the **Device memory layout** section indicates that the device is connected.
 
-     1. Set the SWD selection switch **SW2** to **nRF52** on the Thingy:91.<br/>
-        See the SWD Select section for more information on the switch.
+     1. Set the **SWD** selection switch **SW2** to **nRF52** on the Thingy:91.
      1. In the menu on the left, click **Add file** in the **FILE** section, and select **Browse**.<br/>
         A file explorer window appears.
 
@@ -325,7 +325,7 @@ The update is complete when the animation in the {{app_name}}'s **Device memory 
     To update the modem firmware on the Thingy:91 using an external debug probe, complete the following steps:
 
      1. Open nRF Connect for Desktop and launch the {{app_name}}. Prepare the hardware as described above if you have not done so already.
-     1. Set the SWD selection switch **SW2** to **nRF91** on the Thingy:91.
+     1. Set the **SWD** selection switch **SW2** to **nRF91** on the Thingy:91.
      1. In the menu on the left, click **Add file** in the **FILE** section, and select **Browse**.<br/>
         A file explorer window appears.
 
@@ -357,7 +357,7 @@ The update is complete when the animation in the {{app_name}}'s **Device memory 
     To program the nRF9160 SiP application firmware on the Thingy:91 using an external debug probe, complete the following steps:
 
      1. Open nRF Connect for Desktop and launch the {{app_name}}. Prepare the hardware as described above if you have not done so already.
-     1. Make sure the SWD selection switch **SW2** is set to **nRF91** on the Thingy:91.
+     1. Make sure the **SWD** selection switch **SW2** is set to **nRF91** on the Thingy:91.
      1. In the menu on the left, click **Add file** in the **FILE** section, and select **Browse**.<br/>
         A file explorer window appears.
 
