@@ -245,6 +245,10 @@ Make sure you have the following hardware:
 
 ### Nordic Thingy:91
 
+!!! note "Note"
+    Make sure to check the partition layout configuration when programming the Nordic Thingy:91 firmware.
+    See [Updating the Thingy:91 firmware using nRF Connect for Desktop apps](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/app_dev/device_guides/thingy91/thingy91_updating_fw_celmon.html) for more information.
+
 === "Updating nRF52840 SoC firmware"
 
     To update the nRF52840 SoC firmware on the Thingy:91 using the nRF9160 DK as an external debug probe, complete the following steps:
