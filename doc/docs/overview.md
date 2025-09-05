@@ -2,19 +2,23 @@
 
 The {{app_name}} main window displays the memory layout of the device and the file you want to work with. It also provides options to program the device and inspect the entire process through the log.
 
-When you start the Programmer app, the application main window appears with the **Programmer** tab selected by default and the [**File Memory Layout**](#file-memory-layout) and [**Device Memory Layout**](#device-memory-layout) panels empty:
+When you start the {{app_name}}, the application main window appears with the **Programmer** tab selected by default and the [**File Memory Layout**](#file-memory-layout) and [**Device Memory Layout**](#device-memory-layout) panels empty:
 
 ![{{app_name}} default view at startup](./screenshots/programmer_overview.png "{{app_name}} main window")
 
-## Select Device
+## Select device
 
 Once you connect a device to the system, it becomes visible and available when you click on the **Select device** drop-down list. You can choose a device from the list of connected devices to perform further actions on the device such as programming.
+
+![Select device drop-down menu](./screenshots/thingy91x_select_device.png "Select device drop-down menu")
 
 ## Device panel sections
 
 The following options become available after selecting a device.
 
 ### File
+
+![File section](./screenshots/programmer_file_section.png "File section")
 
 When you select a device, the following actions are available in the File section:
 
@@ -26,7 +30,9 @@ When you select a device, the following actions are available in the File sectio
 
 ### Device
 
-When you select a device, the following actions are available in the Device section:
+![Device section for a device programmed with MCUboot](./screenshots/programmer_device_section.png "Device section for a device programmed with MCUboot")
+
+When you select a device, the following actions are available in the Device section, depending on the programming method:
 
 | Action              | Programming method       | Description                                                                                        |
 |---------------------|--------------------------|----------------------------------------------------------------------------------------------------|
@@ -38,6 +44,8 @@ When you select a device, the following actions are available in the Device sect
 | **Read**            | J-Link                   | Reads and displays the written memory in the **Device Memory Layout**, unless the device has readback protection enabled.  |
 
 ### J-Link Settings
+
+![J-Link Settings section](./screenshots/programmer_jlink_settings_section.png "J-Link Settings section")
 
 When you select a device, the following toggles are available in the J-Link Settings section:
 
@@ -60,11 +68,13 @@ Both windows display the different sections in the memory with different colors.
 
 ### File Memory Layout
 
-The **File Memory Layout** panel displays the memory layout for files added to the Programmer app with the [**Add file**](#file-section) option. Once added, these files can be programmed onto the device.
+The **File Memory Layout** panel displays the memory layout for files added to the {{app_name}} with the [**Add file**](#file) option. Once added, these files can be programmed onto the device.
+
+![File Memory Layout panel](./screenshots/programmer_programmer_tab.png "File Memory Layout panel")
 
 ### Device Memory Layout
 
-In the **Device Memory Layout**, you can read the name, address range, and size of a memory section by hovering the mouse cursor over one of the memory sections. This option is possible only after loading a memory layout.
+In the **Device Memory Layout**, you can read the name, address range, and size of a memory section by hovering the mouse cursor over one of the memory sections. This is possible only after loading a memory layout.
 
 ![Memory section details](./screenshots/programmer_with_device.png "Memory section after selecting a device")
 
