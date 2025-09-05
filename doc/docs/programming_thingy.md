@@ -1,6 +1,6 @@
 # Programming Nordic Thingy prototyping platforms
 
-[Test link](vscode://nordic-semiconductor.nrf-connect-extension-pack/quickstart)
+[Test link](vscode:///nordic-semiconductor.nrf-connect-extension-pack/quickstart)
 
 You can program the Nordic Thingy application and network core firmware over USB by using MCUboot, which is a secure bootloader that you can use to update applications without an external debugger. MCUboot bootloader is enabled by default for the Nordic Thingy prototyping platforms in the `Kconfig.defconfig` files of the board, available in either the [nRF Connect SDK](https://github.com/nrfconnect/sdk-nrf/tree/main/boards/nordic) or [Zephyr](https://github.com/zephyrproject-rtos/zephyr/tree/main/boards/nordic).
 
