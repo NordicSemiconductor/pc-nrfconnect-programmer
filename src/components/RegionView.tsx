@@ -102,7 +102,11 @@ const RegionView = ({
             {region && region.fileNames.length > 0 && !active && (
                 <Button
                     className="transparent"
-                    onClick={() => removeFile(region.fileNames[0])}
+                    onClick={() => {
+                        console.log('remove', region.fileNames[0]);
+                        removeFile(region.fileNames[0]);
+                        // dispatch(fileActions.closeFiles());
+                    }}
                 >
                     <span className="mdi mdi-minus-circle" />
                 </Button>

@@ -16,21 +16,24 @@ import MemoryMap, { MemoryMapTuple } from 'nrf-intel-hex';
 import { basename } from 'path';
 
 import {
+    getCoreDefinitions,
     getDeviceDefinition as getDeviceDefinitionFromRedux,
     setDeviceDefinition,
 } from '../reducers/deviceDefinitionReducer';
 import {
     fileParse,
+    fileRegionsKnown,
     filesEmpty,
     mcubootFileKnown,
     mruFilesLoadSuccess,
     zipFileKnown,
 } from '../reducers/fileReducer';
 import { RootState } from '../reducers/types';
-import { fileWarningRemove } from '../reducers/warningReducer';
+import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
 import { defaultDeviceDefinition, nRF5340DefaultDevice } from '../util/devices';
 import { DeviceFamily } from '../util/deviceTypes';
+import { generateFileRegions } from '../util/regions';
 import { updateTargetWritable } from './targetActions';
 
 // Update core info when file actions happen and not when the device is selected
@@ -96,6 +99,54 @@ export const removeFile =
 
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
+
+        // Recalculate regions after removing file
+        const coreDefinitions = getCoreDefinitions(getState());
+        dispatch(fileWarningRemove());
+        const validFileRegions = Object.keys(coreDefinitions)
+            .map(core => {
+                const coreInfo =
+                    coreDefinitions[core as keyof typeof coreDefinitions];
+                if (!coreInfo) return [];
+
+                logger.info(`Update files regions according to ${core} core`);
+                const allRegions = generateFileRegions(newMemMaps, coreInfo);
+                const validRegions = allRegions.filter(
+                    r =>
+                        (r.startAddress >= coreInfo.romBaseAddr &&
+                            r.startAddress + r.regionSize <=
+                                coreInfo.romBaseAddr + coreInfo.romSize) ||
+                        (r.startAddress >= coreInfo.uicrBaseAddr &&
+                            r.startAddress + r.regionSize <=
+                                coreInfo.uicrBaseAddr + coreInfo.uicrSize)
+                );
+
+                if (validRegions.length !== allRegions.length) {
+                    dispatch(
+                        fileWarningAdd(
+                            'Part of the HEX regions are out of the device memory size, ' +
+                                'but you can still proceed write operation'
+                        )
+                    );
+                }
+
+                return allRegions.filter(
+                    r =>
+                        r.startAddress >= coreInfo.romBaseAddr &&
+                        r.startAddress + r.regionSize <=
+                            coreInfo.romBaseAddr + coreInfo.romSize
+                );
+            })
+            .flat();
+
+        // Show file warning if overlapping.
+        if (validFileRegions.find(r => r.fileNames && r.fileNames.length > 1)) {
+            dispatch(
+                fileWarningAdd('Some of the HEX files have overlapping data.')
+            );
+        }
+
+        dispatch(fileRegionsKnown(validFileRegions));
         dispatch(updateTargetWritable());
     };
 

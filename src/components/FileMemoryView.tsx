@@ -75,6 +75,7 @@ export default () => {
 
     useEffect(() => {
         dispatch(fileWarningRemove());
+        console.log('memMaps changed. Recalculating regions...');
         const validFileRegions = Object.keys(coreDefinitions)
             .map(core => {
                 const name = core as DeviceCore;
@@ -100,6 +101,10 @@ export default () => {
                         )
                     );
                 }
+
+                console.log(
+                    `Found ${validRegions.length} valid regions for ${name}`
+                );
 
                 return allRegions.filter(
                     r =>
