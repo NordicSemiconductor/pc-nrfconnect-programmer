@@ -1,3 +1,10 @@
+## 4.6.3 - Unreleased
+
+### Fixed
+
+-   Issue where programming some MCUboot-compatible devices would fail with
+    `Unhandled ProgrammingOptions`.
+
 ## 4.6.2 - 2025-07-14
 
 ### Fixed
