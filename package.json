@@ -20,7 +20,7 @@
             ]
         },
         "html": "dist/index.html",
-        "nrfutilCore": "8.0.0"
+        "nrfutilCore": "8.1.1"
     },
     "main": "dist/bundle.js",
     "files": [
