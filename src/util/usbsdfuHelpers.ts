@@ -33,10 +33,10 @@ export const generateRegionDetectedNames = (fileRegions: Region[]) => {
 // (Or fix getting softdevice id from bootloader)
 export const generateFileAppRegions = (
     fileRegions: Region[],
-    targetRegions: Region[]
+    targetRegions: Region[],
 ) => {
     const targetBootloaderRegion = targetRegions?.find(
-        r => r.name === RegionName.BOOTLOADER
+        r => r.name === RegionName.BOOTLOADER,
     );
 
     let appStartAddress: number | undefined;
@@ -94,11 +94,11 @@ export const generateFileAppRegions = (
 // Regard the Bootloader as a whole when there are gaps found in the Bootloader
 export const generateFileBlRegion = (
     fileRegions: Region[],
-    deviceDefinition: DeviceDefinition
+    deviceDefinition: DeviceDefinition,
 ) => {
     const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     const blRegions = fileRegions.filter(
-        region => region.name === RegionName.BOOTLOADER
+        region => region.name === RegionName.BOOTLOADER,
     );
 
     blRegions.forEach(blRegion => {
@@ -109,7 +109,7 @@ export const generateFileBlRegion = (
                 blStartAddress >= core.coreDefinitions.romBaseAddr &&
                 blStartAddress <
                     core.coreDefinitions.romBaseAddr +
-                        core.coreDefinitions.romSize
+                        core.coreDefinitions.romSize,
         )?.coreDefinitions.romSize;
 
         fileRegions.forEach(r => {

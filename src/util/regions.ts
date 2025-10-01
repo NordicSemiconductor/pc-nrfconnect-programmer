@@ -162,7 +162,7 @@ const knownSoftDevices: { [key: number]: string } = {
 const isRegionInRange = (
     region: Region,
     startAddr: number,
-    endAddr: number
+    endAddr: number,
 ): boolean =>
     region.startAddress >= startAddr &&
     region.startAddress + region.regionSize <= endAddr;
@@ -177,18 +177,18 @@ const isRegionInRange = (
  */
 const isRegionInCore = (
     region: Region,
-    coreDefinition: CoreDefinition
+    coreDefinition: CoreDefinition,
 ): boolean => {
     const { romBaseAddr, romSize, pageSize, uicrBaseAddr } = coreDefinition;
     const isInRange = isRegionInRange(
         region,
         romBaseAddr,
-        romBaseAddr + romSize
+        romBaseAddr + romSize,
     );
     const isUicr = isRegionInRange(
         region,
         uicrBaseAddr,
-        uicrBaseAddr + pageSize
+        uicrBaseAddr + pageSize,
     );
     return isInRange || isUicr;
 };
@@ -202,12 +202,12 @@ const isRegionInCore = (
  */
 export const getBootloaderRegion = (
     memMap: MemoryMap,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): Region | undefined => {
     const { uicrBaseAddr, blAddrOffset } = coreDefinitions;
     const bootloaderAddress = memMap.getUint32(
         uicrBaseAddr + blAddrOffset,
-        true
+        true,
     );
     if (
         bootloaderAddress &&
@@ -237,7 +237,7 @@ export const getBootloaderRegion = (
  */
 export const getMBRParamsRegion = (
     memMap: MemoryMap,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): Region | undefined => {
     const { uicrBaseAddr, mbrParamsOffset } = coreDefinitions;
     const mbrParamsAddr = uicrBaseAddr + mbrParamsOffset;
@@ -266,7 +266,7 @@ export const getMBRParamsRegion = (
  */
 export const getMBRRegion = (
     memMap: MemoryMap,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): Region | undefined => {
     const { romBaseAddr } = coreDefinitions;
     const mbr = memMap.getUint32(romBaseAddr, true);
@@ -294,7 +294,7 @@ export const getMBRRegion = (
  */
 export const getSoftDeviceRegion = (
     memMap: MemoryMap,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): Region | undefined => {
     const { pageSize } = coreDefinitions;
     for (
@@ -336,7 +336,7 @@ export const getSoftDeviceRegion = (
  */
 export const getSoftDeviceId = (
     memMap: MemoryMap,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): number | undefined => {
     const { pageSize } = coreDefinitions;
     let fwId;
@@ -350,7 +350,7 @@ export const getSoftDeviceId = (
             undefined;
         const softdeviceFwIdBit = memMap.getUint32(
             address + SOFTDEVICE_FW_ID_OFFSET,
-            true
+            true,
         );
         if (
             softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER &&
@@ -373,7 +373,7 @@ export const getSoftDeviceId = (
  */
 export const logSoftDeviceRegion = (
     memMap: MemoryMap,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ) => {
     const { pageSize } = coreDefinitions;
     for (
@@ -383,7 +383,7 @@ export const logSoftDeviceRegion = (
     ) {
         const softdeviceMagicNumber = memMap.getUint32(
             address + SOFTDEVICE_MAGIC_OFFSET,
-            true
+            true,
         );
         if (softdeviceMagicNumber === SOFTDEVICE_MAGIC_NUMBER) {
             const infoBlockSizeBit = memMap.getUint32(address, true);
@@ -393,7 +393,7 @@ export const logSoftDeviceRegion = (
 
             const fwIdBit = memMap.getUint32(
                 address + SOFTDEVICE_FW_ID_OFFSET,
-                true
+                true,
             );
             const fwId: number = fwIdBit ? fwIdBit & 0x0000ffff : 0;
             if (fwId === 0) {
@@ -404,32 +404,32 @@ export const logSoftDeviceRegion = (
             if (infoBlockSize && infoBlockSize >= 0x18) {
                 const softDeviceId = memMap.getUint32(
                     address + SOFTDEVICE_ID_OFFSET,
-                    true
+                    true,
                 );
                 const softDeviceVersion = memMap.getUint32(
                     address + SOFTDEVICE_VERSION_OFFSET,
-                    true
+                    true,
                 );
                 if (softDeviceVersion === 0) {
                     logger.info(
                         `SoftDevice detected, id ${hexpad2(
-                            fwId
-                        )} (S${softDeviceId} prerelease)`
+                            fwId,
+                        )} (S${softDeviceId} prerelease)`,
                     );
                     return;
                 }
                 if (softDeviceVersion) {
                     const softDeviceVersionMajor = Math.floor(
-                        (softDeviceVersion / 1000000) % 1000
+                        (softDeviceVersion / 1000000) % 1000,
                     );
                     const softDeviceVersionMinor = Math.floor(
-                        (softDeviceVersion / 1000) % 1000
+                        (softDeviceVersion / 1000) % 1000,
                     );
                     const softDeviceVersionPatch = softDeviceVersion % 1000;
                     logger.info(
                         `SoftDevice detected, id ${hexpad2(
-                            fwId
-                        )} (S${softDeviceId} v${softDeviceVersionMajor}.${softDeviceVersionMinor}.${softDeviceVersionPatch})`
+                            fwId,
+                        )} (S${softDeviceId} v${softDeviceVersionMajor}.${softDeviceVersionMinor}.${softDeviceVersionPatch})`,
                     );
                     return;
                 }
@@ -438,7 +438,7 @@ export const logSoftDeviceRegion = (
                 logger.info(
                     `SoftDevice detected, id ${hexpad2(fwId)} (${
                         knownSoftDevices[fwId]
-                    })`
+                    })`,
                 );
                 return;
             }
@@ -459,7 +459,7 @@ export const logSoftDeviceRegion = (
  */
 export const getMemoryRegions = (
     memMap: MemoryMap,
-    coreDefinition: CoreDefinition
+    coreDefinition: CoreDefinition,
 ): Region[] => {
     let regions: Region[] = [];
     let region;
@@ -488,7 +488,7 @@ export const getMemoryRegions = (
  */
 const getRegionsFromOverlaps = (
     overlaps: Overlaps<string>,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): Region[] => {
     const memMap = MemoryMap.flattenOverlaps(overlaps);
     const memRegions = getMemoryRegions(memMap, coreDefinitions);
@@ -617,7 +617,7 @@ const getRegionsFromOverlaps = (
  */
 export const generateFileRegions = (
     memMaps: MemoryMaps<string>,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): Region[] => {
     logger.info('Parse memory regions for file');
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
@@ -629,7 +629,7 @@ export const generateFileRegions = (
 export const getCoreRegions = (
     memMap: MemoryMap,
     name: DeviceCore,
-    coreDefinitions: CoreDefinition
+    coreDefinitions: CoreDefinition,
 ): Region[] => {
     logger.info(`Parse memory regions for ${name} core`);
     const overlaps = MemoryMap.overlapMemoryMaps([['', memMap]]);
@@ -649,7 +649,7 @@ export const getCoreRegions = (
  */
 export const getTargetRegions = (
     memMap: MemoryMap,
-    deviceDefinition: DeviceDefinition
+    deviceDefinition: DeviceDefinition,
 ): Region[] => {
     let regions: Region[] = [];
     convertDeviceDefinitionToCoreArray(deviceDefinition).forEach(c => {

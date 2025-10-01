@@ -21,11 +21,11 @@ const openFileFromArgs = (): AppThunk => dispatch => {
         if (fs.existsSync(filePath)) {
             dispatch(fileActions.openFile(filePath));
             logger.info(
-                `Opening file ${filePath} (passed as argument to --filePath)`
+                `Opening file ${filePath} (passed as argument to --filePath)`,
             );
         } else {
             logger.warn(
-                `No file found at ${filePath} (passed as argument to --filePath)`
+                `No file found at ${filePath} (passed as argument to --filePath)`,
             );
         }
     }

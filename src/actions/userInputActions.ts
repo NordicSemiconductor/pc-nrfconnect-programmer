@@ -18,7 +18,7 @@ let userInputCallback: ((input?: string) => void) | undefined;
 export const getUserInput =
     (
         message: string,
-        choices: Record<string, string>
+        choices: Record<string, string>,
     ): AppThunk<RootState, Promise<string>> =>
     dispatch =>
         new Promise((resolve, reject) => {

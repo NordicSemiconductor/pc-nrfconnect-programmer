@@ -122,7 +122,7 @@ const ModemUpdateDialogView = () => {
 Closing application right now might result in some unknown behavior and might also brick the device.
 Are you sure you want to continue?`,
                 onClose: () => abortController.current.abort(),
-            })
+            }),
         );
         setProgress(progress);
 
@@ -152,7 +152,7 @@ Are you sure you want to continue?`,
                 }
                 setProgress(updatedProgress);
             },
-            abortController.current
+            abortController.current,
         )
             .then(() => setWritingSucceed(true))
             .catch(error => {

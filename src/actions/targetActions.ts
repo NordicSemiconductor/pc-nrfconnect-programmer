@@ -28,29 +28,29 @@ export const openDevice =
         try {
             if (device.traits.jlink) {
                 await dispatch(
-                    jlinkTargetActions.openDevice(device, abortController)
+                    jlinkTargetActions.openDevice(device, abortController),
                 );
             } else if (device.traits.mcuBoot) {
                 dispatch(mcubootTargetActions.openDevice(device));
             } else if (device.traits.nordicDfu) {
                 dispatch(
-                    usbsdfuTargetActions.openDevice(device, abortController)
+                    usbsdfuTargetActions.openDevice(device, abortController),
                 );
             } else {
                 logger.warn('No operations possible for device.');
                 logger.warn(
-                    `If the device is a MCUboot device make sure it is in the bootloader mode`
+                    `If the device is a MCUboot device make sure it is in the bootloader mode`,
                 );
                 if (process.platform === 'linux') {
                     logger.warn(
                         'If the device is a JLink device, please make sure J-Link Software and nrf-udev are installed. ' +
-                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
+                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux',
                     );
                 }
                 if (process.platform === 'darwin') {
                     logger.warn(
                         'If the device is a JLink device, please make sure J-Link Software is installed. ' +
-                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux'
+                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux',
                     );
                 }
             }

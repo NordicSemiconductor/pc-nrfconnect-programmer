@@ -40,7 +40,7 @@ const DeviceInfoView = () => {
                         {device.serialPorts.map(port =>
                             port.comName ? (
                                 <span key={port.comName}>{port.comName}</span>
-                            ) : null
+                            ) : null,
                         )}
                     </p>
                 </div>

@@ -34,19 +34,19 @@ const allocateCores = (cores: CoreInfo[], regions: Region[]) =>
                 r.startAddress >= core.coreDefinitions.romBaseAddr &&
                 r.startAddress + r.regionSize <=
                     core.coreDefinitions.romBaseAddr +
-                        core.coreDefinitions.romSize
+                        core.coreDefinitions.romSize,
         ),
     }));
 
 const convertCoresToViews = (
     deviceDefinition: DeviceDefinition,
-    regions: Region[]
+    regions: Region[],
 ) => {
     const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     return allocateCores(coreInfos, regions)
         .sort(
             (a, b) =>
-                b.coreDefinitions.romBaseAddr - a.coreDefinitions.romBaseAddr
+                b.coreDefinitions.romBaseAddr - a.coreDefinitions.romBaseAddr,
         )
         .map(c => ({
             core: c,
@@ -89,15 +89,15 @@ export default () => {
                                 coreInfo.romBaseAddr + coreInfo.romSize) ||
                         (r.startAddress >= coreInfo.uicrBaseAddr &&
                             r.startAddress + r.regionSize <=
-                                coreInfo.uicrBaseAddr + coreInfo.uicrSize)
+                                coreInfo.uicrBaseAddr + coreInfo.uicrSize),
                 );
 
                 if (validRegions.length !== allRegions.length) {
                     dispatch(
                         fileWarningAdd(
                             'Part of the HEX regions are out of the device memory size, ' +
-                                'but you can still proceed write operation'
-                        )
+                                'but you can still proceed write operation',
+                        ),
                     );
                 }
 
@@ -105,7 +105,7 @@ export default () => {
                     r =>
                         r.startAddress >= coreInfo.romBaseAddr &&
                         r.startAddress + r.regionSize <=
-                            coreInfo.romBaseAddr + coreInfo.romSize
+                            coreInfo.romBaseAddr + coreInfo.romSize,
                 );
             })
             .flat();
@@ -113,7 +113,7 @@ export default () => {
         // Show file warning if overlapping.
         if (validFileRegions.find(r => r.fileNames && r.fileNames.length > 1)) {
             dispatch(
-                fileWarningAdd('Some of the HEX files have overlapping data.')
+                fileWarningAdd('Some of the HEX files have overlapping data.'),
             );
         }
 
@@ -141,7 +141,7 @@ export default () => {
                             </div>
                         )}
                     </div>
-                )
+                ),
             )}
         </>
     );

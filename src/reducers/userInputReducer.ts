@@ -31,7 +31,7 @@ const userInputSlice = createSlice({
     reducers: {
         userInputRequired(
             state,
-            action: PayloadAction<UserInputRequiredPayload>
+            action: PayloadAction<UserInputRequiredPayload>,
         ) {
             state.isRequired = true;
             state.message = action.payload.message;

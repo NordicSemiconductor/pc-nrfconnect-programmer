@@ -37,20 +37,20 @@ const allocateCores = (cores: CoreInfo[], regions: Region[]) =>
                 r.startAddress >= core.coreDefinitions.romBaseAddr &&
                 r.startAddress + r.regionSize <=
                     core.coreDefinitions.romBaseAddr +
-                        core.coreDefinitions.romSize
+                        core.coreDefinitions.romSize,
         ),
     }));
 
 const convertCoresToViews = (
     deviceDefinition: DeviceDefinition,
     deviceRebooting: boolean,
-    regions: Region[]
+    regions: Region[],
 ) => {
     const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     return allocateCores(coreInfos, regions)
         .sort(
             (a, b) =>
-                b.coreDefinitions.romBaseAddr - a.coreDefinitions.romBaseAddr
+                b.coreDefinitions.romBaseAddr - a.coreDefinitions.romBaseAddr,
         )
         .map(c => ({
             core: c,
@@ -206,7 +206,7 @@ export default () => {
             {convertCoresToViews(
                 deviceDefinition,
                 waitingForDevice,
-                targetRegions
+                targetRegions,
             ).map(coreView => (
                 <div
                     key={coreView.core.name}

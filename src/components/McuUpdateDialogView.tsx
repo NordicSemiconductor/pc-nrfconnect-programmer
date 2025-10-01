@@ -99,7 +99,7 @@ const McuUpdateDialogView = () => {
 
         const timeout =
             getPersistentStore().get(
-                `firmwareProgram:device:${device.serialNumber}`
+                `firmwareProgram:device:${device.serialNumber}`,
             )?.netCoreUploadDelay ?? NET_CORE_UPLOAD_DELAY;
         setUploadDelay(timeout);
 
@@ -139,7 +139,7 @@ const McuUpdateDialogView = () => {
 Closing application right now might result in some unknown behavior and might also brick the device.
 Are you sure you want to continue?`,
                 onClose: () => abortController.current.abort(),
-            })
+            }),
         );
 
         reset();
@@ -150,7 +150,7 @@ Are you sure you want to continue?`,
                 timeout: 99999999999999, // Wait 'indefinitely' as we will cancel the wait when programming is complete
                 when: 'always',
                 once: false,
-            })
+            }),
         );
 
         performUpdate(
@@ -176,7 +176,7 @@ Are you sure you want to continue?`,
                 ? {
                       netCoreUploadDelay: uploadDelay,
                   }
-                : undefined
+                : undefined,
         )
             .then(() => {
                 setWritingSucceed(true);
@@ -202,7 +202,7 @@ Are you sure you want to continue?`,
             `firmwareProgram:device:${device.serialNumber}`,
             {
                 netCoreUploadDelay: timeout,
-            }
+            },
         );
     };
 
@@ -290,7 +290,7 @@ Are you sure you want to continue?`,
                         <div
                             className={classNames(
                                 'tw-mb-0 tw-flex tw-w-full tw-flex-col tw-gap-2',
-                                keepDefaultTimeout ? 'tw-hidden' : 'tw-block'
+                                keepDefaultTimeout ? 'tw-hidden' : 'tw-block',
                             )}
                         >
                             <div className="tw-flex tw-flex-row tw-justify-between">

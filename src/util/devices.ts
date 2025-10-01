@@ -215,7 +215,7 @@ export const ModemProductIds = [
 
 export const getDeviceDefinition = (type: string): DeviceDefinition => {
     const predefined = deviceDefinitions.find((device: DeviceDefinition) =>
-        device?.type?.toLowerCase().includes(type.toLowerCase())
+        device?.type?.toLowerCase().includes(type.toLowerCase()),
     );
     return {
         ...(predefined ?? defaultDeviceDefinition),
@@ -224,10 +224,10 @@ export const getDeviceDefinition = (type: string): DeviceDefinition => {
 };
 
 const getDeviceDefinitionByFamily = (
-    family: DeviceFamily
+    family: DeviceFamily,
 ): DeviceDefinition => {
     const predefined = deviceDefinitions.find(
-        device => device.family === family
+        device => device.family === family,
     );
 
     return (
@@ -244,9 +244,9 @@ const getProductId = (device: NrfutilDevice) => {
     return parseInt(
         device.serialPorts.reduce(
             (m, p) => (p.vendorId === '1915' ? p.productId : '') || m,
-            ''
+            '',
         ),
-        16
+        16,
     );
 };
 
@@ -255,7 +255,7 @@ const identifyUsbByVersion = (deviceInfo?: DeviceInfo) => {
         return null;
 
     return getDeviceDefinition(
-        deviceInfo?.hwInfo.deviceVersion.slice(0, 8) // example 'NRF52840_AAD0'
+        deviceInfo?.hwInfo.deviceVersion.slice(0, 8), // example 'NRF52840_AAD0'
     );
 };
 
@@ -278,7 +278,7 @@ const identifyUsbBySerialPort = (device: NrfutilDevice) => {
 // Get device info by calling version command
 export const getDeviceInfoByUSB = (
     device: NrfutilDevice,
-    deviceInfo?: DeviceInfo
+    deviceInfo?: DeviceInfo,
 ) =>
     identifyUsbByVersion(deviceInfo) ||
     identifyUsbBySerialPort(device) ||
@@ -286,7 +286,7 @@ export const getDeviceInfoByUSB = (
 
 // Get default device info from jLink family
 export const getDefaultDeviceInfoByJlinkFamily = (
-    deviceInfo?: DeviceInfo
+    deviceInfo?: DeviceInfo,
 ): DeviceDefinition => {
     const type = deviceInfo?.jlink?.deviceVersion ?? DeviceFamily.UNKNOWN;
     const family = deviceInfo?.jlink
@@ -311,7 +311,7 @@ export const getDefaultDeviceInfoByJlinkFamily = (
 
 export const mergeNrfutilDeviceInfoInCoreDefinition = (
     existingDefinition: CoreDefinition,
-    inputCoreInfo: DeviceCoreInfo
+    inputCoreInfo: DeviceCoreInfo,
 ): CoreDefinition => ({
     ...existingDefinition,
     romBaseAddr: inputCoreInfo.codeAddress,
@@ -323,13 +323,13 @@ export const mergeNrfutilDeviceInfoInCoreDefinition = (
 
 export const generateMergedMemMap = (deviceDefinition: DeviceDefinition) => {
     const coreMemMaps = convertDeviceDefinitionToCoreArray(
-        deviceDefinition
+        deviceDefinition,
     ).map(deviceInfo => deviceInfo.coreMemMap ?? new MemoryMap([]));
 
     return MemoryMap.flattenOverlaps(
         MemoryMap.overlapMemoryMaps(
-            coreMemMaps.filter(m => m).map(m => ['', m])
-        )
+            coreMemMaps.filter(m => m).map(m => ['', m]),
+        ),
     );
 };
 
@@ -338,7 +338,7 @@ export type CoreInfo = ReturnType<
 >[number];
 
 export const convertDeviceDefinitionToCoreArray = (
-    deviceDefinition: DeviceDefinition
+    deviceDefinition: DeviceDefinition,
 ) =>
     Object.keys(deviceDefinition.coreDefinitions).map(core => ({
         name: core as DeviceCore,
