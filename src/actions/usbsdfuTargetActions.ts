@@ -309,7 +309,7 @@ export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
  * @param {MemoryMap} image the input memory map
  * @returns {Buffer} the calculated hash
  */
-const calculateSHA256Hash = (image = new Uint8Array()) => {
+const calculateSHA256Hash = (image: Uint8Array = new Uint8Array()) => {
     const digest = Crypto.createHash('sha256');
     digest.update(image);
     return Buffer.from(digest.digest().reverse());
@@ -321,7 +321,7 @@ const calculateSHA256Hash = (image = new Uint8Array()) => {
  * @param {MemoryMap} image the input memory map
  * @returns {Buffer} the calculated hash
  */
-const calculateSHA512Hash = (image = new Uint8Array()) => {
+const calculateSHA512Hash = (image: Uint8Array = new Uint8Array()) => {
     const digest = Crypto.createHash('sha512');
     digest.update(image);
     return Buffer.from(digest.digest().reverse());
