@@ -47,27 +47,12 @@ export enum RegionName {
 }
 
 /**
- * Definition of RegionColor
- */
-export enum RegionColor {
-    MBR_PARAMS = '#333F48',
-    MBR = '#FF9800',
-    MBR_OR_APP = '#FFC107',
-    BOOTLOADER = '#E91E63',
-    SOFTDEVICE = '#3F51B5',
-    APPLICATION = ' #4CAF50',
-    UICR = '#333F48', // eslint-disable-line @typescript-eslint/no-duplicate-enum-values -- FIXME: Using an enum is wrong here and could potantially lead to bugs because RegionColor.UICR === RegionColor.NONE is true. Will be fixed later.
-    NONE = '#333F48', // eslint-disable-line @typescript-eslint/no-duplicate-enum-values
-}
-
-/**
  * Definition of Region
  */
 export interface Region {
     name: RegionName;
     startAddress: number;
     regionSize: number;
-    color: RegionColor;
     fileNames: string[];
     permission: RegionPermission;
 }
@@ -79,7 +64,6 @@ export const defaultRegion: Region = {
     name: RegionName.NONE,
     startAddress: 0,
     regionSize: 0,
-    color: RegionColor.NONE,
     fileNames: [],
     permission: RegionPermission.READ_ONLY,
 };
@@ -219,7 +203,6 @@ export const getBootloaderRegion = (
             name: RegionName.BOOTLOADER,
             startAddress: bootloaderAddress,
             regionSize: memMap.get(bootloaderAddress)?.length || 0,
-            color: RegionColor.BOOTLOADER,
             permission: RegionPermission.READ_WRITE,
         };
         return region;
@@ -248,7 +231,6 @@ export const getMBRParamsRegion = (
             name: RegionName.MBR_PARAMS,
             startAddress: mbrParamsAddr,
             regionSize: memMap.get(mbrParamsAddr)?.length || 0,
-            color: RegionColor.MBR_PARAMS,
             permission: RegionPermission.READ_ONLY,
         };
         return region;
@@ -276,7 +258,6 @@ export const getMBRRegion = (
             name: RegionName.MBR_OR_APP,
             startAddress: romBaseAddr,
             regionSize: memMap.get(romBaseAddr)?.length || 0,
-            color: RegionColor.MBR,
             permission: RegionPermission.READ_ONLY,
         };
         return region;
@@ -317,7 +298,6 @@ export const getSoftDeviceRegion = (
                 name: RegionName.SOFTDEVICE,
                 startAddress: SOFTDEVICE_MAGIC_START,
                 regionSize,
-                color: RegionColor.SOFTDEVICE,
                 permission: RegionPermission.READ_WRITE,
             };
             return region;
@@ -517,7 +497,6 @@ const getRegionsFromOverlaps = (
             : {
                   ...defaultRegion,
                   name: RegionName.NONE,
-                  color: RegionColor.NONE,
                   startAddress,
                   regionSize,
                   fileNames,
@@ -536,7 +515,6 @@ const getRegionsFromOverlaps = (
             const appRegion = {
                 ...defaultRegion,
                 name: RegionName.APPLICATION,
-                color: RegionColor.APPLICATION,
                 startAddress: startAddress + region.regionSize,
                 regionSize: regionSize - region.regionSize,
                 fileNames,
@@ -555,7 +533,6 @@ const getRegionsFromOverlaps = (
             region = {
                 ...region,
                 name: RegionName.APPLICATION,
-                color: RegionColor.APPLICATION,
             };
         }
 
@@ -570,7 +547,6 @@ const getRegionsFromOverlaps = (
             region = {
                 ...region,
                 name: RegionName.APPLICATION,
-                color: RegionColor.APPLICATION,
             };
         }
 
@@ -585,7 +561,6 @@ const getRegionsFromOverlaps = (
             region = {
                 ...region,
                 name: RegionName.APPLICATION,
-                color: RegionColor.APPLICATION,
             };
         }
 
@@ -595,7 +570,6 @@ const getRegionsFromOverlaps = (
             region = {
                 ...region,
                 name: RegionName.APPLICATION,
-                color: RegionColor.APPLICATION,
             };
         }
 

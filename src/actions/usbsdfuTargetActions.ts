@@ -46,7 +46,6 @@ import {
     defaultRegion,
     getSoftDeviceId,
     Region,
-    RegionColor,
     RegionName,
     RegionPermission,
 } from '../util/regions';
@@ -135,7 +134,6 @@ export const refreshMemoryLayout =
                             name: RegionName.MBR,
                             startAddress: coreInfo.mbrBaseAddr,
                             regionSize: coreInfo.mbrSize,
-                            color: RegionColor.MBR,
                             permission: RegionPermission.NONE,
                         });
                     }
@@ -169,26 +167,11 @@ export const refreshMemoryLayout =
                                     RegionName.APPLICATION,
                             })[imageType] || RegionName.NONE;
 
-                        const color =
-                            (<
-                                Partial<{
-                                    [key in ImageType]: RegionColor;
-                                }>
-                            >{
-                                NRFDL_IMAGE_TYPE_BOOTLOADER:
-                                    RegionColor.BOOTLOADER,
-                                NRFDL_IMAGE_TYPE_SOFTDEVICE:
-                                    RegionColor.SOFTDEVICE,
-                                NRFDL_IMAGE_TYPE_APPLICATION:
-                                    RegionColor.APPLICATION,
-                            })[imageType] || RegionColor.NONE;
-
                         regions.push({
                             ...defaultRegion,
                             name: regionName,
                             startAddress,
                             regionSize,
-                            color,
                         });
                     });
 
