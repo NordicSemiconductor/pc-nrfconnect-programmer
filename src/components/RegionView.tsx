@@ -19,11 +19,11 @@ import RegionInfoView from './RegionInfoView';
 
 const regionColorByName: Record<RegionName | 'background', string> = {
     [RegionName.MBR_PARAMS]: '#333F48',
-    [RegionName.MBR]: '#FF9800',
-    [RegionName.MBR_OR_APP]: '#FF9800',
-    [RegionName.BOOTLOADER]: '#E91E63',
-    [RegionName.SOFTDEVICE]: '#3F51B5',
-    [RegionName.APPLICATION]: '#4CAF50',
+    [RegionName.MBR]: colors.orange,
+    [RegionName.MBR_OR_APP]: colors.orange,
+    [RegionName.BOOTLOADER]: colors.pink,
+    [RegionName.SOFTDEVICE]: colors.indigo,
+    [RegionName.APPLICATION]: colors.green,
     [RegionName.FICR]: '#333F48',
     [RegionName.UICR]: '#333F48',
     [RegionName.NONE]: '#333F48',
