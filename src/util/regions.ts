@@ -56,8 +56,8 @@ export enum RegionColor {
     BOOTLOADER = '#E91E63',
     SOFTDEVICE = '#3F51B5',
     APPLICATION = ' #4CAF50',
-    UICR = '#333F48',
-    NONE = '#333F48',
+    UICR = '#333F48', // eslint-disable-line @typescript-eslint/no-duplicate-enum-values -- FIXME: Using an enum is wrong here and could potantially lead to bugs because RegionColor.UICR === RegionColor.NONE is true. Will be fixed later.
+    NONE = '#333F48', // eslint-disable-line @typescript-eslint/no-duplicate-enum-values
 }
 
 /**
