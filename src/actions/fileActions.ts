@@ -90,9 +90,12 @@ export const removeFile =
     (filePath: string): AppThunk<RootState> =>
     (dispatch, getState) => {
         const { loaded, memMaps } = getState().app.file;
-        const newLoaded = { ...loaded };
+
+        const newLoaded = Object.fromEntries(
+            Object.entries(loaded).filter(([key]) => key !== filePath),
+        );
+
         const newMemMaps = memMaps.filter(element => element[0] !== filePath);
-        delete newLoaded[filePath];
 
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
