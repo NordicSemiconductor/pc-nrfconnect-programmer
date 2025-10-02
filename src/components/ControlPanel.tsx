@@ -320,7 +320,7 @@ Are you sure you want to continue?`,
                                     jlinkTargetActions.resetDevice(device),
                                 );
                             }
-                        } catch (e) {
+                        } catch {
                             /* empty */
                         }
                         dispatch(setDeviceBusy(false));
@@ -345,7 +345,7 @@ Are you sure you want to continue?`,
                             // Refresh all files in case that some files have been updated right before write action.
                             refreshAllFiles();
                             dispatch(targetActions.write(device));
-                        } catch (e) {
+                        } catch {
                             /* empty */
                         }
                         dispatch(setDeviceBusy(false));
@@ -377,7 +377,7 @@ Are you sure you want to continue?`,
                         dispatch(setDeviceBusy(true));
                         try {
                             await dispatch(jlinkTargetActions.read(device));
-                        } catch (e) {
+                        } catch {
                             /* empty */
                         }
                         dispatch(setDeviceBusy(false));
