@@ -6,7 +6,7 @@
 
 import { convertDeviceDefinitionToCoreArray } from './devices';
 import { DeviceDefinition } from './deviceTypes';
-import { defaultRegion, Region, RegionColor, RegionName } from './regions';
+import { defaultRegion, Region, RegionName } from './regions';
 
 export const generateRegionDetectedNames = (fileRegions: Region[]) => {
     const regionChecklist = [
@@ -82,7 +82,6 @@ export const generateFileAppRegions = (
             name: RegionName.APPLICATION,
             startAddress: appStartAddress,
             regionSize: appEndAddress - appStartAddress,
-            color: RegionColor.APPLICATION,
         };
         fileRegions = [...restFileRegions, appRegion];
     }

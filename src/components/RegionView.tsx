@@ -13,9 +13,25 @@ import { colors } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import * as fileActions from '../actions/fileActions';
 import { CoreInfo } from '../util/devices';
-import { Region } from '../util/regions';
+import { Region, RegionName } from '../util/regions';
 import CoreInfoView from './CoreInfoView';
 import RegionInfoView from './RegionInfoView';
+
+const regionColorByName: Record<RegionName | 'background', string> = {
+    [RegionName.MBR_PARAMS]: '#333F48',
+    [RegionName.MBR]: colors.orange,
+    [RegionName.MBR_OR_APP]: colors.orange,
+    [RegionName.BOOTLOADER]: colors.pink,
+    [RegionName.SOFTDEVICE]: colors.indigo,
+    [RegionName.APPLICATION]: colors.green,
+    [RegionName.FICR]: '#333F48',
+    [RegionName.UICR]: '#333F48',
+    [RegionName.NONE]: '#333F48',
+
+    background: colors.gray100,
+};
+
+const color = (name?: RegionName) => regionColorByName[name ?? 'background'];
 
 interface RegionViewProps {
     width: number;
@@ -47,7 +63,6 @@ const RegionView = ({
         setTarget(event.target as HTMLElement);
     };
 
-    const color = region ? region.color : colors.gray100;
     const fileNames = region ? region.fileNames : [];
 
     let className = 'region';
@@ -68,7 +83,7 @@ const RegionView = ({
             className={className}
             style={{
                 flexGrow: width,
-                backgroundColor: color,
+                backgroundColor: color(region?.name),
             }}
         >
             <Overlay
