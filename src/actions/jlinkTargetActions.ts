@@ -48,27 +48,27 @@ let abortController: AbortController | undefined;
 export const openDevice =
     (
         device: Device,
-        controller: AbortController
+        controller: AbortController,
     ): AppThunk<RootState, Promise<void>> =>
     async (dispatch, getState) => {
         abortController = controller;
         logger.info(
-            'Using nrfutil device to communicate with target via JLink'
+            'Using nrfutil device to communicate with target via JLink',
         );
 
         logDeviceInfo(device, getState().device.selectedDeviceInfo);
         const defaultDeviceInfo = getDefaultDeviceInfoByJlinkFamily(
-            getState().device.selectedDeviceInfo
+            getState().device.selectedDeviceInfo,
         );
         const deviceCoreNames = convertDeviceDefinitionToCoreArray(
-            defaultDeviceInfo
+            defaultDeviceInfo,
         ).map(c => c.name);
 
         dispatch(setDeviceDefinition(defaultDeviceInfo));
 
         await dispatch(getAllCoreProtectionStatusBatch(deviceCoreNames)).run(
             device,
-            abortController
+            abortController,
         );
 
         await dispatch(getAllCoreInfoBatch(true)).run(device);
@@ -86,7 +86,7 @@ export const openDevice =
                 .reset('Application', 'RESET_DEBUG')
                 .run(device, abortController);
             await dispatch(
-                getAllCoreProtectionStatusBatch(deviceCoreNames)
+                getAllCoreProtectionStatusBatch(deviceCoreNames),
             ).run(device, abortController);
         } else {
             await batch.run(device, abortController);
@@ -100,7 +100,7 @@ const logDeviceInfo = (device: Device, deviceInfo?: DeviceInfo) => {
 
     logger.info(
         'JLink OB firmware version',
-        deviceInfo.jlink.jlinkObFirmwareVersion
+        deviceInfo.jlink.jlinkObFirmwareVersion,
     );
     logger.info('Device family', device.devkit?.deviceFamily);
     logger.info('Device version', deviceInfo.jlink.deviceVersion);
@@ -110,7 +110,7 @@ const logDeviceInfo = (device: Device, deviceInfo?: DeviceInfo) => {
 const readAllCoresBatch =
     (
         checkProtection: boolean,
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     (dispatch, getState) => {
         const deviceDefinition = getDeviceDefinition(getState());
@@ -126,7 +126,7 @@ const readAllCoresBatch =
                         'NRFDL_PROTECTION_STATUS_NONE'
                 ) {
                     logger.info(
-                        `Skipping reading core ${deviceCoreInfo.name} as it is protected.`
+                        `Skipping reading core ${deviceCoreInfo.name} as it is protected.`,
                     );
                     return accBatch;
                 }
@@ -140,12 +140,12 @@ const readAllCoresBatch =
                                 updateCoreOperations({
                                     core: deviceCoreInfo.name,
                                     state: 'reading',
-                                })
+                                }),
                             );
                             dispatch(
                                 updateCoreMemMap({
                                     [deviceCoreInfo.name]: undefined,
-                                })
+                                }),
                             );
                         },
                         (success, data) => {
@@ -155,29 +155,29 @@ const readAllCoresBatch =
                                 const paddedArray = memMap.slicePad(
                                     0,
                                     deviceCoreInfo.coreDefinitions.romBaseAddr +
-                                        deviceCoreInfo.coreDefinitions.romSize
+                                        deviceCoreInfo.coreDefinitions.romSize,
                                 );
 
                                 dispatch(
                                     updateCoreMemMap({
                                         [deviceCoreInfo.name]:
                                             MemoryMap.fromPaddedUint8Array(
-                                                paddedArray
+                                                paddedArray,
                                             ),
-                                    })
+                                    }),
                                 );
                             }
                             dispatch(
                                 updateCoreOperations({
                                     core: deviceCoreInfo.name,
                                     state: 'idle',
-                                })
+                                }),
                             );
-                        }
-                    )
+                        },
+                    ),
                 );
             },
-            batch
+            batch,
         );
 
         return batch;
@@ -194,7 +194,7 @@ export const read =
 const batchLoggingCallbacks = <T>(
     message: string,
     onBegin?: () => void,
-    onEnd?: (success: boolean, data?: T) => void
+    onEnd?: (success: boolean, data?: T) => void,
 ): BatchCallbacks<T> => ({
     onTaskBegin: () => {
         logger.info(message);
@@ -211,7 +211,7 @@ const batchLoggingCallbacks = <T>(
                     taskEnd.error
                         ? ` code: ${taskEnd.error.code}, description: ${taskEnd.error.description},`
                         : ''
-                } message: ${taskEnd.message}`
+                } message: ${taskEnd.message}`,
             );
         }
     },
@@ -221,7 +221,7 @@ const batchLoggingCallbacks = <T>(
     onProgress: progress => {
         const status = `${message.replace(
             '.',
-            ':'
+            ':',
         )} ${progress.totalProgressPercentage.toFixed(0)}%`;
         logger.info(status);
     },
@@ -230,7 +230,7 @@ const batchLoggingCallbacks = <T>(
 const recoverOneCoreBatch =
     (
         core: DeviceCore,
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch => {
         dispatch(updateCoreMemMap({ [core]: undefined }));
@@ -244,7 +244,7 @@ const recoverOneCoreBatch =
                         updateCoreOperations({
                             core,
                             state: 'erasing',
-                        })
+                        }),
                     );
                 },
                 () =>
@@ -252,9 +252,9 @@ const recoverOneCoreBatch =
                         updateCoreOperations({
                             core,
                             state: 'idle',
-                        })
-                    )
-            )
+                        }),
+                    ),
+            ),
         );
     };
 
@@ -262,7 +262,7 @@ const writeOneCoreBatch =
     (
         core: DeviceCore,
         hexFileString: string,
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch =>
         batch.program(
@@ -276,18 +276,18 @@ const writeOneCoreBatch =
                     () => {
                         dispatch(updateCoreMemMap({ [core]: undefined }));
                         dispatch(
-                            updateCoreOperations({ core, state: 'writing' })
+                            updateCoreOperations({ core, state: 'writing' }),
                         );
                     },
                     () =>
-                        dispatch(updateCoreOperations({ core, state: 'idle' }))
+                        dispatch(updateCoreOperations({ core, state: 'idle' })),
                 ),
-            }
+            },
         );
 
 const geCoreHexIntel = (
     coreInfo: CoreDefinition,
-    memMaps: MemoryMaps<string>
+    memMaps: MemoryMaps<string>,
 ) => {
     // Parse input files and filter program regions with core start address and size
     const overlaps = MemoryMap.overlapMemoryMaps(memMaps);
@@ -317,18 +317,18 @@ const geCoreHexIntel = (
 const recoverAllCoresBatch =
     (
         cores: DeviceCore[],
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch =>
         cores.reduce(
             (accBatch, core) => dispatch(recoverOneCoreBatch(core, accBatch)),
-            batch
+            batch,
         );
 
 const writeToAllCoresBatch =
     (
         memMaps: MemoryMaps<string>,
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     (dispatch, getState) => {
         const deviceDefinition = getDeviceDefinition(getState());
@@ -336,7 +336,7 @@ const writeToAllCoresBatch =
             (accBatch, deviceCoreInfo) => {
                 const hex = geCoreHexIntel(
                     deviceCoreInfo.coreDefinitions,
-                    memMaps
+                    memMaps,
                 );
                 if (!hex) return accBatch;
 
@@ -344,11 +344,11 @@ const writeToAllCoresBatch =
                     writeOneCoreBatch(
                         deviceCoreInfo.name,
                         hex.asHexString(),
-                        accBatch
-                    )
+                        accBatch,
+                    ),
                 );
             },
-            batch
+            batch,
         );
     };
 
@@ -359,7 +359,7 @@ const updateDeviceInfo =
             device,
             undefined,
             undefined,
-            abortController
+            abortController,
         );
 
         if (
@@ -378,7 +378,7 @@ const updateDeviceInfo =
         const coreNames = coreInfos.map(c => c.name);
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
-            abortController
+            abortController,
         );
 
         return getDeviceDefinition(getState());
@@ -395,8 +395,8 @@ export const recover =
         await dispatch(
             getAllCoreInfoBatch(
                 false, // No need to check protection as we recovered
-                batch
-            )
+                batch,
+            ),
         ).run(device);
 
         batch = NrfutilDeviceLib.batch();
@@ -417,7 +417,7 @@ export const recover =
 
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
-            abortController
+            abortController,
         );
     };
 
@@ -432,8 +432,8 @@ export const recoverAndWrite =
         await dispatch(
             getAllCoreInfoBatch(
                 false, // No need to check protection as we recovered
-                batch
-            )
+                batch,
+            ),
         ).run(device);
 
         batch = NrfutilDeviceLib.batch();
@@ -456,7 +456,7 @@ export const recoverAndWrite =
 
         await dispatch(getAllCoreProtectionStatusBatch(coreNames)).run(
             device,
-            abortController
+            abortController,
         );
     };
 
@@ -470,16 +470,16 @@ export const resetDevice =
             'Application',
             'RESET_DEBUG',
             undefined,
-            abortController
+            abortController,
         );
 
         const deviceCoreNames = convertDeviceDefinitionToCoreArray(
-            deviceDefinition
+            deviceDefinition,
         ).map(c => c.name);
 
         await dispatch(getAllCoreProtectionStatusBatch(deviceCoreNames)).run(
             device,
-            abortController
+            abortController,
         );
     };
 
@@ -488,8 +488,8 @@ export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
     const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     const maxAddress = Math.max(
         ...coreInfos.map(
-            c => c.coreDefinitions.romBaseAddr + c.coreDefinitions.romSize
-        )
+            c => c.coreDefinitions.romBaseAddr + c.coreDefinitions.romSize,
+        ),
     );
 
     const options = {
@@ -524,7 +524,7 @@ export const saveAsFile = (): AppThunk<RootState> => (_, getState) => {
 const getCoreProtectionStatusBatch =
     (
         core: DeviceCore,
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch =>
         batch.getProtectionStatus(
@@ -537,12 +537,12 @@ const getCoreProtectionStatusBatch =
                 (success, protectionStatus) => {
                     if (success && protectionStatus) {
                         logger.info(
-                            `${core} core protection status '${protectionStatus?.protectionStatus}'`
+                            `${core} core protection status '${protectionStatus?.protectionStatus}'`,
                         );
                         dispatch(
                             updateCoreProtection({
                                 [core]: protectionStatus.protectionStatus,
-                            })
+                            }),
                         );
 
                         if (
@@ -552,31 +552,31 @@ const getCoreProtectionStatusBatch =
                             dispatch(
                                 updateCoreMemMap({
                                     [core]: undefined,
-                                })
+                                }),
                             );
                         }
                     }
-                }
-            )
+                },
+            ),
         );
 
 const getAllCoreProtectionStatusBatch =
     (
         cores: DeviceCore[],
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch =>
         cores.reduce(
             (accBatch, core) =>
                 dispatch(getCoreProtectionStatusBatch(core, accBatch)),
-            batch
+            batch,
         );
 
 const getCoreInfoBatch =
     (
         core: DeviceCore,
         defaultCoreInfo: CoreDefinition,
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     dispatch =>
         batch.getCoreInfo(
@@ -593,32 +593,32 @@ const getCoreInfoBatch =
                             updateCoreInfos({
                                 [core]: mergeNrfutilDeviceInfoInCoreDefinition(
                                     defaultCoreInfo,
-                                    coreInfo
+                                    coreInfo,
                                 ),
-                            })
+                            }),
                         );
                     }
                     dispatch(updateCoreOperations({ core, state: 'idle' }));
-                }
-            )
+                },
+            ),
         );
 
 const getAllCoreInfoBatch =
     (
         checkProtection: boolean,
-        batch = NrfutilDeviceLib.batch()
+        batch = NrfutilDeviceLib.batch(),
     ): AppThunk<RootState, DeviceBatch> =>
     (dispatch, getState) => {
         const currentDeviceDefinition = getDeviceDefinition(getState());
         return convertDeviceDefinitionToCoreArray(
-            currentDeviceDefinition
+            currentDeviceDefinition,
         ).reduce((accBatch, coreInfo) => {
             if (
                 checkProtection &&
                 coreInfo.coreProtection !== 'NRFDL_PROTECTION_STATUS_NONE'
             ) {
                 logger.info(
-                    `Skipping reading core ${coreInfo.name} information as it is protected.`
+                    `Skipping reading core ${coreInfo.name} information as it is protected.`,
                 );
                 return accBatch;
             }
@@ -629,8 +629,8 @@ const getAllCoreInfoBatch =
                     currentDeviceDefinition.coreDefinitions[
                         coreInfo.name
                     ] as CoreDefinition,
-                    accBatch
-                )
+                    accBatch,
+                ),
             );
         }, batch);
     };

@@ -69,7 +69,7 @@ export default () => {
             updateCoreOperations({
                 core: 'Application',
                 state: 'writing',
-            })
+            }),
         );
 
         let canceled = false;
@@ -84,7 +84,7 @@ export default () => {
                 onCanceled: () => {
                     canceled = true;
                 },
-            })
+            }),
         );
 
         setWriting(true);
@@ -94,7 +94,7 @@ export default () => {
                 message: `The device is being programmed.
 Closing application right now might result in some unknown behavior and might also brick the device.
 Are you sure you want to continue?`,
-            })
+            }),
         );
 
         try {
@@ -134,14 +134,14 @@ Are you sure you want to continue?`,
                     once: true,
                     onSuccess: programmedDevice =>
                         dispatch(refreshMemoryLayout(programmedDevice)),
-                })
+                }),
             );
 
             dispatch(
                 updateCoreOperations({
                     core: 'Application',
                     state: 'idle',
-                })
+                }),
             );
         }
     }, [device, dispatch, images]);

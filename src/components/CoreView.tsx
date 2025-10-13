@@ -46,7 +46,7 @@ export default ({ coreInfo, active, regions = [] }: CoreViewProps) => {
                                 hoverable
                                 active={active}
                                 width={regionSize}
-                            />
+                            />,
                         );
                     }
 
@@ -57,7 +57,7 @@ export default ({ coreInfo, active, regions = [] }: CoreViewProps) => {
                                 key={lastAddress}
                                 coreInfo={coreInfo}
                                 width={startAddress}
-                            />
+                            />,
                         );
                         regionViews.push(
                             <RegionView
@@ -66,7 +66,7 @@ export default ({ coreInfo, active, regions = [] }: CoreViewProps) => {
                                 hoverable
                                 active={active}
                                 width={regionSize}
-                            />
+                            />,
                         );
                     }
 
@@ -78,7 +78,7 @@ export default ({ coreInfo, active, regions = [] }: CoreViewProps) => {
                             key={lastAddress}
                             coreInfo={coreInfo}
                             width={startAddress - lastAddress}
-                        />
+                        />,
                     );
 
                     regionViews.push(
@@ -88,7 +88,7 @@ export default ({ coreInfo, active, regions = [] }: CoreViewProps) => {
                             hoverable
                             active={active}
                             width={regionSize}
-                        />
+                        />,
                     );
 
                     // Update lastAddress
@@ -101,7 +101,7 @@ export default ({ coreInfo, active, regions = [] }: CoreViewProps) => {
             key={lastAddress}
             coreInfo={coreInfo}
             width={romBaseAddr + romSize - lastAddress}
-        />
+        />,
     );
 
     // eslint-disable-next-line react/jsx-no-useless-fragment -- RegionViews is an array and requires a fragment

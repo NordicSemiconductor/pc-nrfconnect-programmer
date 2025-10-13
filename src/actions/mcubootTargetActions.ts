@@ -63,7 +63,7 @@ export const performUpdate = async (
     dfuFilePath: string,
     onProgress: (progress: Progress) => void,
     abortController: AbortController,
-    programmingOptions?: ProgrammingOptions
+    programmingOptions?: ProgrammingOptions,
 ) => {
     logger.info(`Writing ${dfuFilePath} to device ${device.serialNumber}`);
 
@@ -75,7 +75,7 @@ export const performUpdate = async (
             onProgress,
             undefined,
             programmingOptions,
-            abortController
+            abortController,
         );
         logger.info('MCUboot DFU completed successfully!');
     } catch (e) {

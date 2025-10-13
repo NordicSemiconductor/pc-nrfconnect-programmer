@@ -37,7 +37,7 @@ const UserInputDialogView = () => {
             })),
             { value: 'Custom', label: 'Custom' },
         ],
-        [choices]
+        [choices],
     );
 
     const [isValidInput, setIsValidInput] = useState(false);
@@ -100,7 +100,7 @@ const UserInputDialogView = () => {
                     items={choiceItems}
                     selectedItem={
                         choiceItems.find(
-                            item => item.value === selectedValue.value
+                            item => item.value === selectedValue.value,
                         ) ?? choiceItems[0]
                     }
                     onSelect={item => onSelectChoice(item)}

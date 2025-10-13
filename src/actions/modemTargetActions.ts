@@ -16,7 +16,7 @@ export const performUpdate = async (
     device: Device,
     fileName: string,
     onProgress: (progress: Progress) => void,
-    abortController: AbortController
+    abortController: AbortController,
 ) => {
     logger.info('Modem DFU starts to write...');
     logger.info(`Writing ${fileName} to device ${device.serialNumber || ''}`);
@@ -28,7 +28,7 @@ export const performUpdate = async (
             onProgress,
             undefined,
             undefined,
-            abortController
+            abortController,
         );
 
         logger.info('Modem DFU completed successfully!');

@@ -112,7 +112,7 @@ const Mru = ({ mruFiles }: { mruFiles: string[] }) => {
     };
 
     const containerNode = document.getElementsByClassName(
-        'core-main-layout'
+        'core-main-layout',
     )[0] as HTMLElement;
 
     return (
@@ -178,7 +178,7 @@ const ControlPanel = () => {
     const targetIsReady = !useSelector(getDeviceIsBusy) && !!device;
     const coreInfos = convertDeviceDefinitionToCoreArray(deviceDefinition);
     const canRead = !!coreInfos.find(
-        coreInfo => coreInfo.coreProtection === 'NRFDL_PROTECTION_STATUS_NONE'
+        coreInfo => coreInfo.coreProtection === 'NRFDL_PROTECTION_STATUS_NONE',
     );
 
     const isMemLoaded = coreInfos.find(coreInfo => !!coreInfo.coreMemMap);
@@ -233,9 +233,9 @@ Closing application right now might result in some unknown behavior and might al
 Are you sure you want to continue?`,
                                 },
                                 dispatch(
-                                    jlinkTargetActions.recover(device)
-                                ).finally(() => dispatch(setDeviceBusy(false)))
-                            )
+                                    jlinkTargetActions.recover(device),
+                                ).finally(() => dispatch(setDeviceBusy(false))),
+                            ),
                         );
                     }}
                     disabled={
@@ -267,9 +267,9 @@ Closing application right now might result in some unknown behavior and might al
 Are you sure you want to continue?`,
                                 },
                                 dispatch(
-                                    jlinkTargetActions.recoverAndWrite(device)
-                                ).finally(() => dispatch(setDeviceBusy(false)))
-                            )
+                                    jlinkTargetActions.recoverAndWrite(device),
+                                ).finally(() => dispatch(setDeviceBusy(false))),
+                            ),
                         );
                     }}
                     disabled={
@@ -313,14 +313,14 @@ Are you sure you want to continue?`,
                         try {
                             if (isNordicDfu) {
                                 await dispatch(
-                                    usbsdfuTargetActions.resetDevice(device)
+                                    usbsdfuTargetActions.resetDevice(device),
                                 );
                             } else {
                                 await dispatch(
-                                    jlinkTargetActions.resetDevice(device)
+                                    jlinkTargetActions.resetDevice(device),
                                 );
                             }
-                        } catch (e) {
+                        } catch {
                             /* empty */
                         }
                         dispatch(setDeviceBusy(false));
@@ -345,7 +345,7 @@ Are you sure you want to continue?`,
                             // Refresh all files in case that some files have been updated right before write action.
                             refreshAllFiles();
                             dispatch(targetActions.write(device));
-                        } catch (e) {
+                        } catch {
                             /* empty */
                         }
                         dispatch(setDeviceBusy(false));
@@ -377,7 +377,7 @@ Are you sure you want to continue?`,
                         dispatch(setDeviceBusy(true));
                         try {
                             await dispatch(jlinkTargetActions.read(device));
-                        } catch (e) {
+                        } catch {
                             /* empty */
                         }
                         dispatch(setDeviceBusy(false));

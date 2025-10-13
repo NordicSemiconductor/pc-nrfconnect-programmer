@@ -58,7 +58,7 @@ const updateCoreInfo = (): AppThunk<RootState> => (dispatch, getState) => {
         startAddresses.find(
             s =>
                 s >= networkCore.romBaseAddr &&
-                s <= networkCore.romBaseAddr + networkCore.romSize
+                s <= networkCore.romBaseAddr + networkCore.romSize,
         )
     ) {
         dispatch(setDeviceDefinition(nRF5340DefaultDevice));
@@ -81,7 +81,7 @@ const updateCoreInfo = (): AppThunk<RootState> => (dispatch, getState) => {
                         romSize: Math.max(lastEndAddress, 0x100000), // 1 MB
                     },
                 },
-            })
+            }),
         );
     }
 };
@@ -90,9 +90,12 @@ export const removeFile =
     (filePath: string): AppThunk<RootState> =>
     (dispatch, getState) => {
         const { loaded, memMaps } = getState().app.file;
-        const newLoaded = { ...loaded };
+
+        const newLoaded = Object.fromEntries(
+            Object.entries(loaded).filter(([key]) => key !== filePath),
+        );
+
         const newMemMaps = memMaps.filter(element => element[0] !== filePath);
-        delete newLoaded[filePath];
 
         dispatch(fileParse({ loaded: newLoaded, memMaps: newMemMaps }));
         dispatch(updateCoreInfo());
@@ -135,10 +138,12 @@ const parseZipFile =
             stat(filePath, (statsError, result) => {
                 if (statsError) {
                     logger.error(
-                        `Could not open ZIP file: ${describeError(statsError)}`
+                        `Could not open ZIP file: ${describeError(statsError)}`,
                     );
                     dispatch(
-                        ErrorDialogActions.showDialog(describeError(statsError))
+                        ErrorDialogActions.showDialog(
+                            describeError(statsError),
+                        ),
                     );
                     removeMruFile(filePath);
                     return reject();
@@ -163,10 +168,12 @@ const parseHexFile =
             stat(filePath, (statsError, result) => {
                 if (statsError) {
                     logger.error(
-                        `Could not open HEX file: ${describeError(statsError)}`
+                        `Could not open HEX file: ${describeError(statsError)}`,
                     );
                     dispatch(
-                        ErrorDialogActions.showDialog(describeError(statsError))
+                        ErrorDialogActions.showDialog(
+                            describeError(statsError),
+                        ),
                     );
                     removeMruFile(filePath);
                     return reject();
@@ -180,14 +187,14 @@ const parseHexFile =
                 logger.info('Parsing HEX file: ', filePath);
                 logger.info(
                     'File was last modified at ',
-                    stats.mtime.toLocaleString()
+                    stats.mtime.toLocaleString(),
                 );
                 if (readError) {
                     logger.error(
-                        `Could not open HEX file: ${describeError(readError)}`
+                        `Could not open HEX file: ${describeError(readError)}`,
                     );
                     dispatch(
-                        ErrorDialogActions.showDialog(describeError(readError))
+                        ErrorDialogActions.showDialog(describeError(readError)),
                     );
                     removeMruFile(filePath);
                     return reject();
@@ -268,7 +275,7 @@ export const openFileDialog = (): AppThunk => dispatch => {
         .showOpenDialog(getCurrentWindow(), dialogOptions)
         .then(
             ({ filePaths }: { filePaths: string[] }) =>
-                filePaths && dispatch(openFile(...filePaths))
+                filePaths && dispatch(openFile(...filePaths)),
         );
 };
 
@@ -288,11 +295,11 @@ export const refreshAllFiles =
                     logger.info('Does not need to be reloaded: ', filePath);
                 } catch (error) {
                     logger.error(
-                        `Could not open HEX file: ${describeError(error)}`
+                        `Could not open HEX file: ${describeError(error)}`,
                     );
                     dispatch(
-                        ErrorDialogActions.showDialog(describeError(error))
+                        ErrorDialogActions.showDialog(describeError(error)),
                     );
                 }
-            })
+            }),
         ).then(() => Promise.resolve());

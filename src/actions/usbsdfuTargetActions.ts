@@ -70,7 +70,7 @@ export const openDevice =
     dispatch => {
         abortController = controller;
         logger.info(
-            'Using nrfutil-device to communicate with target via USB SDFU protocol'
+            'Using nrfutil-device to communicate with target via USB SDFU protocol',
         );
 
         const deviceInfo = getDeviceInfoByUSB(device);
@@ -86,7 +86,7 @@ export const refreshMemoryLayout =
             updateCoreOperations({
                 core: 'Application',
                 state: 'reading',
-            })
+            }),
         );
         dispatch(targetRegionsUnknown());
         dispatch(
@@ -97,13 +97,13 @@ export const refreshMemoryLayout =
                         deviceInBootLoader,
                         undefined,
                         undefined,
-                        abortController
+                        abortController,
                     );
                     dispatch(
                         updateCoreOperations({
                             core: 'Application',
                             state: 'idle',
-                        })
+                        }),
                     );
                     const deviceInfo = getDeviceInfoByUSB(deviceInBootLoader);
                     dispatch(setDeviceDefinition(deviceInfo));
@@ -198,17 +198,17 @@ export const refreshMemoryLayout =
                         updateCoreOperations({
                             core: 'Application',
                             state: 'idle',
-                        })
+                        }),
                     );
                 },
                 error => {
                     logger.error(
                         `Error when fetching device versions: ${describeError(
-                            error
-                        )}`
+                            error,
+                        )}`,
                     );
-                }
-            )
+                },
+            ),
         );
     };
 
@@ -219,21 +219,21 @@ export const resetDevice =
             updateCoreOperations({
                 core: 'Application',
                 state: 'loading',
-            })
+            }),
         );
         await NrfutilDeviceLib.reset(
             device,
             undefined,
             undefined,
             undefined,
-            abortController
+            abortController,
         );
         logger.info(`Resetting device completed`);
         dispatch(
             updateCoreOperations({
                 core: 'Application',
                 state: 'idle',
-            })
+            }),
         );
     };
 
@@ -309,7 +309,7 @@ export const canWrite = (): AppThunk<RootState> => (dispatch, getState) => {
  * @param {MemoryMap} image the input memory map
  * @returns {Buffer} the calculated hash
  */
-const calculateSHA256Hash = (image = new Uint8Array()) => {
+const calculateSHA256Hash = (image: Uint8Array = new Uint8Array()) => {
     const digest = Crypto.createHash('sha256');
     digest.update(image);
     return Buffer.from(digest.digest().reverse());
@@ -321,7 +321,7 @@ const calculateSHA256Hash = (image = new Uint8Array()) => {
  * @param {MemoryMap} image the input memory map
  * @returns {Buffer} the calculated hash
  */
-const calculateSHA512Hash = (image = new Uint8Array()) => {
+const calculateSHA512Hash = (image: Uint8Array = new Uint8Array()) => {
     const digest = Crypto.createHash('sha512');
     digest.update(image);
     return Buffer.from(digest.digest().reverse());
@@ -338,7 +338,7 @@ const calculateSHA512Hash = (image = new Uint8Array()) => {
 const handleImage = (
     image: DfuImage,
     regions: Region[],
-    memMap: MemoryMap
+    memMap: MemoryMap,
 ): DfuImage => {
     if (!image.initPacket) {
         throw new Error('Init packet was not created.');
@@ -363,7 +363,7 @@ const handleImage = (
 
     const firmwareImage = memMap.slicePad(
         region?.startAddress as number,
-        Math.ceil((region?.regionSize as number) / 4) * 4
+        Math.ceil((region?.regionSize as number) / 4) * 4,
     );
 
     return {
@@ -403,7 +403,7 @@ const handleHwVersion = (image: DfuImage, hwVersion: number): DfuImage => ({
 const handleSdReq = (
     image: DfuImage,
     fileMemMap: MemoryMap,
-    deviceInfo: DeviceDefinition
+    deviceInfo: DeviceDefinition,
 ): DfuImage => {
     // If sdReq is already set, then do not handle it.
     if (image.initPacket.sdReq && image.initPacket.sdReq.length > 0) {
@@ -421,7 +421,7 @@ const handleSdReq = (
         const sdId = deviceInfo.coreDefinitions?.Application
             ? getSoftDeviceId(
                   fileMemMap,
-                  deviceInfo.coreDefinitions?.Application
+                  deviceInfo.coreDefinitions?.Application,
               )
             : undefined;
         sdReq = sdId ? [sdId] : undefined;
@@ -456,7 +456,7 @@ const handleUserInput =
                 const message =
                     'Please select the SoftDevice required by the application firmware:';
                 sdReq = await dispatch(
-                    userInputActions.getUserInput(message, NordicFwIds)
+                    userInputActions.getUserInput(message, NordicFwIds),
                 );
                 sdReq = typeof sdReq === 'string' ? parseInt(sdReq, 16) : sdReq;
             }
@@ -521,7 +521,7 @@ const nrfdlErrorSdfuExtSdVersionFailure = (error: unknown) =>
 export const operateDFU = async (
     device: Device,
     inputDfuImages: DfuImage[],
-    onProgress: (progress: Progress) => void
+    onProgress: (progress: Progress) => void,
 ) => {
     const zipBuffer = await sdfuOperations.createDfuZipBuffer(inputDfuImages);
 
@@ -532,7 +532,7 @@ export const operateDFU = async (
             onProgress,
             undefined,
             undefined,
-            abortController
+            abortController,
         );
 
         logger.info('All dfu images have been written to the target device');
@@ -563,7 +563,7 @@ export const write =
 
         const hwVersion = parseInt(
             deviceDefinition.family?.slice(3) ?? '0',
-            10
+            10,
         );
 
         let images = dfuImages
@@ -573,7 +573,7 @@ export const write =
             .map(image => handleHash(image, HashType.SHA256));
 
         images = await Promise.all(
-            images.map(image => dispatch(handleUserInput(image)))
+            images.map(image => dispatch(handleUserInput(image))),
         );
 
         dispatch(setDFUImages(images));

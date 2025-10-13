@@ -47,7 +47,7 @@ const targetSlice = createSlice({
         },
         updateCoreInfos(
             state,
-            action: PayloadAction<Partial<CoreDefinitions>>
+            action: PayloadAction<Partial<CoreDefinitions>>,
         ) {
             state.coreDefinitions = {
                 ...state.coreDefinitions,
@@ -59,7 +59,7 @@ const targetSlice = createSlice({
         },
         updateCoreOperations(
             state,
-            action: PayloadAction<{ core: DeviceCore; state: CoreState }>
+            action: PayloadAction<{ core: DeviceCore; state: CoreState }>,
         ) {
             state.coreOperation = {
                 ...state.coreOperation,
@@ -71,7 +71,7 @@ const targetSlice = createSlice({
         },
         updateCoreProtection(
             state,
-            action: PayloadAction<Partial<CoreProtection>>
+            action: PayloadAction<Partial<CoreProtection>>,
         ) {
             state.coreProtection = {
                 ...state.coreProtection,

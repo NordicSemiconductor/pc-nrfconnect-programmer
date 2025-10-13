@@ -57,7 +57,7 @@ const RegionView = ({
     className = fileNames.length > 1 ? `${className} crosses` : className;
 
     const containerNode = document.getElementsByClassName(
-        'core-main-layout'
+        'core-main-layout',
     )[0] as HTMLElement;
 
     return (

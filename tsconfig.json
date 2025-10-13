@@ -1,6 +1,3 @@
 {
-    "extends": "@nordicsemiconductor/pc-nrfconnect-shared/config/tsconfig.json",
-    "compilerOptions": {
-        "typeRoots": ["./types", "./node_modules/@types"]
-    }
+    "extends": "@nordicsemiconductor/pc-nrfconnect-shared/config/tsconfig.json"
 }

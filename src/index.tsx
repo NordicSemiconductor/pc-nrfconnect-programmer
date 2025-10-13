@@ -28,5 +28,5 @@ render(
         sidePanel={<ControlPanel />}
         panes={[{ name: 'Programmer', Main: AppMainView }]}
         documentation={DocumentationSections}
-    />
+    />,
 );

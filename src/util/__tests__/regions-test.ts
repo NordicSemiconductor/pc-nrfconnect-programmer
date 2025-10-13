@@ -48,19 +48,19 @@ describe('detect regions', () => {
         const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(1);
         expect(
-            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
+            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.BOOTLOADER)
+            regionList.find(r => r.name === regions.RegionName.BOOTLOADER),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE)
+            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.APPLICATION)
+            regionList.find(r => r.name === regions.RegionName.APPLICATION),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.NONE)
+            regionList.find(r => r.name === regions.RegionName.NONE),
         ).toBeUndefined();
     });
 
@@ -71,19 +71,19 @@ describe('detect regions', () => {
         const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
-            regionList.find(r => r.name === regions.RegionName.BOOTLOADER)
+            regionList.find(r => r.name === regions.RegionName.BOOTLOADER),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.NONE)
+            regionList.find(r => r.name === regions.RegionName.NONE),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
+            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE)
+            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.APPLICATION)
+            regionList.find(r => r.name === regions.RegionName.APPLICATION),
         ).toBeUndefined();
     });
 
@@ -94,19 +94,19 @@ describe('detect regions', () => {
         const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
-            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
+            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE)
+            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.BOOTLOADER)
+            regionList.find(r => r.name === regions.RegionName.BOOTLOADER),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.APPLICATION)
+            regionList.find(r => r.name === regions.RegionName.APPLICATION),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.NONE)
+            regionList.find(r => r.name === regions.RegionName.NONE),
         ).toBeUndefined();
     });
 
@@ -117,19 +117,19 @@ describe('detect regions', () => {
         const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(2);
         expect(
-            regionList.find(r => r.name === regions.RegionName.APPLICATION)
+            regionList.find(r => r.name === regions.RegionName.APPLICATION),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
+            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE)
+            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.BOOTLOADER)
+            regionList.find(r => r.name === regions.RegionName.BOOTLOADER),
         ).toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.NONE)
+            regionList.find(r => r.name === regions.RegionName.NONE),
         ).toBeUndefined();
     });
 
@@ -145,19 +145,19 @@ describe('detect regions', () => {
         const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(4);
         expect(
-            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
+            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE)
+            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.BOOTLOADER)
+            regionList.find(r => r.name === regions.RegionName.BOOTLOADER),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.NONE)
+            regionList.find(r => r.name === regions.RegionName.NONE),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.APPLICATION)
+            regionList.find(r => r.name === regions.RegionName.APPLICATION),
         ).toBeUndefined();
     });
 
@@ -176,19 +176,19 @@ describe('detect regions', () => {
         const regionList = regions.generateFileRegions(memMaps, CoreDefinition);
         expect(regionList.length).toEqual(6);
         expect(
-            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP)
+            regionList.find(r => r.name === regions.RegionName.MBR_OR_APP),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE)
+            regionList.find(r => r.name === regions.RegionName.SOFTDEVICE),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.BOOTLOADER)
+            regionList.find(r => r.name === regions.RegionName.BOOTLOADER),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.APPLICATION)
+            regionList.find(r => r.name === regions.RegionName.APPLICATION),
         ).not.toBeUndefined();
         expect(
-            regionList.find(r => r.name === regions.RegionName.NONE)
+            regionList.find(r => r.name === regions.RegionName.NONE),
         ).not.toBeUndefined();
     });
 });
