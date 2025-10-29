@@ -62,6 +62,7 @@ nav:
   - Overview and user interface: overview.md
   - Programming devices:
     - General programming procedure: programming_dk.md
+    - Programming nRF91 Series DK firmware: programming_91dk.md
     - Programming Nordic Thingy prototyping platforms: programming_thingy.md
     - Programming nRF52840 Dongle: programming_nrf52840_dongle.md
   - Troubleshooting: troubleshooting.md
