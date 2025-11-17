@@ -1,7 +1,8 @@
 # Programming nRF91 Series DK firmware
 
 You can program the nRF91 Series DK firmware application and network core firmware over USB.
-Before you begin to update the firmware, download and extract the latest application and modem firmware from the from the [Nordic Semiconductor website](https://www.nordicsemi.com/), depending on the DK you are using:
+
+You can follow this procedure to update the firmware on nRF91 Series DKs using the latest application and modem firmware from the from the [Nordic Semiconductor website](https://www.nordicsemi.com/):
 
 - [nRF9151 DK Downloads](https://www.nordicsemi.com/Products/Development-hardware/nRF9151-DK/Download?lang=en#infotabs)
 - [nRF9161 DK Downloads](https://www.nordicsemi.com/Products/Development-hardware/nRF9161-DK/Download?lang=en#infotabs)
@@ -9,57 +10,47 @@ Before you begin to update the firmware, download and extract the latest applica
 
 The downloaded ZIP archive contains the following firmware:
 
-* Application firmware
+=== "nRF9151 DK"
 
-    The `img_app_bl` folder contains full firmware images for different applications.
-    The guides in this section use the image for the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample as an example.
+     | File or Folder                                   | Description                                                                                                                                                                                                                      |
+     |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample as an example.<br/><br/>The nRF Cloud multi-service sample simulates sensor data and transmits it to Nordic Semiconductor's cloud solution, [nRF Cloud](https://nrfcloud.com/).<br/><br/>The data is transmitted using either LTE-M or NB-IoT. The nRF Cloud multi-service sample first attempts to use LTE-M, then NB-IoT. Check with your SIM card provider for the mode they support at your location.<br/><br/>- For the Onomondo SIM card, check the [Onomondo LTE-M coverage](https://onomondo.com/product/coverage/lte-m-networks/) and [Onomondo NB-IoT coverage](https://onomondo.com/product/coverage/nb-iot-networks/) to see if your country is supported.<br/>- For the Wireless Logic SIM card, check the [Wireless Logic LTE-M/NB-IoT network coverage](https://www.wirelesslogic.com/simclaim/nsctrial/) to see if your country is supported. |
+     | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
+     | Modem firmware ZIP (`mfw_nrf91x1_...`)          | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
+     | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
 
-    The nRF Cloud multi-service sample simulates sensor data and transmits it to Nordic Semiconductor's cloud solution, [nRF Cloud](https://nrfcloud.com/).
+=== "nRF9161 DK"
 
-    The data is transmitted using either LTE-M or NB-IoT.
-    The nRF Cloud multi-service sample first attempts to use LTE-M, then NB-IoT.
-    Check with your SIM card provider for the mode they support at your location.
+     | File or Folder                                   | Description                                                                                                                                                                                                                      |
+     |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample as an example.<br/><br/>The nRF Cloud multi-service sample simulates sensor data and transmits it to Nordic Semiconductor's cloud solution, [nRF Cloud](https://nrfcloud.com/).<br/><br/>The data is transmitted using either LTE-M or NB-IoT. The nRF Cloud multi-service sample first attempts to use LTE-M, then NB-IoT. Check with your SIM card provider for the mode they support at your location.<br/><br/>For the Onomondo SIM card, check the [Onomondo LTE-M coverage](https://onomondo.com/product/coverage/lte-m-networks/) and [Onomondo NB-IoT coverage](https://onomondo.com/product/coverage/nb-iot-networks/) to see the network coverage for different countries. |
+     | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
+     | Modem firmware ZIP (`mfw_nrf91x1_...`)          | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
+     | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
 
-    === "nRF9151 DK"
+=== "nRF9160 DK"
 
-         * For the Onomondo SIM card, check the [Onomondo LTE-M coverage](https://onomondo.com/product/coverage/lte-m-networks/) and [Onomondo NB-IoT coverage](https://onomondo.com/product/coverage/nb-iot-networks/) to see if your country is supported.
-         * For the Wireless Logic SIM card, check the [Wireless Logic LTE-M/NB-IoT network coverage](https://www.wirelesslogic.com/simclaim/nsctrial/) to see if your country is supported.
+     | File or Folder                                   | Description                                                                                                                                                                                                                      |
+     |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample as an example.<br/><br/>The nRF Cloud multi-service sample simulates sensor data and transmits it to Nordic Semiconductor's cloud solution, [nRF Cloud](https://nrfcloud.com/). The data is transmitted using either LTE-M or NB-IoT.<br/><br/>The nRF Cloud multi-service sample first attempts to use LTE-M, then NB-IoT. Check with your SIM card provider for the mode they support at your location.<br/><br/>For the iBasis SIM card provided with the nRF9160 DK, see [iBasis IoT network coverage](https://ibasis.com/solutions/iot-connectivity/network-coverage/). |
+     | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
+     | Modem firmware ZIP (`mfw_nrf9160_...`)          | The modem firmware is provided as a ZIP archive named `mfw_nrf9160_` followed by the firmware version number. Do not unzip this file.                                                                                         |
+     | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
 
-    === "nRF9161 DK"
-
-         For the Onomondo SIM card, check the [Onomondo LTE-M coverage](https://onomondo.com/product/coverage/lte-m-networks/) and [Onomondo NB-IoT coverage](https://onomondo.com/product/coverage/nb-iot-networks/) to see the network coverage for different countries.
-
-    === "nRF9160 DK"
-
-         For the iBasis SIM card provided with the nRF9160 DK, see [iBasis IoT network coverage](https://ibasis.com/solutions/iot-connectivity/network-coverage/).
-
-* Application firmware for Device Firmware Update (DFU)
-
-    The images in the `img_fota_dfu_bin` and `img_fota_dfu_hex` folders contain firmware images for DFU.
-    These images are not used in the guides in this section.
-
-* Modem firmware
-
-    The modem firmware is in a ZIP archive instead of a folder.
-    The archive is named `mfw_nrf9160_` or `mfw_nrf91x1_`, followed by the firmware version number.
-    Do not unzip this file.
-
-The `CONTENTS.txt` file in the extracted folder contains the location and names of the different firmware images.
-
-You will also need the following USB cables:
+To program the nRF91 Series DK, you will also need the following USB cables:
 
 * nRF91x1 DK - USB-C cable
 * nRF9160 DK - micro-USB cable
 
+!!! tip "Tip"
+
+    If you experience any problems during the process, press `Ctrl+R` (`command+R` on macOS) to restart the Programmer app and try again.
+
 ## nRF91x1 DK
 
-=== "Updating the modem firmware"
+=== "Updating the nRF91x1 DK modem firmware"
 
-    To update the modem firmware, complete the following steps.
-
-    !!! tip "Tip"
-
-        If you experience any problems during the process, press `Ctrl+R` (`command+R` on macOS) to restart the Programmer app and try again.
+    To update the modem firmware on the nRF91x1 DK, complete the following steps:
 
       1. Open the {{app_name}}.
       1. Connect the DK to the computer with a USB cable, and then turn the DK on.
@@ -92,13 +83,9 @@ You will also need the following USB cables:
 
         If you experience problems updating the modem firmware, click **Erase all** in the **DEVICE** section of the side panel and try updating again.
 
-=== "Updating the application firmware"
+=== "Updating the nRF91x1 DK application firmware"
 
-    To update the application firmware using the Programmer app, complete the following steps.
-
-    !!! tip "Tip"
-
-        If you experience any problems during the process, press `Ctrl+R` (`command+R` on macOS) to restart the Programmer app and try again.
+    To update the nRF91x1 DK application firmware, complete the following steps:
 
       1. Open the {{app_name}}.
       1. Connect the DK to the computer with a USB cable, and then turn the DK on.
@@ -125,13 +112,9 @@ You will also need the following USB cables:
 
 ## nRF9160 DK
 
-=== "Updating the modem firmware"
+=== "Updating the nRF9160 DK modem firmware"
 
-    To update the modem firmware, complete the following steps.
-
-    !!! tip "Tip"
-
-        If you experience any problems during the process, press `Ctrl+R` (`command+R` on macOS) to restart the Programmer app and try again.
+    To update the nRF9160 DK modem firmware, complete the following steps:
 
       1. Open the {{app_name}}.
       1. Make sure the **PROG/DEBUG SW10** switch on the nRF9160 DK is set to **nRF91**.
@@ -166,13 +149,9 @@ You will also need the following USB cables:
 
         If you experience problems updating the modem firmware, click **Erase all** in the **DEVICE** section of the side panel and try updating again.
 
-=== "Updating the application firmware"
+=== "Updating the nRF9160 DK application firmware"
 
-    To update the application firmware using the Programmer app, complete the following steps.
-
-    !!! tip "Tip"
-
-        If you experience any problems during the process, press `Ctrl+R` (`command+R` on macOS) to restart the Programmer app and try again.
+    To update the nRF9160 DK application firmware, complete the following steps:
 
       1. Open the {{app_name}}.
       1. Make sure the **PROG/DEBUG SW10** switch (**SW5** on DK v0.9.0 and earlier) on the nRF9160 DK is set to **nRF91** or **nRF52** as appropriate for the application or sample you are programming.<br/>
