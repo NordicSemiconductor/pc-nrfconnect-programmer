@@ -10,7 +10,7 @@ When you start the {{app_name}}, the application main window appears with the **
 
 Once you connect a device to the system, it becomes visible and available when you click on the **Select device** drop-down list. You can choose a device from the list of connected devices to perform further actions on the device such as programming.
 
-![Select device drop-down menu](./screenshots/thingy91x_select_device.png "Select device drop-down menu")
+![Select device drop-down menu](./screenshots/programmer_select_device_thingy91.png "Select device drop-down menu")
 
 ## Device panel sections
 

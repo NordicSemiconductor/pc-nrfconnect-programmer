@@ -11,9 +11,9 @@ The following devices have specific programming requirements or procedures:
 
 | Device                            | Description                                                                                                          |
 |-----------------------------------|----------------------------------------------------------------------------------------------------------------------|
-| nRF9160 DK            | To program the nRF9160 DK, see [Updating the nRF9160 DK firmware using Programmer](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/working_with_nrf/nrf91/nrf9160.html#updating_the_dk_firmware_using_programmer). |
-| Nordic Thingy:91 X     | To program Nordic Thingy:91 X, see [Programming Nordic Thingy prototyping platforms](programming_thingy.md).
-| Nordic Thingy:91      | To program Nordic Thingy:91, see [Programming Nordic Thingy prototyping platforms](programming_thingy.md).
+| nRF91 Series DK            | To program the nRF91 Series DK, see [Programming nRF91 Series DK firmware](programming_91dk.md). |
+| Nordic Thingy:91 X     | To program Nordic Thingy:91 X, see [Programming Nordic Thingy prototyping platforms](programming_thingy.md).|
+| Nordic Thingy:91      | To program Nordic Thingy:91, see [Programming Nordic Thingy prototyping platforms](programming_thingy.md).|
 | Nordic Thingy:53      | To program Nordic Thingy:53, see [Programming Nordic Thingy prototyping platforms](programming_thingy.md). |
 | Nordic Thingy:52      | Nordic Thingy:52 can be programmed using the [general programming procedure](#general-programming-procedure), but only through J-Link and a 10-pin programming cable. |
 | nRF52840 Dongle       | To program the nRF52840 Dongle, see [Programming the nRF52840 Dongle](programming_nrf52840_dongle.md). |
