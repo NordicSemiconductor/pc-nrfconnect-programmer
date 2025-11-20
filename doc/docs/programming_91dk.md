@@ -14,27 +14,27 @@ The downloaded ZIP archive contains the following firmware:
 
      | File or Folder                                   | Description                                                                                                                                                                                                                      |
      |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample as an example.<br/><br/>The nRF Cloud multi-service sample simulates sensor data and transmits it to Nordic Semiconductor's cloud solution, [nRF Cloud](https://nrfcloud.com/).<br/><br/>The data is transmitted using either LTE-M or NB-IoT. The nRF Cloud multi-service sample first attempts to use LTE-M, then NB-IoT. Check with your SIM card provider for the mode they support at your location.<br/><br/>- For the Onomondo SIM card, check the [Onomondo LTE-M coverage](https://onomondo.com/product/coverage/lte-m-networks/) and [Onomondo NB-IoT coverage](https://onomondo.com/product/coverage/nb-iot-networks/) to see if your country is supported.<br/>- For the Wireless Logic SIM card, check the [Wireless Logic LTE-M/NB-IoT network coverage](https://www.wirelesslogic.com/simclaim/nsctrial/) to see if your country is supported. |
+     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample as an example. |
      | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
-     | Modem firmware ZIP (`mfw_nrf91x1_...`)          | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
+     | Modem firmware ZIP (`mfw_nrf91x1_...`)           | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
      | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
 
 === "nRF9161 DK"
 
      | File or Folder                                   | Description                                                                                                                                                                                                                      |
      |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample as an example.<br/><br/>The nRF Cloud multi-service sample simulates sensor data and transmits it to Nordic Semiconductor's cloud solution, [nRF Cloud](https://nrfcloud.com/).<br/><br/>The data is transmitted using either LTE-M or NB-IoT. The nRF Cloud multi-service sample first attempts to use LTE-M, then NB-IoT. Check with your SIM card provider for the mode they support at your location.<br/><br/>For the Onomondo SIM card, check the [Onomondo LTE-M coverage](https://onomondo.com/product/coverage/lte-m-networks/) and [Onomondo NB-IoT coverage](https://onomondo.com/product/coverage/nb-iot-networks/) to see the network coverage for different countries. |
+     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample as an example. |
      | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
-     | Modem firmware ZIP (`mfw_nrf91x1_...`)          | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
+     | Modem firmware ZIP (`mfw_nrf91x1_...`)           | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
      | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
 
 === "nRF9160 DK"
 
      | File or Folder                                   | Description                                                                                                                                                                                                                      |
      |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample as an example.<br/><br/>The nRF Cloud multi-service sample simulates sensor data and transmits it to Nordic Semiconductor's cloud solution, [nRF Cloud](https://nrfcloud.com/). The data is transmitted using either LTE-M or NB-IoT.<br/><br/>The nRF Cloud multi-service sample first attempts to use LTE-M, then NB-IoT. Check with your SIM card provider for the mode they support at your location.<br/><br/>For the iBasis SIM card provided with the nRF9160 DK, see [iBasis IoT network coverage](https://ibasis.com/solutions/iot-connectivity/network-coverage/). |
+     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample as an example. |
      | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
-     | Modem firmware ZIP (`mfw_nrf9160_...`)          | The modem firmware is provided as a ZIP archive named `mfw_nrf9160_` followed by the firmware version number. Do not unzip this file.                                                                                         |
+     | Modem firmware ZIP (`mfw_nrf9160_...`)           | The modem firmware is provided as a ZIP archive named `mfw_nrf9160_` followed by the firmware version number. Do not unzip this file.                                                                                         |
      | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
 
 To program the nRF91 Series DK, you will also need the following USB cables:
@@ -102,8 +102,8 @@ To program the nRF91 Series DK, you will also need the following USB cables:
       1. Navigate to where you extracted the firmware, and then to the `img_app_bl` folder there.
       1. Select the `.hex` file for your DK for the application you are programming:
 
-         * nRF9151 DK: `nrf9151dk_nrfcloud_multi_service_coap_<version-number>.hex`
-         * nRF9651 DK: `nrf9161dk_nrfcloud_multi_service_coap_<version-number>.hex`
+         * nRF9151 DK: `nrf9151dk_at_client_<version-number>.hex`
+         * nRF9651 DK: `nrf9161dk_at_client_<version-number>.hex`
 
       1. Click the **Erase & write** button in the **DEVICE** section to program the DK.
          Do not unplug or turn off the DK during this process.<br/>
@@ -157,7 +157,7 @@ To program the nRF91 Series DK, you will also need the following USB cables:
       1. Make sure the **PROG/DEBUG SW10** switch (**SW5** on DK v0.9.0 and earlier) on the nRF9160 DK is set to **nRF91** or **nRF52** as appropriate for the application or sample you are programming.<br/>
          See the [Device programming section in the nRF9160 DK User Guide](https://docs.nordicsemi.com/bundle/ug_nrf9160_dk/page/UG/nrf91_DK/operating_modes/mcu_device_programming.html) for more information.<br/>
 
-         For the [nRF Cloud multi-service](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/nrf_cloud_multi_service/README.html#nrf-cloud-multi-service) sample, the switch must be set to **nRF91**.
+         For the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample, the switch must be set to **nRF91**.
       1. Connect the DK to the computer with a USB cable, and then turn the DK on.
       1. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
 
@@ -170,7 +170,7 @@ To program the nRF91 Series DK, you will also need the following USB cables:
 
       1. Click **Add file** in the **FILE** section, and select **Browse**.
       1. Navigate to where you extracted the firmware, and then to the `img_app_bl` folder there.
-      1. Select the `nrf9160dk_nrfcloud_multi_service_coap_<version-number>.hex` file.
+      1. Select the `nrf9160dk_at_client_<version-number>.hex` file.
       1. Click the **Erase & write** button in the **DEVICE** section to program the DK.
          Do not unplug or turn off the DK during this process.<br/>
 
