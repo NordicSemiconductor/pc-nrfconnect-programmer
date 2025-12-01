@@ -1,4 +1,8 @@
-## 4.6.3 - Unreleased
+## 4.7.0 - 2025-12-01
+
+### Added
+
+- Support for the nRF9151 SMA DK.
 
 ### Fixed
 
