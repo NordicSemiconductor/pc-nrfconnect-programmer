@@ -1,3 +1,10 @@
+## 4.7.1 - Unreleased
+
+### Fixed
+
+- Windows: Fixed issue in the device enumeration, caused by nrfutil-device prior
+  to version 2.15.6.
+
 ## 4.7.0 - 2025-12-01
 
 ### Added
