@@ -1,3 +1,10 @@
+## 4.7.1 - Unreleased
+
+### Fixed
+
+- Updated the bundled `nrfutil device` command to v2.15.7, which includes a fix
+  to an issue with the device enumeration on Windows.
+
 ## 4.7.0 - 2025-12-01
 
 ### Added
