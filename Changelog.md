@@ -2,8 +2,8 @@
 
 ### Fixed
 
-- Windows: Fixed issue in the device enumeration, caused by nrfutil-device prior
-  to version 2.15.6.
+- Updated the bundled `nrfutil device` command to v2.15.7, which includes a fix
+  to an issue with the device enumeration on Windows.
 
 ## 4.7.0 - 2025-12-01
 
