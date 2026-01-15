@@ -7,7 +7,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import { type DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 
 import { updateTargetWritable } from '../actions/targetActions';
 import {
@@ -21,9 +21,15 @@ import {
     getZipFilePath,
 } from '../reducers/fileReducer';
 import { fileWarningAdd, fileWarningRemove } from '../reducers/warningReducer';
-import { convertDeviceDefinitionToCoreArray, CoreInfo } from '../util/devices';
-import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
-import { generateFileRegions, Region } from '../util/regions';
+import {
+    convertDeviceDefinitionToCoreArray,
+    type CoreInfo,
+} from '../util/devices';
+import {
+    type CoreDefinition,
+    type DeviceDefinition,
+} from '../util/deviceTypes';
+import { generateFileRegions, type Region } from '../util/regions';
 import CoreView from './CoreView';
 
 const allocateCores = (cores: CoreInfo[], regions: Region[]) =>

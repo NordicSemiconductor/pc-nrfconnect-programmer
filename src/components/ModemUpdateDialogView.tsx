@@ -18,7 +18,7 @@ import {
     selectedDeviceInfo,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { type Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { performUpdate } from '../actions/modemTargetActions';
 import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
@@ -27,7 +27,7 @@ import {
     getShowModemProgrammingDialog,
     setShowModemProgrammingDialog,
 } from '../reducers/modemReducer';
-import { WithRequired } from '../util/types';
+import { type WithRequired } from '../util/types';
 
 const ModemUpdateDialogView = () => {
     const abortController = useRef(new AbortController());

@@ -6,10 +6,10 @@
 
 import {
     describeError,
-    Device,
+    type Device,
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { type Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 
 export const performUpdate = async (

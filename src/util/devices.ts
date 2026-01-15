@@ -5,17 +5,17 @@
  */
 
 import {
-    DeviceCore,
-    DeviceCoreInfo,
-    DeviceInfo,
-    NrfutilDevice,
+    type DeviceCore,
+    type DeviceCoreInfo,
+    type DeviceInfo,
+    type NrfutilDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import MemoryMap from 'nrf-intel-hex';
 
 import {
-    CoreDefinition,
-    CoreDefinitions,
-    DeviceDefinition,
+    type CoreDefinition,
+    type CoreDefinitions,
+    type DeviceDefinition,
     DeviceFamily,
 } from './deviceTypes';
 

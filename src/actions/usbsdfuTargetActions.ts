@@ -5,11 +5,11 @@
  */
 
 import {
-    AppThunk,
+    type AppThunk,
     defaultInitPacket,
     describeError,
-    Device,
-    DfuImage,
+    type Device,
+    type DfuImage,
     FwType,
     HashType,
     isDeviceInDFUBootloader,
@@ -18,9 +18,9 @@ import {
     selectedDevice,
     switchToBootloaderMode,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { type Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import {
-    ImageType,
+    type ImageType,
     NrfutilDeviceLib,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 import Crypto from 'crypto';
@@ -35,17 +35,17 @@ import {
     targetRegionsUnknown,
     targetWritableKnown,
 } from '../reducers/targetReducer';
-import { RootState } from '../reducers/types';
+import { type RootState } from '../reducers/types';
 import {
     setDFUImages,
     setUsbSdfuProgrammingDialog,
 } from '../reducers/usbSdfuReducer';
 import { getDeviceInfoByUSB, NordicFwIds } from '../util/devices';
-import { DeviceDefinition } from '../util/deviceTypes';
+import { type DeviceDefinition } from '../util/deviceTypes';
 import {
     defaultRegion,
     getSoftDeviceId,
-    Region,
+    type Region,
     RegionName,
     RegionPermission,
 } from '../util/regions';

@@ -4,18 +4,18 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { type DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import { defaultDeviceDefinition } from '../util/devices';
 import {
-    CoreDefinitions,
-    CoreMemMap,
-    CoreOperations,
-    CoreProtection,
-    CoreState,
-    DeviceDefinition,
-    DeviceFamily,
+    type CoreDefinitions,
+    type CoreMemMap,
+    type CoreOperations,
+    type CoreProtection,
+    type CoreState,
+    type DeviceDefinition,
+    type DeviceFamily,
 } from '../util/deviceTypes';
 import { fileParse, filesEmpty } from './fileReducer';
 import type { RootState } from './types';

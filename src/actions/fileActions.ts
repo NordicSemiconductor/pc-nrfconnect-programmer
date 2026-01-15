@@ -6,13 +6,13 @@
 
 import { dialog, getCurrentWindow } from '@electron/remote';
 import {
-    AppThunk,
+    type AppThunk,
     describeError,
     ErrorDialogActions,
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { readFile, stat, Stats, statSync } from 'fs';
-import MemoryMap, { MemoryMapTuple } from 'nrf-intel-hex';
+import { readFile, stat, type Stats, statSync } from 'fs';
+import MemoryMap, { type MemoryMapTuple } from 'nrf-intel-hex';
 import { basename } from 'path';
 
 import {
@@ -26,7 +26,7 @@ import {
     mruFilesLoadSuccess,
     zipFileKnown,
 } from '../reducers/fileReducer';
-import { RootState } from '../reducers/types';
+import { type RootState } from '../reducers/types';
 import { fileWarningRemove } from '../reducers/warningReducer';
 import { getMruFiles, setMruFiles } from '../store';
 import { defaultDeviceDefinition, nRF5340DefaultDevice } from '../util/devices';

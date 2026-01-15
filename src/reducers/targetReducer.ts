@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { Region } from '../util/regions';
+import { type Region } from '../util/regions';
 import { fileParse, filesEmpty } from './fileReducer';
 import type { RootState } from './types';
 

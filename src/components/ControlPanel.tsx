@@ -10,7 +10,7 @@ import Overlay from 'react-bootstrap/Overlay';
 import Popover from 'react-bootstrap/Popover';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    AppDispatch,
+    type AppDispatch,
     Button,
     colors,
     Group,

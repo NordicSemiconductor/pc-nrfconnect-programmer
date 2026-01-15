@@ -25,7 +25,7 @@ import {
     Toggle,
     useStopwatch,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { type Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import { canWrite, performUpdate } from '../actions/mcubootTargetActions';
 import { getMcubootFilePath, getZipFilePath } from '../reducers/fileReducer';
@@ -33,7 +33,7 @@ import {
     getShowMcuBootProgrammingDialog,
     setShowMcuBootProgrammingDialog,
 } from '../reducers/mcubootReducer';
-import { WithRequired } from '../util/types';
+import { type WithRequired } from '../util/types';
 
 const TOOLTIP_TEXT =
     'Delay duration to allow successful image swap from RAM NET to NET core after image upload. Recommended default timeout is 40s. Should be increased for the older Thingy:53 devices';

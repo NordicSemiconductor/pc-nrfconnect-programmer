@@ -7,11 +7,11 @@
 /* eslint-disable no-bitwise */
 
 import { logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
-import MemoryMap, { MemoryMaps, Overlaps } from 'nrf-intel-hex';
+import { type DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import MemoryMap, { type MemoryMaps, type Overlaps } from 'nrf-intel-hex';
 
 import { convertDeviceDefinitionToCoreArray } from './devices';
-import { CoreDefinition, DeviceDefinition } from './deviceTypes';
+import { type CoreDefinition, type DeviceDefinition } from './deviceTypes';
 import { hexpad2 } from './hexpad';
 
 const SOFTDEVICE_MAGIC_START = 0x1000;

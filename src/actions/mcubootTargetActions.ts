@@ -5,19 +5,19 @@
  */
 
 import {
-    AppThunk,
+    type AppThunk,
     describeError,
-    Device,
+    type Device,
     logger,
     selectedDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { type Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 import { NrfutilDeviceLib } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
-import { ProgrammingOptions } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device/program';
+import { type ProgrammingOptions } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device/program';
 
 import { setDeviceDefinition } from '../reducers/deviceDefinitionReducer';
 import { targetWritableKnown } from '../reducers/targetReducer';
-import { RootState } from '../reducers/types';
+import { type RootState } from '../reducers/types';
 import { getDeviceInfoByUSB } from '../util/devices';
 
 export const first = <T>(items: T[]): T | undefined => items[0];

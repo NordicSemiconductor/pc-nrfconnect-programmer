@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { AppThunk } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { type AppThunk } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import {
     settingsLoad,
     toggleAutoRead as toggleAutoReadAction,
     toggleAutoReset as toggleAutoResetAction,
 } from '../reducers/settingsReducer';
-import { RootState } from '../reducers/types';
+import { type RootState } from '../reducers/types';
 import { getSettings, setSettings } from '../store';
 
 export const loadSettings = (): AppThunk => dispatch => {

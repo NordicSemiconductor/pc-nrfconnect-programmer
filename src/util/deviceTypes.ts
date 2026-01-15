@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 import {
-    DeviceCore,
-    ProtectionStatus,
+    type DeviceCore,
+    type ProtectionStatus,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
-import MemoryMap from 'nrf-intel-hex';
+import type MemoryMap from 'nrf-intel-hex';
 
 export type CoreState = 'loading' | 'writing' | 'reading' | 'erasing' | 'idle';
 export type CoreDefinitions = { [key in DeviceCore]?: CoreDefinition };

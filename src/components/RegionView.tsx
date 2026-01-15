@@ -12,8 +12,8 @@ import { useDispatch } from 'react-redux';
 import { colors } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import * as fileActions from '../actions/fileActions';
-import { CoreInfo } from '../util/devices';
-import { Region, RegionName } from '../util/regions';
+import { type CoreInfo } from '../util/devices';
+import { type Region, RegionName } from '../util/regions';
 import CoreInfoView from './CoreInfoView';
 import RegionInfoView from './RegionInfoView';
 

@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import { type DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
 
 import { hexpad8 } from '../util/hexpad';
 
