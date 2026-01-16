@@ -70,6 +70,12 @@ describe('Modem firmware filename validation', () => {
             ).toBe(true);
         });
 
+        it('accepts names from https://www.nordicsemi.com/Products/nRF9151/Download', () => {
+            expect(
+                isValidNrf91x1FirmwareName('mfw_nrf9151-ntn_1.0.0-1.alpha.zip'),
+            ).toBe(true);
+        });
+
         it('accepts undefined as valid (no file selected)', () => {
             expect(isValidNrf91x1FirmwareName(undefined)).toBe(true);
         });
