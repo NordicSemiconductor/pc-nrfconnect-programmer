@@ -1,3 +1,11 @@
+## 4.7.2 - Unreleased
+
+### Fixed
+
+- Issue with incorrect warning "Unexpected file name detected" that would appear
+  for nRF9151 modem firmware files with variant suffixes (for example,
+  `mfw_nrf9151-ntn_1.0.0-1.alpha.zip`).
+
 ## 4.7.1 - 2025-12-18
 
 ### Fixed
