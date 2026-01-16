@@ -12,8 +12,8 @@ The following table lists the hardware platforms that you can program with the {
 | Nordic Thingy:91 X  | nRF9151  | PCA20065   | *Not yet available*      | No                                  | *Not yet available*      |
 | nRF9160 DK          | nRF9160  | PCA10090   | Yes                      | No                                  | No                       |
 | Nordic Thingy:91    | nRF9160  | PCA20035   | Yes                      | No                                  | Yes                      |
-| nRF9151 DK          | nRF9131  | PCA10171   | Yes                      | No                                  | No                       |
-| nRF9151 SMA DK      | nRF9131  | PCA10201   | Yes                      | No                                  | No                       |
+| nRF9151 DK          | nRF9151  | PCA10171   | Yes                      | No                                  | No                       |
+| nRF9151 SMA DK      | nRF9151  | PCA10201   | Yes                      | No                                  | No                       |
 | nRF9131 DK          | nRF9131  | PCA10147   | Yes                      | No                                  | No                       |
 | nRF54H20 DK         | nRF54H20 | PCA10175   | *Not yet available*      | No                                  | No                       |
 | nRF54LV10 DK        | nRF54LV10| PCA10188   | Yes                      | No                                  | No                       |
