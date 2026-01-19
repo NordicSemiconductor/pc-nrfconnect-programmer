@@ -164,7 +164,7 @@ const TextOverlay = ({
 
     return (
         <div className="centering-container">
-            <div className="read-indicatorv  tw-break-words tw-text-center">
+            <div className="read-indicatorv tw-break-words tw-text-center">
                 <p>Device is connected</p>
             </div>
         </div>
