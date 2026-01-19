@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-programmer",
-    "version": "4.7.1",
+    "version": "4.7.2",
     "displayName": "Programmer",
     "description": "Tool for flash programming Nordic SoCs and SiPs",
     "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer",

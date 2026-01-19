@@ -29,6 +29,14 @@ import {
 } from '../reducers/modemReducer';
 import { WithRequired } from '../util/types';
 
+export const isValidNrf9160FirmwareName = (filename: string | undefined) =>
+    !filename || /mfw_nrf9160_\d+\.\d+\.\d+.*.zip/.test(filename);
+
+export const isValidNrf91x1FirmwareName = (filename: string | undefined) =>
+    !filename ||
+    /mfw_nrf91x1_\d+\.\d+\.\d+.*.zip/.test(filename) ||
+    /mfw.*nrf91.1(-\w+)?_\d+\.\d+\.\d+.*.zip/.test(filename);
+
 const ModemUpdateDialogView = () => {
     const abortController = useRef(new AbortController());
     const [progress, setProgress] =
@@ -61,17 +69,12 @@ const ModemUpdateDialogView = () => {
 
     if (is9160) {
         expectedFileName = 'mfw_nrf9160_X.X.X*.zip';
-        expectedFwName =
-            !modemFwName || /mfw_nrf9160_\d+\.\d+\.\d+.*.zip/.test(modemFwName);
+        expectedFwName = isValidNrf9160FirmwareName(modemFwName);
         url =
             'https://www.nordicsemi.com/Products/Development-hardware/nrf9160-dk/download#infotabs';
     } else if (is91x1) {
-        expectedFileName = 'mfw_nrf91x1_X.X.X*.zip';
-        expectedFwName =
-            !modemFwName ||
-            /mfw_nrf91x1_\d+\.\d+\.\d+.*.zip/.test(modemFwName) ||
-            // DECT mfw
-            /mfw.*nrf91.1_\d+\.\d+\.\d+\.zip/.test(modemFwName);
+        expectedFileName = 'mfw_nrf91?1*_X.X.X*.zip';
+        expectedFwName = isValidNrf91x1FirmwareName(modemFwName);
         url = 'https://www.nordicsemi.com/Products/nRF9161/Download';
     }
 
