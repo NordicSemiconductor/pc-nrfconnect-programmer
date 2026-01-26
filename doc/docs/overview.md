@@ -1,10 +1,10 @@
 # Overview and user interface
 
-The {{app_name}} main window displays the memory layout of the device and the file you want to work with. It also provides options to program the device and inspect the entire process through the log.
+The Programmer app main window displays the memory layout of the device and the file you want to work with. It also provides options to program the device and inspect the entire process through the log.
 
-When you start the {{app_name}}, the application main window appears with the **Programmer** tab selected by default and the [**File Memory Layout**](#file-memory-layout) and [**Device Memory Layout**](#device-memory-layout) panels empty:
+When you start the Programmer app, the application main window appears with the **Programmer** tab selected by default and the [**File Memory Layout**](#file-memory-layout) and [**Device Memory Layout**](#device-memory-layout) panels empty:
 
-![{{app_name}} default view at startup](./screenshots/programmer_overview.png "{{app_name}} main window")
+![Programmer app default view at startup](./screenshots/programmer_overview.png "Programmer app main window")
 
 ## Select device
 
@@ -56,7 +56,7 @@ When you select a device, the following toggles are available in the J-Link Sett
 
 ### MCUboot Settings
 
-The experimental **Enable MCUBoot** toggle is deprecated and will be removed in a future release of the {{app_name}}.
+The experimental **Enable MCUBoot** toggle is deprecated and will be removed in a future release of the Programmer app.
 
 ## Programmer tab
 
@@ -68,7 +68,7 @@ Both windows display the different sections in the memory with different colors.
 
 ### File Memory Layout
 
-The **File Memory Layout** panel displays the memory layout for files added to the {{app_name}} with the [**Add file**](#file) option. Once added, these files can be programmed onto the device.
+The **File Memory Layout** panel displays the memory layout for files added to the Programmer app with the [**Add file**](#file) option. Once added, these files can be programmed onto the device.
 
 ![File Memory Layout panel](./screenshots/programmer_programmer_tab.png "File Memory Layout panel")
 
@@ -86,7 +86,7 @@ In the **Device Memory Layout**, you can read the name, address range, and size 
 
 You can view application information, restore defaults, access source code and documentation. You also can find information on the selected device, access support tools, send feedback, and enable verbose logging.
 
-![{{app_name}} About tab](./screenshots/nRF_Connect_for_Desktop_Prog_about.png "{{app_name}} About tab")
+![Programmer app About tab](./screenshots/nRF_Connect_for_Desktop_Prog_about.png "Programmer app About tab")
 
 ## Log
 

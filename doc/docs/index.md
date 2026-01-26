@@ -1,10 +1,10 @@
-# {{app_name}}
+# Programmer app
 
-The {{app_name}} in [nRF Connect for Desktop](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/index.html) lets you program firmware to Nordic devices. The application allows you to see the memory layout for devices that support programming with J-Link, Nordic Secure DFU, and MCUboot. It also allows you to display content of HEX files and write it to the devices.
+The Programmer app in [nRF Connect for Desktop](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/index.html) lets you program firmware to Nordic devices. The application allows you to see the memory layout for devices that support programming with J-Link, Nordic Secure DFU, and MCUboot. It also allows you to display content of HEX files and write it to the devices.
 
 ## Supported hardware
 
-The following table lists the hardware platforms that you can program with the {{app_name}}.
+The following table lists the hardware platforms that you can program with the Programmer app.
 
 | Hardware platform   | Device   | PCA number | Programming with J-Link  | Programming with Nordic Secure DFU  | Programming with MCUboot |
 |---------------------|----------|------------|--------------------------|-------------------------------------|--------------------------|
@@ -32,16 +32,16 @@ Programming with Nordic Secure DFU is **Possible** on some nRF52 Series platform
 
 ### Support for custom hardware
 
-The following criteria apply to programming custom hardware with the {{app_name}}:
+The following criteria apply to programming custom hardware with the Programmer app:
 
 - **Device**: The hardware platform you are programming must use an SoC or SiP from Nordic Semiconductor.
 - **Programming with J-Link**: Possible for all custom hardware that features Nordic SoCs supported by [nRF Util](https://docs.nordicsemi.com/bundle/nrfutil/page/README.html).
-- **Programming with Nordic Secure DFU**: Possible if you implement a bootloader solution that supports Nordic Secure DFU. The {{app_name}} checks the bootloader for Nordic ID to be able to program using this method.
+- **Programming with Nordic Secure DFU**: Possible if you implement a bootloader solution that supports Nordic Secure DFU. The Programmer app checks the bootloader for Nordic ID to be able to program using this method.
 - **Programming with MCUboot**: Only possible using CLI.
 
 ## Deprecated hardware support
 
-The following hardware platforms cannot be programmed with the {{app_name}} anymore.
+The following hardware platforms cannot be programmed with the Programmer app anymore.
 
 | Hardware platform   | Device   | PCA number | Programming with J-Link  | Programming with Nordic Secure DFU  | Programming with MCUboot |
 |---------------------|----------|------------|--------------------------|-------------------------------------|--------------------------|

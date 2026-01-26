@@ -61,7 +61,7 @@ See the following sections for programming Nordic Thingy prototyping platforms u
           1. While holding **SW4** pressed, move the **SW1** power switch to **ON** to power the Thingy:91.<br/>
              The device turns on in the bootloader mode for the nRF52840 SoC.
 
-      1. Open nRF Connect for Desktop and launch the {{app_name}}.
+      1. Open nRF Connect for Desktop and launch the Programmer app.
       1. Click **Select device**.<br/>
 
           ![Programmer - Select device](./screenshots/programmer_click_select_device.png "Programmer - Select device")
@@ -108,7 +108,7 @@ See the following sections for programming Nordic Thingy prototyping platforms u
           1. While holding **SW3** pressed, move the **SW1** power switch to **ON** to power the Thingy:91.<br/>
              The device turns on in the bootloader mode for the nRF9160 SiP.
 
-      1. Open nRF Connect for Desktop and launch the {{app_name}} if it is not already open.
+      1. Open nRF Connect for Desktop and launch the Programmer app if it is not already open.
       1. Click **Select device**.<br/>
 
           ![Programmer - Select device](./screenshots/programmer_click_select_device.png "Programmer - Select device")
@@ -155,7 +155,7 @@ See the following sections for programming Nordic Thingy prototyping platforms u
         1. While holding **SW3** pressed, move the **SW1** power switch to **ON** to power the Thingy:91.<br/>
            The device turns on in the bootloader mode for the nRF9160 SiP.
 
-    1. Open nRF Connect for Desktop and launch the {{app_name}} if it is not already open.
+    1. Open nRF Connect for Desktop and launch the Programmer app if it is not already open.
     1. Click **Select device**.<br/>
 
         ![Programmer - Select device](./screenshots/programmer_click_select_device.png "Programmer - Select device")
@@ -203,7 +203,7 @@ To program Nordic Thingy using the USB connection, complete the following steps:
     1. While holding **SW2** pressed, move the **SW1** power switch to **ON** to power the Thingy:53.<br/>
        The device turns on in the bootloader mode.
 
-1. Open nRF Connect for Desktop and launch the {{app_name}} if it is not already open.
+1. Open nRF Connect for Desktop and launch the Programmer app if it is not already open.
 1. Click **Select device**.<br/>
 
     ![Programmer - Select device](./screenshots/programmer_click_select_device.png "Programmer - Select device")
@@ -253,7 +253,7 @@ Make sure you have the following hardware:
 
     To update the nRF52840 SoC firmware on the Thingy:91 using the nRF9160 DK as an external debug probe, complete the following steps:
 
-     1. Open nRF Connect for Desktop and launch the {{app_name}}.
+     1. Open nRF Connect for Desktop and launch the Programmer app.
      1. Prepare the hardware:
 
         a. Connect the Thingy:91 to the debug out port on a 10-pin external debug probe using a JTAG cable.
@@ -289,7 +289,7 @@ Make sure you have the following hardware:
         See the `CONTENTS.txt` file for information on which file you need.
      1. Select the `thingy91_nrf52_connectivity_bridge_*.hex` file and click **Open**.
      1. In the [**Device** section](overview.md#device), click **Erase & write**.<br/>
-        The update is complete when the animation in the {{app_name}}'s **Device memory layout** window ends.
+        The update is complete when the animation in the Programmer app's **Device memory layout** window ends.
      1. In the [**File** section](overview.md#file), click **Clear files**.
 
     You can now disconnect the external debug probe from Nordic Thingy:91, disconnect Nordic Thingy:91 from the computer, and put the cover back on.
@@ -298,7 +298,7 @@ Make sure you have the following hardware:
 
     To update the modem firmware on the Thingy:91 using an external debug probe, complete the following steps:
 
-     1. Open nRF Connect for Desktop and launch the {{app_name}}.
+     1. Open nRF Connect for Desktop and launch the Programmer app.
      1. Prepare the hardware:
 
         a. Connect the Thingy:91 to the debug out port on a 10-pin external debug probe using a JTAG cable.
@@ -354,7 +354,7 @@ Make sure you have the following hardware:
 
     To program the nRF9160 SiP application firmware on the Thingy:91 using an external debug probe, complete the following steps:
 
-     1. Open nRF Connect for Desktop and launch the {{app_name}}.
+     1. Open nRF Connect for Desktop and launch the Programmer app.
      1. Prepare the hardware:
 
         a. Connect the Thingy:91 to the debug out port on a 10-pin external debug probe using a JTAG cable.
@@ -386,7 +386,7 @@ Make sure you have the following hardware:
      1. Open the `img_app_bl` folder that contains the HEX files for updating using a debugger.
      1. Select the `thingy91_at_client_*.hex` file and click **Open**.
      1. In the [**Device** section](overview.md#device), click **Erase & write**.<br/>
-         The update is complete when the animation in the {{app_name}}'s **Device memory layout** window ends.
+         The update is complete when the animation in the Programmer app's **Device memory layout** window ends.
 
      1. In the [**File** section](overview.md#file), click **Clear files**.
 
@@ -396,7 +396,7 @@ Make sure you have the following hardware:
 
 To program Nordic Thingy:53 using an external debug probe, complete the following steps:
 
-1. Open nRF Connect for Desktop and launch the {{app_name}}.
+1. Open nRF Connect for Desktop and launch the Programmer app.
 1. Prepare the hardware:
 
     a. Open the connector cover on the side of Nordic Thingy:53.
@@ -422,7 +422,7 @@ To program Nordic Thingy:53 using an external debug probe, complete the followin
    You can identify the nRF5340 DK by its PCA number PCA10095 and its ID that is printed on the label sticker on the DK.
 
     !!! note "Note"
-        If the nRF5340 DK does not show up in the drop-down list, press Ctrl-R in Windows or command-R in macOS to restart the {{app_name}}.
+        If the nRF5340 DK does not show up in the drop-down list, press Ctrl-R in Windows or command-R in macOS to restart the Programmer app.
 
 1. In the [**File** section](overview.md#file), click **Add file** and select **Browse**.<br/>
    A file explorer window appears.
@@ -432,7 +432,7 @@ To program Nordic Thingy:53 using an external debug probe, complete the followin
 1. Select the corresponding HEX file to be used with the debug probe and click **Open**.<br/>
    The HEX file appears in the **File memory layout** section.
 1. In the [**Device** section](overview.md#device), click **Erase & write**.<br/>
-   The update is complete when the animation in the {{app_name}}'s **Device memory layout** window ends.
+   The update is complete when the animation in the Programmer app's **Device memory layout** window ends.
 1. In the [**File** section](overview.md#file), click **Clear files**.
 
 You can now disconnect the external debug probe from Nordic Thingy:53, disconnect Nordic Thingy:53 from the computer, and put the connector cover back on.
