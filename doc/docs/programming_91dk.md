@@ -37,7 +37,7 @@ To program the nRF91 Series DK, you will also need the following USB cables:
 
 To update the modem firmware, application firmware, or NTN firmware, complete the following steps:
 
-1. Open the {{app_name}}.
+1. Open the Programmer app.
 2. Connect the DK to the computer with a USB cable, and then turn the DK on.
 3. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
 
@@ -90,7 +90,7 @@ To update the modem firmware, application firmware, or NTN firmware, complete th
 
 To update the modem or application firmware, complete the following steps:
 
-1. Open the {{app_name}}.
+1. Open the Programmer app.
 2. Make sure the **PROG/DEBUG SW10** switch on the nRF9160 DK is set to **nRF91**.
    On DK v0.9.0 and earlier, this is the **SW5** switch.
 
