@@ -5,37 +5,24 @@ You can program the nRF91 Series DK firmware application and network core firmwa
 You can follow this procedure to update the firmware on nRF91 Series DKs using the latest application and modem firmware from the from the [Nordic Semiconductor website](https://www.nordicsemi.com/):
 
 - [nRF9151 DK Downloads](https://www.nordicsemi.com/Products/Development-hardware/nRF9151-DK/Download?lang=en#infotabs)
+- [nRF9151 SMA DK Downloads](https://www.nordicsemi.com/Products/Development-hardware/nRF9151-SMA-DK/Download?lang=en#infotabs)
 - [nRF9161 DK Downloads](https://www.nordicsemi.com/Products/Development-hardware/nRF9161-DK/Download?lang=en#infotabs)
 - [nRF9160 DK Downloads](https://www.nordicsemi.com/Products/Development-hardware/nRF9160-DK/Download#infotabs)
 
 The downloaded ZIP archive contains the following firmware:
 
-=== "nRF9151 DK"
+- `img_app_bl`: Contains full firmware images for different applications. The guides in this section use the image for the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample as an example.
+- `img_fota_dfu_bin`, `img_fota_dfu_hex`: Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.
+- Firmware ZIP for the network component (do not unzip this file):
 
-     | File or Folder                                   | Description                                                                                                                                                                                                                      |
-     |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample as an example. |
-     | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
-     | Modem firmware ZIP (`mfw_nrf91x1_...`)           | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
-     | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
+    - `mfw_nrf91x1_...` - For the modem firmware, with name followed by the firmware version number.
+    - `mfw_nrf9151-ntn_...` - For the NTN firmware, with name followed by the firmware version number. This archive is only included in the [nRF9151 SiP NTN](https://www.nordicsemi.com/Products/Development-hardware/nRF9151-SMA-DK/Download?lang=en#A9BA541CDE7C49A1A7B28D0099AC3E24) ZIP archive.
 
-=== "nRF9161 DK"
+        !!! note "Note"
+             - The NTN firmware is currently only for evaluation purposes and not for production.
+             - The NTN firmware is only supported for the nRF9151 SMA DK.
 
-     | File or Folder                                   | Description                                                                                                                                                                                                                      |
-     |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample as an example. |
-     | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
-     | Modem firmware ZIP (`mfw_nrf91x1_...`)           | The modem firmware is provided as a ZIP archive named `mfw_nrf91x1_` followed by the firmware version number. Do not unzip this file.                                                                                         |
-     | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
-
-=== "nRF9160 DK"
-
-     | File or Folder                                   | Description                                                                                                                                                                                                                      |
-     |--------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-     | `img_app_bl`                                     | Contains full firmware images for different applications. The guides in this section use the image for the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample as an example. |
-     | `img_fota_dfu_bin`, `img_fota_dfu_hex`           | Contain firmware images for Device Firmware Update (DFU). These images are not used in the procedure in this page.                                                                                                              |
-     | Modem firmware ZIP (`mfw_nrf9160_...`)           | The modem firmware is provided as a ZIP archive named `mfw_nrf9160_` followed by the firmware version number. Do not unzip this file.                                                                                         |
-     | `CONTENTS.txt`                                   | Lists the location and names of the different firmware images included in the extracted folder.                                                                                                                                |
+- `CONTENTS.txt`: Lists the location and names of the different firmware images included in the extracted folder.
 
 To program the nRF91 Series DK, you will also need the following USB cables:
 
@@ -48,130 +35,110 @@ To program the nRF91 Series DK, you will also need the following USB cables:
 
 ## nRF91x1 DK
 
-=== "Updating the nRF91x1 DK modem firmware"
+To update the modem firmware, application firmware, or NTN firmware, complete the following steps:
 
-    To update the modem firmware on the nRF91x1 DK, complete the following steps:
+1. Open the {{app_name}}.
+2. Connect the DK to the computer with a USB cable, and then turn the DK on.
+3. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
 
-      1. Open the {{app_name}}.
-      1. Connect the DK to the computer with a USB cable, and then turn the DK on.
-      1. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
+    ![Programmer - Select device (nRF9151 DK shown)](./screenshots/programmer_select_device_nrf9151.png "Programmer - Select device (nRF9151 DK shown)")
 
-          ![Programmer - Select device (nRF9151 DK shown)](./screenshots/programmer_select_device_nrf9151.png "Programmer - Select device (nRF9151 DK shown)")
+    The drop-down text changes to the type of the selected device, with its SEGGER ID below the name.
+    The **Device memory layout** section also changes its name to the device name, and indicates that the device is connected.
+    If the **Auto read memory** option is selected in the **J-LINK SETTINGS** section of the side panel, the memory layout will update.
+    If it is not selected and you wish to see the memory layout, click **Read** in the **DEVICE** section of the side panel.
 
-         The drop-down text changes to the type of the selected device, with its SEGGER ID below the name.
-         The **Device memory layout** section also changes its name to the device name, and indicates that the device is connected.
-         If the **Auto read memory** option is selected in the **J-LINK SETTINGS** section of the side panel, the memory layout will update.
-         If it is not selected and you wish to see the memory layout, click **Read** in the **DEVICE** section of the side panel.
+4. Click **Add file** in the **FILE** section, and select **Browse**.
+5. Navigate to where you extracted the firmware, and select the following files, depending on the firmware that you need to update:
 
-      1. Click **Add file** in the **FILE** section, and select **Browse**.
-      1. Navigate to where you extracted the firmware, and select the `mfw_nrf91x1_<version-number>.zip` file.
-      1. Click **Write** in the **DEVICE** section of the side panel.<br/>
+    - `mfw_nrf91x1_...` - For the modem firmware, with name followed by the firmware version number.
+    - `mfw_nrf9151-ntn_...` - For the NTN firmware, with name followed by the firmware version number.
+    - `img_app_bl` folder, select the `.hex` file for your DK for the application you are programming:
 
-          ![Programmer - Write (nRF9151 DK shown)](./screenshots/programmer_hex_write_nrf9151.png "Programmer - Write (nRF9151 DK shown)")
+        - nRF9151 DK: `nrf9151dk_at_client_<version-number>.hex`
+        - nRF9161 DK: `nrf9161dk_at_client_<version-number>.hex`
 
-         The **Modem DFU** window appears.<br/>
+6. Write the firmware to the device. Depending on the firmware type:
 
-          ![Modem DFU window (nRF9151 DK shown)](./screenshots/programmerapp_modemdfu_nrf9151.png "Modem DFU window (nRF9151 DK shown)")
+    === "Modem and NTN firmware"
 
-      1. Ignore the warning message and click the **Write** button in the **Modem DFU** window to update the firmware.
-         Do not unplug or turn off the device during this process.
+        a. Click **Write** in the **DEVICE** section of the side panel.
 
-    When the update is complete, you see a success message.
-    If you update the application firmware now, you can skip the initial steps about connecting and selecting the device in the [Updating the application firmware](#nrf91x1-dk) tab.
+           ![Programmer - Write (nRF9151 DK shown)](./screenshots/programmer_hex_write_nrf9151.png "Programmer - Write (nRF9151 DK shown)")
 
-    !!! note "Note"
+           The **Modem DFU** window appears.<br/>
 
-        If you experience problems updating the modem firmware, click **Erase all** in the **DEVICE** section of the side panel and try updating again.
+           ![Modem DFU window (nRF9151 DK shown)](./screenshots/programmerapp_modemdfu_nrf9151.png "Modem DFU window (nRF9151 DK shown)")
 
-=== "Updating the nRF91x1 DK application firmware"
+        b. Click the **Write** button in the **Modem DFU** window to update the firmware.
+           Do not unplug or turn off the device during this process.
 
-    To update the nRF91x1 DK application firmware, complete the following steps:
+        When the update is complete, you see a success message.
 
-      1. Open the {{app_name}}.
-      1. Connect the DK to the computer with a USB cable, and then turn the DK on.
-      1. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
+        !!! note "Note"
 
-          ![Programmer - Select device (nRF9151 DK shown)](./screenshots/programmer_select_device_nrf9151.png "Programmer - Select device (nRF9151 DK shown)")
+            If you experience problems updating the modem firmware, click **Erase all** in the **DEVICE** section of the side panel and try updating again.
 
-         The drop-down text changes to the type of the selected device, with its SEGGER ID below the name.
-         The **Device memory layout** section also changes its name to the device name, and indicates that the device is connected.
-         If the **Auto read memory** option is selected in the **J-LINK SETTINGS** section, the memory layout will update.
-         If it is not selected and you wish to see the memory layout, **Read** in the **DEVICE** section.
+    === "Application firmware"
 
-      1. Click **Add file** in the **FILE** section, and select **Browse**.
-      1. Navigate to where you extracted the firmware, and then to the `img_app_bl` folder there.
-      1. Select the `.hex` file for your DK for the application you are programming:
+        Click the **Erase & write** button in the **DEVICE** section to program the DK.
+        Do not unplug or turn off the DK during this process.<br/>
 
-         * nRF9151 DK: `nrf9151dk_at_client_<version-number>.hex`
-         * nRF9651 DK: `nrf9161dk_at_client_<version-number>.hex`
-
-      1. Click the **Erase & write** button in the **DEVICE** section to program the DK.
-         Do not unplug or turn off the DK during this process.<br/>
-
-          ![Programmer - Erase & write (nRF9151 DK shown)](./screenshots/programmer_erasewrite_nrf9151dk.png "Programmer - Erase & write (nRF9151 DK shown)")
+        ![Programmer - Erase & write (nRF9151 DK shown)](./screenshots/programmer_erasewrite_nrf9151dk.png "Programmer - Erase & write (nRF9151 DK shown)")
 
 ## nRF9160 DK
 
-=== "Updating the nRF9160 DK modem firmware"
+To update the modem or application firmware, complete the following steps:
 
-    To update the nRF9160 DK modem firmware, complete the following steps:
+1. Open the {{app_name}}.
+2. Make sure the **PROG/DEBUG SW10** switch on the nRF9160 DK is set to **nRF91**.
+   On DK v0.9.0 and earlier, this is the **SW5** switch.
 
-      1. Open the {{app_name}}.
-      1. Make sure the **PROG/DEBUG SW10** switch on the nRF9160 DK is set to **nRF91**.
-         On DK v0.9.0 and earlier, this is the **SW5** switch.
-      1. Connect the DK to the computer with a USB cable, and then turn the DK on.
-      1. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
+    For application firmware, set to **nRF91** or **nRF52** as appropriate for the application or sample you are programming.<br/>
+    See the [Device programming section in the nRF9160 DK User Guide](https://docs.nordicsemi.com/bundle/ug_nrf9160_dk/page/UG/nrf91_DK/operating_modes/mcu_device_programming.html) for more information.<br/>
 
-          ![Programmer - Select device](./screenshots/programmer_selectdevice_nrf9160.png "Programmer - Select device")
+    For the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample, the switch must be set to **nRF91**.
 
-         The drop-down text changes to the type of the selected device, with its SEGGER ID below the name.
-         The **Device memory layout** section also changes its name to the device name, and indicates that the device is connected.
-         If the **Auto read memory** option is selected in the **J-LINK SETTINGS** section of the side panel, the memory layout will update.
-         If it is not selected and you wish to see the memory layout, click **Read** in the **DEVICE** section of the side panel.
+3. Connect the DK to the computer with a USB cable, and then turn the DK on.
+4. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
 
-      1. Click **Add file** in the **FILE** section, and select **Browse**.
-      1. Navigate to where you extracted the firmware, and select the `mfw_nrf9160_<version-number>.zip` file.
-      1. Click **Write** in the **DEVICE** section of the side panel.<br/>
+    ![Programmer - Select device](./screenshots/programmer_selectdevice_nrf9160.png "Programmer - Select device")
 
-          ![Programmer - Write](./screenshots/programmer_write_nrf9160dk.png "Programmer - Write")
+    The drop-down text changes to the type of the selected device, with its SEGGER ID below the name.
+    The **Device memory layout** section also changes its name to the device name, and indicates that the device is connected.
+    If the **Auto read memory** option is selected in the **J-LINK SETTINGS** section of the side panel, the memory layout will update.
+    If it is not selected and you wish to see the memory layout, click **Read** in the **DEVICE** section of the side panel.
 
-         The **Modem DFU** window appears.<br/>
+5. Click **Add file** in the **FILE** section, and select **Browse**.
+6. Navigate to where you extracted the firmware, and select the following files, depending on the firmware that you need to update:
 
-          ![Modem DFU window](./screenshots/programmerapp_modemdfu.png "Modem DFU window")
+    - `mfw_nrf91x1_...` - For the modem firmware, with name followed by the firmware version number.
+    - `img_app_bl` folder, select the `nrf9160dk_at_client_<version-number>.hex` file.
 
-      1. Ignore the warning message and click the **Write** button in the **Modem DFU** window to update the firmware.
-         Do not unplug or turn off the device during this process.
+7. Write the firmware to the device. Depending on the firmware type:
 
-    When the update is complete, you see a success message.
-    If you update the application firmware now, you can skip the initial steps about connecting and selecting the device in the [Updating the application firmware](#nrf9160-dk) tab.
+    === "Modem firmware"
 
-    !!! note "Note"
+        a. Click **Write** in the **DEVICE** section of the side panel.<br/>
 
-        If you experience problems updating the modem firmware, click **Erase all** in the **DEVICE** section of the side panel and try updating again.
+           ![Programmer - Write](./screenshots/programmer_write_nrf9160dk.png "Programmer - Write")
 
-=== "Updating the nRF9160 DK application firmware"
+           The **Modem DFU** window appears.<br/>
 
-    To update the nRF9160 DK application firmware, complete the following steps:
+           ![Modem DFU window](./screenshots/programmerapp_modemdfu.png "Modem DFU window")
 
-      1. Open the {{app_name}}.
-      1. Make sure the **PROG/DEBUG SW10** switch (**SW5** on DK v0.9.0 and earlier) on the nRF9160 DK is set to **nRF91** or **nRF52** as appropriate for the application or sample you are programming.<br/>
-         See the [Device programming section in the nRF9160 DK User Guide](https://docs.nordicsemi.com/bundle/ug_nrf9160_dk/page/UG/nrf91_DK/operating_modes/mcu_device_programming.html) for more information.<br/>
+        b. Click the **Write** button in the **Modem DFU** window to update the firmware.
+           Do not unplug or turn off the device during this process.
 
-         For the [AT Client](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/samples/cellular/at_client/README.html) sample, the switch must be set to **nRF91**.
-      1. Connect the DK to the computer with a USB cable, and then turn the DK on.
-      1. Click **SELECT DEVICE** and select the DK from the drop-down list.<br/>
+        When the update is complete, you see a success message.
 
-          ![Programmer - Select device](./screenshots/programmer_selectdevice_nrf9160.png "Programmer - Select device")
+        !!! note "Note"
 
-         The drop-down text changes to the type of the selected device, with its SEGGER ID below the name.
-         The **Device memory layout** section also changes its name to the device name, and indicates that the device is connected.
-         If the **Auto read memory** option is selected in the **J-LINK SETTINGS** section, the memory layout will update.
-         If it is not selected and you wish to see the memory layout, **Read** in the **DEVICE** section.
+            If you experience problems updating the modem firmware, click **Erase all** in the **DEVICE** section of the side panel and try updating again.
 
-      1. Click **Add file** in the **FILE** section, and select **Browse**.
-      1. Navigate to where you extracted the firmware, and then to the `img_app_bl` folder there.
-      1. Select the `nrf9160dk_at_client_<version-number>.hex` file.
-      1. Click the **Erase & write** button in the **DEVICE** section to program the DK.
-         Do not unplug or turn off the DK during this process.<br/>
+    === "Application firmware"
 
-          ![Programmer - Erase & write](./screenshots/programmer_erasewrite_nrf9160dk.png "Programmer - Erase & write")
+        Click the **Erase & write** button in the **DEVICE** section to program the DK.
+        Do not unplug or turn off the DK during this process.<br/>
+
+        ![Programmer - Erase & write](./screenshots/programmer_erasewrite_nrf9160dk.png "Programmer - Erase & write")
