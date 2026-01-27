@@ -13,8 +13,9 @@ theme:
       toggle:
         icon: material/lightbulb
         name: Switch to light mode
-  # logo: assets/logo.png
-  # favicon: assets/logo.png
+   # logo: assets/logo.png
+   # favicon: assets/logo.png
+
   features:
     - content.code.annotate
     - content.tooltips
@@ -25,12 +26,11 @@ theme:
     - search.highlight
     - toc.follow
 
-
 extra_css:
   - stylesheets/style.css
 
 copyright:
-  Copyright &copy; 2019-2024
+  Copyright &copy; 2019-2026
 
 markdown_extensions:
   - abbr
@@ -40,8 +40,7 @@ markdown_extensions:
   - meta
   - pymdownx.details
   - pymdownx.keys
-  - pymdownx.tabbed:
-      alternate_style: true
+  - pymdownx.tabbed
   - pymdownx.superfences
   - toc:
       permalink: true
@@ -51,13 +50,11 @@ plugins:
   - macros
   - search
 
-
 extra:
   test: This is a test abbreviation snippet
 
 nav:
-  - Home: index.md
-  - Installing the Programmer app: installing.md
+  - Get started: index.md
   - Overview and user interface: overview.md
   - Programming devices:
     - General programming procedure: programming_dk.md
