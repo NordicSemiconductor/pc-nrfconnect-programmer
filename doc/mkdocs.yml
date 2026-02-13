@@ -62,4 +62,3 @@ nav:
     - Programming Nordic Thingy prototyping platforms: programming_thingy.md
     - Programming nRF52840 Dongle: programming_nrf52840_dongle.md
   - Troubleshooting: troubleshooting.md
-  - Revision history: revision_history.md
