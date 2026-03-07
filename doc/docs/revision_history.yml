@@ -1,0 +1,78 @@
+tool:
+- name: Programmer app
+  link: true
+sections:
+- name: January 2026
+  entries:
+  - "Renamed the Home page to [Get started](./index.md)."
+  - "Removed the separate Installing the Programmer app page. This page is now a section of the Get started page."
+  - "Added the NTN firmware instruction in the [Programming nRF91 Series DK firmware](programming_91dk.md) page."
+- name: November 2025
+  entries:
+  - "Added the [Programming nRF91 Series DK firmware](programming_91dk.md) page."
+  - "Updated the [supported hardware section](index.md#supported-hardware) with an entry for the nRF9151 SMA DK."
+- name: August 2025
+  entries:
+  - "Updated the [supported hardware section](index.md#supported-hardware) with entries for nRF54LM20 and Nordic Thingy:91 X."
+  - "Added the [Programming Nordic Thingy prototyping platforms](programming_thingy.md) page."
+  - "Added the [General programming procedure](programming_dk.md) page."
+  - "Added back the [Programming the nRF52840 Dongle](programming_nrf52840_dongle.md) page."
+  - "Created the Programming devices section to include all the separate pages."
+- name: January 2025
+  entries:
+  - "Updated the [supported hardware section](index.md#supported-hardware) with entries for nRF54L15, nRF54H20, and nRF9151."
+  - "Added the Programming Nordic Thingy:53 section on the [Programming devices](programming_dk.md) page."
+  - "Added the [Application source code](./index.md#application-source-code) section on the [Home](./index.md) page."
+- name: November 2024
+  entries:
+  - "Editorial changes."
+- name: May 2024
+  entries:
+  - "Editorial changes."
+- name: March 2024
+  entries:
+  - "Updated the documentation for the [nRF Connect Programmer v4.3.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)."
+- name: February 2024
+  entries:
+  - "Updated the [supported hardware section](index.md#supported-hardware) with a matrix table."
+- name: January 2024
+  entries:
+  - "Updated the documentation for the [nRF Connect Programmer v4.2.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)."
+- name: September 2022
+  entries:
+  - "Updated images and text for new user interface in [nRF Connect Programmer v3.0.3](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md#303---2022-06-17)."
+- name: February 2022
+  entries:
+  - "Removed nRF9160 DK related content. Removed content is found in [Getting started with nRF9160 DK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/working_with_nrf/nrf91/nrf9160_gs.html)."
+- name: October 2021
+  entries:
+  - "Added **SW10** information to Programming the nRF9160 DK, Programming applications on nRF9160 DK, and Programming the nRF9160 DK cellular modem."
+- name: August 2021
+  entries:
+  - "Updated Programming applications on nRF9160 DK."
+  - "Removed Nordic Thingy:91™ related content. Removed content is found in [Getting started with Thingy:91](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/working_with_nrf/nrf91/thingy91_gsg.html)."
+  - "Editorial changes."
+- name: August 2020
+  entries:
+  - "Updated [nRF Connect Programmer](index.md), [Overview and user interface](overview.md), [Programming a Development Kit or the nRF51 Dongle](programming_dk.md), [Programming the nRF52840 Dongle](programming_nrf52840_dongle.md), Programming the nRF9160 DK, Programming Nordic Thingy:91, and [Troubleshooting](troubleshooting.md)."
+- name: May 2020
+  entries:
+  - "Added Figure 5: Nordic Thingy:91 buttons."
+- name: April 2020
+  entries:
+  - "Updated [Supported devices](index.md) in the Programmer app."
+  - "Updated [Overview and user interface](overview.md)."
+  - "Added Programming the nRF9160 DK."
+  - "Added Programming Nordic Thingy:91."
+- name: September 2019
+  entries:
+  - "Updated to match [nRF Connect Programmer v1.2.3](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md#123---2019-08-30)."
+  - "Added Programming the nRF9160 DK cellular modem."
+  - "Updated [Overview and user interface](overview.md)."
+  - "Updated [Installing the Programmer app](index.md#installing-the-programmer-app)."
+- name: May 2019
+  entries:
+  - "Updated [Installing the Programmer app](index.md#installing-the-programmer-app)."
+- name: February 2019
+  entries:
+  - "First release."
