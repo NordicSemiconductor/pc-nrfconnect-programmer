@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { selectedDevice } from '@nordicsemiconductor/pc-nrfconnect-shared';
 
 import { getDeviceDefinition } from '../reducers/deviceDefinitionReducer';
-import { DeviceDefinition, DeviceFamily } from '../util/deviceTypes';
+import { type DeviceDefinition, DeviceFamily } from '../util/deviceTypes';
 import DeviceInfoView from './DeviceInfoView';
 import DeviceMemoryView from './DeviceMemoryView';
 

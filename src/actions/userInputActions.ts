@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { AppThunk, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    type AppThunk,
+    logger,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 
-import { RootState } from '../reducers/types';
+import { type RootState } from '../reducers/types';
 import {
     userInputCancelled,
     userInputReceived,

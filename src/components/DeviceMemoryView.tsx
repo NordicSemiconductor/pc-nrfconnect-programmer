@@ -11,8 +11,8 @@ import {
     isDeviceInDFUBootloader,
     selectedDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
-import MemoryMap from 'nrf-intel-hex';
+import { type DeviceCore } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
+import type MemoryMap from 'nrf-intel-hex';
 
 import {
     getCoreDefinitions,
@@ -24,9 +24,15 @@ import {
     targetRegionsKnown,
     targetRegionsUnknown,
 } from '../reducers/targetReducer';
-import { convertDeviceDefinitionToCoreArray, CoreInfo } from '../util/devices';
-import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
-import { getCoreRegions, Region } from '../util/regions';
+import {
+    convertDeviceDefinitionToCoreArray,
+    type CoreInfo,
+} from '../util/devices';
+import {
+    type CoreDefinition,
+    type DeviceDefinition,
+} from '../util/deviceTypes';
+import { getCoreRegions, type Region } from '../util/regions';
 import CoreView from './CoreView';
 
 const allocateCores = (cores: CoreInfo[], regions: Region[]) =>

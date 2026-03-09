@@ -19,7 +19,7 @@ import {
     selectedDevice,
     setWaitForDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
+import { type Progress } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil';
 
 import {
     operateDFU,
@@ -31,7 +31,7 @@ import {
     getUsbSdfuProgrammingDialog,
     setUsbSdfuProgrammingDialog,
 } from '../reducers/usbSdfuReducer';
-import { WithRequired } from '../util/types';
+import { type WithRequired } from '../util/types';
 
 export default () => {
     const [progress, setProgress] =

@@ -5,8 +5,8 @@
  */
 
 import { convertDeviceDefinitionToCoreArray } from './devices';
-import { DeviceDefinition } from './deviceTypes';
-import { defaultRegion, Region, RegionName } from './regions';
+import { type DeviceDefinition } from './deviceTypes';
+import { defaultRegion, type Region, RegionName } from './regions';
 
 export const generateRegionDetectedNames = (fileRegions: Region[]) => {
     const regionChecklist = [

@@ -6,8 +6,8 @@
 
 import React from 'react';
 
-import { CoreInfo } from '../util/devices';
-import { Region } from '../util/regions';
+import { type CoreInfo } from '../util/devices';
+import { type Region } from '../util/regions';
 import RegionView from './RegionView';
 
 interface CoreViewProps {

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { DfuImage } from '@nordicsemiconductor/pc-nrfconnect-shared';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { type DfuImage } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from './types';
 

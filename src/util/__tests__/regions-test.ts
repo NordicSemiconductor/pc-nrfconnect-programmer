@@ -5,7 +5,7 @@
  */
 
 import { readFileSync } from 'fs';
-import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
+import MemoryMap, { type MemoryMaps } from 'nrf-intel-hex';
 
 import { defaultCore as CoreDefinition } from '../devices';
 import * as regions from '../regions';
