@@ -5,8 +5,8 @@
  */
 
 import {
-    AppThunk,
-    Device,
+    type AppThunk,
+    type Device,
     logger,
     selectedDevice,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
@@ -16,7 +16,7 @@ import { setDeviceBusy } from '../reducers/deviceDefinitionReducer';
 import { setShowMcuBootProgrammingDialog } from '../reducers/mcubootReducer';
 import { setShowModemProgrammingDialog } from '../reducers/modemReducer';
 import { targetWritableKnown } from '../reducers/targetReducer';
-import { RootState } from '../reducers/types';
+import { type RootState } from '../reducers/types';
 import * as jlinkTargetActions from './jlinkTargetActions';
 import * as mcubootTargetActions from './mcubootTargetActions';
 import * as usbsdfuTargetActions from './usbsdfuTargetActions';

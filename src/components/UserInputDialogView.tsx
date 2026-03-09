@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     DialogButton,
     Dropdown,
-    DropdownItem,
+    type DropdownItem,
     GenericDialog,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 

@@ -7,7 +7,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import {
-    Device as SharedDevice,
+    type Device as SharedDevice,
     DeviceSelector,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 

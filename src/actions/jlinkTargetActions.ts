@@ -6,25 +6,25 @@
 
 import { dialog, getCurrentWindow } from '@electron/remote';
 import {
-    AppThunk,
+    type AppThunk,
     describeError,
-    Device,
+    type Device,
     logger,
 } from '@nordicsemiconductor/pc-nrfconnect-shared';
 import {
-    BatchCallbacks,
-    DeviceBatch,
-    DeviceCore,
-    DeviceCoreInfo,
-    DeviceInfo,
-    GetProtectionStatusResult,
+    type BatchCallbacks,
+    type DeviceBatch,
+    type DeviceCore,
+    type DeviceCoreInfo,
+    type DeviceInfo,
+    type GetProtectionStatusResult,
     NrfutilDeviceLib,
-    ReadResult,
+    type ReadResult,
 } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device';
-import { XReadOptions } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device/xRead';
+import { type XReadOptions } from '@nordicsemiconductor/pc-nrfconnect-shared/nrfutil/device/xRead';
 import { setSelectedDeviceInfo } from '@nordicsemiconductor/pc-nrfconnect-shared/src/Device/deviceSlice';
 import fs from 'fs';
-import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
+import MemoryMap, { type MemoryMaps } from 'nrf-intel-hex';
 
 import {
     getDeviceDefinition,
@@ -34,14 +34,17 @@ import {
     updateCoreOperations,
     updateCoreProtection,
 } from '../reducers/deviceDefinitionReducer';
-import { RootState } from '../reducers/types';
+import { type RootState } from '../reducers/types';
 import {
     convertDeviceDefinitionToCoreArray,
     generateMergedMemMap,
     getDefaultDeviceInfoByJlinkFamily,
     mergeNrfutilDeviceInfoInCoreDefinition,
 } from '../util/devices';
-import { CoreDefinition, DeviceDefinition } from '../util/deviceTypes';
+import {
+    type CoreDefinition,
+    type DeviceDefinition,
+} from '../util/deviceTypes';
 
 let abortController: AbortController | undefined;
 

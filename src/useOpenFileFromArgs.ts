@@ -6,7 +6,10 @@
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppThunk, logger } from '@nordicsemiconductor/pc-nrfconnect-shared';
+import {
+    type AppThunk,
+    logger,
+} from '@nordicsemiconductor/pc-nrfconnect-shared';
 import * as fs from 'fs';
 
 import * as fileActions from './actions/fileActions';

@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: LicenseRef-Nordic-4-Clause
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import MemoryMap, { MemoryMaps } from 'nrf-intel-hex';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type MemoryMap from 'nrf-intel-hex';
+import { type MemoryMaps } from 'nrf-intel-hex';
 
-import { Region } from '../util/regions';
+import { type Region } from '../util/regions';
 import type { RootState } from './types';
 
 type Loaded = {
