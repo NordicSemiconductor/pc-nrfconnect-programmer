@@ -1,3 +1,9 @@
+## 4.7.3 - 2026-03-10
+
+### Changed
+
+- Updated `nrfutil device` to v2.17.5.
+
 ## 4.7.2 - 2026-01-19
 
 ### Fixed
