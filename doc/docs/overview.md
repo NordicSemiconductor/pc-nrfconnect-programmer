@@ -6,11 +6,9 @@ When you start the Programmer app, the application main window appears with the 
 
 ![Programmer app default view at startup](./screenshots/programmer_overview.png "Programmer app main window")
 
-## Select device
+## Common interface
 
-Once you connect a device to the system, it becomes visible and available when you click on the **Select device** drop-down list. You can choose a device from the list of connected devices to perform further actions on the device such as programming.
-
-![Select device drop-down menu](./screenshots/programmer_select_device_thingy91.png "Select device drop-down menu")
+This app uses the nRF Connect for Desktop UI framework. Shared UI elements such as **Select device**, **About** tab, and **Log** panel are described in the [Common user interface](https://docs.nordicsemi.com/bundle/swtools_docs/page/common_interface.html) documentation.
 
 ## Device panel sections
 
@@ -81,18 +79,3 @@ In the **Device Memory Layout**, you can read the name, address range, and size 
 !!! note "Note"
       If the device has readback protection enabled, you will not be able to read its memory.
       In such cases, the information about application core being protected is displayed in the **Device Memory Layout** and the [**File**](#file) options **Read**, **Write**, and **Save as file** are disabled.
-
-## About tab
-
-You can view application information, restore defaults, access source code and documentation. You also can find information on the selected device, access support tools, send feedback, and enable verbose logging.
-
-![Programmer app About tab](./screenshots/nRF_Connect_for_Desktop_Prog_about.png "Programmer app About tab")
-
-## Log
-
-The Log panel allows you to view the most important log events, tagged with a timestamp. Each time you open the app, a new session log file is created. You can find the Log panel and its controls, below the main application Window.
-
-- When troubleshooting, to view more detailed information than shown in the Log panel, use **Open log file** to open the current log file in a text editor.
-- To clear the information currently displayed in the Log panel, use **Clear Log**. The contents of the log file are not affected.
-- To hide or display the Log panel in the user interface, use **Show Log**.
-- To freeze Log panel scrolling, use **Autoscroll Log**.
