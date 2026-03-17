@@ -17,17 +17,17 @@ the firmware files and the devices.
 
 The Programmer app is installed from nRF Connect from Desktop. For detailed
 steps, see
-[Installing nRF Connect for Desktop apps](https://docs.nordicsemi.com/bundle/nrf-connect-desktop/page/installing_apps.html)
+[Installing nRF Connect for Desktop apps](https://docs.nordicsemi.com/bundle/swtools_docs/page/app/nrf-connect-desktop/installing_apps.html)
 in the nRF Connect from Desktop documentation.
 
 ## Documentation
 
 Read the
-[Programmer app](https://docs.nordicsemi.com/bundle/nrf-connect-programmer/page/index.html)
+[Programmer app](https://docs.nordicsemi.com/bundle/swtools_docs/page/app/pc-nrfconnect-programmer/index.html)
 official documentation, which includes information about the
-[application UI](https://docs.nordicsemi.com/bundle/nrf-connect-programmer/page/overview.html)
+[application UI](https://docs.nordicsemi.com/bundle/swtools_docs/page/app/pc-nrfconnect-programmer/overview.html)
 and
-[programming procedures](https://docs.nordicsemi.com/bundle/nrf-connect-programmer/page/programming_dk.html).
+[programming procedures](https://docs.nordicsemi.com/bundle/swtools_docs/page/app/pc-nrfconnect-programmer/programming_dk.html).
 
 ## Development
 
