@@ -57,5 +57,5 @@ The following hardware platforms cannot be programmed with the Programmer app an
 
 ## Application source code
 
-The code of the application is open source and [available on GitHub](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer).
+The code of the application is open source and [available on GitHub](https://github.com/nordicsemi/pc-nrfconnect-programmer).
 Feel free to fork the repository and clone it for secondary development or feature contributions.

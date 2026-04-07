@@ -44,13 +44,13 @@ export const openDevice =
                 if (process.platform === 'linux') {
                     logger.warn(
                         'If the device is a JLink device, please make sure J-Link Software and nrf-udev are installed. ' +
-                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux',
+                            'See https://github.com/nordicsemi/pc-nrfconnect-launcher/#macos-and-linux',
                     );
                 }
                 if (process.platform === 'darwin') {
                     logger.warn(
                         'If the device is a JLink device, please make sure J-Link Software is installed. ' +
-                            'See https://github.com/NordicSemiconductor/pc-nrfconnect-launcher/#macos-and-linux',
+                            'See https://github.com/nordicsemi/pc-nrfconnect-launcher/#macos-and-linux',
                     );
                 }
             }
