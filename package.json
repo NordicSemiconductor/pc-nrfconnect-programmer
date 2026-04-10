@@ -3,10 +3,10 @@
     "version": "4.7.3",
     "displayName": "Programmer",
     "description": "Tool for flash programming Nordic SoCs and SiPs",
-    "homepage": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer",
+    "homepage": "https://github.com/nordicsemi/pc-nrfconnect-programmer",
     "repository": {
         "type": "git",
-        "url": "https://github.com/NordicSemiconductor/pc-nrfconnect-programmer.git"
+        "url": "https://github.com/nordicsemi/pc-nrfconnect-programmer.git"
     },
     "author": "Nordic Semiconductor ASA",
     "license": "SEE LICENSE IN LICENSE",

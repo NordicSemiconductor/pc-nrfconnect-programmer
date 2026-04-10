@@ -31,16 +31,16 @@ sections:
   - "Editorial changes."
 - name: March 2024
   entries:
-  - "Updated the documentation for the [nRF Connect Programmer v4.3.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)."
+  - "Updated the documentation for the [nRF Connect Programmer v4.3.0](https://github.com/nordicsemi/pc-nrfconnect-programmer/blob/main/Changelog.md)."
 - name: February 2024
   entries:
   - "Updated the [supported hardware section](index.md#supported-hardware) with a matrix table."
 - name: January 2024
   entries:
-  - "Updated the documentation for the [nRF Connect Programmer v4.2.0](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md)."
+  - "Updated the documentation for the [nRF Connect Programmer v4.2.0](https://github.com/nordicsemi/pc-nrfconnect-programmer/blob/main/Changelog.md)."
 - name: September 2022
   entries:
-  - "Updated images and text for new user interface in [nRF Connect Programmer v3.0.3](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md#303---2022-06-17)."
+  - "Updated images and text for new user interface in [nRF Connect Programmer v3.0.3](https://github.com/nordicsemi/pc-nrfconnect-programmer/blob/main/Changelog.md#303---2022-06-17)."
 - name: February 2022
   entries:
   - "Removed nRF9160 DK related content. Removed content is found in [Getting started with nRF9160 DK](https://docs.nordicsemi.com/bundle/ncs-latest/page/nrf/device_guides/working_with_nrf/nrf91/nrf9160_gs.html)."
@@ -66,7 +66,7 @@ sections:
   - "Added Programming Nordic Thingy:91."
 - name: September 2019
   entries:
-  - "Updated to match [nRF Connect Programmer v1.2.3](https://github.com/NordicSemiconductor/pc-nrfconnect-programmer/blob/main/Changelog.md#123---2019-08-30)."
+  - "Updated to match [nRF Connect Programmer v1.2.3](https://github.com/nordicsemi/pc-nrfconnect-programmer/blob/main/Changelog.md#123---2019-08-30)."
   - "Added Programming the nRF9160 DK cellular modem."
   - "Updated [Overview and user interface](overview.md)."
   - "Updated [Installing the Programmer app](index.md#installing-the-programmer-app)."
