@@ -1,3 +1,9 @@
+## 4.7.4 - 2026-04-23
+
+### Changed
+
+- Maintenance release to update the dependencies.
+
 ## 4.7.3 - 2026-03-10
 
 ### Changed
