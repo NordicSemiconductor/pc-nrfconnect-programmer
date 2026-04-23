@@ -1,6 +1,6 @@
 {
     "name": "pc-nrfconnect-programmer",
-    "version": "4.7.3",
+    "version": "4.7.4",
     "displayName": "Programmer",
     "description": "Tool for flash programming Nordic SoCs and SiPs",
     "homepage": "https://github.com/nordicsemi/pc-nrfconnect-programmer",
@@ -47,7 +47,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^244.0.0"
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^246.0.0"
     },
     "prettier": "@nordicsemiconductor/pc-nrfconnect-shared/config/prettier.config.js"
 }
