@@ -169,7 +169,7 @@ supported_devices:
 
   - device: "Nordic Thingy:91 X"
     pca: PCA20049
-    verification_version:
+    verification_version: 4.4.1
     support:
       erase_all_j_link: unsupported
       erase_and_write_j_link: unsupported
@@ -521,7 +521,7 @@ supported_devices:
 
   - device: nRF9151 DK
     pca: PCA10171
-    verification_version:
+    verification_version: 4.4.1
     support:
       erase_all_j_link: full
       erase_and_write_j_link: full
@@ -565,7 +565,7 @@ supported_devices:
 
   - device: nRF9160 DK
     pca: PCA10090
-    verification_version:
+    verification_version: 4.4.1
     support:
       erase_all_j_link: full
       erase_and_write_j_link: full
@@ -587,7 +587,7 @@ supported_devices:
 
   - device: nRF9161 DK
     pca: PCA10153
-    verification_version:
+    verification_version: 4.4.1
     support:
       erase_all_j_link: full
       erase_and_write_j_link: full
