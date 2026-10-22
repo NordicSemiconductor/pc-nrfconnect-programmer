@@ -47,7 +47,7 @@
         "prepare": "husky install"
     },
     "devDependencies": {
-        "@nordicsemiconductor/pc-nrfconnect-shared": "^252.0.0",
+        "@nordicsemiconductor/pc-nrfconnect-shared": "^261.0.0",
         "@types/unzipper": "^0.10.11"
     },
     "prettier": "@nordicsemiconductor/pc-nrfconnect-shared/config/prettier.config.js",
